@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { SunDisc } from './SunDisc';
 import { useLanguage } from '../context/LanguageContext';
 
-export const Footer = ({ setView }) => {
+export const Footer = () => {
   const { lang, t } = useLanguage();
 
   return (
@@ -12,14 +13,18 @@ export const Footer = ({ setView }) => {
         {/* 3-Col Desktop -> Stacked Mobile Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-12 border-b border-grave">
           
-          {/* Col 1: Brand & Logo Lockup (Allowed Sun Disc Location #1) */}
+          {/* Col 1: Brand & Logo Lockup */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex items-center gap-3"
+            >
               <SunDisc size={28} variant="gold" />
               <span className="font-clash font-bold text-2xl text-bone uppercase tracking-tight">
                 DUAT
               </span>
-            </div>
+            </Link>
             <p className="font-space text-sm text-ash max-w-sm font-light">
               {t('footerTagline')}
             </p>
@@ -34,24 +39,27 @@ export const Footer = ({ setView }) => {
               NAVIGATION
             </h4>
             <div className="flex flex-col space-y-2">
-              <button
-                onClick={() => setView('shop')}
+              <Link
+                to="/shop"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-left text-bone/80 hover:text-gold transition-colors"
               >
                 {t('navShop')}
-              </button>
-              <button
-                onClick={() => setView('customizer')}
+              </Link>
+              <Link
+                to="/customizer"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-left text-bone/80 hover:text-gold transition-colors"
               >
                 {t('navCustomize')}
-              </button>
-              <button
-                onClick={() => setView('about')}
+              </Link>
+              <Link
+                to="/about"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-left text-bone/80 hover:text-gold transition-colors"
               >
                 {t('navDuat')}
-              </button>
+              </Link>
             </div>
           </div>
 

@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SunDisc } from '../components/SunDisc';
 import { ProductCard } from '../components/ProductCard';
 import { PRODUCTS, CATEGORIES, REVIEWS, FAQS } from '../data/products';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowRight, ArrowLeft, Star, ChevronDown, ChevronUp, Sparkles, ShieldCheck, Truck, Clock, Smartphone, Layers, Disc, Bookmark } from 'lucide-react';
 
-export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
+export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const { lang, t } = useLanguage();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
+  const navigate = useNavigate();
 
   const [openFaqId, setOpenFaqId] = useState('faq-1');
 
   const handleCategoryClick = (catId) => {
     setSelectedCategory(catId);
-    setView('shop');
+    navigate('/shop');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const featuredProducts = PRODUCTS.slice(0, 4);
 
-  // Category specific graphics (Part 2 Fix: No repeated sun discs)
   const renderCategoryIcon = (catId) => {
     switch (catId) {
       case 'cases':
@@ -38,19 +39,16 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
   return (
     <div className="space-y-20 sm:space-y-28 pb-20">
       
-      {/* HERO SECTION — RESPONSIVE + REALISTIC 3D CASE RENDER */}
+      {/* HERO SECTION */}
       <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-void overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
         
-        {/* Subtle Ambient Radial Lighting */}
         <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-radial from-gold/10 via-transparent to-transparent rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
-            {/* Left Column: Headlines & CTAs */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8">
               
-              {/* Allowed Sun Disc Location #2: Tiny 12px Eyebrow Tick */}
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
                 <SunDisc size={12} variant="gold" />
                 <span>{t('heroEyebrow')}</span>
@@ -65,10 +63,9 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
                 {t('heroSub')}
               </p>
 
-              {/* CTAs Stack on Mobile */}
               <div className="flex flex-col sm:flex-row gap-4 pt-2 sm:pt-4">
                 <button
-                  onClick={() => setView('customizer')}
+                  onClick={() => navigate('/customizer')}
                   className="btn-primary group text-sm py-4 px-8 flex items-center justify-center gap-3 shadow-lg"
                 >
                   <Sparkles size={18} />
@@ -77,14 +74,13 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
                 </button>
                 
                 <button
-                  onClick={() => setView('shop')}
+                  onClick={() => navigate('/shop')}
                   className="btn-ghost text-sm py-4 px-8 flex items-center justify-center gap-3"
                 >
                   <span>{t('heroCtaSecondary')}</span>
                 </button>
               </div>
 
-              {/* Trust Specs */}
               <div className="pt-6 border-t border-grave grid grid-cols-3 gap-2 sm:gap-4 font-mono text-[10px] sm:text-xs text-ash uppercase">
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <ShieldCheck size={16} className="text-gold flex-shrink-0" />
@@ -102,11 +98,9 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
 
             </div>
 
-            {/* Right Column: Realistic 3D-Feeling Techwear Case Render (Part 2 Fix) */}
             <div className="lg:col-span-5 flex justify-center pt-6 lg:pt-0">
               <div className="w-64 sm:w-72 h-[440px] sm:h-[480px] rounded-[38px] border-2 border-gold/40 bg-stone p-5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500">
                 
-                {/* Camera Module with Metallic Gold Rim Light */}
                 <div className="self-end w-20 h-20 rounded-2xl bg-coal border-2 border-gold flex flex-col items-center justify-center p-2 shadow-lg">
                   <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center mb-1">
                     <div className="w-2 h-2 rounded-full bg-ash/30" />
@@ -116,7 +110,6 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
                   </div>
                 </div>
 
-                {/* Case Back Text Detail */}
                 <div className="my-auto flex flex-col items-center gap-3 text-center">
                   <div className="w-16 h-16 rounded-full border border-gold/30 flex items-center justify-center bg-coal">
                     <div className="w-8 h-8 rounded-full border border-gold" />
@@ -131,7 +124,6 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
                   </div>
                 </div>
 
-                {/* Tone-on-Tone Debossed Mark */}
                 <div className="self-start text-[9px] font-mono tracking-widest text-ash/40 font-bold uppercase select-none">
                   DUAT
                 </div>
@@ -143,7 +135,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* CATEGORIES GRID — 4-COL -> 2-COL -> 1-COL */}
+      {/* CATEGORIES GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-8">
           
@@ -190,7 +182,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* BUILD YOUR OWN — THE FORGE */}
+      {/* BUILD YOUR OWN */}
       <section className="bg-stone border-y border-grave py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -210,7 +202,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
               </p>
 
               <button
-                onClick={() => setView('customizer')}
+                onClick={() => navigate('/customizer')}
                 className="btn-primary py-4 px-8 text-sm flex items-center justify-center gap-3 group w-full sm:w-auto"
               >
                 <span>{t('forgeCta')}</span>
@@ -218,7 +210,6 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
               </button>
             </div>
 
-            {/* Realistic Mini Customizer Canvas Preview */}
             <div className="flex justify-center pt-6 lg:pt-0">
               <div className="w-64 h-[400px] rounded-[32px] border-2 border-grave bg-void p-4 shadow-2xl relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500">
                 <div className="self-end w-16 h-16 rounded-xl bg-coal border border-grave flex items-center justify-center p-2">
@@ -242,7 +233,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS — NEW PASSAGE */}
+      {/* FEATURED PRODUCTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6">
           <div className="space-y-2">
@@ -256,7 +247,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
           </div>
 
           <button
-            onClick={() => setView('shop')}
+            onClick={() => navigate('/shop')}
             className="font-mono text-xs uppercase tracking-widest text-gold hover:text-ember flex items-center gap-2 transition-colors min-h-[44px]"
           >
             <span>VIEW ALL DROPS</span>
@@ -264,7 +255,6 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
           </button>
         </div>
 
-        {/* 4-Col -> 2-Col -> 1-Col Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredProducts.map((product) => (
             <div key={product.id} onClick={() => onSelectProduct?.(product)}>
@@ -274,7 +264,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* REVIEWS SECTION — WHAT THEY CARRY / اللي بيحملوه */}
+      {/* REVIEWS */}
       <section className="bg-stone border-y border-grave py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
@@ -313,7 +303,7 @@ export const HomeView = ({ setView, setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* FAQ ACCORDION */}
+      {/* FAQ */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="space-y-2 text-center">
           <div className="flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">

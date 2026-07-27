@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { SunDisc } from './SunDisc';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { ShoppingBag, Globe, Menu, X, Package } from 'lucide-react';
 
-export const Navbar = ({ currentView, setView, onOpenTracker }) => {
+export const Navbar = ({ onOpenTracker }) => {
   const { lang, toggleLanguage, t } = useLanguage();
   const { totalItems, openCart } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navLinks = [
-    { id: 'home', labelEn: 'Home', labelAr: 'الرئيسية' },
-    { id: 'shop', labelEn: t('navShop'), labelAr: t('navShop') },
-    { id: 'customizer', labelEn: t('navCustomize'), labelAr: t('navCustomize') },
-    { id: 'about', labelEn: t('navDuat'), labelAr: t('navDuat') }
+    { path: '/', labelEn: 'Home', labelAr: 'الرئيسية' },
+    { path: '/shop', labelEn: t('navShop'), labelAr: t('navShop') },
+    { path: '/customizer', labelEn: t('navCustomize'), labelAr: t('navCustomize') },
+    { path: '/about', labelEn: t('navDuat'), labelAr: t('navDuat') }
   ];
 
-  const handleNavClick = (viewId) => {
-    setView(viewId);
+  const handleNavClick = (path) => {
+    navigate(path);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -27,35 +29,36 @@ export const Navbar = ({ currentView, setView, onOpenTracker }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* Logo Lockup (Allowed Sun Disc Location #1) */}
-          <button
-            onClick={() => handleNavClick('home')}
+          {/* Logo Lockup */}
+          <NavLink
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-3 text-bone hover:text-gold transition-colors focus:outline-none"
           >
             <SunDisc size={26} variant="gold" />
             <span className="font-clash font-bold text-2xl tracking-tight text-bone">
               DUAT
             </span>
-          </button>
+          </NavLink>
 
-          {/* Desktop Navigation Links (>= 768px) */}
+          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 font-space text-sm font-medium">
-            {navLinks.map((link) => {
-              const isActive = currentView === link.id;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => handleNavClick(link.id)}
-                  className={`transition-colors py-2 border-b-2 font-space ${
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.path === '/'}
+                className={({ isActive }) =>
+                  `transition-colors py-2 border-b-2 font-space ${
                     isActive
                       ? 'border-gold text-gold font-bold'
                       : 'border-transparent text-bone/80 hover:text-gold'
-                  }`}
-                >
-                  {lang === 'ar' ? link.labelAr : link.labelEn}
-                </button>
-              );
-            })}
+                  }`
+                }
+              >
+                {lang === 'ar' ? link.labelAr : link.labelEn}
+              </NavLink>
+            ))}
           </nav>
 
           {/* Right Actions Bar */}
@@ -80,7 +83,7 @@ export const Navbar = ({ currentView, setView, onOpenTracker }) => {
               <span>{lang === 'en' ? 'AR' : 'EN'}</span>
             </button>
 
-            {/* Cart Drawer Trigger (Always Visible) */}
+            {/* Cart Drawer Trigger */}
             <button
               onClick={openCart}
               className="relative p-2.5 text-bone hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center border border-grave bg-stone/50 hover:border-gold"
@@ -94,7 +97,7 @@ export const Navbar = ({ currentView, setView, onOpenTracker }) => {
               )}
             </button>
 
-            {/* Mobile Hamburger Toggle (< 768px) */}
+            {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2.5 text-bone hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center border border-grave bg-stone/50"
@@ -108,26 +111,27 @@ export const Navbar = ({ currentView, setView, onOpenTracker }) => {
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay (< 768px) */}
+      {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-stone border-b border-grave px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-2">
-            {navLinks.map((link) => {
-              const isActive = currentView === link.id;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => handleNavClick(link.id)}
-                  className={`text-left py-3 px-4 text-base font-space font-medium border-l-2 transition-all min-h-[44px] flex items-center ${
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.path === '/'}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `text-left py-3 px-4 text-base font-space font-medium border-l-2 transition-all min-h-[44px] flex items-center ${
                     isActive
                       ? 'border-gold bg-coal text-gold font-bold'
                       : 'border-transparent text-bone hover:bg-coal hover:text-gold'
-                  }`}
-                >
-                  {lang === 'ar' ? link.labelAr : link.labelEn}
-                </button>
-              );
-            })}
+                  }`
+                }
+              >
+                {lang === 'ar' ? link.labelAr : link.labelEn}
+              </NavLink>
+            ))}
           </div>
 
           <div className="pt-3 border-t border-grave flex items-center justify-between px-4">
