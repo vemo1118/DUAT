@@ -36,13 +36,14 @@ export function App() {
     <LanguageProvider>
       <CartProvider>
         <ToastProvider>
-          <div className="min-h-screen bg-void text-bone flex flex-col font-space selection:bg-gold selection:text-void">
+          {/* Main Container with Filmic Grain Texture Overlay */}
+          <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-void relative bg-noise">
             
             {/* Top Navigation Header */}
             <Navbar onOpenTracker={() => setTrackerOpen(true)} />
 
             {/* Main Content Router View */}
-            <main className="flex-grow">
+            <main className="flex-grow relative z-10">
               <Routes>
                 <Route
                   path="/"
