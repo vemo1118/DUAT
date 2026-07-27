@@ -132,12 +132,12 @@ export const TRANSLATIONS = {
     faqEyebrow: 'THE PASSAGE GUIDE',
     faqTitle: 'Frequently asked questions.',
 
-    // About — Clean Personal / Emotional Story Narrative (Part 3 Cleanse)
+    // About — Final Abstract Copy Narrative (Part 4)
     aboutEyebrow: 'DUAT / ∞',
     aboutTitle: 'The Duat.',
-    aboutP1: 'Duat is the space between dusk and dawn — the hours you cross to come out changed. We make objects for that passage.',
-    aboutP2: 'Objects crafted between the two suns of any day, between the person you were and the person you\'re becoming.',
-    aboutP3: 'Made in Alexandria. Shipped worldwide. To order.',
+    aboutP1: 'Duat is the space between dusk and dawn — the hours you cross to come out changed.',
+    aboutP2: 'We don\'t sell cases. We sell the idea that you\'re moving through the dark toward the light.',
+    aboutP3: 'Made in Alexandria, to order. Shipped worldwide.',
     aboutCta: 'BUILD YOUR CASE',
 
     // Footer
@@ -219,7 +219,7 @@ export const TRANSLATIONS = {
     fontBody: 'عربي (ريم كوفي)',
     fontMono: 'بيانات (أرقام)',
     addTextBtn: 'إضافة النص',
-    uploadZoneText: 'اسحب صورة هنا أو انقر للاختيار',
+    uploadZoneText: 'اسحب صورة هنا أو انقر للااختيار',
     uploadZoneHint: 'تدعم PNG, JPG, WebP حتى ١٠ ميجابايت',
     layersHeader: 'طبقات التصميم',
     noLayersText: 'لا توجد طبقات بعد. ارفع صورة، اكتب نصاً، أو أضف ملصقاً.',
@@ -292,12 +292,12 @@ export const TRANSLATIONS = {
     faqEyebrow: 'دليل العبور',
     faqTitle: 'الأسئلة الشائعة.',
 
-    // About — Clean Personal / Emotional Story Narrative
+    // About — Final Abstract Story Copy
     aboutEyebrow: 'دوات / ∞',
     aboutTitle: 'الدوات.',
-    aboutP1: 'الدُوات هو المساحة بين الغروب والفجر — الساعات اللي بتعبرها عشان تخرج منها متغيّر. بنصنع أشياء مصممة للرحلة دي.',
-    aboutP2: 'أشياء مصممة بين شمسي أي يوم، بين الشخص اللي كنته والشخص اللي بتبقاه.',
-    aboutP3: 'مصنوع في الإسكندرية. شحن للعالم كله. حسب الطلب.',
+    aboutP1: 'الدُوات هو المساحة بين الغروب والفجر — الساعات اللي بتعبرها عشان تخرج منها متغيّر.',
+    aboutP2: 'احنا مش بنبيع جرابات، بنبيع فكرة إنك بتعبر من الضلمة للنور.',
+    aboutP3: 'مصنوع في الإسكندرية، حسب الطلب. شحن للعالم كله.',
     aboutCta: 'صمم جرابك الآن',
 
     // Footer

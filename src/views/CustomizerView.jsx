@@ -2,752 +2,531 @@ import React, { useState, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { SunDisc } from '../components/SunDisc';
 import { StickerIcon } from '../components/StickerIcon';
 import { PHONE_MODELS, CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
-import {
-  Type,
-  Image as ImageIcon,
-  Smile,
-  Copy,
-  Trash2,
-  RotateCw,
-  Search,
-  Upload,
-  Check,
-  ShoppingBag,
-  Layers,
-  ChevronUp,
-  ChevronDown,
-  Grid,
-  Download,
-  Sparkles,
-  FlipHorizontal,
-  FlipVertical,
-  Smartphone
-} from 'lucide-react';
+import { Sparkles, Move, RotateCw, Trash2, Layers, Search, Download, Check, Plus, Upload, Type, Image as ImageIcon, ChevronRight } from 'lucide-react';
 
 export const CustomizerView = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
 
-  // Model & Case state
-  const [selectedModel, setSelectedModel] = useState('iPhone 17 Pro Max');
-  const [modelSearch, setModelSearch] = useState('');
+  const [selectedModel, setSelectedModel] = useState(PHONE_MODELS[0]);
   const [selectedCaseType, setSelectedCaseType] = useState(CASE_TYPES[0]);
-  const [showGrid, setShowGrid] = useState(false);
+  const [modelSearch, setModelSearch] = useState('');
 
-  // Active Tool Tab: 'presets' | 'stickers' | 'text' | 'image'
-  const [activeTab, setActiveTab] = useState('stickers');
-
-  // Text Tool inputs
-  const [textInput, setTextInput] = useState('');
-  const [textFont, setTextFont] = useState('space');
-  const [textColor, setTextColor] = useState('#E0A93B');
-
-  // Layers state
+  const [activeTab, setActiveTab] = useState('stickers'); // 'presets', 'stickers', 'text', 'image'
   const [layers, setLayers] = useState([
-    {
-      id: 'layer-init-1',
-      type: 'sticker',
-      stickerId: 'pill-tale3-noor',
-      x: 50,
-      y: 50,
-      scale: 1.1,
-      rotation: 0,
-      flipH: false,
-      flipV: false
-    }
+    { id: 'l1', type: 'sticker', stickerId: 'disc', x: 50, y: 36, scale: 1.2, rotation: 0 },
+    { id: 'l2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 64, scale: 1.1, rotation: 0 }
   ]);
-  const [selectedLayerId, setSelectedLayerId] = useState('layer-init-1');
+  const [selectedLayerId, setSelectedLayerId] = useState('l2');
 
-  // Canvas Ref
+  const [customText, setCustomText] = useState('');
+  const [textColor, setTextColor] = useState('#E0A93B');
+  const [textFont, setTextFont] = useState('kufi'); // 'clash', 'kufi', 'mono'
+
+  const [dragActive, setDragActive] = useState(false);
   const canvasRef = useRef(null);
-  const isDraggingRef = useRef(false);
-  const dragTypeRef = useRef(null);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const initialLayerStateRef = useRef(null);
 
-  // Quick Color Swatches
-  const colorSwatches = ['#E0A93B', '#D9432E', '#F0EBE0', '#6E675D', '#FFFFFF', '#050505'];
-
-  const filteredModels = PHONE_MODELS.filter(m =>
-    m.toLowerCase().includes(modelSearch.toLowerCase())
-  );
-
-  // Add Layer Helper
-  const addLayer = (layerData) => {
-    const newId = `layer-${Date.now()}`;
+  // Layer Operations
+  const handleAddSticker = (stickerId) => {
     const newLayer = {
-      id: newId,
+      id: `sticker-${Date.now()}`,
+      type: 'sticker',
+      stickerId,
       x: 50,
       y: 50,
       scale: 1.0,
-      rotation: 0,
-      flipH: false,
-      flipV: false,
-      ...layerData
+      rotation: 0
     };
-    setLayers(prev => [...prev, newLayer]);
-    setSelectedLayerId(newId);
-  };
-
-  // Load Preset Template
-  const handleLoadPreset = (preset) => {
-    const targetCase = CASE_TYPES.find(c => c.id === preset.caseTypeId) || CASE_TYPES[0];
-    setSelectedCaseType(targetCase);
-    setLayers(preset.layers.map(l => ({ ...l, id: `layer-${Date.now()}-${Math.random()}` })));
-    setSelectedLayerId(null);
-    showToast(t('presetLoadedToast'), 'success');
-  };
-
-  const handleAddSticker = (stickerId) => {
-    addLayer({ type: 'sticker', stickerId });
+    setLayers((prev) => [...prev, newLayer]);
+    setSelectedLayerId(newLayer.id);
   };
 
   const handleAddText = () => {
-    if (!textInput.trim()) return;
-    addLayer({
+    if (!customText.trim()) return;
+    const newLayer = {
+      id: `text-${Date.now()}`,
       type: 'text',
-      text: textInput.trim(),
+      text: customText,
+      color: textColor,
       font: textFont,
-      color: textColor
-    });
-    setTextInput('');
+      x: 50,
+      y: 50,
+      scale: 1.0,
+      rotation: 0
+    };
+    setLayers((prev) => [...prev, newLayer]);
+    setSelectedLayerId(newLayer.id);
+    setCustomText('');
   };
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
-      if (event.target?.result) {
-        addLayer({
-          type: 'image',
-          src: event.target.result
-        });
-      }
+      const newLayer = {
+        id: `img-${Date.now()}`,
+        type: 'image',
+        src: event.target?.result,
+        x: 50,
+        y: 50,
+        scale: 1.0,
+        rotation: 0
+      };
+      setLayers((prev) => [...prev, newLayer]);
+      setSelectedLayerId(newLayer.id);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleDuplicateLayer = (id, e) => {
-    e?.stopPropagation();
-    const target = layers.find(l => l.id === id);
-    if (!target) return;
-    const duplicated = {
-      ...target,
-      id: `layer-${Date.now()}`,
-      x: Math.min(target.x + 5, 85),
-      y: Math.min(target.y + 5, 85)
-    };
-    setLayers(prev => [...prev, duplicated]);
-    setSelectedLayerId(duplicated.id);
+  const handleLoadPreset = (preset) => {
+    const caseType = CASE_TYPES.find((c) => c.id === preset.caseTypeId) || CASE_TYPES[0];
+    setSelectedCaseType(caseType);
+    setLayers(preset.layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+    setSelectedLayerId(null);
+    showToast(t('presetLoadedToast'), 'success');
   };
 
-  const handleDeleteLayer = (id, e) => {
+  const handleRemoveLayer = (id, e) => {
     e?.stopPropagation();
-    setLayers(prev => prev.filter(l => l.id !== id));
-    if (selectedLayerId === id) {
-      setSelectedLayerId(null);
-    }
+    setLayers((prev) => prev.filter((l) => l.id !== id));
+    if (selectedLayerId === id) setSelectedLayerId(null);
   };
 
-  const handleFlipLayer = (id, direction, e) => {
-    e?.stopPropagation();
-    setLayers(prev =>
-      prev.map(l => {
-        if (l.id !== id) return l;
-        return direction === 'h' ? { ...l, flipH: !l.flipH } : { ...l, flipV: !l.flipV };
-      })
+  const handleLayerTransform = (id, field, value) => {
+    setLayers((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, [field]: value } : l))
     );
   };
 
-  const handleMoveLayerOrder = (index, direction, e) => {
-    e?.stopPropagation();
-    const newLayers = [...layers];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= newLayers.length) return;
-
-    const temp = newLayers[index];
-    newLayers[index] = newLayers[targetIndex];
-    newLayers[targetIndex] = temp;
-    setLayers(newLayers);
-  };
-
-  // Pointer Interaction Handlers (Touch & Mouse Compatible)
-  const handlePointerDown = (e, layerId, actionType) => {
+  // Touch Pointer Drag Handlers
+  const handlePointerDownLayer = (id, e) => {
     e.stopPropagation();
-    setSelectedLayerId(layerId);
-
-    const layer = layers.find(l => l.id === layerId);
-    if (!layer || !canvasRef.current) return;
-
-    isDraggingRef.current = true;
-    dragTypeRef.current = actionType;
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-    initialLayerStateRef.current = { ...layer };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+    setSelectedLayerId(id);
+    setDragActive(true);
   };
 
-  const handlePointerMove = (e) => {
-    if (!isDraggingRef.current || !selectedLayerId || !canvasRef.current) return;
-
+  const handleCanvasPointerMove = (e) => {
+    if (!dragActive || !selectedLayerId || !canvasRef.current) return;
     const rect = canvasRef.current.getBoundingClientRect();
-    const initial = initialLayerStateRef.current;
-    if (!initial) return;
-
-    if (dragTypeRef.current === 'move') {
-      const deltaXPixels = e.clientX - dragStartRef.current.x;
-      const deltaYPixels = e.clientY - dragStartRef.current.y;
-
-      const deltaXPercent = (deltaXPixels / rect.width) * 100;
-      const deltaYPercent = (deltaYPixels / rect.height) * 100;
-
-      const newX = Math.max(10, Math.min(90, initial.x + deltaXPercent));
-      const newY = Math.max(10, Math.min(90, initial.y + deltaYPercent));
-
-      setLayers(prev =>
-        prev.map(l => l.id === selectedLayerId ? { ...l, x: newX, y: newY } : l)
-      );
-    } else if (dragTypeRef.current === 'resize') {
-      const deltaY = e.clientY - dragStartRef.current.y;
-      const scaleDelta = deltaY * 0.01;
-      const newScale = Math.max(0.4, Math.min(3.0, initial.scale + scaleDelta));
-
-      setLayers(prev =>
-        prev.map(l => l.id === selectedLayerId ? { ...l, scale: newScale } : l)
-      );
-    } else if (dragTypeRef.current === 'rotate') {
-      const centerX = rect.left + (initial.x / 100) * rect.width;
-      const centerY = rect.top + (initial.y / 100) * rect.height;
-
-      const rad = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-      let deg = Math.round(rad * (180 / Math.PI)) + 90;
-      if (deg < 0) deg += 360;
-
-      setLayers(prev =>
-        prev.map(l => l.id === selectedLayerId ? { ...l, rotation: deg } : l)
-      );
-    }
+    const x = Math.max(10, Math.min(90, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(10, Math.min(90, ((e.clientY - rect.top) / rect.height) * 100));
+    handleLayerTransform(selectedLayerId, 'x', Math.round(x));
+    handleLayerTransform(selectedLayerId, 'y', Math.round(y));
   };
 
-  const handlePointerUp = () => {
-    isDraggingRef.current = false;
-    dragTypeRef.current = null;
-    window.removeEventListener('pointermove', handlePointerMove);
-    window.removeEventListener('pointerup', handlePointerUp);
-  };
-
-  const handleExportPNG = () => {
-    showToast(t('designExportedToast'), 'info');
+  const handleCanvasPointerUp = () => {
+    setDragActive(false);
   };
 
   const handleAddToCart = () => {
-    if (layers.length === 0) return;
-
-    addToCart(
-      { price: 850 },
-      {
-        phoneModel: selectedModel,
+    const customCaseProduct = {
+      id: `custom-case-${Date.now()}`,
+      nameEn: `Custom ${selectedModel} Case`,
+      nameAr: `جراب مخصص ${selectedModel}`,
+      price: 850,
+      category: 'cases',
+      tagEn: selectedCaseType.nameEn,
+      tagAr: selectedCaseType.nameAr,
+      customDetails: {
+        model: selectedModel,
         caseType: selectedCaseType.nameEn,
-        layersCount: layers.length,
-        titleEn: `Custom Case (${selectedModel})`,
-        titleAr: `جراب مخصص (${selectedModel})`
+        layersCount: layers.length
       }
-    );
+    };
+    addToCart(customCaseProduct);
     showToast(t('itemAddedToast'), 'success');
   };
 
+  const filteredModels = PHONE_MODELS.filter((m) =>
+    m.toLowerCase().includes(modelSearch.toLowerCase())
+  );
+
+  const selectedLayer = layers.find((l) => l.id === selectedLayerId);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       
-      {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-            <SunDisc size={12} variant="gold" />
-            <span>{t('customizerEyebrow')}</span>
-          </div>
-          <h1 className="font-clash text-3xl sm:text-5xl uppercase text-bone tracking-tight">
-            {t('customizerTitle')}
-          </h1>
+      {/* Header */}
+      <div className="space-y-2 border-l-2 border-gold pl-4">
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+          <span>{t('customizerEyebrow')}</span>
         </div>
-
-        {/* Toolbar Helpers (44px min tap targets) */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowGrid(!showGrid)}
-            className={`font-mono text-xs uppercase tracking-widest px-3.5 py-2.5 border transition-colors flex items-center gap-2 min-h-[44px] ${
-              showGrid ? 'border-gold text-gold bg-gold/10' : 'border-grave text-ash hover:text-bone'
-            }`}
-          >
-            <Grid size={14} />
-            <span>{t('toggleGrid')}</span>
-          </button>
-
-          <button
-            onClick={handleExportPNG}
-            className="font-mono text-xs uppercase tracking-widest px-3.5 py-2.5 border border-grave text-bone hover:border-gold hover:text-gold transition-colors flex items-center gap-2 min-h-[44px]"
-          >
-            <Download size={14} />
-            <span>{t('exportDesign')}</span>
-          </button>
-        </div>
+        <h1 className="font-clash text-4xl sm:text-5xl uppercase text-bone">
+          {t('customizerTitle')}
+        </h1>
       </div>
 
-      {/* Main Responsive Layout: Mobile Stacked (Canvas Top, Controls Bottom) */}
+      {/* Main Grid Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* CANVAS CONTAINER (STACKED ON TOP ON MOBILE) */}
-        <div className="lg:col-span-6 flex flex-col items-center justify-center bg-stone border border-grave p-4 sm:p-8 lg:sticky lg:top-28">
+        {/* LEFT COLUMN: INTERACTIVE CANVAS (7 cols on lg) */}
+        <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-center space-y-4">
           
-          <div className="font-mono text-xs uppercase tracking-widest text-ash mb-4 sm:mb-6 flex items-center gap-2 text-center">
-            <span>CANVAS:</span>
-            <span className="text-gold font-bold">{selectedModel}</span>
-          </div>
-
-          {/* PHONE CASE MOCKUP CANVAS */}
-          <div
-            ref={canvasRef}
-            onClick={() => setSelectedLayerId(null)}
-            className="w-[260px] sm:w-[300px] h-[520px] sm:h-[620px] rounded-[38px] sm:rounded-[42px] relative overflow-hidden shadow-2xl transition-all duration-300 select-none cursor-crosshair touch-none"
-            style={{
-              backgroundColor: selectedCaseType.bg,
-              border: `4px solid ${selectedCaseType.ring}`,
-              boxShadow: `0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.5)`
-            }}
-          >
-            {/* Alignment Grid Overlay */}
-            {showGrid && (
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2523_1px,transparent_1px),linear-gradient(to_bottom,#2a2523_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none opacity-40 z-10" />
-            )}
-
-            {/* Camera Cutout Housing (Top-Right) */}
-            <div className="absolute top-4 right-4 w-16 sm:w-20 h-16 sm:h-20 rounded-2xl bg-void/90 border-2 border-grave z-20 flex flex-col items-center justify-center gap-1.5 p-2 shadow-inner pointer-events-none">
-              <div className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-ash/40" />
-              </div>
-              <div className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-ash/40" />
-              </div>
-            </div>
-
-            {/* Part 2 Fix: NEUTRAL GHOSTED PHONE OUTLINE EMPTY STATE (No big gold sun disc) */}
-            {layers.length === 0 && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3 pointer-events-none opacity-30">
-                <Smartphone size={48} className="text-ash" />
-                <p className="font-mono text-xs uppercase tracking-widest text-ash">
-                  {t('noLayersText')}
-                </p>
-              </div>
-            )}
-
-            {/* RENDER CANVAS LAYERS */}
-            {layers.map((layer) => {
-              const isSelected = selectedLayerId === layer.id;
-
-              return (
-                <div
-                  key={layer.id}
-                  onPointerDown={(e) => handlePointerDown(e, layer.id, 'move')}
-                  className="absolute cursor-grab active:cursor-grabbing touch-none select-none transition-shadow"
-                  style={{
-                    left: `${layer.x}%`,
-                    top: `${layer.y}%`,
-                    transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg) scaleX(${layer.flipH ? -1 : 1}) scaleY(${layer.flipV ? -1 : 1})`,
-                    zIndex: layers.findIndex(l => l.id === layer.id) + 10
-                  }}
-                >
-                  <div
-                    className={`relative p-2 flex items-center justify-center ${
-                      isSelected
-                        ? 'outline outline-2 outline-gold outline-offset-4 bg-gold/5'
-                        : 'hover:outline hover:outline-1 hover:outline-ash'
-                    }`}
-                  >
-                    {/* Render Sticker SVG / Slogan Pill Content */}
-                    {layer.type === 'sticker' && (
-                      <StickerIcon stickerId={layer.stickerId} size={54} />
-                    )}
-
-                    {/* Render Text Content */}
-                    {layer.type === 'text' && (
-                      <span
-                        className={`block whitespace-nowrap leading-none ${
-                          layer.font === 'mono'
-                            ? 'font-mono'
-                            : layer.font === 'kufi'
-                            ? 'font-kufi font-bold'
-                            : 'font-space font-bold'
-                        }`}
-                        style={{
-                          color: layer.color,
-                          fontSize: '24px',
-                          textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-                        }}
-                      >
-                        {layer.text}
-                      </span>
-                    )}
-
-                    {/* Render Image Content */}
-                    {layer.type === 'image' && (
-                      <img
-                        src={layer.src}
-                        alt="Uploaded graphic"
-                        className="max-w-[130px] max-h-[130px] object-contain pointer-events-none"
-                      />
-                    )}
-
-                    {/* SELECTION HANDLES ON TOP */}
-                    {isSelected && (
-                      <>
-                        <div
-                          onPointerDown={(e) => handlePointerDown(e, layer.id, 'rotate')}
-                          className="absolute -top-7 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gold text-void flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg z-30"
-                          title="Rotate"
-                        >
-                          <RotateCw size={12} />
-                        </div>
-
-                        <div
-                          onPointerDown={(e) => handlePointerDown(e, layer.id, 'resize')}
-                          className="absolute -bottom-3 -right-3 w-5 h-5 bg-gold border border-void cursor-se-resize shadow-lg z-30"
-                          title="Resize"
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-          </div>
-
-          <p className="font-mono text-[10px] sm:text-[11px] text-ash tracking-widest uppercase mt-4 sm:mt-6 text-center">
-            TAP LAYER TO SELECT • DRAG TO POSITION • CORNERS TO ROTATE/RESIZE
-          </p>
-
-        </div>
-
-        {/* CONTROLS PANEL (STACKED BELOW ON MOBILE) */}
-        <div className="lg:col-span-6 bg-stone border border-grave p-4 sm:p-6 space-y-6 sm:space-y-8">
-          
-          {/* SECTION A: PHONE MODEL SELECTOR */}
-          <div className="space-y-3">
-            <label className="font-mono text-xs uppercase tracking-widest text-gold font-bold block">
-              a) {t('selectModel')}
-            </label>
-
-            <div className="relative space-y-2">
-              <div className="relative">
-                <Search size={16} className="absolute left-3 top-3.5 text-ash" />
-                <input
-                  type="text"
-                  value={modelSearch}
-                  onChange={(e) => setModelSearch(e.target.value)}
-                  placeholder={t('searchModel')}
-                  className="w-full bg-coal border border-grave text-bone pl-10 pr-4 py-2.5 text-sm font-space focus:border-gold focus:outline-none min-h-[44px]"
-                />
-              </div>
-
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full bg-coal border border-grave text-bone px-4 py-3 text-sm font-mono focus:border-gold focus:outline-none cursor-pointer min-h-[44px]"
+          <div className="w-full max-w-sm aspect-[3/5] bg-stone border border-grave p-4 shadow-2xl relative flex flex-col items-center justify-center select-none overflow-hidden card-depth-highlight">
+            
+            {/* Phone Base Outline Container */}
+            <div
+              ref={canvasRef}
+              onPointerMove={handleCanvasPointerMove}
+              onPointerUp={handleCanvasPointerUp}
+              onPointerLeave={handleCanvasPointerUp}
+              className="w-full h-full rounded-[38px] border-2 border-grave relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] transition-colors duration-500"
+              style={{ backgroundColor: selectedCaseType.bg }}
+            >
+              
+              {/* Camera Island */}
+              <div
+                className="self-end w-20 h-20 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 z-20"
+                style={{ borderColor: selectedCaseType.ring, backgroundColor: '#050505' }}
               >
-                {filteredModels.map((model) => (
-                  <option key={model} value={model} className="bg-coal text-bone">
-                    {model}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* SECTION B: CASE ARMOR FINISH SWATCHES */}
-          <div className="space-y-3 pt-4 border-t border-grave">
-            <label className="font-mono text-xs uppercase tracking-widest text-gold font-bold block">
-              b) {t('caseType')}
-            </label>
-
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-              {CASE_TYPES.map((type) => {
-                const isSelected = selectedCaseType.id === type.id;
-                return (
-                  <button
-                    key={type.id}
-                    onClick={() => setSelectedCaseType(type)}
-                    className={`flex flex-col items-center gap-2 p-2 border transition-all min-h-[44px] ${
-                      isSelected
-                        ? 'border-gold bg-coal'
-                        : 'border-grave bg-coal/50 hover:border-ash'
-                    }`}
-                  >
-                    <div
-                      className="w-7 h-7 rounded-sm border flex items-center justify-center shadow"
-                      style={{ backgroundColor: type.bg, borderColor: type.ring }}
-                    >
-                      {isSelected && <Check size={14} className="text-gold" />}
-                    </div>
-                    <span className="font-mono text-[9px] uppercase tracking-tighter text-ash text-center leading-tight">
-                      {lang === 'ar' ? type.nameAr : type.nameEn}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* SECTION C: TOOLS TABS */}
-          <div className="space-y-4 pt-4 border-t border-grave">
-            <div className="flex border-b border-grave">
-              {[
-                { id: 'presets', label: t('tabPresets'), icon: Sparkles },
-                { id: 'stickers', label: t('tabStickers'), icon: Smile },
-                { id: 'text', label: t('tabText'), icon: Type },
-                { id: 'image', label: t('tabImage'), icon: ImageIcon }
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 py-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center justify-center gap-1 border-b-2 transition-colors min-h-[44px] ${
-                      isActive
-                        ? 'border-gold text-gold font-bold bg-coal/50'
-                        : 'border-transparent text-ash hover:text-bone'
-                    }`}
-                  >
-                    <Icon size={14} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* PRESETS TAB */}
-            {activeTab === 'presets' && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                {PRESET_TEMPLATES.map((preset) => (
-                  <button
-                    key={preset.id}
-                    onClick={() => handleLoadPreset(preset)}
-                    className="bg-coal border border-grave p-3.5 text-left hover:border-gold transition-all group space-y-2 min-h-[44px]"
-                  >
-                    <span className="font-mono text-[9px] text-ash uppercase block">PRESET</span>
-                    <h4 className="font-space text-xs font-bold text-bone group-hover:text-gold transition-colors">
-                      {lang === 'ar' ? preset.nameAr : preset.nameEn}
-                    </h4>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* STICKERS TAB */}
-            {activeTab === 'stickers' && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                {STICKER_PRESETS.map((sticker) => (
-                  <button
-                    key={sticker.id}
-                    onClick={() => handleAddSticker(sticker.id)}
-                    className="bg-coal border border-grave p-3 flex flex-col items-center justify-center gap-2 hover:border-gold transition-all group min-h-[44px]"
-                  >
-                    <StickerIcon stickerId={sticker.id} size={30} />
-                    <span className="font-mono text-[9px] uppercase tracking-tighter text-ash group-hover:text-gold text-center">
-                      {lang === 'ar' ? sticker.nameAr : sticker.nameEn}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* TEXT TAB */}
-            {activeTab === 'text' && (
-              <div className="space-y-4 pt-2">
-                <input
-                  type="text"
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  placeholder={t('textPlaceholder')}
-                  className="w-full bg-coal border border-grave text-bone p-3 text-sm font-space focus:border-gold focus:outline-none min-h-[44px]"
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-mono text-[10px] uppercase text-ash block mb-1">
-                      Typography
-                    </label>
-                    <select
-                      value={textFont}
-                      onChange={(e) => setTextFont(e.target.value)}
-                      className="w-full bg-coal border border-grave text-bone p-2.5 text-xs font-mono min-h-[44px]"
-                    >
-                      <option value="space">{t('fontDisplay')}</option>
-                      <option value="kufi">{t('fontBody')}</option>
-                      <option value="mono">{t('fontMono')}</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="font-mono text-[10px] uppercase text-ash block mb-1">
-                      Swatches
-                    </label>
-                    <div className="flex items-center gap-2">
-                      {colorSwatches.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => setTextColor(color)}
-                          className={`w-7 h-7 border ${
-                            textColor === color ? 'border-gold scale-110' : 'border-grave'
-                          }`}
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center mb-1">
+                  <div className="w-2 h-2 rounded-full bg-ash/30" />
                 </div>
-
-                <button
-                  onClick={handleAddText}
-                  disabled={!textInput.trim()}
-                  className="w-full btn-primary py-3 text-xs disabled:opacity-50 min-h-[44px]"
-                >
-                  {t('addTextBtn')}
-                </button>
+                <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-ash/30" />
+                </div>
               </div>
-            )}
 
-            {/* IMAGE TAB */}
-            {activeTab === 'image' && (
-              <div className="pt-2">
-                <label className="border-2 border-dashed border-grave hover:border-gold bg-coal/50 p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group">
-                  <Upload size={28} className="text-ash group-hover:text-gold mb-2 transition-colors" />
-                  <p className="font-mono text-xs text-bone uppercase tracking-wider mb-1">
-                    {t('uploadZoneText')}
-                  </p>
-                  <p className="font-mono text-[10px] text-ash">
-                    {t('uploadZoneHint')}
-                  </p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            )}
-          </div>
+              {/* MagSafe Ring Detail if MagSafe Case */}
+              {selectedCaseType.id === 'magsafe' && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 rounded-full border-2 border-grave/60 pointer-events-none" />
+              )}
 
-          {/* SECTION D: LAYERS STACK */}
-          <div className="space-y-3 pt-4 border-t border-grave">
-            <label className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-              <Layers size={14} />
-              <span>d) {t('layersHeader')} ({layers.length})</span>
-            </label>
-
-            {layers.length === 0 ? (
-              <p className="font-mono text-xs text-ash italic py-2">
-                {t('noLayersText')}
-              </p>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                {layers.map((layer, index) => {
-                  const isSelected = selectedLayerId === layer.id;
+              {/* CANVAS LAYERS STACK — RENDER ACTUAL ARTWORK (Part 2 Fix) */}
+              <div className="absolute inset-0 pointer-events-auto">
+                {layers.map((layer) => {
+                  const isSelected = layer.id === selectedLayerId;
                   return (
                     <div
                       key={layer.id}
-                      onClick={() => setSelectedLayerId(layer.id)}
-                      className={`p-2.5 border flex items-center justify-between gap-2 cursor-pointer transition-all min-h-[44px] ${
-                        isSelected
-                          ? 'border-gold bg-coal'
-                          : 'border-grave bg-coal/40 hover:border-ash'
+                      onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
+                      style={{
+                        left: `${layer.x}%`,
+                        top: `${layer.y}%`,
+                        transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
+                      }}
+                      className={`absolute cursor-grab active:cursor-grabbing p-1 transition-shadow ${
+                        isSelected ? 'outline outline-1 outline-gold outline-offset-4 z-30' : 'z-10'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 bg-void border border-grave flex items-center justify-center flex-shrink-0">
-                          {layer.type === 'sticker' && <StickerIcon stickerId={layer.stickerId} size={16} />}
-                          {layer.type === 'text' && <Type size={14} className="text-gold" />}
-                          {layer.type === 'image' && <ImageIcon size={14} className="text-gold" />}
-                        </div>
-                        <span className="font-mono text-xs text-bone truncate">
-                          {layer.type === 'text'
-                            ? `Text: "${layer.text}"`
-                            : layer.type === 'sticker'
-                            ? `Sticker (${layer.stickerId})`
-                            : 'Uploaded Image'}
-                        </span>
-                      </div>
+                      {/* Render Sticker SVG Artwork */}
+                      {layer.type === 'sticker' && (
+                        <StickerIcon stickerId={layer.stickerId} size={42} />
+                      )}
 
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={(e) => handleFlipLayer(layer.id, 'h', e)}
-                          className="p-1.5 text-ash hover:text-gold transition-colors min-h-[36px]"
-                          title="Flip Horizontal"
+                      {/* Render Custom Text */}
+                      {layer.type === 'text' && (
+                        <div
+                          style={{ color: layer.color }}
+                          className={`whitespace-nowrap font-bold text-sm select-none ${
+                            layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
+                          }`}
                         >
-                          <FlipHorizontal size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => handleMoveLayerOrder(index, 'up', e)}
-                          disabled={index === 0}
-                          className="p-1.5 text-ash hover:text-bone disabled:opacity-30 min-h-[36px]"
-                          title="Move up"
-                        >
-                          <ChevronUp size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => handleMoveLayerOrder(index, 'down', e)}
-                          disabled={index === layers.length - 1}
-                          className="p-1.5 text-ash hover:text-bone disabled:opacity-30 min-h-[36px]"
-                          title="Move down"
-                        >
-                          <ChevronDown size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDuplicateLayer(layer.id, e)}
-                          className="p-1.5 text-ash hover:text-gold transition-colors min-h-[36px]"
-                          title="Duplicate"
-                        >
-                          <Copy size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDeleteLayer(layer.id, e)}
-                          className="p-1.5 text-ash hover:text-ember transition-colors min-h-[36px]"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          {layer.text}
+                        </div>
+                      )}
+
+                      {/* Render Uploaded Image */}
+                      {layer.type === 'image' && (
+                        <img src={layer.src} alt="Custom Layer" className="max-w-[100px] max-h-[100px] object-contain" />
+                      )}
                     </div>
                   );
                 })}
               </div>
-            )}
+
+              {/* Empty Canvas State (Part 2: Ghosted phone outline + text only) */}
+              {layers.length === 0 && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-ash/60 pointer-events-none">
+                  <span className="font-mono text-xs uppercase tracking-widest">CANVAS EMPTY</span>
+                  <span className="font-space text-xs mt-1">Add a 3D dome sticker or text layer</span>
+                </div>
+              )}
+
+              {/* Phone Speaker Bottom Bar */}
+              <div className="w-24 h-1.5 bg-grave/80 rounded-full self-center z-20" />
+
+            </div>
+
           </div>
 
-          {/* SECTION E: ADD TO CART CTA */}
-          <div className="pt-4 border-t border-grave">
-            <button
-              onClick={handleAddToCart}
-              disabled={layers.length === 0}
-              className="w-full btn-primary py-4 text-sm font-mono tracking-widest flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed group min-h-[44px]"
-            >
-              <ShoppingBag size={18} />
-              <span>{t('customizerAddToCart')}</span>
-            </button>
+          <div className="font-mono text-xs text-ash text-center uppercase tracking-widest">
+            {selectedModel} · {selectedCaseType.nameEn}
           </div>
+
+          <button
+            onClick={handleAddToCart}
+            className="btn-primary w-full max-w-sm py-4 text-sm font-mono tracking-widest"
+          >
+            {t('customizerAddToCart')}
+          </button>
+
+        </div>
+
+        {/* RIGHT COLUMN: CONTROLS & TABS (5 cols on lg) */}
+        <div className="lg:col-span-6 xl:col-span-7 space-y-6">
+          
+          {/* Model & Finish Selection */}
+          <div className="bg-stone border border-grave p-6 space-y-4">
+            <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold">
+              {t('selectModel')} & {t('caseType')}
+            </h3>
+
+            {/* Model Select Dropdown */}
+            <div className="space-y-2">
+              <label className="font-mono text-xs text-ash block">{t('selectModel')}</label>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="w-full bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
+              >
+                {PHONE_MODELS.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Case Type Finishes Grid */}
+            <div className="space-y-2 pt-2">
+              <label className="font-mono text-xs text-ash block">{t('caseType')}</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {CASE_TYPES.map((ct) => {
+                  const active = selectedCaseType.id === ct.id;
+                  return (
+                    <button
+                      key={ct.id}
+                      onClick={() => setSelectedCaseType(ct)}
+                      className={`p-3 border text-left flex items-center gap-2.5 transition-all min-h-[44px] ${
+                        active
+                          ? 'border-gold bg-coal text-gold font-bold'
+                          : 'border-grave bg-stone text-bone hover:border-ash'
+                      }`}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full border border-grave flex-shrink-0"
+                        style={{ backgroundColor: ct.ring }}
+                      />
+                      <span className="font-space text-xs truncate">
+                        {lang === 'ar' ? ct.nameAr : ct.nameEn}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Builder Controls Tabs */}
+          <div className="bg-stone border border-grave p-6 space-y-6">
+            
+            {/* Tab Buttons */}
+            <div className="grid grid-cols-4 gap-2 border-b border-grave pb-4">
+              <button
+                onClick={() => setActiveTab('stickers')}
+                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
+                  activeTab === 'stickers'
+                    ? 'border-gold text-gold font-bold'
+                    : 'border-transparent text-ash hover:text-bone'
+                }`}
+              >
+                Stickers
+              </button>
+
+              <button
+                onClick={() => setActiveTab('presets')}
+                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
+                  activeTab === 'presets'
+                    ? 'border-gold text-gold font-bold'
+                    : 'border-transparent text-ash hover:text-bone'
+                }`}
+              >
+                Presets
+              </button>
+
+              <button
+                onClick={() => setActiveTab('text')}
+                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
+                  activeTab === 'text'
+                    ? 'border-gold text-gold font-bold'
+                    : 'border-transparent text-ash hover:text-bone'
+                }`}
+              >
+                Text
+              </button>
+
+              <button
+                onClick={() => setActiveTab('image')}
+                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
+                  activeTab === 'image'
+                    ? 'border-gold text-gold font-bold'
+                    : 'border-transparent text-ash hover:text-bone'
+                }`}
+              >
+                Image
+              </button>
+            </div>
+
+            {/* TAB CONTENTS */}
+            {activeTab === 'stickers' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                  {STICKER_PRESETS.map((st) => (
+                    <button
+                      key={st.id}
+                      onClick={() => handleAddSticker(st.id)}
+                      className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-colors min-h-[70px]"
+                    >
+                      <StickerIcon stickerId={st.id} size={28} />
+                      <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full">
+                        {lang === 'ar' ? st.nameAr : st.nameEn}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'presets' && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {PRESET_TEMPLATES.map((tmpl) => (
+                  <button
+                    key={tmpl.id}
+                    onClick={() => handleLoadPreset(tmpl)}
+                    className="p-4 bg-coal border border-grave hover:border-gold text-left space-y-2 transition-colors"
+                  >
+                    <span className="font-space font-bold text-sm text-bone block">
+                      {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
+                    </span>
+                    <span className="font-mono text-[10px] text-gold uppercase tracking-widest block">
+                      LOAD PRESET
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'text' && (
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder={t('textPlaceholder')}
+                    className="flex-1 bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
+                  />
+                  <button onClick={handleAddText} className="btn-primary px-6 text-xs min-h-[44px]">
+                    {t('addTextBtn')}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => setTextFont('space')}
+                    className={`p-2 border font-space text-xs ${
+                      textFont === 'space' ? 'border-gold text-gold' : 'border-grave text-ash'
+                    }`}
+                  >
+                    Space Grotesk
+                  </button>
+                  <button
+                    onClick={() => setTextFont('kufi')}
+                    className={`p-2 border font-kufi text-xs ${
+                      textFont === 'kufi' ? 'border-gold text-gold' : 'border-grave text-ash'
+                    }`}
+                  >
+                    ريم كوفي
+                  </button>
+                  <button
+                    onClick={() => setTextFont('mono')}
+                    className={`p-2 border font-mono text-xs ${
+                      textFont === 'mono' ? 'border-gold text-gold' : 'border-grave text-ash'
+                    }`}
+                  >
+                    JetBrains Mono
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'image' && (
+              <div className="border-2 border-dashed border-grave p-8 text-center space-y-3 bg-coal">
+                <Upload size={24} className="mx-auto text-ash" />
+                <p className="font-space text-xs text-ash">{t('uploadZoneText')}</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="block w-full text-xs text-ash file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-gold file:text-void file:font-bold cursor-pointer"
+                />
+              </div>
+            )}
+
+          </div>
+
+          {/* Layers Controls Stack */}
+          {selectedLayer && (
+            <div className="bg-stone border border-grave p-6 space-y-4">
+              <div className="flex justify-between items-center border-b border-grave pb-3">
+                <span className="font-mono text-xs uppercase tracking-widest text-gold font-bold">
+                  SELECTED LAYER CONTROLS
+                </span>
+                <button
+                  onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
+                  className="text-ember hover:text-red-400 p-1 flex items-center gap-1 font-mono text-xs"
+                >
+                  <Trash2 size={14} />
+                  <span>REMOVE</span>
+                </button>
+              </div>
+
+              {/* Transform Controls Sliders */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] text-ash uppercase flex justify-between">
+                    <span>Scale</span>
+                    <span>{selectedLayer.scale.toFixed(1)}x</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2.5"
+                    step="0.1"
+                    value={selectedLayer.scale}
+                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
+                    className="w-full accent-gold"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] text-ash uppercase flex justify-between">
+                    <span>Rotation</span>
+                    <span>{selectedLayer.rotation}°</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    step="5"
+                    value={selectedLayer.rotation}
+                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
+                    className="w-full accent-gold"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
 
       </div>
-
     </div>
   );
 };

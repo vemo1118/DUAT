@@ -37,24 +37,24 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   };
 
   return (
-    <div className="space-y-20 sm:space-y-28 pb-20">
+    <div className="space-y-20 sm:space-y-28 pb-20 overflow-hidden">
       
-      {/* HERO SECTION — LAYERED ATMOSPHERIC BACKLIGHTING */}
+      {/* HERO SECTION — SOFT WIDE AMBIENT GLOW */}
       <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
         
-        {/* Headline Backlight (10% Gold Glow) */}
-        <div className="absolute top-1/3 left-12 w-[420px] h-[420px] bg-gold/10 rounded-full blur-[90px] pointer-events-none" />
+        {/* Soft Wide Ambient Glow Centered Behind Image Feathering Leftward (Part 0 Fix) */}
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[680px] h-[680px] bg-gold/[0.12] rounded-full blur-[160px] pointer-events-none" />
 
-        {/* Product Image Backlight Bleeding Leftward (16% Gold Glow) */}
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[580px] h-[580px] bg-gold/[0.16] rounded-full blur-[120px] pointer-events-none" />
+        {/* Headline Backlight (Subtle 8% Glow) */}
+        <div className="absolute top-1/3 left-10 w-[380px] h-[380px] bg-gold/[0.08] rounded-full blur-[100px] pointer-events-none" />
 
         {/* Outer Dark Vignette for Edge Contrast */}
-        <div className="absolute inset-0 bg-radial from-transparent via-transparent to-void/70 pointer-events-none" />
+        <div className="absolute inset-0 bg-radial from-transparent via-transparent to-void/75 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
-            {/* Left Column: Headlines & CTAs */}
+            {/* Left Column: Display Headings & CTAs */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8 relative">
               
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
@@ -62,7 +62,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 <span>{t('heroEyebrow')}</span>
               </div>
 
-              <h1 className="font-clash text-4xl sm:text-6xl lg:text-[90px] uppercase text-bone leading-display drop-shadow-lg">
+              <h1 className="font-clash text-3xl sm:text-6xl lg:text-[84px] uppercase text-bone leading-display drop-shadow-md">
                 THROUGH THE NIGHT <br />
                 <span className="text-gold">BORN AT DAWN.</span>
               </h1>
@@ -74,7 +74,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               <div className="flex flex-col sm:flex-row gap-4 pt-2 sm:pt-4">
                 <button
                   onClick={() => navigate('/customizer')}
-                  className="btn-primary group text-sm py-4 px-8 flex items-center justify-center gap-3 shadow-[0_4px_20px_rgba(224,169,59,0.25)]"
+                  className="btn-primary group text-sm py-4 px-8 flex items-center justify-center gap-3 shadow-[0_4px_20px_rgba(224,169,59,0.2)]"
                 >
                   <Sparkles size={18} />
                   <span>{t('heroCtaPrimary')}</span>
@@ -131,9 +131,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* CATEGORIES GRID — TOP-RIGHT CORNER ATMOSPHERIC GLOW */}
+      {/* CATEGORIES GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute -top-16 -right-16 w-96 h-96 bg-gold/[0.07] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-96 h-96 bg-gold/[0.06] rounded-full blur-[100px] pointer-events-none" />
 
         <div className="space-y-8 relative z-10">
           <div className="space-y-2 border-l-2 border-gold pl-4">
@@ -178,9 +178,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* BUILD YOUR OWN — THE FORGE (TOP-LEFT CORNER GLOW) */}
+      {/* BUILD YOUR OWN — THE FORGE */}
       <section className="bg-stone border-y border-grave py-16 sm:py-20 relative overflow-hidden card-depth-highlight">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gold/[0.07] rounded-full blur-[110px] pointer-events-none" />
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gold/[0.06] rounded-full blur-[110px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -234,9 +234,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS — BOTTOM-RIGHT CORNER GLOW */}
+      {/* FEATURED PRODUCTS — NEW PASSAGE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative">
-        <div className="absolute -bottom-16 -right-16 w-96 h-96 bg-gold/[0.07] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-16 -right-16 w-96 h-96 bg-gold/[0.06] rounded-full blur-[100px] pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6 relative z-10">
           <div className="space-y-2">
