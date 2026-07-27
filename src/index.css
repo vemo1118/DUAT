@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --night: #0A0C16;
-  --twilight: #161A32;
-  --indigo: #232A55;
-  --amber: #E8A33D;
-  --amber-deep: #C97B22;
-  --rose: #E0917A;
-  --bone: #EDE4D3;
-  --bone-dim: #9A9384;
+  --void: #050505;
+  --stone: #12100E;
+  --coal: #1C1917;
+  --grave: #2A2523;
+  --gold: #E8B04B;
+  --ember: #E5493A;
+  --bone: #EFE9DE;
+  --ash: #6B655D;
 }
 
 /* Enforce hard edges by default across all buttons, cards, inputs. Only mockup classes get radius */
@@ -20,32 +20,47 @@ button, input, select, textarea, div, a, article, section {
 
 /* Accessible focus ring */
 *:focus-visible {
-  outline: 1.5px solid var(--amber) !important;
+  outline: 1.5px solid var(--gold) !important;
   outline-offset: 4px !important;
 }
 
-/* RTL Typography & Direction adjustments */
+/* RTL Typography: Force Reem Kufi for all Arabic text */
 [dir="rtl"] body,
-[dir="rtl"] {
-  font-family: 'Cairo', sans-serif;
+[dir="rtl"],
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] button {
+  font-family: 'Reem Kufi', sans-serif !important;
 }
 
-[dir="rtl"] .font-anton {
-  font-family: 'Cairo', 'Anton', sans-serif;
-  font-weight: 800;
+.font-kufi {
+  font-family: 'Reem Kufi', sans-serif;
 }
 
-[dir="rtl"] .font-mono {
-  font-family: 'JetBrains Mono', 'Cairo', monospace;
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
 }
 
-/* Primary CTA hover transition amber -> rose */
+[dir="rtl"] .font-display {
+  font-family: 'Reem Kufi', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.1;
+}
+
+/* Primary CTA hover transition gold -> ember */
 .btn-primary {
-  background-color: var(--amber);
-  color: var(--night);
+  background-color: var(--gold);
+  color: var(--void);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   padding: 0.875rem 1.75rem;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
@@ -56,17 +71,17 @@ button, input, select, textarea, div, a, article, section {
 }
 
 .btn-primary:hover {
-  background-color: var(--amber-deep);
+  background-color: var(--ember);
   color: var(--bone);
 }
 
 .btn-ghost {
   background-color: transparent;
   color: var(--bone);
-  border: 1px solid rgba(237,228,211,0.2);
+  border: 1px solid var(--grave);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   padding: 0.875rem 1.75rem;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -76,15 +91,8 @@ button, input, select, textarea, div, a, article, section {
 }
 
 .btn-ghost:hover {
-  border-color: var(--amber);
-  color: var(--amber);
-}
-
-/* Hero Horizon Atmosphere Gradient */
-.hero-dawn-bg {
-  background:
-    radial-gradient(120% 80% at 50% 118%, rgba(232,163,61,.55) 0%, rgba(224,145,122,.22) 26%, rgba(35,42,85,.15) 48%, transparent 66%),
-    linear-gradient(180deg,#070812 0%,#0A0C16 46%,#12152b 100%);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 /* Custom Scrollbar */
@@ -94,13 +102,13 @@ button, input, select, textarea, div, a, article, section {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--night);
+  background: var(--void);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--twilight);
+  background: var(--grave);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--amber);
+  background: var(--gold);
 }

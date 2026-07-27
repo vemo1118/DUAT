@@ -1,17 +1,15 @@
 import React from 'react';
 
-export const SunDisc = ({ size = 28, className = '', variant = 'default' }) => {
+export const SunDisc = ({ size = 24, className = '', variant = 'default' }) => {
   const getColors = () => {
     switch (variant) {
       case 'eclipse':
-        return { sun: '#C97B22', line: '#0A0C16' };
-      case 'rose':
-        return { sun: '#E0917A', line: '#EDE4D3' };
-      case 'dark':
-        return { sun: '#E8A33D', line: '#0A0C16' };
+        return { stroke: '#E8B04B', fill: '#050505', ring: '#2A2523' };
+      case 'ember':
+        return { stroke: '#E5493A', fill: '#E5493A', ring: '#2A2523' };
       case 'gold':
       default:
-        return { sun: '#E8A33D', line: '#EDE4D3' };
+        return { stroke: '#E8B04B', fill: '#E8B04B', ring: '#2A2523' };
     }
   };
 
@@ -27,18 +25,23 @@ export const SunDisc = ({ size = 28, className = '', variant = 'default' }) => {
       className={`inline-block flex-shrink-0 ${className}`}
       aria-hidden="true"
     >
-      {/* Sun Disc Rising */}
-      <circle cx="50" cy="52" r="24" fill={colors.sun} />
-      {/* Horizon Line */}
-      <line
-        x1="12"
-        y1="70"
-        x2="88"
-        y2="70"
-        stroke={colors.line}
-        strokeWidth="3.5"
-        strokeLinecap="round"
+      {/* Outer Stroke Ring */}
+      <circle
+        cx="50"
+        cy="50"
+        r="44"
+        stroke={colors.stroke}
+        strokeWidth="6"
       />
+      {/* Inner Solid Disc (or Eclipse offset) */}
+      {variant === 'eclipse' ? (
+        <>
+          <circle cx="50" cy="50" r="28" fill="#E8B04B" />
+          <circle cx="62" cy="46" r="24" fill="#050505" />
+        </>
+      ) : (
+        <circle cx="50" cy="50" r="26" fill={colors.fill} />
+      )}
     </svg>
   );
 };

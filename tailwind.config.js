@@ -7,34 +7,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        night: '#0A0C16',
-        twilight: '#161A32',
-        indigo: '#232A55',
-        amber: {
-          DEFAULT: '#E8A33D',
-          deep: '#C97B22',
-        },
-        rose: '#E0917A',
-        bone: {
-          DEFAULT: '#EDE4D3',
-          dim: '#9A9384',
-        },
-        // Backwards compatibility tokens mapped to Dawn palette
-        void: '#0A0C16',
-        stone: '#161A32',
-        coal: '#12152B',
-        grave: 'rgba(237,228,211,0.12)',
-        gold: '#E8A33D',
-        ember: '#E0917A',
-        ash: '#9A9384',
+        void: 'var(--void)',
+        stone: 'var(--stone)',
+        coal: 'var(--coal)',
+        grave: 'var(--grave)',
+        gold: 'var(--gold)',
+        ember: 'var(--ember)',
+        bone: 'var(--bone)',
+        ash: 'var(--ash)',
       },
       fontFamily: {
-        anton: ['"Anton"', 'sans-serif'],
-        cairo: ['"Cairo"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
+        kufi: ['"Reem Kufi"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        archivo: ['"Anton"', 'sans-serif'], // Fallback alias
+        display: ['"Space Grotesk"', 'sans-serif'],
+        archivo: ['"Space Grotesk"', 'sans-serif'], // Fallback alias mapped to Space Grotesk
       },
+      letterSpacing: {
+        tightest: '-0.04em',
+        tight: '-0.03em',
+        widest: '0.25em',
+      },
+      lineHeight: {
+        display: '0.95',
+      }
     },
   },
   plugins: [],

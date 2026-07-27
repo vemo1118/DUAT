@@ -9,82 +9,77 @@ export const CATEGORIES = [
 export const PRODUCTS = [
   // CASES
   {
-    id: 'case-bone',
+    id: 'case-void',
     category: 'cases',
-    nameEn: 'Bone Canvas Case',
-    nameAr: 'جراب الكانفس العظمي',
+    nameEn: 'Void Case',
+    nameAr: 'جراب الفراغ',
     price: 650,
-    tagEn: 'Bone Matte',
-    tagAr: 'عظمي مطفي',
-    image: '/images/hero_case.png',
-    descriptionEn: 'Clean bone matte acrylic blank canvas designed for custom 3D epoxy sticker layouts.',
-    descriptionAr: 'كانفس مطفي بلون العظم النقي مُصمم لترتيب ملصقات الإيبوكسي المجسمة.',
-    specsEn: ['Material: High-Density Polycarbonate', 'Finish: Soft-Touch Bone', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
-    specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: ملمس ناعم بلون العظم', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
-    caseTypeConfig: { bg: '#EDE4D3', ring: '#9A9384' }
+    tagEn: 'Matte Black',
+    tagAr: 'أسود مطفي',
+    descriptionEn: 'Ultra-matte dark techwear shell with reinforced camera housing and grave-edge structure.',
+    descriptionAr: 'لمسة داكنة مطفية للغاية مع حماية معززة للكاميرا وحواف صلبة.',
+    specsEn: ['Material: High-Density Polycarbonate', 'Finish: Ultra-Matte Shockproof', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
+    specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
+    caseTypeConfig: { bg: '#0A0A0A', ring: '#1F1B15' }
   },
   {
-    id: 'case-midnight',
+    id: 'case-solar',
     category: 'cases',
-    nameEn: 'Midnight Case',
-    nameAr: 'جراب منتصف الليل',
-    price: 650,
-    tagEn: 'Midnight Black',
-    tagAr: 'أسود الليل',
-    image: '/images/hero_case.png',
-    descriptionEn: 'Deep midnight black finish with reinforced camera housing and dawn gold ring.',
-    descriptionAr: 'لمسة داكنة بلون أسود الليل مع حماية معززة للكاميرا وحلقة ذهبية.',
-    specsEn: ['Material: Polycarbonate Composite', 'Finish: Ultra-Matte Shockproof', 'Weight: 40g'],
-    specsAr: ['المادة: مركب البوليكاربونات', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٤٠ جرام'],
-    caseTypeConfig: { bg: '#0A0C16', ring: '#232A55' }
-  },
-  {
-    id: 'case-burgundy',
-    category: 'cases',
-    nameEn: 'Burgundy Ember Case',
-    nameAr: 'جراب الجمر النبيذي',
-    price: 690,
-    tagEn: 'Burgundy Matte',
-    tagAr: 'نبيذي داكن',
-    image: '/images/hero_case.png',
-    descriptionEn: 'Rich mahogany burgundy finish with rose gold rim detailing.',
-    descriptionAr: 'درجة نبيذي داكن مع تفاصيل حافة بلون الروز جولد.',
-    specsEn: ['Material: Soft Composite', 'Finish: Velvet Matte', 'Weight: 40g'],
-    specsAr: ['المادة: مركب ناعم', 'النهاية: مخملي مطفي', 'الوزن: ٤٠ جرام'],
-    caseTypeConfig: { bg: '#3A121A', ring: '#6B2232' }
-  },
-  {
-    id: 'case-olive',
-    category: 'cases',
-    nameEn: 'Olive Twilight Case',
-    nameAr: 'جراب الزيتوني',
-    price: 690,
-    tagEn: 'Tactical Olive',
-    tagAr: 'زيتوني تكتيكي',
-    image: '/images/hero_case.png',
-    descriptionEn: 'Deep tactical olive green shell designed for dusk-to-dawn protection.',
-    descriptionAr: 'غطاء زيتوني داكن بتصميم تكتيكي لحماية طوال الليل والنهار.',
-    specsEn: ['Material: High-Impact TPU', 'Finish: Matte Olive', 'Weight: 42g'],
-    specsAr: ['المادة: TPU عالي الصدمات', 'النهاية: زيتوني مطفي', 'الوزن: ٤٢ جرام'],
-    caseTypeConfig: { bg: '#1E2A20', ring: '#324536' }
-  },
-  {
-    id: 'case-solar-clear',
-    category: 'cases',
-    nameEn: 'Solar Clear Case',
-    nameAr: 'جراب الشمس الشفاف',
+    nameEn: 'Solar Case',
+    nameAr: 'جراب الشمسي',
     price: 720,
     tagEn: 'Clear + Gold Ring',
     tagAr: 'شفاف + حلقة ذهبية',
-    image: '/images/hero_case.png',
     descriptionEn: 'Crystal clear acrylic canvas with anodized dawn-gold camera housing ring.',
     descriptionAr: 'أكريليك شفاف نقي مع حلقة كاميرا مؤكسدة بذهبي الفجر.',
-    specsEn: ['Material: Optical Grade Acrylic', 'Finish: Anti-Yellowing Clear', 'Weight: 42g'],
-    specsAr: ['المادة: أكريليك بصري', 'النهاية: شفاف مقوم للاصفرار', 'الوزن: ٤٢ جرام'],
-    caseTypeConfig: { bg: 'rgba(22, 26, 50, 0.4)', ring: '#E8A33D' }
+    specsEn: ['Material: Optical Grade Acrylic + TPU', 'Finish: Anti-Yellowing Clear', 'Weight: 42g', 'Ring: Dawn Gold Anodized Alloy'],
+    specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقوم للاصفرار', 'الوزن: ٤٢ جرام', 'الحلقة: سبيكة مؤكسدة بذهب الفجر'],
+    caseTypeConfig: { bg: 'rgba(20, 20, 20, 0.4)', ring: '#E8B04B' }
+  },
+  {
+    id: 'case-ember',
+    category: 'cases',
+    nameEn: 'Ember Case',
+    nameAr: 'جراب الجمر',
+    price: 690,
+    tagEn: 'Frosted Ember',
+    tagAr: 'جمر ضبابي',
+    descriptionEn: 'Semi-translucent dark mahogany tint with Black Sun accent detailing.',
+    descriptionAr: 'درجة بني داكن شبه شفافة مع تفاصيل لون شمس الفجر.',
+    specsEn: ['Material: Matte Translucent Composite', 'Finish: Soft-Touch Frosted', 'Weight: 40g', 'Drop Protection: 3 Meters'],
+    specsAr: ['المادة: مركب مطفي شبه شفاف', 'النهاية: ملمس ناعم ضبابي', 'الوزن: ٤٠ جرام', 'حماية السقوط: ٣ أمتار'],
+    caseTypeConfig: { bg: '#2A1610', ring: '#4A2418' }
+  },
+  {
+    id: 'case-eclipse',
+    category: 'cases',
+    nameEn: 'Eclipse Case',
+    nameAr: 'جراب الكسوف',
+    price: 780,
+    tagEn: 'MagSafe Compatible',
+    tagAr: 'متوافق مع MagSafe',
+    descriptionEn: 'High-grade protective shell integrated with magnetic eclipse alignment ring.',
+    descriptionAr: 'غطاء حماية عالي الجودة مزود بحلقة كسوف مغناطيسية.',
+    specsEn: ['Material: Carbon Fiber Weave + TPU', 'Magnets: N52 Neodymium Array', 'Weight: 45g', 'Wireless Charging: Full Support'],
+    specsAr: ['المادة: ألياف كربون منسوجة + TPU', 'المغناطيس: مصفوفة نيويميوم N52', 'الوزن: ٤٥ جرام', 'الشحن اللاسلكي: دعم كامل'],
+    caseTypeConfig: { bg: '#141110', ring: '#2A2523' }
   },
 
   // DOME STICKERS
+  {
+    id: 'sticker-sun-disc',
+    category: 'stickers',
+    nameEn: 'Sun Disc Dome',
+    nameAr: 'ملصق قرص الشمس',
+    price: 120,
+    tagEn: '3D Epoxy Dome',
+    tagAr: 'إيبوكسي مجسم',
+    descriptionEn: 'High-gloss raised 3D epoxy sticker displaying the signature Duat sun disc.',
+    descriptionAr: 'ملصق إيبوكسي ثلاثي الأبعاد عالي اللمعان يحمل شعار قرص الشمس.',
+    specsEn: ['Diameter: 35mm', 'Material: Self-Healing Polyurethane Epoxy', 'Adhesive: 3M Industrial Grade'],
+    specsAr: ['القطر: ٣٥ مم', 'المادة: إيبوكسي بولي يوريثان ذاتي التثبيت', 'اللاصق: درجة صناعية من 3M'],
+    stickerType: 'sun-disc'
+  },
   {
     id: 'sticker-tale3-noor',
     category: 'stickers',
@@ -93,7 +88,6 @@ export const PRODUCTS = [
     price: 120,
     tagEn: '3D Epoxy Slogan',
     tagAr: 'إيبوكسي مجسم',
-    image: '/images/stickers.png',
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "طالع نور".',
     descriptionAr: 'ملصق بيضاوي مجسم ثلاثي الأبعاد بارز بعبارة "طالع نور".',
     stickerType: 'pill-tale3-noor'
@@ -106,23 +100,9 @@ export const PRODUCTS = [
     price: 120,
     tagEn: '3D Epoxy Slogan',
     tagAr: 'إيبوكسي مجسم',
-    image: '/images/stickers.png',
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "عدّي الليل".',
     descriptionAr: 'ملصق بيضاوي مجسم ثلاثي الأبعاد بارز بعبارة "عدّي الليل".',
     stickerType: 'pill-3addi-lel'
-  },
-  {
-    id: 'sticker-bokra-ahla',
-    category: 'stickers',
-    nameEn: 'Bokra Ahla Dome Pill',
-    nameAr: 'ملصق مجسم — بكرة أحلى',
-    price: 120,
-    tagEn: '3D Epoxy Slogan',
-    tagAr: 'إيبوكسي مجسم',
-    image: '/images/stickers.png',
-    descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "بكرة أحلى".',
-    descriptionAr: 'ملصق بيضاوي مجسم ثلاثي الأبعاد بارز بعبارة "بكرة أحلى".',
-    stickerType: 'pill-bokra-ahla'
   },
   {
     id: 'sticker-born-dawn',
@@ -132,7 +112,6 @@ export const PRODUCTS = [
     price: 120,
     tagEn: '3D Epoxy Slogan',
     tagAr: 'إيبوكسي مجسم',
-    image: '/images/stickers.png',
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "BORN AT DAWN".',
     descriptionAr: 'ملصق مجسم ثلاثي الأبعاد بارز بعبارة "BORN AT DAWN".',
     stickerType: 'pill-born-dawn'
@@ -147,9 +126,10 @@ export const PRODUCTS = [
     price: 180,
     tagEn: 'Brass + Gold Plate',
     tagAr: 'نحاس مطل بالذهب',
-    image: '/images/charms.png',
     descriptionEn: 'Heavyweight solid brass ring charm plated in 18k dawn gold.',
     descriptionAr: 'تعليقة حلقة من النحاس الصلب المطلية بذهب الفجر عيار ١٨.',
+    specsEn: ['Material: Solid Brass', 'Plating: 18k Dawn Gold', 'Loop: Heavy Duty Braided Wire'],
+    specsAr: ['المادة: نحاس صلب', 'الطلاء: ذهب الفجر عيار ١٨', 'الحلقة: سلك مجدول شديد التحمل'],
     charmType: 'gold-ring'
   },
   {
@@ -160,9 +140,10 @@ export const PRODUCTS = [
     price: 150,
     tagEn: 'Hand-Set Epoxy',
     tagAr: 'تركيب يدوي',
-    image: '/images/charms.png',
     descriptionEn: 'Dark red volcanic glass style bead with engraved accent ring.',
     descriptionAr: 'خرزة بأسلوب الزجاج البركاني الأحمر الداكن مع حلقة محفورة.',
+    specsEn: ['Material: Volcanic Epoxy Glass', 'Finish: Polished Smooth', 'Attachment: Stainless Steel Ring'],
+    specsAr: ['المادة: زجاج بركاني إيبوكسي', 'النهاية: صقل مصقول', 'التثبيت: حلقة صلب مقاومة للصدأ'],
     charmType: 'ember-bead'
   },
 
@@ -175,7 +156,6 @@ export const PRODUCTS = [
     price: 240,
     tagEn: 'Woven Cotton',
     tagAr: 'قطن منسوج',
-    image: '/images/charms.png',
     descriptionEn: 'Heavy duty tactical wrist strap made from high-density black woven cotton.',
     descriptionAr: 'حبل معصم تكتيكي منسوج من القطن الأسود عالي الكثافة.',
     accType: 'lanyard'
@@ -212,55 +192,53 @@ export const PHONE_MODELS = [
 ];
 
 export const CASE_TYPES = [
-  { id: 'bone', nameEn: 'Bone Canvas', nameAr: 'عظمي مطفي', bg: '#EDE4D3', ring: '#9A9384' },
-  { id: 'midnight', nameEn: 'Midnight Black', nameAr: 'أسود الليل', bg: '#0A0C16', ring: '#232A55' },
-  { id: 'burgundy', nameEn: 'Burgundy Ember', nameAr: 'نبيذي داكن', bg: '#3A121A', ring: '#6B2232' },
-  { id: 'olive', nameEn: 'Olive Twilight', nameAr: 'زيتوني تكتيكي', bg: '#1E2A20', ring: '#324536' },
-  { id: 'solar-clear', nameEn: 'Solar Clear', nameAr: 'شفاف', bg: 'rgba(22, 26, 50, 0.4)', ring: '#E8A33D' }
+  { id: 'matte-black', nameEn: 'Matte Black', nameAr: 'أسود مطفي', bg: '#0A0A0A', ring: '#1F1B15' },
+  { id: 'clear', nameEn: 'Clear', nameAr: 'شفاف', bg: 'rgba(20, 20, 20, 0.4)', ring: '#3A342C' },
+  { id: 'frosted-ember', nameEn: 'Frosted Ember', nameAr: 'جمر ضبابي', bg: '#2A1610', ring: '#4A2418' },
+  { id: 'gold-ring', nameEn: 'Gold Ring', nameAr: 'حلقة ذهبية', bg: '#0A0A0A', ring: '#E8B04B' },
+  { id: 'magsafe', nameEn: 'MagSafe', nameAr: 'ماج سيف', bg: '#141110', ring: '#2A2523' }
 ];
 
 export const STICKER_PRESETS = [
+  { id: 'sun-disc', nameEn: 'Sun Disc', nameAr: 'قرص الشمس' },
+  { id: 'eclipse', nameEn: 'Eclipse', nameAr: 'كسوف' },
+  { id: 'scarab', nameEn: 'Scarab', nameAr: 'جعران' },
+  { id: 'ankh', nameEn: 'Ankh', nameAr: 'عنخ' },
   { id: 'pill-tale3-noor', nameEn: 'طالع نور', nameAr: 'طالع نور' },
   { id: 'pill-3addi-lel', nameEn: 'عدّي الليل', nameAr: 'عدّي الليل' },
   { id: 'pill-bokra-ahla', nameEn: 'بكرة أحلى', nameAr: 'بكرة أحلى' },
-  { id: 'pill-lesa-badri', nameEn: 'لسه بدري عليك', nameAr: 'لسه بدري عليك' },
-  { id: 'pill-born-dawn', nameEn: 'BORN AT DAWN', nameAr: 'BORN AT DAWN' },
-  { id: 'pill-through-night', nameEn: 'THROUGH THE NIGHT', nameAr: 'THROUGH THE NIGHT' },
-  { id: 'dome-palm', nameEn: 'Palm Dome', nameAr: 'نخلة مجسمة' },
-  { id: 'dome-horse', nameEn: 'Horse Dome', nameAr: 'خيل مجسم' },
-  { id: 'dome-scarab', nameEn: 'Scarab Dome', nameAr: 'جعران مجسم' },
-  { id: 'dome-ankh', nameEn: 'Ankh Dome', nameAr: 'عنخ مجسم' },
-  { id: 'dome-sun', nameEn: 'Sun Disc', nameAr: 'قرص الشمس' }
+  { id: 'pill-born-dawn', nameEn: 'BORN AT DAWN', nameAr: 'BORN AT DAWN' }
 ];
 
+// CLEAN PRESET NAMES (PRIORITY 4 FIX)
 export const PRESET_TEMPLATES = [
   {
-    id: 'preset-tale3-noor',
-    nameEn: 'Tale3 Noor Canvas',
-    nameAr: 'كانفس طالع نور',
-    caseTypeId: 'bone',
+    id: 'preset-dawn-rise',
+    nameEn: 'Dawn Rise',
+    nameAr: 'طالع نور',
+    caseTypeId: 'gold-ring',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'dome-palm', x: 50, y: 35, scale: 1.2, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'sun-disc', x: 50, y: 35, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 65, scale: 1.1, rotation: 0 }
     ]
   },
   {
-    id: 'preset-3addi-lel',
-    nameEn: '3addi El-Lel Midnight',
-    nameAr: 'ميدنايت عدّي الليل',
-    caseTypeId: 'midnight',
+    id: 'preset-night-crossing',
+    nameEn: 'Night Crossing',
+    nameAr: 'عدّي الليل',
+    caseTypeId: 'matte-black',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'dome-sun', x: 50, y: 38, scale: 1.3, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'eclipse', x: 50, y: 38, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-3addi-lel', x: 50, y: 68, scale: 1.1, rotation: 0 }
     ]
   },
   {
     id: 'preset-born-dawn',
-    nameEn: 'Born At Dawn Olive',
-    nameAr: 'زيتوني BORN AT DAWN',
-    caseTypeId: 'olive',
+    nameEn: 'Born at Dawn',
+    nameAr: 'مولود الفجر',
+    caseTypeId: 'magsafe',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'dome-scarab', x: 50, y: 40, scale: 1.2, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'scarab', x: 50, y: 40, scale: 1.2, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-born-dawn', x: 50, y: 70, scale: 1.0, rotation: 0 }
     ]
   }
@@ -287,12 +265,12 @@ export const GOVERNORATES = [
 export const REVIEWS = [
   {
     id: 'rev-1',
-    author: 'Moataz K.',
+    author: 'Youssef K.',
     city: 'Alexandria',
     cityAr: 'الإسكندرية',
     rating: 5,
-    textEn: 'The 3D epoxy slogan pills feel insane in hand. "طالع نور" on Bone canvas is pure art.',
-    textAr: 'استيكر "طالع نور" المجسم على كفر العظمي خرافة في الإيد. ستايل تكوير حقيقي ومش طابع سياحي تقليدي.'
+    textEn: 'The 3D epoxy dome sticker feels insane in hand. Real techwear aesthetic, not touristy. Fast 3-day shipping in Alex.',
+    textAr: 'ملصق الإيبوكسي المجسم خرافة في الإيد. ستايل تكوير حقيقي ومش طابع سياحي تقليدي. التوصيل في إسكندرية وصل في ٣ أيام.'
   },
   {
     id: 'rev-2',
@@ -300,8 +278,8 @@ export const REVIEWS = [
     city: 'Cairo',
     cityAr: 'القاهرة',
     rating: 5,
-    textEn: 'Built a custom Midnight case with "BORN AT DAWN" text. Quality exceeds expectations. 10/10.',
-    textAr: 'صممت جراب ميدنايت مخصص مع كتابة "BORN AT DAWN". الجودة تتفوق على كاستيفاي وبسعر ممتاز.'
+    textEn: 'Built a custom MagSafe case with dawn text. Quality exceeds expectations. 10/10 craftsmanship.',
+    textAr: 'صممت جراب ماج سيف مخصص مع كتابة ذهبية. الجودة تتفوق على توقعاتي وبسعر ممتاز. إتقان ١٠/١٠.'
   }
 ];
 
@@ -312,5 +290,19 @@ export const FAQS = [
     qAr: 'كم يستغرق تصنيع الجراب المخصص وشحنه؟',
     aEn: 'Every custom case is made to order in our Alexandria forge within 2–3 business days. Delivery takes 1 day for Alexandria & Cairo, and 2–3 days for other governorates.',
     aAr: 'كل جراب مخصص بيتم تصنيعه حسب الطلب في مصنعنا بالإسكندرية خلال ٢-٣ أيام عمل. التوصيل بياخد يوم واحد للإسكندرية والقاهرة، و٢-٣ أيام لباقي المحافظات.'
+  },
+  {
+    id: 'faq-2',
+    qEn: 'Are 3D epoxy dome stickers durable & waterproof?',
+    qAr: 'هل ملصقات الإيبوكسي المجسمة متينة ومقاومة للماء؟',
+    aEn: 'Yes. We use self-healing optical resin with industrial 3M adhesive. They resist scratches, water, and daily pocket friction without peeling.',
+    aAr: 'نعم. بنستخدم راتينج بولي يوريثان ذاتي التثبيت مع لاصق 3M صناعي. بيقاوم الخدوش، المية، واحتكاك الجيب اليومي بدون ما يقشر.'
+  },
+  {
+    id: 'faq-3',
+    qEn: 'What is your warranty and returns policy?',
+    qAr: 'ما هي سياسة الضمان والاستبدال؟',
+    aEn: 'All products come with a 1-year replacement warranty against manufacturing defects or yellowing. If anything arrives damaged, we replace it instantly via WhatsApp support.',
+    aAr: 'جميع المنتجات معاها ضمان استبدال لمدة سنة ضد عيوب التصنيع أو الاصفرار. لو وصلك أي شيء فيه عيب، بنستبدله فوراً عبر خدمة عملاء الواتساب.'
   }
 ];

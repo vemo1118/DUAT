@@ -11,22 +11,22 @@ export const TRANSLATIONS = {
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
     heroHeadline1: 'THROUGH THE NIGHT',
     heroHeadline2: 'BORN AT DAWN.',
-    heroSub: 'A modern Egyptian label for a generation moving through the dark toward the light. Phone cases, 3D epoxy slogan pills, and charms.',
+    heroSub: 'Objects for the night crossing. Phone cases, 3D dome stickers, and charms — designed for the passage from dusk to dawn.',
     heroCtaPrimary: 'BUILD YOUR CASE',
     heroCtaSecondary: 'SEE THE COLLECTION',
 
     // Categories
     catEyebrow: 'THE FOUR HOURS',
     catTitle: 'What we make.',
-    catCases: 'Blank Canvases',
-    catStickers: '3D Epoxy Stickers',
-    catCharms: 'Dawn Charms',
+    catCases: 'Cases',
+    catStickers: 'Dome Stickers',
+    catCharms: 'Charms',
     catAccessories: 'Accessories',
 
     // Forge
     forgeEyebrow: 'THE FORGE',
     forgeTitle: 'Build a case for yourself.',
-    forgeDesc: 'Select your phone model, choose your armor tint, and stack 3D epoxy slogan pills ("طالع نور", "BORN AT DAWN") on canvas. Made to order. Shipped in 5 days.',
+    forgeDesc: 'Select your phone model, choose your armor finish, and stack 3D epoxy domes or custom text on canvas. Made to order. Shipped in 5 days.',
     forgeCta: 'OPEN THE BUILDER',
 
     // Featured
@@ -62,13 +62,13 @@ export const TRANSLATIONS = {
     searchModel: 'Search phone model...',
     caseType: 'Case Armor Finish',
     tabPresets: 'Presets',
-    tabStickers: '3D Epoxy Stickers',
+    tabStickers: 'Stickers',
     tabText: 'Text',
     tabImage: 'Image',
     textPlaceholder: 'Enter custom text...',
-    fontDisplay: 'Display (Anton)',
-    fontBody: 'Body (Space Grotesk)',
-    fontMono: 'Arabic (Cairo)',
+    fontDisplay: 'Body (Space Grotesk)',
+    fontBody: 'Arabic (Reem Kufi)',
+    fontMono: 'Data (Monospace)',
     addTextBtn: 'ADD TEXT',
     uploadZoneText: 'Drag & drop image file or click to browse',
     uploadZoneHint: 'PNG, JPG, WebP up to 10MB',
@@ -137,17 +137,23 @@ export const TRANSLATIONS = {
     stepShipped: 'Out for Courier Delivery',
     stepDelivered: 'Passage Delivered',
 
-    // About (Moataz's Exact Narrative)
-    aboutEyebrow: 'The Story · الحدوتة',
-    aboutTitle: 'Born at dawn.',
-    aboutP1: 'الدُوات هو العالم اللي بتعدّي فيه الشمس كل ليلة في الضلمة، بتحارب، وبتتولد من جديد عند الفجر. الاسم نفسه هو الوعد: إنك تعدّي ليلك وتطلع نور.',
-    aboutP2: 'مش بنبيع جراب. بنبيع فكرة إنك جاي من الضلمة وماشي للنور.',
-    aboutP3: 'BORN AT DAWN · MADE IN ALEXANDRIA · SHIPPED WORLDWIDE',
-    aboutCta: 'صمم جرابك الآن',
+    // Reviews & FAQ — PRIORITY 3 FIX
+    reviewsEyebrow: 'WHAT THEY CARRY',
+    reviewsTitle: 'From the passage.',
+    faqEyebrow: 'THE PASSAGE GUIDE',
+    faqTitle: 'Frequently asked questions.',
+
+    // About
+    aboutEyebrow: 'DUAT / ∞',
+    aboutTitle: 'The Duat.',
+    aboutP1: 'In the old story, the sun descended each night into the Duat — the underworld — and crossed twelve hours of darkness before rising again at dawn. Twelve hours, twelve trials, one passage.',
+    aboutP2: 'We took the name because we make objects for the same journey. The one you\'re on. Between the two suns of any day, between the person you were and the person you\'re becoming.',
+    aboutP3: 'Made in Alexandria. Shipped worldwide. To order.',
+    aboutCta: 'BUILD YOUR CASE',
 
     // Footer
     footerBrand: 'DUAT',
-    footerTagline: 'Through the night · من الضلمة للنور',
+    footerTagline: 'Objects for the night crossing.',
     footerLocation: 'Alexandria, Egypt',
     footerSocial: '@wearduat on IG / TikTok / Threads',
     footerRights: '© DUAT. All rights reserved.'
@@ -157,30 +163,30 @@ export const TRANSLATIONS = {
     // Nav
     navShop: 'المتجر',
     navCustomize: 'صمم جرابك',
-    navDuat: 'الحدوتة',
+    navDuat: 'الدوات',
     cartTitle: 'سلة الشراء',
     trackOrderNav: 'تتبع طلبك',
 
     // Hero
     heroEyebrow: 'دوات / ٠٠ — العبور',
-    heroHeadline1: 'عدّي الليل',
-    heroHeadline2: 'طالع نور.',
-    heroSub: 'براند مصري لجيل بيعدّي في ليله وهو عارف إنه طالع نور. مظلم في الشكل، مليان أمل في المعنى.',
+    heroHeadline1: 'عبر ظلمة الليل',
+    heroHeadline2: 'مولود مع الفجر.',
+    heroSub: 'جرابات هواتف، ملصقات مجسمة، وتعليقات — مُصممة للعبور من الغروب إلى الفجر.',
     heroCtaPrimary: 'صمم جرابك الآن',
     heroCtaSecondary: 'استكشف التشكيلة',
 
     // Categories
     catEyebrow: 'الساعات الأربع',
     catTitle: 'ما نصنعه.',
-    catCases: 'الجرابات (الكانفس)',
-    catStickers: 'الملصقات المجسمة 3D',
-    catCharms: 'التعليقات والخرز',
+    catCases: 'الجرابات',
+    catStickers: 'الملصقات المجسمة',
+    catCharms: 'التعليقات',
     catAccessories: 'الإكسسوارات',
 
     // Forge
     forgeEyebrow: 'المصنع',
     forgeTitle: 'صمم جراباً يعبر عنك.',
-    forgeDesc: 'اختر موديل هاتفك، لون الدروع، وأضف طبقات ملصقات الإيبوكسي المجسمة ("طالع نور"، "BORN AT DAWN") على اللوحة. مصنوع حسب الطلب. الشحن خلال ٥ أيام.',
+    forgeDesc: 'اختر موديل هاتفك، لون الدروع، وأضف طبقات الملصقات المجسمة أو نصوصك الخاصة على اللوحة. مصنوع حسب الطلب. الشحن خلال ٥ أيام.',
     forgeCta: 'افتح أداة التصميم',
 
     // Featured
@@ -220,9 +226,9 @@ export const TRANSLATIONS = {
     tabText: 'النصوص',
     tabImage: 'الصور',
     textPlaceholder: 'أدخل النص الخاص بك...',
-    fontDisplay: 'العنوان (Anton)',
-    fontBody: 'النص (Space Grotesk)',
-    fontMono: 'عربي (Cairo)',
+    fontDisplay: 'النص (Space Grotesk)',
+    fontBody: 'عربي (ريم كوفي)',
+    fontMono: 'بيانات (أرقام)',
     addTextBtn: 'إضافة النص',
     uploadZoneText: 'اسحب صورة هنا أو انقر للاختيار',
     uploadZoneHint: 'تدعم PNG, JPG, WebP حتى ١٠ ميجابايت',
@@ -291,17 +297,23 @@ export const TRANSLATIONS = {
     stepShipped: 'في الطريق مع مندوب الشحن',
     stepDelivered: 'تم وصول الطلب بنجاح',
 
+    // Reviews & FAQ — PRIORITY 3 FIX
+    reviewsEyebrow: 'اللي بيحملوه',
+    reviewsTitle: 'من الرحلة.',
+    faqEyebrow: 'دليل العبور',
+    faqTitle: 'الأسئلة الشائعة.',
+
     // About
-    aboutEyebrow: 'The Story · الحدوتة',
-    aboutTitle: 'Born at dawn',
-    aboutP1: 'الدُوات هو العالم اللي بتعدّي فيه الشمس كل ليلة في الضلمة، بتحارب، وبتتولد من جديد عند الفجر. الاسم نفسه هو الوعد: إنك تعدّي ليلك وتطلع نور.',
-    aboutP2: 'مش بنبيع جراب. بنبيع فكرة إنك جاي من الضلمة وماشي للنور.',
-    aboutP3: 'مصنوع في الإسكندرية · شحن للعالم كله · حسب الطلب',
+    aboutEyebrow: 'دوات / ∞',
+    aboutTitle: 'الدوات.',
+    aboutP1: 'في الأسطورة القديمة، كانت الشمس بتنزل كل ليلة في الدوات — العالم السفلي — و تعبر ١٢ ساعة من الظلمة قبل ما تشرق تاني مع الفجر. ١٢ ساعة، ١٢ اختبار، عبور واحد.',
+    aboutP2: 'خدنا الاسم لأننا بنعمل أشياء لنفس الرحلة. الرحلة اللي إنت فيها. بين شمسي أي يوم، بين اللي كنته و اللي بتبقاه.',
+    aboutP3: 'مصنوع في الإسكندرية. شحن للعالم كله. حسب الطلب.',
     aboutCta: 'صمم جرابك الآن',
 
     // Footer
     footerBrand: 'دوات',
-    footerTagline: 'Through the night · من الضلمة للنور',
+    footerTagline: 'أشياء مخصصة لرحلة الليل.',
     footerLocation: 'الإسكندرية، مصر',
     footerSocial: 'wearduat@ على إنستجرام / تيك توك / ثريدز',
     footerRights: '© دوات. جميع الحقوق محفوظة.'

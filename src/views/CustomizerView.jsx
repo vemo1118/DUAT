@@ -38,11 +38,11 @@ export const CustomizerView = () => {
   const [showGrid, setShowGrid] = useState(false);
 
   // Active Tool Tab: 'presets' | 'stickers' | 'text' | 'image'
-  const [activeTab, setActiveTab] = useState('presets');
+  const [activeTab, setActiveTab] = useState('stickers');
 
   // Text Tool inputs
   const [textInput, setTextInput] = useState('');
-  const [textFont, setTextFont] = useState('archivo');
+  const [textFont, setTextFont] = useState('space');
   const [textColor, setTextColor] = useState('#E8B04B');
 
   // Layers state
@@ -68,7 +68,7 @@ export const CustomizerView = () => {
   const dragStartRef = useRef({ x: 0, y: 0 });
   const initialLayerStateRef = useRef(null);
 
-  // Quick Brand Swatches
+  // Quick Color Swatches
   const colorSwatches = ['#E8B04B', '#E5493A', '#EFE9DE', '#6B655D', '#FFFFFF', '#050505'];
 
   const filteredModels = PHONE_MODELS.filter(m =>
@@ -242,13 +242,10 @@ export const CustomizerView = () => {
     window.removeEventListener('pointerup', handlePointerUp);
   };
 
-  // Export Design Render Mockup
   const handleExportPNG = () => {
-    // Generate simulated high-res PNG download notification
     showToast(t('designExportedToast'), 'info');
   };
 
-  // Add Custom Case to Cart
   const handleAddToCart = () => {
     if (layers.length === 0) return;
 
@@ -275,12 +272,12 @@ export const CustomizerView = () => {
             <SunDisc size={14} variant="gold" />
             <span>{t('customizerEyebrow')}</span>
           </div>
-          <h1 className="font-archivo text-4xl sm:text-5xl uppercase text-bone">
+          <h1 className="font-space text-4xl sm:text-5xl font-bold tracking-tight uppercase text-bone">
             {t('customizerTitle')}
           </h1>
         </div>
 
-        {/* Toolbar Helpers: Grid Toggle & PNG Export */}
+        {/* Toolbar Helpers */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowGrid(!showGrid)}
@@ -330,7 +327,7 @@ export const CustomizerView = () => {
             )}
 
             {/* Camera Cutout Housing (Top-Right) */}
-            <div className="absolute top-4 right-4 w-20 h-20 rounded-2xl bg-void/90 border-2 border-grave z-20 flex flex-col items-center justify-center gap-1.5 p-2 shadow-inner">
+            <div className="absolute top-4 right-4 w-20 h-20 rounded-2xl bg-void/90 border-2 border-grave z-20 flex flex-col items-center justify-center gap-1.5 p-2 shadow-inner pointer-events-none">
               <div className="w-5 h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-ash/40" />
               </div>
@@ -339,12 +336,10 @@ export const CustomizerView = () => {
               </div>
             </div>
 
-            {/* MagSafe Ring visual indicator if MagSafe case */}
-            {selectedCaseType.id === 'magsafe' && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
-                <div className="w-44 h-44 rounded-full border-4 border-dashed border-bone" />
-              </div>
-            )}
+            {/* Minimal Brand Sun Disc Mark on Case Bottom */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none opacity-40">
+              <SunDisc size={20} variant="gold" />
+            </div>
 
             {/* Empty Canvas Placeholder Graphic */}
             {layers.length === 0 && (
@@ -356,7 +351,7 @@ export const CustomizerView = () => {
               </div>
             )}
 
-            {/* RENDER LAYERS */}
+            {/* RENDER LAYERS ON CANVAS (PRIORITY 2 FIX) */}
             {layers.map((layer) => {
               const isSelected = selectedLayerId === layer.id;
 
@@ -372,30 +367,32 @@ export const CustomizerView = () => {
                     zIndex: layers.findIndex(l => l.id === layer.id) + 10
                   }}
                 >
-                  {/* Layer Content */}
+                  {/* Layer Container with Content Rendered Inside */}
                   <div
-                    className={`relative p-2 ${
+                    className={`relative p-2 flex items-center justify-center ${
                       isSelected
                         ? 'outline outline-2 outline-gold outline-offset-4 bg-gold/5'
                         : 'hover:outline hover:outline-1 hover:outline-ash'
                     }`}
                   >
+                    {/* Render Sticker SVG / Slogan Pill Content */}
                     {layer.type === 'sticker' && (
-                      <StickerIcon stickerId={layer.stickerId} size={64} />
+                      <StickerIcon stickerId={layer.stickerId} size={56} />
                     )}
 
+                    {/* Render Text Content */}
                     {layer.type === 'text' && (
                       <span
                         className={`block whitespace-nowrap leading-none ${
-                          layer.font === 'archivo'
-                            ? 'font-archivo'
-                            : layer.font === 'mono'
+                          layer.font === 'mono'
                             ? 'font-mono'
-                            : 'font-space'
+                            : layer.font === 'kufi'
+                            ? 'font-kufi font-bold'
+                            : 'font-space font-bold'
                         }`}
                         style={{
                           color: layer.color,
-                          fontSize: '28px',
+                          fontSize: '26px',
                           textShadow: '0 2px 8px rgba(0,0,0,0.8)'
                         }}
                       >
@@ -403,6 +400,7 @@ export const CustomizerView = () => {
                       </span>
                     )}
 
+                    {/* Render Image Content */}
                     {layer.type === 'image' && (
                       <img
                         src={layer.src}
@@ -411,12 +409,12 @@ export const CustomizerView = () => {
                       />
                     )}
 
-                    {/* SELECTION HANDLES */}
+                    {/* SELECTION TRANSFORM HANDLES SIT ON TOP */}
                     {isSelected && (
                       <>
                         <div
                           onPointerDown={(e) => handlePointerDown(e, layer.id, 'rotate')}
-                          className="absolute -top-7 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gold text-void flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
+                          className="absolute -top-7 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gold text-void flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg z-30"
                           title="Rotate"
                         >
                           <RotateCw size={12} />
@@ -424,7 +422,7 @@ export const CustomizerView = () => {
 
                         <div
                           onPointerDown={(e) => handlePointerDown(e, layer.id, 'resize')}
-                          className="absolute -bottom-3 -right-3 w-5 h-5 bg-gold border border-void cursor-se-resize shadow-lg"
+                          className="absolute -bottom-3 -right-3 w-5 h-5 bg-gold border border-void cursor-se-resize shadow-lg z-30"
                           title="Resize"
                         />
                       </>
@@ -539,20 +537,20 @@ export const CustomizerView = () => {
               })}
             </div>
 
-            {/* TAB CONTENT: PRESETS */}
+            {/* TAB CONTENT: PRESETS (Clean English/Arabic Names - PRIORITY 4 FIX) */}
             {activeTab === 'presets' && (
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-3 gap-3 pt-2">
                 {PRESET_TEMPLATES.map((preset) => (
                   <button
                     key={preset.id}
                     onClick={() => handleLoadPreset(preset)}
-                    className="bg-stone border border-grave p-4 text-left hover:border-gold transition-all group space-y-2"
+                    className="bg-stone border border-grave p-3.5 text-left hover:border-gold transition-all group space-y-2"
                   >
                     <div className="flex items-center justify-between">
-                      <SunDisc size={16} variant="gold" />
+                      <SunDisc size={14} variant="gold" />
                       <span className="font-mono text-[9px] text-ash uppercase">PRESET</span>
                     </div>
-                    <h4 className="font-space text-sm font-bold text-bone group-hover:text-gold transition-colors">
+                    <h4 className="font-space text-xs font-bold text-bone group-hover:text-gold transition-colors">
                       {lang === 'ar' ? preset.nameAr : preset.nameEn}
                     </h4>
                   </button>
@@ -560,17 +558,17 @@ export const CustomizerView = () => {
               </div>
             )}
 
-            {/* TAB CONTENT: STICKERS */}
+            {/* TAB CONTENT: STICKERS & PHRASE PILLS */}
             {activeTab === 'stickers' && (
               <div className="grid grid-cols-4 gap-3 pt-2">
                 {STICKER_PRESETS.map((sticker) => (
                   <button
                     key={sticker.id}
                     onClick={() => handleAddSticker(sticker.id)}
-                    className="bg-stone border border-grave p-3 flex flex-col items-center gap-2 hover:border-gold hover:bg-void transition-all group"
+                    className="bg-stone border border-grave p-3 flex flex-col items-center justify-center gap-2 hover:border-gold hover:bg-void transition-all group"
                   >
-                    <StickerIcon stickerId={sticker.id} size={36} />
-                    <span className="font-mono text-[9px] uppercase tracking-tighter text-ash group-hover:text-gold">
+                    <StickerIcon stickerId={sticker.id} size={32} />
+                    <span className="font-mono text-[9px] uppercase tracking-tighter text-ash group-hover:text-gold text-center">
                       {lang === 'ar' ? sticker.nameAr : sticker.nameEn}
                     </span>
                   </button>
@@ -599,8 +597,8 @@ export const CustomizerView = () => {
                       onChange={(e) => setTextFont(e.target.value)}
                       className="w-full bg-stone border border-grave text-bone p-2 text-xs font-mono"
                     >
-                      <option value="archivo">{t('fontDisplay')}</option>
-                      <option value="space">{t('fontBody')}</option>
+                      <option value="space">{t('fontDisplay')}</option>
+                      <option value="kufi">{t('fontBody')}</option>
                       <option value="mono">{t('fontMono')}</option>
                     </select>
                   </div>

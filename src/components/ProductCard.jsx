@@ -22,33 +22,57 @@ export const ProductCard = ({ product }) => {
   const name = lang === 'ar' ? product.nameAr : product.nameEn;
   const tag = lang === 'ar' ? product.tagAr : product.tagEn;
 
+  // Custom high-end dark SVG visuals per product type
+  const renderProductGraphic = () => {
+    switch (product.category) {
+      case 'cases':
+        return (
+          <div className="w-24 h-44 rounded-[20px] border-2 border-grave bg-stone shadow-2xl relative flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+            {/* Phone Camera Lens */}
+            <div className="absolute top-2.5 right-2.5 w-6 h-6 rounded-md bg-void border border-grave flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-ash/40" />
+            </div>
+            {/* Minimal Sun Disc Brand Mark */}
+            <SunDisc size={36} variant={product.id.includes('ember') ? 'ember' : 'gold'} />
+          </div>
+        );
+      case 'stickers':
+        return (
+          <div className="w-24 h-24 rounded-full bg-stone border border-grave flex items-center justify-center relative shadow-xl group-hover:scale-110 transition-transform duration-300">
+            <div className="w-20 h-20 rounded-full bg-coal border border-gold/30 flex items-center justify-center">
+              <SunDisc size={32} variant={product.id.includes('scarab') ? 'eclipse' : 'gold'} />
+            </div>
+          </div>
+        );
+      case 'charms':
+        return (
+          <div className="flex flex-col items-center group-hover:scale-105 transition-transform duration-300">
+            <div className="w-1 h-12 bg-gradient-to-b from-gold/60 to-gold" />
+            <div className="w-10 h-10 bg-coal border-2 border-gold flex items-center justify-center shadow-lg">
+              <SunDisc size={20} variant="gold" />
+            </div>
+          </div>
+        );
+      case 'accessories':
+      default:
+        return (
+          <div className="w-32 h-24 border border-grave bg-stone/80 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
+            <div className="w-20 h-12 border-b-2 border-gold flex items-center justify-between px-2">
+              <span className="font-mono text-[9px] text-ash tracking-widest">DUAT</span>
+              <SunDisc size={16} />
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="bg-coal border border-grave flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:border-gold/60 hover:shadow-[0_0_30px_rgba(232,176,75,0.15)] cursor-pointer">
+    <div className="bg-coal border border-grave flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:border-gold/50 cursor-pointer">
       
       {/* Visual Canvas Area */}
-      <div className="h-64 bg-void/80 flex items-center justify-center p-4 relative overflow-hidden border-b border-grave">
-        
-        {/* Ambient Subtle Sun Radial Glow */}
-        <div className="absolute inset-0 bg-radial from-gold/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-        {product.image ? (
-          <img
-            src={product.image}
-            alt={name}
-            className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-24 h-44 rounded-[18px] border-2 border-grave bg-stone shadow-2xl relative flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
-            <SunDisc size={36} variant="gold" />
-          </div>
-        )}
-
-        {/* Tag Badge */}
-        <div className="absolute top-3 left-3 bg-void/90 backdrop-blur-md border border-grave px-2.5 py-1">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-gold font-bold">
-            {tag}
-          </span>
-        </div>
+      <div className="h-64 bg-void/60 flex items-center justify-center p-6 relative overflow-hidden border-b border-grave">
+        <div className="absolute inset-0 bg-gradient-to-t from-stone/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {renderProductGraphic()}
       </div>
 
       {/* Product Information */}
@@ -56,11 +80,11 @@ export const ProductCard = ({ product }) => {
         <div>
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] uppercase tracking-widest text-ash">
-              DUAT OFFICIAL
+              {tag}
             </span>
             <SunDisc size={10} className="text-gold opacity-50" />
           </div>
-          <h3 className="font-space text-lg font-bold text-bone mt-1 group-hover:text-gold transition-colors">
+          <h3 className="font-space font-bold text-lg text-bone mt-1 group-hover:text-gold transition-colors">
             {name}
           </h3>
           <p className="font-mono text-sm text-gold font-bold mt-2">

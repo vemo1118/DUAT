@@ -1,62 +1,49 @@
 import React from 'react';
-import { useLanguage } from '../context/LanguageContext';
 import { SunDisc } from '../components/SunDisc';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const AboutView = ({ setView }) => {
-  const { lang, t } = useLanguage();
-  const isRtl = lang === 'ar';
-  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
+  const { t } = useLanguage();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 min-h-screen">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
       
-      {/* Single Column Max-Width 640px */}
-      <div className="max-w-[640px] mx-auto space-y-12">
+      {/* Header */}
+      <div className="space-y-4 text-center">
+        <div className="flex items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-gold">
+          <SunDisc size={14} variant="gold" />
+          <span>{t('aboutEyebrow')}</span>
+        </div>
+        <h1 className="font-space font-bold text-5xl sm:text-7xl uppercase text-bone tracking-tight">
+          {t('aboutTitle')}
+        </h1>
+      </div>
+
+      {/* Hero Visual Mark */}
+      <div className="flex justify-center my-8">
+        <div className="w-44 h-44 rounded-full bg-stone border-2 border-grave flex items-center justify-center shadow-2xl relative">
+          <SunDisc size={96} variant="gold" className="animate-pulse" />
+        </div>
+      </div>
+
+      {/* Story Narrative Box */}
+      <div className="bg-stone border border-grave p-8 sm:p-12 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed">
+        <p>{t('aboutP1')}</p>
+        <p>{t('aboutP2')}</p>
         
-        {/* Header */}
-        <div className="space-y-4 text-center">
-          <div className="flex items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-gold">
-            <SunDisc size={16} variant="gold" />
-            <span>{t('aboutEyebrow')}</span>
-          </div>
-          
-          <h1 className="font-archivo text-5xl sm:text-7xl uppercase text-bone tracking-tight">
-            {t('aboutTitle')}
-          </h1>
+        <div className="p-6 bg-coal border-l-4 border-gold text-gold font-mono text-sm tracking-widest uppercase">
+          {t('aboutP3')}
         </div>
+      </div>
 
-        {/* Decorative Sun Disc Graphic */}
-        <div className="flex justify-center py-6">
-          <SunDisc size={96} variant="eclipse" className="animate-pulse opacity-90" />
-        </div>
-
-        {/* Narrative Paragraphs */}
-        <div className="space-y-8 text-bone/90 leading-relaxed font-space text-lg sm:text-xl font-light">
-          <p className="border-l-2 border-gold pl-6 py-1">
-            {t('aboutP1')}
-          </p>
-
-          <p className="py-1">
-            {t('aboutP2')}
-          </p>
-
-          <p className="font-mono text-sm uppercase tracking-widest text-gold font-bold pt-4">
-            {t('aboutP3')}
-          </p>
-        </div>
-
-        {/* End CTA */}
-        <div className="pt-8 text-center">
-          <button
-            onClick={() => setView('customizer')}
-            className="btn-primary py-4 px-10 text-sm flex items-center justify-center gap-3 mx-auto group"
-          >
-            <span>{t('aboutCta')}</span>
-            <ArrowIcon size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-
+      {/* CTA */}
+      <div className="flex justify-center pt-4">
+        <button
+          onClick={() => setView('customizer')}
+          className="btn-primary py-4 px-10 text-sm font-mono tracking-widest"
+        >
+          {t('aboutCta')}
+        </button>
       </div>
 
     </div>
