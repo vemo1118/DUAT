@@ -39,14 +39,16 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   return (
     <div className="space-y-20 sm:space-y-28 pb-20">
       
-      {/* HERO SECTION */}
-      <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-void overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
+      {/* HERO SECTION — REAL PRODUCT PHOTOGRAPHY + HERO WARMTH GLOW */}
+      <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
         
-        <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-radial from-gold/10 via-transparent to-transparent rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        {/* Soft ~8% Gold Glow Behind Hero Text (Part 2 Accent) */}
+        <div className="absolute top-1/4 left-10 w-[480px] h-[480px] bg-gold/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
+            {/* Left Column: Display Headings with Proper Word Spacing (Part 3 Fix) */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8">
               
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
@@ -54,9 +56,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 <span>{t('heroEyebrow')}</span>
               </div>
 
-              <h1 className="font-clash text-4xl sm:text-6xl lg:text-[90px] uppercase text-bone leading-display tracking-tight">
-                {t('heroHeadline1')} <br />
-                <span className="text-gold">{t('heroHeadline2')}</span>
+              <h1 className="font-clash text-4xl sm:text-6xl lg:text-[90px] uppercase text-bone leading-display">
+                THROUGH THE NIGHT <br />
+                <span className="text-gold">BORN AT DAWN.</span>
               </h1>
 
               <p className="font-space text-base sm:text-xl text-bone/80 max-w-xl font-light leading-relaxed">
@@ -98,34 +100,26 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
             </div>
 
-            <div className="lg:col-span-5 flex justify-center pt-6 lg:pt-0">
-              <div className="w-64 sm:w-72 h-[440px] sm:h-[480px] rounded-[38px] border-2 border-gold/40 bg-stone p-5 shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500">
+            {/* Right Column: Hero Real Product Photography Container (Part 1 Fix) */}
+            <div className="lg:col-span-5 flex flex-col items-center pt-6 lg:pt-0">
+              <div className="relative group w-full max-w-xs sm:max-w-sm">
                 
-                <div className="self-end w-20 h-20 rounded-2xl bg-coal border-2 border-gold flex flex-col items-center justify-center p-2 shadow-lg">
-                  <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center mb-1">
-                    <div className="w-2 h-2 rounded-full bg-ash/30" />
+                {/* Subtle Gold Rim Glow Behind Container */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-gold/30 via-gold/10 to-gold/30 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500" />
+                
+                {/* Clean Image Container */}
+                <div className="relative bg-stone border border-grave p-2 shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden">
+                  <img
+                    src="/images/hero_case.png"
+                    alt="DUAT Solar Case"
+                    className="w-full aspect-[3/4] object-cover object-center group-hover:scale-103 transition-transform duration-500 ease-out"
+                  />
+                  
+                  {/* Real Product Mono Caption */}
+                  <div className="p-3 bg-void/90 border-t border-grave flex justify-between items-center font-mono text-[11px]">
+                    <span className="text-gold font-bold uppercase">DUAT SOLAR CASE</span>
+                    <span className="text-ash">C.2026 · ALEXANDRIA</span>
                   </div>
-                  <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-ash/30" />
-                  </div>
-                </div>
-
-                <div className="my-auto flex flex-col items-center gap-3 text-center">
-                  <div className="w-16 h-16 rounded-full border border-gold/30 flex items-center justify-center bg-coal">
-                    <div className="w-8 h-8 rounded-full border border-gold" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-space font-bold text-sm text-bone uppercase tracking-widest block">
-                      DUAT SOLAR CASE
-                    </span>
-                    <span className="font-mono text-[10px] text-ash tracking-widest uppercase block">
-                      C.2026 • ALEXANDRIA
-                    </span>
-                  </div>
-                </div>
-
-                <div className="self-start text-[9px] font-mono tracking-widest text-ash/40 font-bold uppercase select-none">
-                  DUAT
                 </div>
 
               </div>
@@ -144,7 +138,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               <SunDisc size={12} variant="gold" />
               <span>{t('catEyebrow')}</span>
             </div>
-            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone tracking-tight">
+            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone">
               {t('catTitle')}
             </h2>
           </div>
@@ -182,7 +176,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* BUILD YOUR OWN */}
+      {/* BUILD YOUR OWN — THE FORGE */}
       <section className="bg-stone border-y border-grave py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -193,7 +187,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 <span>{t('forgeEyebrow')}</span>
               </div>
 
-              <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone leading-tight tracking-tight">
+              <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone leading-tight">
                 {t('forgeTitle')}
               </h2>
 
@@ -210,22 +204,23 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               </button>
             </div>
 
+            {/* Customizer Preview Box */}
             <div className="flex justify-center pt-6 lg:pt-0">
-              <div className="w-64 h-[400px] rounded-[32px] border-2 border-grave bg-void p-4 shadow-2xl relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500">
-                <div className="self-end w-16 h-16 rounded-xl bg-coal border border-grave flex items-center justify-center p-2">
-                  <div className="w-4 h-4 rounded-full bg-void border border-ash/40" />
-                </div>
+              <div className="w-64 aspect-[3/4] border border-grave bg-void p-2 shadow-2xl relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500 overflow-hidden">
+                <img
+                  src="/images/hero_case.png"
+                  alt="Customizer Preview"
+                  className="w-full h-full object-cover object-center opacity-80"
+                />
                 
-                <div className="my-auto flex flex-col items-center gap-3 text-center">
+                <div className="absolute inset-0 bg-void/40 flex flex-col items-center justify-center p-4 text-center">
                   <div className="bg-gold text-void font-kufi font-bold text-xs px-3 py-1 rounded-full shadow-md">
                     طالع نور
                   </div>
-                  <span className="font-mono text-[10px] text-ash tracking-widest uppercase">
+                  <span className="font-mono text-[10px] text-bone tracking-widest uppercase mt-2">
                     INTERACTIVE BUILDER
                   </span>
                 </div>
-
-                <div className="w-20 h-1 bg-grave rounded-full" />
               </div>
             </div>
 
@@ -233,7 +228,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
+      {/* FEATURED PRODUCTS — NEW PASSAGE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6">
           <div className="space-y-2">
@@ -241,7 +236,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               <SunDisc size={12} variant="gold" />
               <span>{t('featuredEyebrow')}</span>
             </div>
-            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone tracking-tight">
+            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone">
               {t('featuredTitle')}
             </h2>
           </div>
@@ -273,7 +268,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               <SunDisc size={12} variant="gold" />
               <span>{t('reviewsEyebrow')}</span>
             </div>
-            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone tracking-tight">
+            <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone">
               {t('reviewsTitle')}
             </h2>
           </div>
@@ -310,7 +305,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
             <SunDisc size={12} variant="gold" />
             <span>{t('faqEyebrow')}</span>
           </div>
-          <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone tracking-tight">
+          <h2 className="font-clash text-3xl sm:text-4xl uppercase text-bone">
             {t('faqTitle')}
           </h2>
         </div>

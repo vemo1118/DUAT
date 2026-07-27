@@ -13,6 +13,13 @@
   --ash: #6E675D;
 }
 
+/* Dusk-to-Dawn Site-Wide Fixed Background Gradient (Part 2) */
+body {
+  background: linear-gradient(180deg, #0C0A07 0%, #050505 50%, #050507 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
 /* Enforce hard edges by default across all buttons, cards, inputs. Only mockup classes get radius */
 button, input, select, textarea, div, a, article, section {
   border-radius: 0;
@@ -29,12 +36,13 @@ button, a.btn, select, input[type="submit"] {
   outline-offset: 4px !important;
 }
 
-/* Typography Stack Definitions */
+/* Display Headings with Clean Word Spacing (Part 3 Fix) */
 .font-clash {
   font-family: 'Clash Display', 'Space Grotesk', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
+  letter-spacing: -0.015em;
+  word-spacing: 0.12em;
+  line-height: 0.95;
 }
 
 .font-space {
@@ -66,6 +74,7 @@ button, a.btn, select, input[type="submit"] {
   font-family: 'Reem Kufi', sans-serif !important;
   font-weight: 700;
   letter-spacing: normal;
+  word-spacing: normal;
   line-height: 1.1;
 }
 
