@@ -39,7 +39,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   return (
     <div className="space-y-20 sm:space-y-28 pb-20">
       
-      {/* HERO SECTION — FRAMELESS EDGE-BLENDED HERO IMAGE */}
+      {/* HERO SECTION — NEW TRANSPARENT CASE WITH 3D EPOXY DOMES & CHARM */}
       <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
         
         {/* Soft ~8% Gold Glow Behind Hero Text Area */}
@@ -100,7 +100,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
             </div>
 
-            {/* Right Column: Frameless & Edge-Faded Hero Image (Round 7 Fix) */}
+            {/* Right Column: Frameless Edge-Blended NEW Transparent Case Image (Round 8 Fix) */}
             <div className="lg:col-span-5 flex flex-col items-center pt-6 lg:pt-0">
               <div className="relative w-full max-w-xs sm:max-w-md flex flex-col items-center">
                 
@@ -110,9 +110,17 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 {/* Frameless Hero Image with CSS/WebKit Mask Edge Blend */}
                 <div className="hero-image-blend w-full aspect-[3/4] relative flex items-center justify-center">
                   <img
-                    src="/images/hero_case.png"
-                    alt="DUAT Passage Case"
+                    src="/images/transparent_hero_case.png"
+                    alt="DUAT Transparent Solar Case"
                     className="w-full h-full object-cover object-center pointer-events-none"
+                    onError={(e) => {
+                      // Fallback placeholder if asset missing — NOT scarab
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div className="w-full h-full bg-stone flex items-center justify-center font-mono text-xs text-ash">HERO IMAGE — awaiting upload</div>';
+                      }
+                    }}
                   />
                 </div>
 
@@ -203,12 +211,12 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               </button>
             </div>
 
-            {/* Frameless Edge-Faded Customizer Preview */}
+            {/* Frameless Edge-Faded Customizer Preview with NEW Transparent Case */}
             <div className="flex justify-center pt-6 lg:pt-0">
               <div className="w-64 aspect-[3/4] relative flex flex-col justify-between items-center overflow-hidden">
                 <div className="hero-image-blend w-full h-full">
                   <img
-                    src="/images/hero_case.png"
+                    src="/images/transparent_hero_case.png"
                     alt="Customizer Preview"
                     className="w-full h-full object-cover object-center"
                   />
