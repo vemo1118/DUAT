@@ -13,11 +13,17 @@
   --ash: #6E675D;
 }
 
-/* Dusk-to-Dawn Site-Wide Fixed Background Gradient (Part 2) */
+/* Dusk-to-Dawn Site-Wide Fixed Background Gradient */
 body {
   background: linear-gradient(180deg, #0C0A07 0%, #050505 50%, #050507 100%);
   background-attachment: fixed;
   min-height: 100vh;
+}
+
+/* Frameless Hero Image Edge-Blend Mask (Safari & WebKit Compatible) */
+.hero-image-blend {
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 48%, rgba(0, 0, 0, 0) 88%);
+  mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 48%, rgba(0, 0, 0, 0) 88%);
 }
 
 /* Enforce hard edges by default across all buttons, cards, inputs. Only mockup classes get radius */
@@ -36,7 +42,7 @@ button, a.btn, select, input[type="submit"] {
   outline-offset: 4px !important;
 }
 
-/* Display Headings with Clean Word Spacing (Part 3 Fix) */
+/* Display Headings with Clean Word Spacing */
 .font-clash {
   font-family: 'Clash Display', 'Space Grotesk', sans-serif;
   font-weight: 700;

@@ -39,16 +39,16 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   return (
     <div className="space-y-20 sm:space-y-28 pb-20">
       
-      {/* HERO SECTION — CLEAN BLANK BACK TECHWEAR CASE + HERO WARMTH GLOW */}
+      {/* HERO SECTION — FRAMELESS EDGE-BLENDED HERO IMAGE */}
       <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
         
-        {/* Soft ~8% Gold Glow Behind Hero Text Area ONLY */}
+        {/* Soft ~8% Gold Glow Behind Hero Text Area */}
         <div className="absolute top-1/4 left-10 w-[480px] h-[480px] bg-gold/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
-            {/* Left Column: Headlines & CTAs */}
+            {/* Left Column: Display Headings & CTAs */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8">
               
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
@@ -100,39 +100,25 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
             </div>
 
-            {/* Right Column: Clean Rugged Techwear Case Mockup (Part 1 Clean Blank Back) */}
+            {/* Right Column: Frameless & Edge-Faded Hero Image (Round 7 Fix) */}
             <div className="lg:col-span-5 flex flex-col items-center pt-6 lg:pt-0">
-              <div className="relative group w-full max-w-xs sm:max-w-sm">
+              <div className="relative w-full max-w-xs sm:max-w-md flex flex-col items-center">
                 
-                {/* Subtle Gold Rim Glow Behind Container */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-gold/30 via-gold/10 to-gold/30 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500" />
-                
-                {/* Clean Blank-Back Techwear Case Render (No Scarab, No Engravings) */}
-                <div className="relative bg-stone border border-grave p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden rounded-[36px] h-[460px] flex flex-col justify-between items-center group-hover:border-gold/60 transition-colors">
-                  
-                  {/* Camera Module */}
-                  <div className="self-end w-20 h-20 rounded-2xl bg-coal border-2 border-grave flex flex-col items-center justify-center p-2 shadow-inner">
-                    <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center mb-1">
-                      <div className="w-2 h-2 rounded-full bg-ash/30" />
-                    </div>
-                    <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-ash/30" />
-                    </div>
-                  </div>
+                {/* Subtle Gold Warmth Glow Behind Image Center */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] bg-gold/10 rounded-full blur-[80px] pointer-events-none" />
 
-                  {/* Completely Blank Matte Black Techwear Back */}
-                  <div className="my-auto flex flex-col items-center text-center space-y-2 opacity-50">
-                    <span className="font-mono text-xs uppercase tracking-[0.3em] text-ash">
-                      DUAT PASSAGE
-                    </span>
-                  </div>
+                {/* Frameless Hero Image with CSS/WebKit Mask Edge Blend */}
+                <div className="hero-image-blend w-full aspect-[3/4] relative flex items-center justify-center">
+                  <img
+                    src="/images/hero_case.png"
+                    alt="DUAT Passage Case"
+                    className="w-full h-full object-cover object-center pointer-events-none"
+                  />
+                </div>
 
-                  {/* Mono Caption Bar */}
-                  <div className="w-full pt-3 border-t border-grave/60 flex justify-between items-center font-mono text-[10px] text-ash">
-                    <span className="text-gold font-bold uppercase">DUAT PASSAGE CASE</span>
-                    <span>C.2026 · ALEXANDRIA</span>
-                  </div>
-
+                {/* Floating Mono Caption in the Void */}
+                <div className="mt-4 font-mono text-[11px] uppercase tracking-widest text-ash/80 text-center">
+                  DUAT PASSAGE CASE · C.2026 · ALEXANDRIA
                 </div>
 
               </div>
@@ -217,22 +203,25 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               </button>
             </div>
 
+            {/* Frameless Edge-Faded Customizer Preview */}
             <div className="flex justify-center pt-6 lg:pt-0">
-              <div className="w-64 h-[400px] rounded-[32px] border-2 border-grave bg-void p-4 shadow-2xl relative flex flex-col justify-between items-center group hover:border-gold transition-colors duration-500">
-                <div className="self-end w-16 h-16 rounded-xl bg-coal border border-grave flex items-center justify-center p-2">
-                  <div className="w-4 h-4 rounded-full bg-void border border-ash/40" />
+              <div className="w-64 aspect-[3/4] relative flex flex-col justify-between items-center overflow-hidden">
+                <div className="hero-image-blend w-full h-full">
+                  <img
+                    src="/images/hero_case.png"
+                    alt="Customizer Preview"
+                    className="w-full h-full object-cover object-center"
+                  />
                 </div>
                 
-                <div className="my-auto flex flex-col items-center gap-3 text-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center pointer-events-none">
                   <div className="bg-gold text-void font-kufi font-bold text-xs px-3 py-1 rounded-full shadow-md">
                     طالع نور
                   </div>
-                  <span className="font-mono text-[10px] text-ash tracking-widest uppercase">
+                  <span className="font-mono text-[10px] text-bone tracking-widest uppercase mt-2">
                     INTERACTIVE BUILDER
                   </span>
                 </div>
-
-                <div className="w-20 h-1 bg-grave rounded-full" />
               </div>
             </div>
 
