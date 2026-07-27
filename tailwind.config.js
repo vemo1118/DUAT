@@ -7,21 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: 'var(--void)',
-        stone: 'var(--stone)',
-        coal: 'var(--coal)',
-        grave: 'var(--grave)',
-        gold: 'var(--gold)',
-        ember: 'var(--ember)',
-        bone: 'var(--bone)',
-        ash: 'var(--ash)',
+        void: '#050505',
+        stone: '#14110F',
+        coal: '#1F1B17',
+        grave: '#2E2823',
+        gold: '#E0A93B',
+        ember: '#D9432E',
+        bone: '#F0EBE0',
+        ash: '#6E675D',
       },
       fontFamily: {
+        clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
         kufi: ['"Reem Kufi"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        archivo: ['"Space Grotesk"', 'sans-serif'], // Fallback alias mapped to Space Grotesk
+        display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.04em',
@@ -29,7 +29,7 @@ export default {
         widest: '0.25em',
       },
       lineHeight: {
-        display: '0.95',
+        display: '0.92',
       }
     },
   },

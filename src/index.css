@@ -4,13 +4,13 @@
 
 :root {
   --void: #050505;
-  --stone: #12100E;
-  --coal: #1C1917;
-  --grave: #2A2523;
-  --gold: #E8B04B;
-  --ember: #E5493A;
-  --bone: #EFE9DE;
-  --ash: #6B655D;
+  --stone: #14110F;
+  --coal: #1F1B17;
+  --grave: #2E2823;
+  --gold: #E0A93B;
+  --ember: #D9432E;
+  --bone: #F0EBE0;
+  --ash: #6E675D;
 }
 
 /* Enforce hard edges by default across all buttons, cards, inputs. Only mockup classes get radius */
@@ -18,10 +18,35 @@ button, input, select, textarea, div, a, article, section {
   border-radius: 0;
 }
 
+/* Minimum 44px touch tap targets */
+button, a.btn, select, input[type="submit"] {
+  min-height: 44px;
+}
+
 /* Accessible focus ring */
 *:focus-visible {
   outline: 1.5px solid var(--gold) !important;
   outline-offset: 4px !important;
+}
+
+/* Typography Stack Definitions */
+.font-clash {
+  font-family: 'Clash Display', 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+}
+
+.font-space {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-kufi {
+  font-family: 'Reem Kufi', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
 }
 
 /* RTL Typography: Force Reem Kufi for all Arabic text */
@@ -36,17 +61,7 @@ button, input, select, textarea, div, a, article, section {
   font-family: 'Reem Kufi', sans-serif !important;
 }
 
-.font-kufi {
-  font-family: 'Reem Kufi', sans-serif;
-}
-
-.font-display {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
-}
-
+[dir="rtl"] .font-clash,
 [dir="rtl"] .font-display {
   font-family: 'Reem Kufi', sans-serif !important;
   font-weight: 700;
@@ -54,13 +69,13 @@ button, input, select, textarea, div, a, article, section {
   line-height: 1.1;
 }
 
-/* Primary CTA hover transition gold -> ember */
+/* Primary CTA hover transition gold -> ember (critical hover state) */
 .btn-primary {
   background-color: var(--gold);
   color: var(--void);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   padding: 0.875rem 1.75rem;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
@@ -68,6 +83,7 @@ button, input, select, textarea, div, a, article, section {
   justify-content: center;
   border: 1px solid transparent;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .btn-primary:hover {
@@ -81,13 +97,14 @@ button, input, select, textarea, div, a, article, section {
   border: 1px solid var(--grave);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   padding: 0.875rem 1.75rem;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .btn-ghost:hover {

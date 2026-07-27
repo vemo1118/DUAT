@@ -23,7 +23,8 @@ import {
   Download,
   Sparkles,
   FlipHorizontal,
-  FlipVertical
+  FlipVertical,
+  Smartphone
 } from 'lucide-react';
 
 export const CustomizerView = () => {
@@ -43,17 +44,17 @@ export const CustomizerView = () => {
   // Text Tool inputs
   const [textInput, setTextInput] = useState('');
   const [textFont, setTextFont] = useState('space');
-  const [textColor, setTextColor] = useState('#E8B04B');
+  const [textColor, setTextColor] = useState('#E0A93B');
 
   // Layers state
   const [layers, setLayers] = useState([
     {
       id: 'layer-init-1',
       type: 'sticker',
-      stickerId: 'sun-disc',
+      stickerId: 'pill-tale3-noor',
       x: 50,
-      y: 45,
-      scale: 1.2,
+      y: 50,
+      scale: 1.1,
       rotation: 0,
       flipH: false,
       flipV: false
@@ -69,7 +70,7 @@ export const CustomizerView = () => {
   const initialLayerStateRef = useRef(null);
 
   // Quick Color Swatches
-  const colorSwatches = ['#E8B04B', '#E5493A', '#EFE9DE', '#6B655D', '#FFFFFF', '#050505'];
+  const colorSwatches = ['#E0A93B', '#D9432E', '#F0EBE0', '#6E675D', '#FFFFFF', '#050505'];
 
   const filteredModels = PHONE_MODELS.filter(m =>
     m.toLowerCase().includes(modelSearch.toLowerCase())
@@ -176,7 +177,7 @@ export const CustomizerView = () => {
     setLayers(newLayers);
   };
 
-  // Pointer Interaction Handlers
+  // Pointer Interaction Handlers (Touch & Mouse Compatible)
   const handlePointerDown = (e, layerId, actionType) => {
     e.stopPropagation();
     setSelectedLayerId(layerId);
@@ -263,25 +264,25 @@ export const CustomizerView = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 min-h-screen">
       
-      {/* Header */}
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-gold">
-            <SunDisc size={14} variant="gold" />
+          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+            <SunDisc size={12} variant="gold" />
             <span>{t('customizerEyebrow')}</span>
           </div>
-          <h1 className="font-space text-4xl sm:text-5xl font-bold tracking-tight uppercase text-bone">
+          <h1 className="font-clash text-3xl sm:text-5xl uppercase text-bone tracking-tight">
             {t('customizerTitle')}
           </h1>
         </div>
 
-        {/* Toolbar Helpers */}
+        {/* Toolbar Helpers (44px min tap targets) */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`font-mono text-xs uppercase tracking-widest px-3.5 py-2 border transition-colors flex items-center gap-2 ${
+            className={`font-mono text-xs uppercase tracking-widest px-3.5 py-2.5 border transition-colors flex items-center gap-2 min-h-[44px] ${
               showGrid ? 'border-gold text-gold bg-gold/10' : 'border-grave text-ash hover:text-bone'
             }`}
           >
@@ -291,7 +292,7 @@ export const CustomizerView = () => {
 
           <button
             onClick={handleExportPNG}
-            className="font-mono text-xs uppercase tracking-widest px-3.5 py-2 border border-grave text-bone hover:border-gold hover:text-gold transition-colors flex items-center gap-2"
+            className="font-mono text-xs uppercase tracking-widest px-3.5 py-2.5 border border-grave text-bone hover:border-gold hover:text-gold transition-colors flex items-center gap-2 min-h-[44px]"
           >
             <Download size={14} />
             <span>{t('exportDesign')}</span>
@@ -299,14 +300,14 @@ export const CustomizerView = () => {
         </div>
       </div>
 
-      {/* Main 2-Column Layout */}
+      {/* Main Responsive Layout: Mobile Stacked (Canvas Top, Controls Bottom) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* LEFT COLUMN: CANVAS */}
-        <div className="lg:col-span-6 flex flex-col items-center justify-center bg-stone border border-grave p-6 sm:p-10 lg:sticky lg:top-28">
+        {/* CANVAS CONTAINER (STACKED ON TOP ON MOBILE) */}
+        <div className="lg:col-span-6 flex flex-col items-center justify-center bg-stone border border-grave p-4 sm:p-8 lg:sticky lg:top-28">
           
-          <div className="font-mono text-xs uppercase tracking-widest text-ash mb-6 flex items-center gap-2">
-            <span>CANVAS TARGET:</span>
+          <div className="font-mono text-xs uppercase tracking-widest text-ash mb-4 sm:mb-6 flex items-center gap-2 text-center">
+            <span>CANVAS:</span>
             <span className="text-gold font-bold">{selectedModel}</span>
           </div>
 
@@ -314,7 +315,7 @@ export const CustomizerView = () => {
           <div
             ref={canvasRef}
             onClick={() => setSelectedLayerId(null)}
-            className="w-[300px] h-[620px] rounded-[42px] relative overflow-hidden shadow-2xl transition-all duration-300 select-none cursor-crosshair"
+            className="w-[260px] sm:w-[300px] h-[520px] sm:h-[620px] rounded-[38px] sm:rounded-[42px] relative overflow-hidden shadow-2xl transition-all duration-300 select-none cursor-crosshair touch-none"
             style={{
               backgroundColor: selectedCaseType.bg,
               border: `4px solid ${selectedCaseType.ring}`,
@@ -327,31 +328,26 @@ export const CustomizerView = () => {
             )}
 
             {/* Camera Cutout Housing (Top-Right) */}
-            <div className="absolute top-4 right-4 w-20 h-20 rounded-2xl bg-void/90 border-2 border-grave z-20 flex flex-col items-center justify-center gap-1.5 p-2 shadow-inner pointer-events-none">
-              <div className="w-5 h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-ash/40" />
+            <div className="absolute top-4 right-4 w-16 sm:w-20 h-16 sm:h-20 rounded-2xl bg-void/90 border-2 border-grave z-20 flex flex-col items-center justify-center gap-1.5 p-2 shadow-inner pointer-events-none">
+              <div className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-ash/40" />
               </div>
-              <div className="w-5 h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-ash/40" />
+              <div className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-coal border border-grave flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-ash/40" />
               </div>
             </div>
 
-            {/* Minimal Brand Sun Disc Mark on Case Bottom */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none opacity-40">
-              <SunDisc size={20} variant="gold" />
-            </div>
-
-            {/* Empty Canvas Placeholder Graphic */}
+            {/* Part 2 Fix: NEUTRAL GHOSTED PHONE OUTLINE EMPTY STATE (No big gold sun disc) */}
             {layers.length === 0 && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3 pointer-events-none opacity-40">
-                <SunDisc size={64} variant="eclipse" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3 pointer-events-none opacity-30">
+                <Smartphone size={48} className="text-ash" />
                 <p className="font-mono text-xs uppercase tracking-widest text-ash">
                   {t('noLayersText')}
                 </p>
               </div>
             )}
 
-            {/* RENDER LAYERS ON CANVAS (PRIORITY 2 FIX) */}
+            {/* RENDER CANVAS LAYERS */}
             {layers.map((layer) => {
               const isSelected = selectedLayerId === layer.id;
 
@@ -367,7 +363,6 @@ export const CustomizerView = () => {
                     zIndex: layers.findIndex(l => l.id === layer.id) + 10
                   }}
                 >
-                  {/* Layer Container with Content Rendered Inside */}
                   <div
                     className={`relative p-2 flex items-center justify-center ${
                       isSelected
@@ -377,7 +372,7 @@ export const CustomizerView = () => {
                   >
                     {/* Render Sticker SVG / Slogan Pill Content */}
                     {layer.type === 'sticker' && (
-                      <StickerIcon stickerId={layer.stickerId} size={56} />
+                      <StickerIcon stickerId={layer.stickerId} size={54} />
                     )}
 
                     {/* Render Text Content */}
@@ -392,7 +387,7 @@ export const CustomizerView = () => {
                         }`}
                         style={{
                           color: layer.color,
-                          fontSize: '26px',
+                          fontSize: '24px',
                           textShadow: '0 2px 8px rgba(0,0,0,0.8)'
                         }}
                       >
@@ -405,11 +400,11 @@ export const CustomizerView = () => {
                       <img
                         src={layer.src}
                         alt="Uploaded graphic"
-                        className="max-w-[140px] max-h-[140px] object-contain pointer-events-none"
+                        className="max-w-[130px] max-h-[130px] object-contain pointer-events-none"
                       />
                     )}
 
-                    {/* SELECTION TRANSFORM HANDLES SIT ON TOP */}
+                    {/* SELECTION HANDLES ON TOP */}
                     {isSelected && (
                       <>
                         <div
@@ -434,14 +429,14 @@ export const CustomizerView = () => {
 
           </div>
 
-          <p className="font-mono text-[11px] text-ash tracking-widest uppercase mt-6 text-center">
-            CLICK LAYER TO SELECT • DRAG TO POSITION • CORNERS TO ROTATE/RESIZE
+          <p className="font-mono text-[10px] sm:text-[11px] text-ash tracking-widest uppercase mt-4 sm:mt-6 text-center">
+            TAP LAYER TO SELECT • DRAG TO POSITION • CORNERS TO ROTATE/RESIZE
           </p>
 
         </div>
 
-        {/* RIGHT COLUMN: CONTROLS PANEL */}
-        <div className="lg:col-span-6 bg-coal border border-grave p-6 space-y-8">
+        {/* CONTROLS PANEL (STACKED BELOW ON MOBILE) */}
+        <div className="lg:col-span-6 bg-stone border border-grave p-4 sm:p-6 space-y-6 sm:space-y-8">
           
           {/* SECTION A: PHONE MODEL SELECTOR */}
           <div className="space-y-3">
@@ -449,7 +444,7 @@ export const CustomizerView = () => {
               a) {t('selectModel')}
             </label>
 
-            <div className="relative">
+            <div className="relative space-y-2">
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-3.5 text-ash" />
                 <input
@@ -457,17 +452,17 @@ export const CustomizerView = () => {
                   value={modelSearch}
                   onChange={(e) => setModelSearch(e.target.value)}
                   placeholder={t('searchModel')}
-                  className="w-full bg-stone border border-grave text-bone pl-10 pr-4 py-2.5 text-sm font-space focus:border-gold focus:outline-none"
+                  className="w-full bg-coal border border-grave text-bone pl-10 pr-4 py-2.5 text-sm font-space focus:border-gold focus:outline-none min-h-[44px]"
                 />
               </div>
 
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full bg-stone border border-grave text-bone px-4 py-3 text-sm font-mono mt-2 focus:border-gold focus:outline-none cursor-pointer"
+                className="w-full bg-coal border border-grave text-bone px-4 py-3 text-sm font-mono focus:border-gold focus:outline-none cursor-pointer min-h-[44px]"
               >
                 {filteredModels.map((model) => (
-                  <option key={model} value={model} className="bg-stone text-bone">
+                  <option key={model} value={model} className="bg-coal text-bone">
                     {model}
                   </option>
                 ))}
@@ -481,21 +476,21 @@ export const CustomizerView = () => {
               b) {t('caseType')}
             </label>
 
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
               {CASE_TYPES.map((type) => {
                 const isSelected = selectedCaseType.id === type.id;
                 return (
                   <button
                     key={type.id}
                     onClick={() => setSelectedCaseType(type)}
-                    className={`flex flex-col items-center gap-2 p-2 border transition-all ${
+                    className={`flex flex-col items-center gap-2 p-2 border transition-all min-h-[44px] ${
                       isSelected
-                        ? 'border-gold bg-stone'
-                        : 'border-grave bg-stone/50 hover:border-ash'
+                        ? 'border-gold bg-coal'
+                        : 'border-grave bg-coal/50 hover:border-ash'
                     }`}
                   >
                     <div
-                      className="w-8 h-8 rounded-sm border-2 flex items-center justify-center shadow"
+                      className="w-7 h-7 rounded-sm border flex items-center justify-center shadow"
                       style={{ backgroundColor: type.bg, borderColor: type.ring }}
                     >
                       {isSelected && <Check size={14} className="text-gold" />}
@@ -509,7 +504,7 @@ export const CustomizerView = () => {
             </div>
           </div>
 
-          {/* SECTION C: TOOLS TABS (Presets / Stickers / Text / Image) */}
+          {/* SECTION C: TOOLS TABS */}
           <div className="space-y-4 pt-4 border-t border-grave">
             <div className="flex border-b border-grave">
               {[
@@ -524,9 +519,9 @@ export const CustomizerView = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 py-3 font-mono text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                    className={`flex-1 py-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center justify-center gap-1 border-b-2 transition-colors min-h-[44px] ${
                       isActive
-                        ? 'border-gold text-gold font-bold bg-stone/50'
+                        ? 'border-gold text-gold font-bold bg-coal/50'
                         : 'border-transparent text-ash hover:text-bone'
                     }`}
                   >
@@ -537,19 +532,16 @@ export const CustomizerView = () => {
               })}
             </div>
 
-            {/* TAB CONTENT: PRESETS (Clean English/Arabic Names - PRIORITY 4 FIX) */}
+            {/* PRESETS TAB */}
             {activeTab === 'presets' && (
-              <div className="grid grid-cols-3 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 {PRESET_TEMPLATES.map((preset) => (
                   <button
                     key={preset.id}
                     onClick={() => handleLoadPreset(preset)}
-                    className="bg-stone border border-grave p-3.5 text-left hover:border-gold transition-all group space-y-2"
+                    className="bg-coal border border-grave p-3.5 text-left hover:border-gold transition-all group space-y-2 min-h-[44px]"
                   >
-                    <div className="flex items-center justify-between">
-                      <SunDisc size={14} variant="gold" />
-                      <span className="font-mono text-[9px] text-ash uppercase">PRESET</span>
-                    </div>
+                    <span className="font-mono text-[9px] text-ash uppercase block">PRESET</span>
                     <h4 className="font-space text-xs font-bold text-bone group-hover:text-gold transition-colors">
                       {lang === 'ar' ? preset.nameAr : preset.nameEn}
                     </h4>
@@ -558,16 +550,16 @@ export const CustomizerView = () => {
               </div>
             )}
 
-            {/* TAB CONTENT: STICKERS & PHRASE PILLS */}
+            {/* STICKERS TAB */}
             {activeTab === 'stickers' && (
-              <div className="grid grid-cols-4 gap-3 pt-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                 {STICKER_PRESETS.map((sticker) => (
                   <button
                     key={sticker.id}
                     onClick={() => handleAddSticker(sticker.id)}
-                    className="bg-stone border border-grave p-3 flex flex-col items-center justify-center gap-2 hover:border-gold hover:bg-void transition-all group"
+                    className="bg-coal border border-grave p-3 flex flex-col items-center justify-center gap-2 hover:border-gold transition-all group min-h-[44px]"
                   >
-                    <StickerIcon stickerId={sticker.id} size={32} />
+                    <StickerIcon stickerId={sticker.id} size={30} />
                     <span className="font-mono text-[9px] uppercase tracking-tighter text-ash group-hover:text-gold text-center">
                       {lang === 'ar' ? sticker.nameAr : sticker.nameEn}
                     </span>
@@ -576,7 +568,7 @@ export const CustomizerView = () => {
               </div>
             )}
 
-            {/* TAB CONTENT: TEXT */}
+            {/* TEXT TAB */}
             {activeTab === 'text' && (
               <div className="space-y-4 pt-2">
                 <input
@@ -584,10 +576,10 @@ export const CustomizerView = () => {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder={t('textPlaceholder')}
-                  className="w-full bg-stone border border-grave text-bone p-3 text-sm font-space focus:border-gold focus:outline-none"
+                  className="w-full bg-coal border border-grave text-bone p-3 text-sm font-space focus:border-gold focus:outline-none min-h-[44px]"
                 />
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="font-mono text-[10px] uppercase text-ash block mb-1">
                       Typography
@@ -595,7 +587,7 @@ export const CustomizerView = () => {
                     <select
                       value={textFont}
                       onChange={(e) => setTextFont(e.target.value)}
-                      className="w-full bg-stone border border-grave text-bone p-2 text-xs font-mono"
+                      className="w-full bg-coal border border-grave text-bone p-2.5 text-xs font-mono min-h-[44px]"
                     >
                       <option value="space">{t('fontDisplay')}</option>
                       <option value="kufi">{t('fontBody')}</option>
@@ -605,14 +597,14 @@ export const CustomizerView = () => {
 
                   <div>
                     <label className="font-mono text-[10px] uppercase text-ash block mb-1">
-                      Accent Swatches
+                      Swatches
                     </label>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       {colorSwatches.map((color) => (
                         <button
                           key={color}
                           onClick={() => setTextColor(color)}
-                          className={`w-6 h-6 border ${
+                          className={`w-7 h-7 border ${
                             textColor === color ? 'border-gold scale-110' : 'border-grave'
                           }`}
                           style={{ backgroundColor: color }}
@@ -625,18 +617,18 @@ export const CustomizerView = () => {
                 <button
                   onClick={handleAddText}
                   disabled={!textInput.trim()}
-                  className="w-full btn-primary py-3 text-xs disabled:opacity-50"
+                  className="w-full btn-primary py-3 text-xs disabled:opacity-50 min-h-[44px]"
                 >
                   {t('addTextBtn')}
                 </button>
               </div>
             )}
 
-            {/* TAB CONTENT: IMAGE UPLOAD */}
+            {/* IMAGE TAB */}
             {activeTab === 'image' && (
               <div className="pt-2">
-                <label className="border-2 border-dashed border-grave hover:border-gold bg-stone/50 p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group">
-                  <Upload size={32} className="text-ash group-hover:text-gold mb-3 transition-colors" />
+                <label className="border-2 border-dashed border-grave hover:border-gold bg-coal/50 p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group">
+                  <Upload size={28} className="text-ash group-hover:text-gold mb-2 transition-colors" />
                   <p className="font-mono text-xs text-bone uppercase tracking-wider mb-1">
                     {t('uploadZoneText')}
                   </p>
@@ -654,14 +646,12 @@ export const CustomizerView = () => {
             )}
           </div>
 
-          {/* SECTION D: LAYERS PANEL STACK */}
+          {/* SECTION D: LAYERS STACK */}
           <div className="space-y-3 pt-4 border-t border-grave">
-            <div className="flex items-center justify-between">
-              <label className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-                <Layers size={14} />
-                <span>d) {t('layersHeader')} ({layers.length})</span>
-              </label>
-            </div>
+            <label className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+              <Layers size={14} />
+              <span>d) {t('layersHeader')} ({layers.length})</span>
+            </label>
 
             {layers.length === 0 ? (
               <p className="font-mono text-xs text-ash italic py-2">
@@ -675,16 +665,15 @@ export const CustomizerView = () => {
                     <div
                       key={layer.id}
                       onClick={() => setSelectedLayerId(layer.id)}
-                      className={`p-2.5 border flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                      className={`p-2.5 border flex items-center justify-between gap-2 cursor-pointer transition-all min-h-[44px] ${
                         isSelected
-                          ? 'border-gold bg-stone'
-                          : 'border-grave bg-stone/40 hover:border-ash'
+                          ? 'border-gold bg-coal'
+                          : 'border-grave bg-coal/40 hover:border-ash'
                       }`}
                     >
-                      {/* Thumbnail & Label */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 bg-void border border-grave flex items-center justify-center flex-shrink-0">
-                          {layer.type === 'sticker' && <StickerIcon stickerId={layer.stickerId} size={18} />}
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 bg-void border border-grave flex items-center justify-center flex-shrink-0">
+                          {layer.type === 'sticker' && <StickerIcon stickerId={layer.stickerId} size={16} />}
                           {layer.type === 'text' && <Type size={14} className="text-gold" />}
                           {layer.type === 'image' && <ImageIcon size={14} className="text-gold" />}
                         </div>
@@ -697,26 +686,18 @@ export const CustomizerView = () => {
                         </span>
                       </div>
 
-                      {/* Action Icons */}
                       <div className="flex items-center gap-1">
                         <button
                           onClick={(e) => handleFlipLayer(layer.id, 'h', e)}
-                          className="p-1 text-ash hover:text-gold transition-colors"
+                          className="p-1.5 text-ash hover:text-gold transition-colors min-h-[36px]"
                           title="Flip Horizontal"
                         >
                           <FlipHorizontal size={14} />
                         </button>
                         <button
-                          onClick={(e) => handleFlipLayer(layer.id, 'v', e)}
-                          className="p-1 text-ash hover:text-gold transition-colors"
-                          title="Flip Vertical"
-                        >
-                          <FlipVertical size={14} />
-                        </button>
-                        <button
                           onClick={(e) => handleMoveLayerOrder(index, 'up', e)}
                           disabled={index === 0}
-                          className="p-1 text-ash hover:text-bone disabled:opacity-30"
+                          className="p-1.5 text-ash hover:text-bone disabled:opacity-30 min-h-[36px]"
                           title="Move up"
                         >
                           <ChevronUp size={14} />
@@ -724,21 +705,21 @@ export const CustomizerView = () => {
                         <button
                           onClick={(e) => handleMoveLayerOrder(index, 'down', e)}
                           disabled={index === layers.length - 1}
-                          className="p-1 text-ash hover:text-bone disabled:opacity-30"
+                          className="p-1.5 text-ash hover:text-bone disabled:opacity-30 min-h-[36px]"
                           title="Move down"
                         >
                           <ChevronDown size={14} />
                         </button>
                         <button
                           onClick={(e) => handleDuplicateLayer(layer.id, e)}
-                          className="p-1 text-ash hover:text-gold transition-colors"
+                          className="p-1.5 text-ash hover:text-gold transition-colors min-h-[36px]"
                           title="Duplicate"
                         >
                           <Copy size={14} />
                         </button>
                         <button
                           onClick={(e) => handleDeleteLayer(layer.id, e)}
-                          className="p-1 text-ash hover:text-ember transition-colors"
+                          className="p-1.5 text-ash hover:text-ember transition-colors min-h-[36px]"
                           title="Delete"
                         >
                           <Trash2 size={14} />
@@ -751,12 +732,12 @@ export const CustomizerView = () => {
             )}
           </div>
 
-          {/* SECTION E: STICKY ADD TO CART CTA */}
+          {/* SECTION E: ADD TO CART CTA */}
           <div className="pt-4 border-t border-grave">
             <button
               onClick={handleAddToCart}
               disabled={layers.length === 0}
-              className="w-full btn-primary py-4 text-sm font-mono tracking-widest flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed group"
+              className="w-full btn-primary py-4 text-sm font-mono tracking-widest flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed group min-h-[44px]"
             >
               <ShoppingBag size={18} />
               <span>{t('customizerAddToCart')}</span>

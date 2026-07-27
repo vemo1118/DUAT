@@ -1,19 +1,8 @@
 import React from 'react';
 
-export const SunDisc = ({ size = 24, className = '', variant = 'default' }) => {
-  const getColors = () => {
-    switch (variant) {
-      case 'eclipse':
-        return { stroke: '#E8B04B', fill: '#050505', ring: '#2A2523' };
-      case 'ember':
-        return { stroke: '#E5493A', fill: '#E5493A', ring: '#2A2523' };
-      case 'gold':
-      default:
-        return { stroke: '#E8B04B', fill: '#E8B04B', ring: '#2A2523' };
-    }
-  };
-
-  const colors = getColors();
+export const SunDisc = ({ size = 20, className = '', variant = 'gold' }) => {
+  const strokeColor = variant === 'ember' ? '#D9432E' : '#E0A93B';
+  const fillColor = variant === 'ember' ? '#D9432E' : '#E0A93B';
 
   return (
     <svg
@@ -30,18 +19,16 @@ export const SunDisc = ({ size = 24, className = '', variant = 'default' }) => {
         cx="50"
         cy="50"
         r="44"
-        stroke={colors.stroke}
-        strokeWidth="6"
+        stroke={strokeColor}
+        strokeWidth="7"
       />
-      {/* Inner Solid Disc (or Eclipse offset) */}
-      {variant === 'eclipse' ? (
-        <>
-          <circle cx="50" cy="50" r="28" fill="#E8B04B" />
-          <circle cx="62" cy="46" r="24" fill="#050505" />
-        </>
-      ) : (
-        <circle cx="50" cy="50" r="26" fill={colors.fill} />
-      )}
+      {/* Inner Solid Disc */}
+      <circle
+        cx="50"
+        cy="50"
+        r="24"
+        fill={fillColor}
+      />
     </svg>
   );
 };
