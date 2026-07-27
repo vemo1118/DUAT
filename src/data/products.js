@@ -20,7 +20,7 @@ export const PRODUCTS = [
     descriptionAr: 'لمسة داكنة مطفية للغاية مع حماية معززة للكاميرا وحواف صلبة.',
     specsEn: ['Material: High-Density Polycarbonate', 'Finish: Ultra-Matte Shockproof', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
     specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
-    caseTypeConfig: { bg: '#0A0A0A', ring: '#1F1B15' }
+    caseTypeConfig: { bg: '#0A0A0A', ring: '#1F1B17' }
   },
   {
     id: 'case-solar',
@@ -33,8 +33,8 @@ export const PRODUCTS = [
     descriptionEn: 'Crystal clear acrylic canvas with anodized dawn-gold camera housing ring.',
     descriptionAr: 'أكريليك شفاف نقي مع حلقة كاميرا مؤكسدة بذهبي الفجر.',
     specsEn: ['Material: Optical Grade Acrylic + TPU', 'Finish: Anti-Yellowing Clear', 'Weight: 42g', 'Ring: Dawn Gold Anodized Alloy'],
-    specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقوم للاصفرار', 'الوزن: ٤٢ جرام', 'الحلقة: سبيكة مؤكسدة بذهب الفجر'],
-    caseTypeConfig: { bg: 'rgba(20, 20, 20, 0.4)', ring: '#E8B04B' }
+    specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقوم للااصفرار', 'الوزن: ٤٢ جرام', 'الحلقة: سبيكة مؤكسدة بذهب الفجر'],
+    caseTypeConfig: { bg: 'rgba(20, 20, 20, 0.4)', ring: '#E0A93B' }
   },
   {
     id: 'case-ember',
@@ -44,8 +44,8 @@ export const PRODUCTS = [
     price: 690,
     tagEn: 'Frosted Ember',
     tagAr: 'جمر ضبابي',
-    descriptionEn: 'Semi-translucent dark mahogany tint with Black Sun accent detailing.',
-    descriptionAr: 'درجة بني داكن شبه شفافة مع تفاصيل لون شمس الفجر.',
+    descriptionEn: 'Semi-translucent dark mahogany tint with accent detailing.',
+    descriptionAr: 'درجة بني داكن شبه شفافة مع تفاصيل لون الفجر.',
     specsEn: ['Material: Matte Translucent Composite', 'Finish: Soft-Touch Frosted', 'Weight: 40g', 'Drop Protection: 3 Meters'],
     specsAr: ['المادة: مركب مطفي شبه شفاف', 'النهاية: ملمس ناعم ضبابي', 'الوزن: ٤٠ جرام', 'حماية السقوط: ٣ أمتار'],
     caseTypeConfig: { bg: '#2A1610', ring: '#4A2418' }
@@ -58,27 +58,27 @@ export const PRODUCTS = [
     price: 780,
     tagEn: 'MagSafe Compatible',
     tagAr: 'متوافق مع MagSafe',
-    descriptionEn: 'High-grade protective shell integrated with magnetic eclipse alignment ring.',
-    descriptionAr: 'غطاء حماية عالي الجودة مزود بحلقة كسوف مغناطيسية.',
+    descriptionEn: 'High-grade protective shell integrated with magnetic alignment ring.',
+    descriptionAr: 'غطاء حماية عالي الجودة مزود بحلقة مغناطيسية.',
     specsEn: ['Material: Carbon Fiber Weave + TPU', 'Magnets: N52 Neodymium Array', 'Weight: 45g', 'Wireless Charging: Full Support'],
     specsAr: ['المادة: ألياف كربون منسوجة + TPU', 'المغناطيس: مصفوفة نيويميوم N52', 'الوزن: ٤٥ جرام', 'الشحن اللاسلكي: دعم كامل'],
-    caseTypeConfig: { bg: '#141110', ring: '#2A2523' }
+    caseTypeConfig: { bg: '#141110', ring: '#2E2823' }
   },
 
   // DOME STICKERS
   {
-    id: 'sticker-sun-disc',
+    id: 'sticker-disc',
     category: 'stickers',
-    nameEn: 'Sun Disc Dome',
-    nameAr: 'ملصق قرص الشمس',
+    nameEn: 'Solid Disc Dome',
+    nameAr: 'ملصق قرص مجسم',
     price: 120,
     tagEn: '3D Epoxy Dome',
     tagAr: 'إيبوكسي مجسم',
-    descriptionEn: 'High-gloss raised 3D epoxy sticker displaying the signature Duat sun disc.',
-    descriptionAr: 'ملصق إيبوكسي ثلاثي الأبعاد عالي اللمعان يحمل شعار قرص الشمس.',
+    descriptionEn: 'High-gloss raised 3D epoxy sticker featuring a minimal solid disc motif.',
+    descriptionAr: 'ملصق إيبوكسي ثلاثي الأبعاد بارز بحجم ناعم.',
     specsEn: ['Diameter: 35mm', 'Material: Self-Healing Polyurethane Epoxy', 'Adhesive: 3M Industrial Grade'],
     specsAr: ['القطر: ٣٥ مم', 'المادة: إيبوكسي بولي يوريثان ذاتي التثبيت', 'اللاصق: درجة صناعية من 3M'],
-    stickerType: 'sun-disc'
+    stickerType: 'disc'
   },
   {
     id: 'sticker-tale3-noor',
@@ -192,25 +192,28 @@ export const PHONE_MODELS = [
 ];
 
 export const CASE_TYPES = [
-  { id: 'matte-black', nameEn: 'Matte Black', nameAr: 'أسود مطفي', bg: '#0A0A0A', ring: '#1F1B15' },
+  { id: 'matte-black', nameEn: 'Matte Black', nameAr: 'أسود مطفي', bg: '#0A0A0A', ring: '#1F1B17' },
   { id: 'clear', nameEn: 'Clear', nameAr: 'شفاف', bg: 'rgba(20, 20, 20, 0.4)', ring: '#3A342C' },
   { id: 'frosted-ember', nameEn: 'Frosted Ember', nameAr: 'جمر ضبابي', bg: '#2A1610', ring: '#4A2418' },
-  { id: 'gold-ring', nameEn: 'Gold Ring', nameAr: 'حلقة ذهبية', bg: '#0A0A0A', ring: '#E8B04B' },
-  { id: 'magsafe', nameEn: 'MagSafe', nameAr: 'ماج سيف', bg: '#141110', ring: '#2A2523' }
+  { id: 'gold-ring', nameEn: 'Gold Ring', nameAr: 'حلقة ذهبية', bg: '#0A0A0A', ring: '#E0A93B' },
+  { id: 'magsafe', nameEn: 'MagSafe', nameAr: 'ماج سيف', bg: '#141110', ring: '#2E2823' }
 ];
 
 export const STICKER_PRESETS = [
-  { id: 'sun-disc', nameEn: 'Sun Disc', nameAr: 'قرص الشمس' },
-  { id: 'eclipse', nameEn: 'Eclipse', nameAr: 'كسوف' },
-  { id: 'scarab', nameEn: 'Scarab', nameAr: 'جعران' },
-  { id: 'ankh', nameEn: 'Ankh', nameAr: 'عنخ' },
+  { id: 'disc', nameEn: 'Disc', nameAr: 'قرص' },
+  { id: 'ring', nameEn: 'Ring', nameAr: 'حلقة' },
+  { id: 'crescent', nameEn: 'Crescent', nameAr: 'هلال' },
+  { id: 'star-4', nameEn: 'Star', nameAr: 'نجمة' },
+  { id: 'lightning', nameEn: 'Lightning', nameAr: 'صاعقة' },
+  { id: 'flame', nameEn: 'Flame', nameAr: 'شعلة' },
+  { id: 'spark', nameEn: 'Spark', nameAr: 'شرارة' },
+  { id: 'plus', nameEn: 'Plus', nameAr: 'زائد' },
   { id: 'pill-tale3-noor', nameEn: 'طالع نور', nameAr: 'طالع نور' },
   { id: 'pill-3addi-lel', nameEn: 'عدّي الليل', nameAr: 'عدّي الليل' },
   { id: 'pill-bokra-ahla', nameEn: 'بكرة أحلى', nameAr: 'بكرة أحلى' },
   { id: 'pill-born-dawn', nameEn: 'BORN AT DAWN', nameAr: 'BORN AT DAWN' }
 ];
 
-// CLEAN PRESET NAMES (PRIORITY 4 FIX)
 export const PRESET_TEMPLATES = [
   {
     id: 'preset-dawn-rise',
@@ -218,7 +221,7 @@ export const PRESET_TEMPLATES = [
     nameAr: 'طالع نور',
     caseTypeId: 'gold-ring',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'sun-disc', x: 50, y: 35, scale: 1.3, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'disc', x: 50, y: 35, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 65, scale: 1.1, rotation: 0 }
     ]
   },
@@ -228,7 +231,7 @@ export const PRESET_TEMPLATES = [
     nameAr: 'عدّي الليل',
     caseTypeId: 'matte-black',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'eclipse', x: 50, y: 38, scale: 1.3, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'crescent', x: 50, y: 38, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-3addi-lel', x: 50, y: 68, scale: 1.1, rotation: 0 }
     ]
   },
@@ -238,7 +241,7 @@ export const PRESET_TEMPLATES = [
     nameAr: 'مولود الفجر',
     caseTypeId: 'magsafe',
     layers: [
-      { id: 'l1', type: 'sticker', stickerId: 'scarab', x: 50, y: 40, scale: 1.2, rotation: 0 },
+      { id: 'l1', type: 'sticker', stickerId: 'star-4', x: 50, y: 40, scale: 1.2, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-born-dawn', x: 50, y: 70, scale: 1.0, rotation: 0 }
     ]
   }
@@ -302,7 +305,7 @@ export const FAQS = [
     id: 'faq-3',
     qEn: 'What is your warranty and returns policy?',
     qAr: 'ما هي سياسة الضمان والاستبدال؟',
-    aEn: 'All products come with a 1-year replacement warranty against manufacturing defects or yellowing. If anything arrives damaged, we replace it instantly via WhatsApp support.',
-    aAr: 'جميع المنتجات معاها ضمان استبدال لمدة سنة ضد عيوب التصنيع أو الاصفرار. لو وصلك أي شيء فيه عيب، بنستبدله فوراً عبر خدمة عملاء الواتساب.'
+    aEn: 'All products come with a 1-year replacement warranty against manufacturing defects. If anything arrives damaged, we replace it instantly via WhatsApp support.',
+    aAr: 'جميع المنتجات معاها ضمان استبدال لمدة سنة ضد عيوب التصنيع. لو وصلك أي شيء فيه عيب، بنستبدله فوراً عبر خدمة عملاء الواتساب.'
   }
 ];

@@ -11,7 +11,7 @@ export const TRANSLATIONS = {
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
     heroHeadline1: 'THROUGH THE NIGHT',
     heroHeadline2: 'BORN AT DAWN.',
-    heroSub: 'Objects for the night crossing. Phone cases, 3D dome stickers, and charms — designed for the passage from dusk to dawn.',
+    heroSub: 'Objects for the night crossing. Phone cases, 3D epoxy slogan pills, and charms — designed for the passage from dusk to dawn.',
     heroCtaPrimary: 'BUILD YOUR CASE',
     heroCtaSecondary: 'SEE THE COLLECTION',
 
@@ -126,28 +126,17 @@ export const TRANSLATIONS = {
     orderNumberLabel: 'ORDER REFERENCE:',
     backToShop: 'BACK TO SHOP',
 
-    // Order Tracker Modal
-    trackerTitle: 'Track Shipment',
-    trackerSubtitle: 'Enter your order reference code to view real-time delivery milestones.',
-    trackerInputPlaceholder: 'DUAT-9842',
-    trackerBtn: 'TRACK',
-    trackerNotFound: 'Order reference not found. Check WhatsApp for confirmation code.',
-    stepPlaced: 'Order Placed & Confirmed',
-    stepForge: 'Handcrafted in Alexandria Forge',
-    stepShipped: 'Out for Courier Delivery',
-    stepDelivered: 'Passage Delivered',
-
-    // Reviews & FAQ — PRIORITY 3 FIX
+    // Reviews & FAQ
     reviewsEyebrow: 'WHAT THEY CARRY',
     reviewsTitle: 'From the passage.',
     faqEyebrow: 'THE PASSAGE GUIDE',
     faqTitle: 'Frequently asked questions.',
 
-    // About
+    // About — Clean Personal / Emotional Story Narrative (Part 3 Cleanse)
     aboutEyebrow: 'DUAT / ∞',
     aboutTitle: 'The Duat.',
-    aboutP1: 'In the old story, the sun descended each night into the Duat — the underworld — and crossed twelve hours of darkness before rising again at dawn. Twelve hours, twelve trials, one passage.',
-    aboutP2: 'We took the name because we make objects for the same journey. The one you\'re on. Between the two suns of any day, between the person you were and the person you\'re becoming.',
+    aboutP1: 'Duat is the space between dusk and dawn — the hours you cross to come out changed. We make objects for that passage.',
+    aboutP2: 'Objects crafted between the two suns of any day, between the person you were and the person you\'re becoming.',
     aboutP3: 'Made in Alexandria. Shipped worldwide. To order.',
     aboutCta: 'BUILD YOUR CASE',
 
@@ -297,17 +286,17 @@ export const TRANSLATIONS = {
     stepShipped: 'في الطريق مع مندوب الشحن',
     stepDelivered: 'تم وصول الطلب بنجاح',
 
-    // Reviews & FAQ — PRIORITY 3 FIX
+    // Reviews & FAQ
     reviewsEyebrow: 'اللي بيحملوه',
     reviewsTitle: 'من الرحلة.',
     faqEyebrow: 'دليل العبور',
     faqTitle: 'الأسئلة الشائعة.',
 
-    // About
+    // About — Clean Personal / Emotional Story Narrative
     aboutEyebrow: 'دوات / ∞',
     aboutTitle: 'الدوات.',
-    aboutP1: 'في الأسطورة القديمة، كانت الشمس بتنزل كل ليلة في الدوات — العالم السفلي — و تعبر ١٢ ساعة من الظلمة قبل ما تشرق تاني مع الفجر. ١٢ ساعة، ١٢ اختبار، عبور واحد.',
-    aboutP2: 'خدنا الاسم لأننا بنعمل أشياء لنفس الرحلة. الرحلة اللي إنت فيها. بين شمسي أي يوم، بين اللي كنته و اللي بتبقاه.',
+    aboutP1: 'الدُوات هو المساحة بين الغروب والفجر — الساعات اللي بتعبرها عشان تخرج منها متغيّر. بنصنع أشياء مصممة للرحلة دي.',
+    aboutP2: 'أشياء مصممة بين شمسي أي يوم، بين الشخص اللي كنته والشخص اللي بتبقاه.',
     aboutP3: 'مصنوع في الإسكندرية. شحن للعالم كله. حسب الطلب.',
     aboutCta: 'صمم جرابك الآن',
 

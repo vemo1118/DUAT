@@ -1,65 +1,94 @@
 import React from 'react';
-import { SunDisc } from './SunDisc';
 
 export const StickerIcon = ({ stickerId, size = 36 }) => {
+  const strokeColor = '#E0A93B';
+  const fillColor = '#E0A93B';
+
   switch (stickerId) {
-    case 'sun-disc':
-    case 'dome-sun':
-      return <SunDisc size={size} variant="gold" />;
-
-    case 'eclipse':
-      return <SunDisc size={size} variant="eclipse" />;
-
-    case 'scarab':
-    case 'dome-scarab':
+    case 'disc':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#1C1917" stroke="#E8B04B" strokeWidth="4" />
-          <path d="M35 50 C35 40 65 40 65 50 L60 75 C60 80 40 80 40 75 Z" fill="#E8B04B" />
-          <circle cx="50" cy="36" r="10" fill="#E8B04B" />
+          <circle cx="50" cy="50" r="40" fill={fillColor} />
         </svg>
       );
 
-    case 'ankh':
-    case 'dome-ankh':
+    case 'ring':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#1C1917" stroke="#E8B04B" strokeWidth="4" />
-          <ellipse cx="50" cy="38" rx="12" ry="16" stroke="#E8B04B" strokeWidth="6" fill="none" />
-          <path d="M30 56 H70 M50 56 V84" stroke="#E8B04B" strokeWidth="6" strokeLinecap="square" />
+          <circle cx="50" cy="50" r="40" stroke={strokeColor} strokeWidth="8" />
         </svg>
       );
 
-    case 'ember':
+    case 'crescent':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#2A1610" stroke="#E5493A" strokeWidth="4" />
-          <circle cx="50" cy="50" r="18" fill="#E5493A" />
+          <path d="M50 10 A40 40 0 1 0 90 50 A30 30 0 1 1 50 10 Z" fill={fillColor} />
         </svg>
       );
 
-    case 'ray':
+    case 'star-4':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#1C1917" stroke="#E8B04B" strokeWidth="4" />
-          <polygon points="50,20 75,75 25,75" fill="#E8B04B" />
+          <path d="M50 5 L62 38 L95 50 L62 62 L50 95 L38 62 L5 50 L38 38 Z" fill={fillColor} />
         </svg>
       );
 
-    case 'eye-horus':
+    case 'triangle':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#1C1917" stroke="#E8B04B" strokeWidth="4" />
-          <path d="M22 50 Q50 30 78 50 Q50 70 22 50 Z" stroke="#E8B04B" strokeWidth="4" fill="none" />
-          <circle cx="50" cy="50" r="8" fill="#E8B04B" />
+          <polygon points="50,10 90,85 10,85" stroke={strokeColor} strokeWidth="8" fill="none" />
         </svg>
       );
 
-    case 'feather':
+    case 'horizon':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#1C1917" stroke="#E8B04B" strokeWidth="4" />
-          <path d="M50 20 Q70 40 50 82 Q30 40 50 20 Z" fill="#E8B04B" />
+          <rect x="15" y="35" width="70" height="10" rx="5" fill={fillColor} />
+          <rect x="15" y="55" width="70" height="10" rx="5" fill={fillColor} />
+        </svg>
+      );
+
+    case 'lightning':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <polygon points="55,5 15,55 45,55 35,95 85,45 55,45" fill={fillColor} />
+        </svg>
+      );
+
+    case 'arrow-up':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <path d="M50 10 L85 45 H62 V90 H38 V45 H15 Z" fill={fillColor} />
+        </svg>
+      );
+
+    case 'spark':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <path d="M50 10 V90 M10 50 H90 M22 22 L78 78 M78 22 L22 78" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
+        </svg>
+      );
+
+    case 'plus':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <path d="M50 15 V85 M15 50 H85" stroke={strokeColor} strokeWidth="12" strokeLinecap="square" />
+        </svg>
+      );
+
+    case 'concentric':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="42" stroke={strokeColor} strokeWidth="6" />
+          <circle cx="50" cy="50" r="26" stroke={strokeColor} strokeWidth="6" />
+          <circle cx="50" cy="50" r="10" fill={fillColor} />
+        </svg>
+      );
+
+    case 'flame':
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <path d="M50 10 C65 30 85 55 85 70 A35 35 0 0 1 15 70 C15 55 35 30 50 10 Z" fill={fillColor} />
         </svg>
       );
 
@@ -91,14 +120,11 @@ export const StickerIcon = ({ stickerId, size = 36 }) => {
         </div>
       );
 
-    case 'dome-palm':
-      return (
-        <div className="w-10 h-10 rounded-xl bg-bone border border-grave flex items-center justify-center shadow-md">
-          <span className="font-kufi font-bold text-void text-xs">🌴</span>
-        </div>
-      );
-
     default:
-      return <SunDisc size={size} variant="gold" />;
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="40" fill={fillColor} />
+        </svg>
+      );
   }
 };

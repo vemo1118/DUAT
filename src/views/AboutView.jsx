@@ -21,12 +21,16 @@ export const AboutView = () => {
         </h1>
       </div>
 
-      {/* Story Narrative Box */}
-      <div className="bg-stone border border-grave p-8 sm:p-12 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed">
-        <p>{t('aboutP1')}</p>
-        <p>{t('aboutP2')}</p>
+      {/* Story Narrative Box (Part 3 Cleanse: Personal/Emotional Dusk-to-Dawn Metaphor) */}
+      <div className="bg-stone border border-grave p-8 sm:p-12 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed shadow-2xl">
+        <p className="text-xl sm:text-2xl font-medium text-bone leading-relaxed">
+          {t('aboutP1')}
+        </p>
+        <p className="text-bone/80 font-light">
+          {t('aboutP2')}
+        </p>
         
-        <div className="p-6 bg-coal border-l-4 border-gold text-gold font-mono text-sm tracking-widest uppercase">
+        <div className="p-6 bg-coal border-l-4 border-gold text-gold font-mono text-xs sm:text-sm tracking-widest uppercase">
           {t('aboutP3')}
         </div>
       </div>
