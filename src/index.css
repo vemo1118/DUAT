@@ -14,7 +14,7 @@
 }
 
 /* ==========================================================================
-   THEMES SYSTEM — NIGHT MODE (DEFAULT) & DAWN MODE (LIGHT MODE GLITCH FIXES)
+   THEMES SYSTEM — NIGHT MODE (DEFAULT) & DAWN MODE (LIGHT MODE FIXED)
    ========================================================================== */
 
 /* Night Mode (Default Dark Base with Rich Warm Dusk Gradient) */
@@ -49,7 +49,7 @@ html[data-theme="dawn"] {
 }
 
 html[data-theme="dawn"] body {
-  background: linear-gradient(180deg, #FBF8F3 0%, #F5EFE4 50%, #ECE4D5 100%);
+  background: linear-gradient(180deg, #FBF8F3 0%, #F5EFE4 50%, #ECE4D5 100%) !important;
   background-attachment: fixed;
   color: #1A1714 !important;
   min-height: 100vh;
@@ -61,6 +61,8 @@ html[data-theme="dawn"] h1,
 html[data-theme="dawn"] h2,
 html[data-theme="dawn"] h3,
 html[data-theme="dawn"] h4,
+html[data-theme="dawn"] p,
+html[data-theme="dawn"] span,
 html[data-theme="dawn"] .font-clash {
   color: #1A1714 !important;
 }
@@ -79,11 +81,15 @@ html[data-theme="dawn"] .bg-coal {
   border-color: #DCD4C7 !important;
 }
 
+html[data-theme="dawn"] .bg-void {
+  background-color: #FBF8F3 !important;
+}
+
 html[data-theme="dawn"] .border-grave {
   border-color: #DCD4C7 !important;
 }
 
-/* Fix Hero Image Mask in Light Mode so no white box appears */
+/* Fix Hero Image Mask in Light Mode so no dark/white box appears */
 html[data-theme="dawn"] .hero-image-blend {
   -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 85%);
   mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 85%);
@@ -100,8 +106,9 @@ html[data-theme="dawn"] .hero-image-blend {
   mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 48%, rgba(0, 0, 0, 0) 88%);
 }
 
-/* Solid Opaque Surface Elevation & Top Highlights (No Over-Transparency) */
+/* Solid Opaque Surface Elevation & Top Highlights (100% Opaque — No Over-Transparency) */
 .card-depth-highlight {
+  background-color: var(--stone);
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -144,7 +151,7 @@ button, a.btn, select, input[type="submit"] {
   outline-offset: 4px !important;
 }
 
-/* Display Headings with Clean Word Spacing & Tight Tracking */
+/* Display Headings with Clean Word Spacing & Tight Tracking for English */
 .font-clash {
   font-family: 'Clash Display', 'Cairo', 'Space Grotesk', sans-serif;
   font-weight: 700;
@@ -160,30 +167,36 @@ button, a.btn, select, input[type="submit"] {
 
 .font-kufi {
   font-family: 'Cairo', 'Alexandria', sans-serif;
+  letter-spacing: 0 !important;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Modern Cairo / Alexandria Arabic Typography Upgrade */
+/* Modern Cairo / Alexandria Arabic Typography Upgrade — CRITICAL LETTER-SPACING FIX */
 [dir="rtl"] body,
 [dir="rtl"],
+[dir="rtl"] *,
 [dir="rtl"] h1,
 [dir="rtl"] h2,
 [dir="rtl"] h3,
 [dir="rtl"] p,
 [dir="rtl"] span,
-[dir="rtl"] button {
+[dir="rtl"] button,
+.font-kufi,
+.font-cairo {
   font-family: 'Cairo', 'Alexandria', sans-serif !important;
+  letter-spacing: 0 !important;
+  word-spacing: normal !important;
 }
 
 [dir="rtl"] .font-clash,
 [dir="rtl"] .font-display {
   font-family: 'Alexandria', 'Cairo', sans-serif !important;
   font-weight: 700;
-  letter-spacing: normal;
-  word-spacing: normal;
+  letter-spacing: 0 !important;
+  word-spacing: normal !important;
   line-height: 1.2;
 }
 

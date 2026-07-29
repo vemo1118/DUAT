@@ -8,11 +8,11 @@ export const ToastContainer = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-24 right-6 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full px-4 sm:px-0">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full px-4 sm:px-0">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto bg-stone/95 backdrop-blur-md border p-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-5 ${
+          className={`pointer-events-auto bg-stone border p-4 shadow-[0_15px_35px_rgba(0,0,0,0.8)] flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-5 ${
             toast.type === 'error'
               ? 'border-ember text-bone'
               : toast.type === 'success'
