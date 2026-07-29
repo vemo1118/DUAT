@@ -2,73 +2,104 @@ import React, { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 import { SunDisc } from './SunDisc';
-import { ShoppingBag, Menu, X, Globe, Truck } from 'lucide-react';
+import { ShoppingBag, Menu, X, Globe, Truck, Sun, Moon } from 'lucide-react';
 
 export const Navbar = ({ onOpenTracker }) => {
   const { lang, toggleLanguage, t } = useLanguage();
   const { totalItems, toggleCart } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const navLinks = [
     { path: '/shop', label: t('navShop') },
-    { path: '/customizer', label: t('navCustomize') },
-    { path: '/about', label: t('navDuat') }
+    { path: '/customize', label: t('navCustomize') },
+    { path: '/the-duat', label: t('navDuat') }
   ];
 
+  const handleTrackerClick = () => {
+    navigate('/track-order');
+    if (onOpenTracker) onOpenTracker();
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-void/90 backdrop-blur-md border-b border-grave">
+    <header className="sticky top-0 z-40 bg-void/90 backdrop-blur-md border-b border-grave transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* LOGO LOCKUP LEFT: Abstract SunDisc + DUAT Typography */}
-          <Link to="/" className="flex items-center gap-3 group focus:outline-none min-h-[44px]">
-            <SunDisc size={22} variant="gold" />
-            <div className="flex flex-col">
+          {/* LOGO LOCKUP: SunDisc + DUAT Typography (Left in LTR, Right in RTL) */}
+          <Link to="/" className="flex items-center gap-3.5 group focus:outline-none min-h-[44px]">
+            <SunDisc size={26} variant="gold" />
+            <div className="flex flex-col text-start">
               <span className="font-clash text-2xl tracking-tight text-bone group-hover:text-gold transition-colors leading-none">
                 DUAT
               </span>
               <span className="font-mono text-[9px] tracking-[0.2em] text-ash uppercase leading-none mt-1">
-                ALEXANDRIA
+                {lang === 'ar' ? 'مصر' : 'EGYPT'}
               </span>
             </div>
           </Link>
 
           {/* DESKTOP NAVIGATION LINKS CENTER (MD+) */}
-          <nav className="hidden md:flex items-center space-x-8 lg:space-x-12 rtl:space-x-reverse">
+          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `font-mono text-xs uppercase tracking-[0.2em] transition-colors py-2 min-h-[44px] flex items-center ${
+                  `font-mono text-xs uppercase tracking-[0.2em] transition-all duration-200 py-2 min-h-[44px] flex items-center relative group ${
                     isActive ? 'text-gold font-bold' : 'text-bone/80 hover:text-gold'
                   }`
                 }
               >
-                {link.label}
+                {({ isActive }) => (
+                  <>
+                    <span>{link.label}</span>
+                    <span className={`absolute bottom-3 left-0 w-full h-[1.5px] bg-gold transition-transform duration-300 origin-left ${
+                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`} />
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
 
-          {/* RIGHT ACTIONS: TRACKER, BILINGUAL TOGGLE & CART */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          {/* RIGHT / LEFT ACTIONS (RTL-BALANCED): TRACKER, THEME, BILINGUAL TOGGLE & CART */}
+          <div className="flex items-center gap-2 sm:gap-3">
             
             {/* Shipment Order Tracker Button */}
             <button
-              onClick={onOpenTracker}
-              className="hidden sm:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ash hover:text-gold transition-colors border border-grave px-3 py-2 min-h-[44px]"
+              onClick={handleTrackerClick}
+              className="hidden sm:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ash hover:text-gold transition-colors border border-grave bg-stone/50 px-3 py-2 min-h-[44px]"
               title={t('trackOrderNav')}
             >
               <Truck size={14} className="text-gold" />
               <span>{t('trackOrderNav')}</span>
             </button>
 
-            {/* Bilingual Toggle EN / AR (Desktop) */}
+            {/* Theme Toggle (Night / Dawn) */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 font-mono text-xs text-ash hover:text-gold border border-grave bg-stone px-2.5 sm:px-3 py-2 transition-colors uppercase min-h-[44px] min-w-[44px] justify-center"
+              aria-label="Toggle Theme"
+              title={theme === 'night' ? 'Dawn Mode (Sunrise)' : 'Night Mode (Dusk)'}
+            >
+              {theme === 'night' ? (
+                <Sun size={15} className="text-gold" />
+              ) : (
+                <Moon size={15} className="text-gold" />
+              )}
+              <span className="hidden lg:inline text-[11px]">
+                {theme === 'night' ? 'Dawn' : 'Night'}
+              </span>
+            </button>
+
+            {/* Bilingual Toggle EN / AR */}
             <button
               onClick={toggleLanguage}
-              className="hidden md:flex items-center gap-1.5 font-mono text-xs tracking-widest text-ash hover:text-gold border border-grave px-3 py-2 transition-colors uppercase min-h-[44px]"
+              className="hidden md:flex items-center gap-1.5 font-mono text-xs tracking-widest text-ash hover:text-gold border border-grave bg-stone px-3 py-2 transition-colors uppercase min-h-[44px]"
               aria-label="Toggle Language"
             >
               <Globe size={14} className="text-gold" />
@@ -83,7 +114,7 @@ export const Navbar = ({ onOpenTracker }) => {
             >
               <ShoppingBag size={20} />
               {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-gold text-void font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-void">
+                <span className="absolute -top-1.5 -right-1.5 bg-gold text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-stone shadow-sm">
                   {totalItems}
                 </span>
               )}
@@ -124,7 +155,7 @@ export const Navbar = ({ onOpenTracker }) => {
 
             <button
               onClick={() => {
-                onOpenTracker();
+                handleTrackerClick();
                 setMobileMenuOpen(false);
               }}
               className="font-mono text-sm uppercase tracking-widest py-3 text-ash hover:text-gold flex items-center gap-2 border-b border-grave/40 min-h-[44px]"
@@ -133,18 +164,27 @@ export const Navbar = ({ onOpenTracker }) => {
               <span>{t('trackOrderNav')}</span>
             </button>
 
-            {/* Mobile Bilingual Toggle */}
-            <div className="pt-2 flex justify-between items-center">
-              <span className="font-mono text-xs text-ash uppercase">Language:</span>
+            {/* Mobile Toggles: Language & Theme */}
+            <div className="pt-3 flex items-center justify-between gap-3">
+              <button
+                onClick={() => {
+                  toggleTheme();
+                }}
+                className="flex-1 font-mono text-xs uppercase text-bone border border-grave bg-coal py-2.5 flex items-center justify-center gap-2 min-h-[44px]"
+              >
+                {theme === 'night' ? <Sun size={14} className="text-gold" /> : <Moon size={14} className="text-gold" />}
+                <span>{theme === 'night' ? 'Dawn Mode' : 'Night Mode'}</span>
+              </button>
+
               <button
                 onClick={() => {
                   toggleLanguage();
                   setMobileMenuOpen(false);
                 }}
-                className="font-mono text-xs font-bold uppercase text-gold border border-gold px-4 py-2 flex items-center gap-2 min-h-[44px]"
+                className="flex-1 font-mono text-xs font-bold uppercase text-gold border border-gold bg-gold/10 py-2.5 flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <Globe size={14} />
-                <span>{lang === 'en' ? 'التحويل للعربية' : 'Switch to English'}</span>
+                <span>{lang === 'en' ? 'عربي' : 'English'}</span>
               </button>
             </div>
 

@@ -9,12 +9,12 @@ export const CartDrawer = () => {
   const { lang, t, formatPrice } = useLanguage();
   const {
     cartItems,
-    isOpen,
+    isCartOpen,
     closeCart,
     updateQuantity,
     removeFromCart,
     subtotal,
-    discount,
+    discountAmount,
     promoCode,
     applyPromoCode
   } = useCart();
@@ -43,28 +43,31 @@ export const CartDrawer = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!isOpen) return null;
+  if (!isCartOpen) return null;
+
+  const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       
-      {/* Dark Overlay */}
+      {/* Dark Overlay Backdrop */}
       <div
         onClick={closeCart}
         className="absolute inset-0 bg-void/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10 rtl:pl-0 rtl:pr-10">
-        <div className="w-screen max-w-md bg-stone border-l border-grave flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+        <div className="w-screen max-w-md bg-stone border-l border-grave flex flex-col shadow-2xl animate-in slide-in-from-right duration-300 card-depth-highlight">
           
           {/* Header */}
           <div className="p-6 border-b border-grave flex justify-between items-center bg-void">
-            <h2 className="font-clash text-2xl font-bold uppercase tracking-tight text-bone">
-              {t('cartTitle')} ({cartItems.reduce((a, b) => a + b.quantity, 0)})
+            <h2 className="font-clash text-2xl uppercase tracking-tight text-bone">
+              {t('cartTitle')} ({totalQuantity})
             </h2>
             <button
               onClick={closeCart}
-              className="p-2 text-ash hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 text-ash hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center border border-grave bg-coal"
               aria-label="Close Cart"
             >
               <X size={20} />
@@ -82,60 +85,64 @@ export const CartDrawer = () => {
                   onClick={closeCart}
                   className="btn-ghost py-3 px-6 text-xs font-mono tracking-widest min-h-[44px]"
                 >
-                  RETURN TO SHOP
+                  {t('backToShop')}
                 </button>
               </div>
             ) : (
-              cartItems.map((item) => (
-                <div
-                  key={item.cartId}
-                  className="p-4 bg-coal border border-grave flex justify-between items-start gap-4"
-                >
-                  <div className="space-y-1 flex-1">
-                    <h4 className="font-space font-bold text-sm text-bone">
-                      {lang === 'ar' ? item.nameAr : item.nameEn}
-                    </h4>
+              cartItems.map((item) => {
+                const itemId = item.cartItemId || item.cartId || item.id;
+                const config = item.customConfig || item.customDetails;
+                return (
+                  <div
+                    key={itemId}
+                    className="p-4 bg-coal border border-grave flex justify-between items-start gap-4"
+                  >
+                    <div className="space-y-1 flex-1">
+                      <h4 className="font-space font-bold text-sm text-bone">
+                        {lang === 'ar' ? item.nameAr : item.nameEn}
+                      </h4>
 
-                    {item.customDetails && (
-                      <div className="font-mono text-[10px] text-gold uppercase space-y-0.5">
-                        <p>Model: {item.customDetails.phoneModel}</p>
-                        <p>Armor: {item.customDetails.caseType}</p>
+                      {config && (
+                        <div className="font-mono text-[10px] text-gold uppercase space-y-0.5 pt-0.5">
+                          {config.phoneModel && <p>Model: {config.phoneModel}</p>}
+                          {config.caseType && <p>Armor: {config.caseType}</p>}
+                        </div>
+                      )}
+
+                      <span className="font-mono text-xs text-gold font-bold block pt-1">
+                        {formatPrice(item.price * item.quantity)}
+                      </span>
+                    </div>
+
+                    {/* Quantity & Delete Controls */}
+                    <div className="flex flex-col items-end gap-3">
+                      <button
+                        onClick={() => removeFromCart(itemId)}
+                        className="text-ash hover:text-ember transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+                        title="Remove"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
+                      <div className="flex items-center border border-grave bg-stone font-mono text-xs">
+                        <button
+                          onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                          className="px-2.5 py-1 text-ash hover:text-bone min-h-[32px] flex items-center justify-center"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="px-2 text-bone font-bold">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(itemId, item.quantity + 1)}
+                          className="px-2.5 py-1 text-ash hover:text-bone min-h-[32px] flex items-center justify-center"
+                        >
+                          <Plus size={12} />
+                        </button>
                       </div>
-                    )}
-
-                    <span className="font-mono text-xs text-gold font-bold block pt-1">
-                      {formatPrice(item.price * item.quantity)}
-                    </span>
-                  </div>
-
-                  {/* Quantity controls */}
-                  <div className="flex flex-col items-end gap-3">
-                    <button
-                      onClick={() => removeFromCart(item.cartId)}
-                      className="text-ash hover:text-ember transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
-                      title="Remove"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-
-                    <div className="flex items-center border border-grave bg-stone font-mono text-xs">
-                      <button
-                        onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
-                        className="px-2.5 py-1 text-ash hover:text-bone min-h-[32px]"
-                      >
-                        <Minus size={12} />
-                      </button>
-                      <span className="px-2 text-bone font-bold">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
-                        className="px-2.5 py-1 text-ash hover:text-bone min-h-[32px]"
-                      >
-                        <Plus size={12} />
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
@@ -170,12 +177,17 @@ export const CartDrawer = () => {
                   <span className="text-bone font-bold">{formatPrice(subtotal)}</span>
                 </div>
 
-                {discount > 0 && (
-                  <div className="flex justify-between text-ember">
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-ember font-bold">
                     <span>{t('discount')} ({promoCode})</span>
-                    <span>-{formatPrice(discount)}</span>
+                    <span>-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
+
+                <div className="flex justify-between text-gold font-bold text-sm pt-1 border-t border-grave/30">
+                  <span>TOTAL</span>
+                  <span>{formatPrice(finalTotal)}</span>
+                </div>
 
                 <p className="text-[10px] text-ash tracking-tight pt-1">
                   {t('freeShippingNotice')}

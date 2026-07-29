@@ -37,32 +37,32 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   };
 
   return (
-    <div className="space-y-20 sm:space-y-28 pb-20 overflow-hidden">
+    <div className="space-y-28 sm:space-y-36 pb-24 overflow-hidden">
       
       {/* HERO SECTION — SOFT WIDE AMBIENT GLOW */}
-      <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-20 border-b border-grave">
+      <section className="relative min-h-[calc(100vh-80px)] flex items-center bg-transparent overflow-hidden pt-8 pb-16 sm:py-24 border-b border-grave reveal-fade-up">
         
-        {/* Soft Wide Ambient Glow Centered Behind Image Feathering Leftward (Part 0 Fix) */}
+        {/* Soft Wide Ambient Glow Centered Behind Image Feathering Leftward */}
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[680px] h-[680px] bg-gold/[0.12] rounded-full blur-[160px] pointer-events-none" />
 
-        {/* Headline Backlight (Subtle 8% Glow) */}
+        {/* Headline Backlight */}
         <div className="absolute top-1/3 left-10 w-[380px] h-[380px] bg-gold/[0.08] rounded-full blur-[100px] pointer-events-none" />
 
         {/* Outer Dark Vignette for Edge Contrast */}
         <div className="absolute inset-0 bg-radial from-transparent via-transparent to-void/75 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             
             {/* Left Column: Display Headings & CTAs */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 relative">
+            <div className="lg:col-span-7 space-y-8 relative">
               
-              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-                <SunDisc size={12} variant="gold" />
+              <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+                <SunDisc size={14} variant="gold" />
                 <span>{t('heroEyebrow')}</span>
               </div>
 
-              <h1 className="font-clash text-3xl sm:text-6xl lg:text-[84px] uppercase text-bone leading-display drop-shadow-md">
+              <h1 className="font-clash text-3xl sm:text-6xl lg:text-[84px] uppercase text-bone leading-display drop-shadow-md tracking-tight">
                 THROUGH THE NIGHT <br />
                 <span className="text-gold">BORN AT DAWN.</span>
               </h1>
@@ -89,16 +89,16 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 </button>
               </div>
 
-              <div className="pt-6 border-t border-grave grid grid-cols-3 gap-2 sm:gap-4 font-mono text-[10px] sm:text-xs text-ash uppercase">
-                <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="pt-8 border-t border-grave grid grid-cols-3 gap-3 sm:gap-6 font-mono text-[10px] sm:text-xs text-ash uppercase">
+                <div className="flex items-center gap-2">
                   <ShieldCheck size={16} className="text-gold flex-shrink-0" />
                   <span>1-Year Warranty</span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-2">
                   <Truck size={16} className="text-gold flex-shrink-0" />
                   <span>Fast Delivery</span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-2">
                   <Clock size={16} className="text-gold flex-shrink-0" />
                   <span>Made To Order</span>
                 </div>
@@ -132,12 +132,12 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       </section>
 
       {/* CATEGORIES GRID */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative reveal-fade-up">
         <div className="absolute -top-16 -right-16 w-96 h-96 bg-gold/[0.06] rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="space-y-8 relative z-10">
+        <div className="space-y-10 relative z-10">
           <div className="space-y-2 border-l-2 border-gold pl-4">
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+            <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
               <SunDisc size={12} variant="gold" />
               <span>{t('catEyebrow')}</span>
             </div>
@@ -146,12 +146,12 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {CATEGORIES.filter(c => c.id !== 'all').map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryClick(cat.id)}
-                className="bg-stone border border-grave card-depth-highlight p-6 sm:p-8 text-left group hover:bg-coal hover:border-gold transition-all duration-300 flex flex-col justify-between h-56 sm:h-64 relative overflow-hidden min-h-[44px]"
+                className="bg-stone border border-grave card-depth-highlight p-8 text-left group flex flex-col justify-between h-60 sm:h-68 relative overflow-hidden min-h-[44px]"
               >
                 <div className="flex justify-between items-start">
                   <span className="font-mono text-xl sm:text-2xl font-bold text-ash group-hover:text-gold transition-colors">
@@ -160,7 +160,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                   {renderCategoryIcon(cat.id)}
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-space font-bold text-xl sm:text-2xl uppercase text-bone group-hover:text-gold transition-colors">
                     {cat.id === 'cases' && t('catCases')}
                     {cat.id === 'stickers' && t('catStickers')}
@@ -179,14 +179,14 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       </section>
 
       {/* BUILD YOUR OWN — THE FORGE */}
-      <section className="bg-stone border-y border-grave py-16 sm:py-20 relative overflow-hidden card-depth-highlight">
+      <section className="bg-stone border-y border-grave py-20 sm:py-28 relative overflow-hidden card-depth-highlight reveal-fade-up">
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gold/[0.06] rounded-full blur-[110px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
             <div className="space-y-6">
-              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+              <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
                 <SunDisc size={12} variant="gold" />
                 <span>{t('forgeEyebrow')}</span>
               </div>
@@ -235,12 +235,12 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       </section>
 
       {/* FEATURED PRODUCTS — NEW PASSAGE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative reveal-fade-up">
         <div className="absolute -bottom-16 -right-16 w-96 h-96 bg-gold/[0.06] rounded-full blur-[100px] pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-grave pb-6 relative z-10">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+            <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
               <SunDisc size={12} variant="gold" />
               <span>{t('featuredEyebrow')}</span>
             </div>
@@ -268,11 +268,11 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       </section>
 
       {/* REVIEWS */}
-      <section className="bg-stone border-y border-grave py-16 sm:py-20 card-depth-highlight">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <section className="bg-stone border-y border-grave py-20 sm:py-24 card-depth-highlight reveal-fade-up">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="space-y-2 border-l-2 border-gold pl-4">
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+            <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
               <SunDisc size={12} variant="gold" />
               <span>{t('reviewsEyebrow')}</span>
             </div>
@@ -283,7 +283,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {REVIEWS.map((rev) => (
-              <div key={rev.id} className="bg-coal border border-grave p-6 space-y-4 flex flex-col justify-between">
+              <div key={rev.id} className="bg-coal border border-grave p-8 space-y-4 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-1 text-gold">
                     {[...Array(rev.rating)].map((_, i) => (
@@ -295,7 +295,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                   </p>
                 </div>
 
-                <div className="border-t border-grave pt-3 flex justify-between items-center font-mono text-xs">
+                <div className="border-t border-grave pt-4 flex justify-between items-center font-mono text-xs">
                   <span className="font-bold text-bone">{rev.author}</span>
                   <span className="text-ash uppercase">{lang === 'ar' ? rev.cityAr : rev.city}</span>
                 </div>
@@ -307,9 +307,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       </section>
 
       {/* FAQ */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
         <div className="space-y-2 text-center">
-          <div className="flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
+          <div className="flex items-center justify-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
             <SunDisc size={12} variant="gold" />
             <span>{t('faqEyebrow')}</span>
           </div>
@@ -325,7 +325,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               <div key={faq.id} className="bg-stone border border-grave transition-colors card-depth-highlight">
                 <button
                   onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 focus:outline-none min-h-[44px]"
+                  className="w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none min-h-[44px]"
                 >
                   <span className="font-space font-bold text-base text-bone">
                     {lang === 'ar' ? faq.qAr : faq.qEn}
@@ -334,7 +334,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-6 pb-6 font-space text-sm text-bone/80 border-t border-grave pt-4 leading-relaxed font-light">
+                  <div className="px-6 pb-6 font-space text-sm text-bone/80 border-t border-grave pt-4 leading-relaxed font-light">
                     {lang === 'ar' ? faq.aAr : faq.aEn}
                   </div>
                 )}

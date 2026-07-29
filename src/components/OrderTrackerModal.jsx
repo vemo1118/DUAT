@@ -15,13 +15,12 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     if (!orderId.trim()) return;
 
-    // Simulated lookup logic for high-end feel
     const query = orderId.trim().toUpperCase();
     if (query.length >= 4) {
       setErrorMsg('');
       setTrackedResult({
         code: query.startsWith('DUAT-') ? query : `DUAT-${query}`,
-        currentStep: 2, // In Alexandria Forge
+        currentStep: 1, // In Production
         updatedAt: new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
       });
     } else {
@@ -31,27 +30,28 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
   };
 
   const steps = [
-    { title: t('stepPlaced'), icon: CheckCircle, desc: 'WhatsApp Confirmation Verified' },
-    { title: t('stepForge'), icon: Clock, desc: 'Epoxy Domes & Assembly' },
-    { title: t('stepShipped'), icon: Truck, desc: 'Express Shipping Dispatch' },
-    { title: t('stepDelivered'), icon: ShieldCheck, desc: 'Night Crossing Arrival' }
+    { title: t('stepPlaced'), icon: CheckCircle, desc: t('stepPlacedDesc') },
+    { title: t('stepForge'), icon: Clock, desc: t('stepForgeDesc') },
+    { title: t('stepShipped'), icon: Truck, desc: t('stepShippedDesc') },
+    { title: t('stepDelivered'), icon: ShieldCheck, desc: t('stepDeliveredDesc') }
   ];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-void/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-stone border border-grave max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-6 animate-in zoom-in-95 duration-200">
+      <div className="bg-stone border border-grave max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-6 animate-in zoom-in-95 duration-200 card-depth-highlight">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-grave pb-4">
           <div className="flex items-center gap-3">
             <SunDisc size={22} variant="gold" />
-            <h2 className="font-archivo text-xl uppercase text-bone">
+            <h2 className="font-clash text-xl uppercase text-bone">
               {t('trackerTitle')}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-ash hover:text-gold border border-grave bg-coal transition-colors"
+            className="p-1.5 text-ash hover:text-gold border border-grave bg-coal transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close"
           >
             <X size={18} />
           </button>
@@ -68,11 +68,11 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder={t('trackerInputPlaceholder')}
-            className="flex-1 bg-coal border border-grave text-bone p-3 text-xs font-mono uppercase focus:border-gold focus:outline-none"
+            className="flex-1 bg-coal border border-grave text-bone p-3 text-xs font-mono uppercase focus:border-gold focus:outline-none min-h-[44px]"
           />
           <button
             type="submit"
-            className="btn-primary px-6 text-xs flex items-center gap-2"
+            className="btn-primary px-6 text-xs flex items-center gap-2 min-h-[44px]"
           >
             <Search size={14} />
             <span>{t('trackerBtn')}</span>
@@ -99,7 +99,7 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
 
                 return (
                   <div key={idx} className="flex items-start gap-4">
-                    <div className={`p-2 border ${
+                    <div className={`p-2 border flex-shrink-0 ${
                       isCurrent
                         ? 'border-gold bg-gold/20 text-gold'
                         : isCompleted

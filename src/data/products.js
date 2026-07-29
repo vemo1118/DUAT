@@ -291,8 +291,8 @@ export const FAQS = [
     id: 'faq-1',
     qEn: 'How long does custom case production & shipping take?',
     qAr: 'كم يستغرق تصنيع الجراب المخصص وشحنه؟',
-    aEn: 'Every custom case is made to order in our Alexandria forge within 2–3 business days. Delivery takes 1 day for Alexandria & Cairo, and 2–3 days for other governorates.',
-    aAr: 'كل جراب مخصص بيتم تصنيعه حسب الطلب في مصنعنا بالإسكندرية خلال ٢-٣ أيام عمل. التوصيل بياخد يوم واحد للإسكندرية والقاهرة، و٢-٣ أيام لباقي المحافظات.'
+    aEn: 'Every custom case is made to order in our Egypt forge within 2–3 business days. Delivery takes 1 day for Alexandria & Cairo, and 2–3 days for other governorates.',
+    aAr: 'كل جراب مخصص بيتم تصنيعه حسب الطلب في مصنعنا بمصر خلال ٢-٣ أيام عمل. التوصيل بياخد يوم واحد للإسكندرية والقاهرة، و٢-٣ أيام لباقي المحافظات.'
   },
   {
     id: 'faq-2',

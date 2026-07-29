@@ -7,14 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#050505',
-        stone: '#14110F',
-        coal: '#1F1B17',
-        grave: '#2E2823',
-        gold: '#E0A93B',
-        ember: '#D9432E',
-        bone: '#F0EBE0',
-        ash: '#6E675D',
+        void: 'rgb(var(--void-rgb) / <alpha-value>)',
+        stone: 'rgb(var(--stone-rgb) / <alpha-value>)',
+        coal: 'rgb(var(--coal-rgb) / <alpha-value>)',
+        grave: 'rgb(var(--grave-rgb) / <alpha-value>)',
+        gold: 'rgb(var(--gold-rgb) / <alpha-value>)',
+        ember: 'rgb(var(--ember-rgb) / <alpha-value>)',
+        bone: 'rgb(var(--bone-rgb) / <alpha-value>)',
+        ash: 'rgb(var(--ash-rgb) / <alpha-value>)',
       },
       fontFamily: {
         clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],

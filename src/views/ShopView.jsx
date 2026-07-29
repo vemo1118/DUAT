@@ -32,21 +32,21 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 space-y-12 min-h-screen">
       
       {/* Shop Header */}
-      <div className="space-y-4 border-b border-grave pb-8">
+      <div className="space-y-4 border-b border-grave pb-8 reveal-on-scroll">
         <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-          <SunDisc size={14} />
+          <SunDisc size={14} variant="gold" />
           <span>{t('shopEyebrow')}</span>
         </div>
-        <h1 className="font-archivo text-5xl sm:text-6xl uppercase text-bone">
+        <h1 className="font-clash text-4xl sm:text-6xl uppercase text-bone tracking-tight">
           {t('shopTitle')}
         </h1>
       </div>
 
       {/* Controls Bar: Category Filters + Live Search + Sort */}
-      <div className="space-y-6">
+      <div className="space-y-6 reveal-on-scroll">
         
         <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
           
@@ -58,7 +58,7 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`font-mono text-xs uppercase tracking-widest px-4 py-3 transition-colors border whitespace-nowrap ${
+                  className={`font-mono text-xs uppercase tracking-widest px-4 py-3 transition-all duration-200 border whitespace-nowrap min-h-[44px] ${
                     isSelected
                       ? 'border-gold text-gold bg-gold/10 font-bold'
                       : 'border-grave text-bone/70 hover:border-gold hover:text-bone bg-coal'
@@ -85,7 +85,7 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="w-full bg-coal border border-grave text-bone pl-10 pr-4 py-2.5 text-xs font-mono focus:border-gold focus:outline-none"
+                className="w-full bg-coal border border-grave text-bone pl-10 pr-4 py-2.5 text-xs font-mono focus:border-gold focus:outline-none min-h-[44px]"
               />
             </div>
 
@@ -95,12 +95,12 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-coal border border-grave text-bone px-3 py-2.5 text-xs font-mono focus:border-gold focus:outline-none cursor-pointer w-full"
+                className="bg-coal border border-grave text-bone px-3 py-2.5 text-xs font-mono focus:border-gold focus:outline-none cursor-pointer w-full min-h-[44px]"
               >
-                <option value="featured">{t('sortFeatured')}</option>
-                <option value="price-low">{t('sortPriceLow')}</option>
-                <option value="price-high">{t('sortPriceHigh')}</option>
-                <option value="name">{t('sortName')}</option>
+                <option value="featured" className="bg-coal text-bone">{t('sortFeatured')}</option>
+                <option value="price-low" className="bg-coal text-bone">{t('sortPriceLow')}</option>
+                <option value="price-high" className="bg-coal text-bone">{t('sortPriceHigh')}</option>
+                <option value="name" className="bg-coal text-bone">{t('sortName')}</option>
               </select>
             </div>
 
@@ -112,14 +112,14 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
 
       {/* Product Grid: 4-up desktop, 2-up tablet, 1-up mobile */}
       {filteredProducts.length === 0 ? (
-        <div className="py-20 text-center space-y-4 bg-stone border border-grave">
+        <div className="py-24 text-center space-y-4 bg-stone border border-grave card-depth-highlight reveal-on-scroll">
           <SunDisc size={48} variant="eclipse" className="opacity-40" />
           <p className="font-mono text-xs uppercase tracking-widest text-ash">
             {t('noProductsFound')}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 reveal-on-scroll">
           {filteredProducts.map((product) => (
             <div key={product.id} onClick={() => onSelectProduct?.(product)}>
               <ProductCard product={product} />

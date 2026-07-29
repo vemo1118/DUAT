@@ -7,25 +7,25 @@ export const Footer = () => {
   const { lang, t } = useLanguage();
 
   return (
-    <footer className="bg-stone border-t border-grave pt-16 pb-12">
+    <footer className="bg-stone border-t border-grave pt-24 pb-16 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* 3-Col Desktop -> Stacked Mobile Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-12 border-b border-grave">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-16 border-b border-grave/60">
           
           {/* Col 1: Brand & Logo Lockup */}
           <div className="space-y-4">
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center gap-3"
+              className="flex items-center gap-3.5 min-h-[44px]"
             >
-              <SunDisc size={28} variant="gold" />
-              <span className="font-clash font-bold text-2xl text-bone uppercase tracking-tight">
+              <SunDisc size={30} variant="gold" />
+              <span className="font-clash text-2xl text-bone uppercase tracking-tight">
                 DUAT
               </span>
             </Link>
-            <p className="font-space text-sm text-ash max-w-sm font-light">
+            <p className="font-space text-sm text-ash max-w-sm font-light leading-relaxed">
               {t('footerTagline')}
             </p>
             <span className="font-mono text-xs text-ash block uppercase">
@@ -42,23 +42,30 @@ export const Footer = () => {
               <Link
                 to="/shop"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="text-left text-bone/80 hover:text-gold transition-colors"
+                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
               >
                 {t('navShop')}
               </Link>
               <Link
-                to="/customizer"
+                to="/customize"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="text-left text-bone/80 hover:text-gold transition-colors"
+                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
               >
                 {t('navCustomize')}
               </Link>
               <Link
-                to="/about"
+                to="/the-duat"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="text-left text-bone/80 hover:text-gold transition-colors"
+                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
               >
                 {t('navDuat')}
+              </Link>
+              <Link
+                to="/track-order"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
+              >
+                {t('trackOrderNav')}
               </Link>
             </div>
           </div>
@@ -77,7 +84,7 @@ export const Footer = () => {
         {/* Bottom Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-xs text-ash">
           <span>{t('footerRights')}</span>
-          <span className="uppercase">Alexandria, Egypt • C.2026</span>
+          <span className="uppercase">{lang === 'ar' ? 'مصر • ٢٠٢٦' : 'Egypt • C.2026'}</span>
         </div>
 
       </div>

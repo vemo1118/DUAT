@@ -14,18 +14,19 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, customConfig = null) => {
     setCartItems(prevItems => {
-      if (customConfig) {
+      if (customConfig || product.customDetails) {
+        const cfg = customConfig || product.customDetails;
         const newItem = {
           cartItemId: `custom-${Date.now()}`,
           id: product.id || 'custom-case',
-          nameEn: customConfig.titleEn || product.nameEn || 'Customized Case',
-          nameAr: customConfig.titleAr || product.nameAr || 'جراب مخصص',
+          nameEn: product.nameEn || 'Customized Case',
+          nameAr: product.nameAr || 'جراب مخصص',
           price: product.price || 850,
-          tagEn: customConfig.phoneModel,
-          tagAr: customConfig.phoneModel,
+          tagEn: product.tagEn || cfg.phoneModel || 'Custom',
+          tagAr: product.tagAr || cfg.phoneModel || 'مخصص',
           quantity: 1,
           isCustom: true,
-          customConfig
+          customConfig: cfg
         };
         return [...prevItems, newItem];
       }
@@ -98,6 +99,7 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{
       cartItems,
       isCartOpen,
+      isOpen: isCartOpen, // Alias for backward compatibility
       openCart,
       closeCart,
       toggleCart,
@@ -106,9 +108,11 @@ export const CartProvider = ({ children }) => {
       updateQuantity,
       clearCart,
       subtotal,
+      totalItems: cartCount,
       cartCount,
       promoCode,
       discountAmount,
+      discount: discountAmount, // Alias
       applyPromoCode
     }}>
       {children}

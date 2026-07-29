@@ -21,9 +21,8 @@ export const ProductCard = ({ product }) => {
   const name = lang === 'ar' ? product.nameAr : product.nameEn;
   const tag = lang === 'ar' ? product.tagAr : product.tagEn;
 
-  // Render high-depth dusk-lit product graphics for all 4 finishes (Part 1 Fix)
+  // Render high-depth dusk-lit product graphics for all 4 finishes
   const renderProductGraphic = () => {
-    // If it's a Solar Case or generic clear case, use high-res photography
     if (product.id === 'case-solar') {
       return (
         <img
@@ -54,7 +53,6 @@ export const ProductCard = ({ product }) => {
       );
     }
 
-    // Cases (Void, Ember, Eclipse) render clean dusk-lit techwear graphics
     switch (product.id) {
       case 'case-ember':
         return (
@@ -78,7 +76,6 @@ export const ProductCard = ({ product }) => {
               <div className="w-2.5 h-2.5 rounded-full bg-void border border-grave" />
             </div>
 
-            {/* MagSafe Ring Detail */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-2 border-grave/70 pointer-events-none" />
 
             <div className="self-start font-mono text-[8px] tracking-widest text-ash/40 font-bold uppercase select-none z-10">
@@ -105,7 +102,7 @@ export const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-stone border border-grave flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:border-gold hover:shadow-[0_8px_30px_rgba(224,169,59,0.15)] cursor-pointer card-depth-highlight">
+    <div className="bg-stone border border-grave flex flex-col justify-between group relative overflow-hidden transition-all duration-300 cursor-pointer card-depth-highlight">
       
       {/* 3:4 Aspect Ratio Photography / Canvas Area */}
       <div className="aspect-[3/4] w-full bg-void overflow-hidden relative border-b border-grave flex items-center justify-center">

@@ -6,6 +6,9 @@ export const TRANSLATIONS = {
     navDuat: 'The Duat',
     cartTitle: 'Your cart',
     trackOrderNav: 'Track Order',
+    navSublabel: 'EGYPT',
+    themeNight: 'Night',
+    themeDawn: 'Dawn',
 
     // Hero
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
@@ -84,6 +87,13 @@ export const TRANSLATIONS = {
     presetLoadedToast: 'Preset design loaded',
     designExportedToast: 'Design mockup PNG downloaded',
 
+    // Sticker Categories
+    stickerCatShapes: 'Shapes',
+    stickerCatArabic: 'Arabic Letters',
+    stickerCatEnglish: 'English Letters',
+    stickerCatNumbers: 'Numbers & Years',
+    stickerCatQuotes: 'Quotes & Slogans',
+
     // Cart
     cartEmpty: 'Cart is empty. The passage awaits.',
     subtotal: 'Subtotal',
@@ -107,7 +117,7 @@ export const TRANSLATIONS = {
     phone: 'Phone Number (WhatsApp)',
     phonePlaceholder: '+20 100 000 0000',
     address: 'Street Address',
-    addressPlaceholder: 'Building 14, Fouad Street, Mahattat El-Raml',
+    addressPlaceholder: 'Building 14, Fouad Street',
     city: 'Governorate / City',
     paymentMethod: 'Payment Method',
     payCod: 'Cash on Delivery',
@@ -126,24 +136,48 @@ export const TRANSLATIONS = {
     orderNumberLabel: 'ORDER REFERENCE:',
     backToShop: 'BACK TO SHOP',
 
+    // Order Tracker Modal / Page (Part 1 Keys Fix)
+    trackerTitle: 'Track your order',
+    trackerSubtitle: 'Enter your order reference to see where it is in the passage.',
+    trackerInputPlaceholder: 'Order number (e.g. DUAT-12345)',
+    trackerBtn: 'Track',
+    trackerNotFound: 'No order found with this reference. Check your WhatsApp confirmation.',
+    stepPlaced: 'Order placed',
+    stepPlacedDesc: 'WhatsApp confirmed',
+    stepForge: 'In production',
+    stepForgeDesc: 'Epoxy domes & assembly',
+    stepShipped: 'Shipped',
+    stepShippedDesc: 'Express dispatch',
+    stepDelivered: 'Delivered',
+    stepDeliveredDesc: 'Arrived',
+
+    // Uppercase key aliases for Track Order
+    TRACKERTITLE: 'Track your order',
+    TRACKERINPUTPLACEHOLDER: 'Order number (e.g. DUAT-12345)',
+    TRACKERBTN: 'Track',
+    STEPPLACED: 'Order placed',
+    STEPFORGE: 'In production',
+    STEPSHIPPED: 'Shipped',
+    STEPDELIVERED: 'Delivered',
+
     // Reviews & FAQ
     reviewsEyebrow: 'WHAT THEY CARRY',
     reviewsTitle: 'From the passage.',
     faqEyebrow: 'THE PASSAGE GUIDE',
     faqTitle: 'Frequently asked questions.',
 
-    // About — Final Abstract Copy Narrative (Part 4)
+    // About — Egypt Branding (Part 4)
     aboutEyebrow: 'DUAT / ∞',
     aboutTitle: 'The Duat.',
     aboutP1: 'Duat is the space between dusk and dawn — the hours you cross to come out changed.',
     aboutP2: 'We don\'t sell cases. We sell the idea that you\'re moving through the dark toward the light.',
-    aboutP3: 'Made in Alexandria, to order. Shipped worldwide.',
+    aboutP3: 'Made in Egypt, to order. Shipped worldwide.',
     aboutCta: 'BUILD YOUR CASE',
 
     // Footer
     footerBrand: 'DUAT',
     footerTagline: 'Objects for the night crossing.',
-    footerLocation: 'Alexandria, Egypt',
+    footerLocation: 'Egypt',
     footerSocial: '@wearduat on IG / TikTok / Threads',
     footerRights: '© DUAT. All rights reserved.'
   },
@@ -155,6 +189,9 @@ export const TRANSLATIONS = {
     navDuat: 'الدوات',
     cartTitle: 'سلة الشراء',
     trackOrderNav: 'تتبع طلبك',
+    navSublabel: 'مصر',
+    themeNight: 'الليل',
+    themeDawn: 'الفجر',
 
     // Hero
     heroEyebrow: 'دوات / ٠٠ — العبور',
@@ -219,7 +256,7 @@ export const TRANSLATIONS = {
     fontBody: 'عربي (ريم كوفي)',
     fontMono: 'بيانات (أرقام)',
     addTextBtn: 'إضافة النص',
-    uploadZoneText: 'اسحب صورة هنا أو انقر للااختيار',
+    uploadZoneText: 'اسحب صورة هنا أو انقر للاختيار',
     uploadZoneHint: 'تدعم PNG, JPG, WebP حتى ١٠ ميجابايت',
     layersHeader: 'طبقات التصميم',
     noLayersText: 'لا توجد طبقات بعد. ارفع صورة، اكتب نصاً، أو أضف ملصقاً.',
@@ -232,6 +269,13 @@ export const TRANSLATIONS = {
     exportDesign: 'تحميل التصميم PNG',
     presetLoadedToast: 'تم تحميل النموذج الجاهز بنجاح',
     designExportedToast: 'تم تحميل صورة التصميم',
+
+    // Sticker Categories
+    stickerCatShapes: 'الأشكال',
+    stickerCatArabic: 'الحروف العربية',
+    stickerCatEnglish: 'الحروف الإنجليزية',
+    stickerCatNumbers: 'الأرقام والسنوات',
+    stickerCatQuotes: 'العبارات والشعارات',
 
     // Cart
     cartEmpty: 'السلة فارغة. العبور بانتظارك.',
@@ -256,7 +300,7 @@ export const TRANSLATIONS = {
     phone: 'رقم الهاتف (واتساب)',
     phonePlaceholder: '٠١٠٠٠٠٠٠٠٠٠+',
     address: 'عنوان الشارع',
-    addressPlaceholder: 'مبنى ١٤، شارع فؤاد، محطة الرمل',
+    addressPlaceholder: 'مبنى ١٤، شارع فؤاد',
     city: 'المحافظة / المدينة',
     paymentMethod: 'طريقة الدفع',
     payCod: 'الدفع عند الاستلام',
@@ -275,16 +319,29 @@ export const TRANSLATIONS = {
     orderNumberLabel: 'رقم مرجع الطلب:',
     backToShop: 'العودة للمتجر',
 
-    // Order Tracker Modal
-    trackerTitle: 'تتبع الشحنة',
-    trackerSubtitle: 'أدخل رقم مرجع الطلب لمتابعة خطوات الشحن والتوصيل.',
-    trackerInputPlaceholder: 'DUAT-9842',
-    trackerBtn: 'تتبع الان',
+    // Order Tracker Modal / Page (Part 1 Keys Fix)
+    trackerTitle: 'تتبّع طلبك',
+    trackerSubtitle: 'اكتب رقم طلبك عشان تشوف هو فين في الرحلة.',
+    trackerInputPlaceholder: 'رقم الطلب (مثال: DUAT-12345)',
+    trackerBtn: 'تتبّع',
     trackerNotFound: 'لم نجد طلباً بهذا الرقم. تحقق من رسالة الواتساب.',
-    stepPlaced: 'تم تأكيد الطلب',
-    stepForge: 'جاري التصنيع بمصنع الإسكندرية',
-    stepShipped: 'في الطريق مع مندوب الشحن',
-    stepDelivered: 'تم وصول الطلب بنجاح',
+    stepPlaced: 'تم الطلب',
+    stepPlacedDesc: 'تأكيد واتساب',
+    stepForge: 'بيتصنّع',
+    stepForgeDesc: 'الدوم والتجميع',
+    stepShipped: 'اتشحن',
+    stepShippedDesc: 'شحن سريع',
+    stepDelivered: 'اتسلّم',
+    stepDeliveredDesc: 'وصل',
+
+    // Uppercase key aliases for Track Order
+    TRACKERTITLE: 'تتبّع طلبك',
+    TRACKERINPUTPLACEHOLDER: 'رقم الطلب (مثال: DUAT-12345)',
+    TRACKERBTN: 'تتبّع',
+    STEPPLACED: 'تم الطلب',
+    STEPFORGE: 'بيتصنّع',
+    STEPSHIPPED: 'اتشحن',
+    STEPDELIVERED: 'اتسلّم',
 
     // Reviews & FAQ
     reviewsEyebrow: 'اللي بيحملوه',
@@ -292,18 +349,18 @@ export const TRANSLATIONS = {
     faqEyebrow: 'دليل العبور',
     faqTitle: 'الأسئلة الشائعة.',
 
-    // About — Final Abstract Story Copy
+    // About — Egypt Branding (Part 4)
     aboutEyebrow: 'دوات / ∞',
     aboutTitle: 'الدوات.',
     aboutP1: 'الدُوات هو المساحة بين الغروب والفجر — الساعات اللي بتعبرها عشان تخرج منها متغيّر.',
     aboutP2: 'احنا مش بنبيع جرابات، بنبيع فكرة إنك بتعبر من الضلمة للنور.',
-    aboutP3: 'مصنوع في الإسكندرية، حسب الطلب. شحن للعالم كله.',
+    aboutP3: 'مصنوع في مصر، حسب الطلب. شحن للعالم كله.',
     aboutCta: 'صمم جرابك الآن',
 
     // Footer
     footerBrand: 'دوات',
     footerTagline: 'أشياء مخصصة لرحلة الليل.',
-    footerLocation: 'الإسكندرية، مصر',
+    footerLocation: 'مصر',
     footerSocial: 'wearduat@ على إنستجرام / تيك توك / ثريدز',
     footerRights: '© دوات. جميع الحقوق محفوظة.'
   }

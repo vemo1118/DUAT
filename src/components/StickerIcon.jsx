@@ -1,14 +1,95 @@
 import React from 'react';
 
-export const StickerIcon = ({ stickerId, size = 36 }) => {
+export const StickerIcon = ({ stickerId, size = 40 }) => {
   const strokeColor = '#E0A93B';
   const fillColor = '#E0A93B';
 
+  // Dynamic prefix matching for Arabic Letters, English Letters, Numbers/Years, and Quotes
+  if (typeof stickerId === 'string') {
+    if (stickerId.startsWith('ar-letter-')) {
+      const char = stickerId.replace('ar-letter-', '');
+      return (
+        <div
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className="rounded-full bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none"
+        >
+          {/* Epoxy Dome Specular Highlight */}
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <span className="font-kufi font-bold text-gold text-lg leading-none transform translate-y-[-1px]">
+            {char}
+          </span>
+        </div>
+      );
+    }
+
+    if (stickerId.startsWith('en-letter-')) {
+      const char = stickerId.replace('en-letter-', '');
+      return (
+        <div
+          style={{ width: `${size}px`, height: `${size}px` }}
+          className="rounded-full bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none"
+        >
+          {/* Epoxy Dome Specular Highlight */}
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <span className="font-mono font-bold text-gold text-base leading-none">
+            {char}
+          </span>
+        </div>
+      );
+    }
+
+    if (stickerId.startsWith('num-')) {
+      const val = stickerId.replace('num-', '');
+      const isYear = val.length > 2;
+      return (
+        <div
+          style={{
+            minWidth: isYear ? `${size * 1.6}px` : `${size}px`,
+            height: `${size}px`,
+            paddingLeft: isYear ? '8px' : '0',
+            paddingRight: isYear ? '8px' : '0'
+          }}
+          className={`${
+            isYear ? 'rounded-full px-3' : 'rounded-full'
+          } bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none`}
+        >
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <span className="font-mono font-bold text-gold text-xs tracking-wider">
+            {val}
+          </span>
+        </div>
+      );
+    }
+
+    if (stickerId.startsWith('quote-')) {
+      const qKey = stickerId.replace('quote-', '');
+      const quotesMap = {
+        'sahr': 'سَهَر',
+        '0x-sun': '0X SUN',
+        '12am': '12 AM',
+        'nocturnal': 'NOCTURNAL',
+        'passage': 'THE PASSAGE',
+        'noor': 'نور'
+      };
+      const text = quotesMap[qKey] || qKey;
+      const isAr = /[\u0600-\u06FF]/.test(text);
+
+      return (
+        <div className={`bg-gradient-to-r from-coal via-stone to-void text-gold border-2 border-gold px-3.5 py-1.5 rounded-full shadow-md text-xs whitespace-nowrap select-none relative overflow-hidden ${isAr ? 'font-kufi' : 'font-mono uppercase tracking-widest'}`}>
+          <div className="absolute top-0.5 left-2 w-1/4 h-1/2 bg-white/15 rounded-full blur-[1px] pointer-events-none" />
+          {text}
+        </div>
+      );
+    }
+  }
+
+  // Pre-existing Shapes and Slogan Pills
   switch (stickerId) {
     case 'disc':
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
           <circle cx="50" cy="50" r="40" fill={fillColor} />
+          <circle cx="42" cy="40" r="12" fill="white" opacity="0.25" />
         </svg>
       );
 
@@ -94,7 +175,7 @@ export const StickerIcon = ({ stickerId, size = 36 }) => {
 
     case 'pill-tale3-noor':
       return (
-        <div className="bg-gold text-void font-kufi font-bold px-3.5 py-1.5 rounded-full border border-bone shadow-md text-xs whitespace-nowrap select-none">
+        <div className="bg-gold text-[#050505] font-kufi font-bold px-3.5 py-1.5 rounded-full border border-stone shadow-md text-xs whitespace-nowrap select-none">
           طالع نور
         </div>
       );

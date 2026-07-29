@@ -8,25 +8,25 @@ export const AboutView = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 space-y-16">
       
       {/* Header */}
-      <div className="space-y-4 text-center">
+      <div className="space-y-4 text-center reveal-on-scroll">
         <div className="flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-          <SunDisc size={12} variant="gold" />
+          <SunDisc size={14} variant="gold" />
           <span>{t('aboutEyebrow')}</span>
         </div>
-        <h1 className="font-clash text-5xl sm:text-7xl uppercase text-bone tracking-tight">
+        <h1 className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase text-bone tracking-tight">
           {t('aboutTitle')}
         </h1>
       </div>
 
-      {/* Story Narrative Box (Part 4: Final Abstract Copy Narrative) */}
-      <div className="bg-stone border border-grave p-8 sm:p-12 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed shadow-2xl card-depth-highlight">
+      {/* Story Narrative Box */}
+      <div className="bg-stone border border-grave p-8 sm:p-14 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed card-depth-highlight reveal-on-scroll">
         <p className="text-xl sm:text-2xl font-medium text-bone leading-relaxed">
           {t('aboutP1')}
         </p>
-        <p className="text-bone/85 font-light">
+        <p className="text-bone/85 font-light leading-relaxed">
           {t('aboutP2')}
         </p>
         
@@ -36,9 +36,9 @@ export const AboutView = () => {
       </div>
 
       {/* CTA */}
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center pt-4 reveal-on-scroll">
         <button
-          onClick={() => navigate('/customizer')}
+          onClick={() => navigate('/customize')}
           className="btn-primary py-4 px-10 text-sm font-mono tracking-widest min-h-[44px]"
         >
           {t('aboutCta')}
