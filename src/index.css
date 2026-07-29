@@ -14,10 +14,10 @@
 }
 
 /* ==========================================================================
-   THEMES SYSTEM — NIGHT MODE (DEFAULT) & DAWN MODE (LIGHT CONTRAST FIX)
+   THEMES SYSTEM — NIGHT MODE (DEFAULT) & DAWN MODE (LIGHT MODE GLITCH FIXES)
    ========================================================================== */
 
-/* Night Mode (Default Dark Base) */
+/* Night Mode (Default Dark Base with Rich Warm Dusk Gradient) */
 html[data-theme="night"],
 html:not([data-theme]) {
   color-scheme: dark;
@@ -31,16 +31,16 @@ html:not([data-theme]) {
 
 html[data-theme="night"] body,
 html:not([data-theme]) body {
-  background: linear-gradient(180deg, #0C0A07 0%, #070605 35%, #050505 70%, #040405 100%);
+  background: linear-gradient(180deg, #0E0C0A 0%, #070605 40%, #050505 100%);
   background-attachment: fixed;
   color: #F0EBE0;
   min-height: 100vh;
 }
 
-/* Dawn Mode (Part 2 Fix — WCAG AA Contrast for Light Mode) */
+/* Dawn Mode (Light Mode with Warm Dawn Gradient & High Contrast Cairo Typography) */
 html[data-theme="dawn"] {
   color-scheme: light;
-  --void: #FAF7F2;
+  --void: #FBF8F3;
   --stone: #EFEAE0;
   --coal: #E5DFC5;
   --grave: #DCD4C7;
@@ -49,13 +49,13 @@ html[data-theme="dawn"] {
 }
 
 html[data-theme="dawn"] body {
-  background: linear-gradient(180deg, #FAF7F2 0%, #F5F0E6 50%, #ECE5D8 100%);
+  background: linear-gradient(180deg, #FBF8F3 0%, #F5EFE4 50%, #ECE4D5 100%);
   background-attachment: fixed;
   color: #1A1714 !important;
   min-height: 100vh;
 }
 
-/* Override Text Utility Classes for Dawn Mode Contrast */
+/* Dawn Mode Class Overrides for High Contrast & No White Boxes */
 html[data-theme="dawn"] .text-bone,
 html[data-theme="dawn"] h1,
 html[data-theme="dawn"] h2,
@@ -83,18 +83,24 @@ html[data-theme="dawn"] .border-grave {
   border-color: #DCD4C7 !important;
 }
 
+/* Fix Hero Image Mask in Light Mode so no white box appears */
+html[data-theme="dawn"] .hero-image-blend {
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 85%);
+  mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 85%);
+}
+
 /* Filmic Noise Grain Texture Overlay */
 .bg-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
-/* Frameless Hero Image Edge-Blend Mask (Safari & WebKit Compatible) */
+/* Frameless Hero Image Edge-Blend Mask */
 .hero-image-blend {
   -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 48%, rgba(0, 0, 0, 0) 88%);
   mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 48%, rgba(0, 0, 0, 0) 88%);
 }
 
-/* Surface Elevation & Top Highlights (Part 3B Elevation) */
+/* Solid Opaque Surface Elevation & Top Highlights (No Over-Transparency) */
 .card-depth-highlight {
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
@@ -106,7 +112,7 @@ html[data-theme="dawn"] .border-grave {
   box-shadow: inset 0 1px 0 0 rgba(224, 169, 59, 0.2), 0 15px 35px -10px rgba(224, 169, 59, 0.15);
 }
 
-/* Scroll Reveal Entrance Keyframes (Part 3D Microinteractions) */
+/* Scroll Reveal Entrance Keyframes */
 @keyframes revealFadeUp {
   from {
     opacity: 0;
@@ -140,7 +146,7 @@ button, a.btn, select, input[type="submit"] {
 
 /* Display Headings with Clean Word Spacing & Tight Tracking */
 .font-clash {
-  font-family: 'Clash Display', 'Space Grotesk', sans-serif;
+  font-family: 'Clash Display', 'Cairo', 'Space Grotesk', sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   word-spacing: 0.12em;
@@ -153,14 +159,14 @@ button, a.btn, select, input[type="submit"] {
 }
 
 .font-kufi {
-  font-family: 'Reem Kufi', sans-serif;
+  font-family: 'Cairo', 'Alexandria', sans-serif;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* RTL Typography: Force Reem Kufi for all Arabic text */
+/* Modern Cairo / Alexandria Arabic Typography Upgrade */
 [dir="rtl"] body,
 [dir="rtl"],
 [dir="rtl"] h1,
@@ -169,16 +175,16 @@ button, a.btn, select, input[type="submit"] {
 [dir="rtl"] p,
 [dir="rtl"] span,
 [dir="rtl"] button {
-  font-family: 'Reem Kufi', sans-serif !important;
+  font-family: 'Cairo', 'Alexandria', sans-serif !important;
 }
 
 [dir="rtl"] .font-clash,
 [dir="rtl"] .font-display {
-  font-family: 'Reem Kufi', sans-serif !important;
+  font-family: 'Alexandria', 'Cairo', sans-serif !important;
   font-weight: 700;
   letter-spacing: normal;
   word-spacing: normal;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 /* Primary CTA hover transition gold -> ember (critical hover state) */

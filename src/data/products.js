@@ -7,62 +7,76 @@ export const CATEGORIES = [
 ];
 
 export const PRODUCTS = [
-  // CASES
-  {
-    id: 'case-void',
-    category: 'cases',
-    nameEn: 'Void Case',
-    nameAr: 'جراب الفراغ',
-    price: 650,
-    tagEn: 'Matte Black',
-    tagAr: 'أسود مطفي',
-    descriptionEn: 'Ultra-matte dark techwear shell with reinforced camera housing and grave-edge structure.',
-    descriptionAr: 'لمسة داكنة مطفية للغاية مع حماية معززة للكاميرا وحواف صلبة.',
-    specsEn: ['Material: High-Density Polycarbonate', 'Finish: Ultra-Matte Shockproof', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
-    specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
-    caseTypeConfig: { bg: '#0A0A0A', ring: '#1F1B17' }
-  },
+  // 5 DISTINCT CASE FINISHES
   {
     id: 'case-solar',
     category: 'cases',
-    nameEn: 'Solar Case',
-    nameAr: 'جراب الشمسي',
+    nameEn: 'Clear Solar Case',
+    nameAr: 'جراب الشمسي الشفاف',
     price: 720,
-    tagEn: 'Clear + Gold Ring',
-    tagAr: 'شفاف + حلقة ذهبية',
-    descriptionEn: 'Crystal clear acrylic canvas with anodized dawn-gold camera housing ring.',
-    descriptionAr: 'أكريليك شفاف نقي مع حلقة كاميرا مؤكسدة بذهبي الفجر.',
-    specsEn: ['Material: Optical Grade Acrylic + TPU', 'Finish: Anti-Yellowing Clear', 'Weight: 42g', 'Ring: Dawn Gold Anodized Alloy'],
-    specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقوم للااصفرار', 'الوزن: ٤٢ جرام', 'الحلقة: سبيكة مؤكسدة بذهب الفجر'],
-    caseTypeConfig: { bg: 'rgba(20, 20, 20, 0.4)', ring: '#E0A93B' }
+    tagEn: 'Clear + 3D Domes',
+    tagAr: 'شفاف + ملصقات إيبوكسي',
+    descriptionEn: 'Crystal clear optical acrylic canvas featuring three raised 3D epoxy dome stickers (sun-disc, amber crescent, solid gold).',
+    descriptionAr: 'أكريليك شفاف نقي مزين بثلاث ملصقات إيبوكسي مجسمة (قرص الشمس، هلال الجمبر، وقرص ذهبي).',
+    specsEn: ['Material: Optical Grade Acrylic + TPU', 'Finish: Anti-Yellowing Clear', 'Weight: 42g', 'Domes: 3D Polyurethane Epoxy'],
+    specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقوم للااصفرار', 'الوزن: ٤٢ جرام', 'الملصقات: إيبوكسي مجسم ثلاثي الأبعاد'],
+    caseTypeId: 'clear'
+  },
+  {
+    id: 'case-gold-ring',
+    category: 'cases',
+    nameEn: 'Gold Ring Armor Case',
+    nameAr: 'جراب حلقة الذهب التكتيكي',
+    price: 780,
+    tagEn: '18k Gold Bezel + MagSafe',
+    tagAr: 'إطار ذهب ١٨ + ماج سيف',
+    descriptionEn: 'High-density stealth black armor with an 18k anodized dawn-gold camera ring and MagSafe alignment ring.',
+    descriptionAr: 'درع أسود عالي الكثافة مع حلقة كاميرا مؤكسدة بذهب الفجر عيار ١٨ وحلقة ماج سيف.',
+    specsEn: ['Material: High-Density Polycarbonate', 'Bezel: 18k Gold Anodized Alloy', 'Weight: 44g', 'Magnets: N52 Neodymium Array'],
+    specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'الإطار: سبيكة مؤكسدة بذهب ١٨', 'الوزن: ٤٤ جرام', 'المغناطيس: مصفوفة نيويميوم N52'],
+    caseTypeId: 'gold-ring'
+  },
+  {
+    id: 'case-carbon',
+    category: 'cases',
+    nameEn: 'Carbon Techwear Case',
+    nameAr: 'جراب كربون تكتيكي',
+    price: 820,
+    tagEn: 'Carbon Weave + Titanium',
+    tagAr: 'ألياف كربون + تيتانيوم',
+    descriptionEn: 'Textured carbon fiber weave back panel with industrial titanium camera housing and drop protection corners.',
+    descriptionAr: 'لوحة خلفية منسوجة من ألياف الكربون مع حماية كاميرا من التيتانيوم الصناعي.',
+    specsEn: ['Material: Real Carbon Fiber Weave', 'Finish: Matte Textured Weave', 'Weight: 36g', 'Drop Rating: 3.5 Meters'],
+    specsAr: ['المادة: ألياف كربون حقيقية', 'النهاية: نسيج مطفي ملموس', 'الوزن: ٣٦ جرام', 'حماية السقوط: ٣٫٥ أمتار'],
+    caseTypeId: 'carbon'
   },
   {
     id: 'case-ember',
     category: 'cases',
-    nameEn: 'Ember Case',
-    nameAr: 'جراب الجمر',
+    nameEn: 'Ember Crimson Case',
+    nameAr: 'جراب الجمر النبيذي',
     price: 690,
-    tagEn: 'Frosted Ember',
-    tagAr: 'جمر ضبابي',
-    descriptionEn: 'Semi-translucent dark mahogany tint with accent detailing.',
-    descriptionAr: 'درجة بني داكن شبه شفافة مع تفاصيل لون الفجر.',
+    tagEn: 'Frosted Crimson Ruby',
+    tagAr: 'جمر نبيذي ضبابي',
+    descriptionEn: 'Semi-translucent dark crimson ruby tint with soft-touch frosted surface.',
+    descriptionAr: 'درجة نبيذي داكنة شبه شفافة بملمس ناعم وضبابي.',
     specsEn: ['Material: Matte Translucent Composite', 'Finish: Soft-Touch Frosted', 'Weight: 40g', 'Drop Protection: 3 Meters'],
     specsAr: ['المادة: مركب مطفي شبه شفاف', 'النهاية: ملمس ناعم ضبابي', 'الوزن: ٤٠ جرام', 'حماية السقوط: ٣ أمتار'],
-    caseTypeConfig: { bg: '#2A1610', ring: '#4A2418' }
+    caseTypeId: 'frosted-ember'
   },
   {
-    id: 'case-eclipse',
+    id: 'case-void',
     category: 'cases',
-    nameEn: 'Eclipse Case',
-    nameAr: 'جراب الكسوف',
-    price: 780,
-    tagEn: 'MagSafe Compatible',
-    tagAr: 'متوافق مع MagSafe',
-    descriptionEn: 'High-grade protective shell integrated with magnetic alignment ring.',
-    descriptionAr: 'غطاء حماية عالي الجودة مزود بحلقة مغناطيسية.',
-    specsEn: ['Material: Carbon Fiber Weave + TPU', 'Magnets: N52 Neodymium Array', 'Weight: 45g', 'Wireless Charging: Full Support'],
-    specsAr: ['المادة: ألياف كربون منسوجة + TPU', 'المغناطيس: مصفوفة نيويميوم N52', 'الوزن: ٤٥ جرام', 'الشحن اللاسلكي: دعم كامل'],
-    caseTypeConfig: { bg: '#141110', ring: '#2E2823' }
+    nameEn: 'Void Stealth Case',
+    nameAr: 'جراب الفراغ المطفي',
+    price: 650,
+    tagEn: 'Ultra-Matte Stealth Black',
+    tagAr: 'أسود مطفي نقي',
+    descriptionEn: 'Ultra-matte dark techwear shell with reinforced camera housing and grave-edge structure.',
+    descriptionAr: 'لمسة داكنة مطفية للغاية مع حماية معززة للكاميرا وحواف صلبة.',
+    specsEn: ['Material: High-Density Polycarbonate', 'Finish: Ultra-Matte Shockproof', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
+    specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
+    caseTypeId: 'matte-black'
   },
 
   // DOME STICKERS
@@ -76,8 +90,6 @@ export const PRODUCTS = [
     tagAr: 'إيبوكسي مجسم',
     descriptionEn: 'High-gloss raised 3D epoxy sticker featuring a minimal solid disc motif.',
     descriptionAr: 'ملصق إيبوكسي ثلاثي الأبعاد بارز بحجم ناعم.',
-    specsEn: ['Diameter: 35mm', 'Material: Self-Healing Polyurethane Epoxy', 'Adhesive: 3M Industrial Grade'],
-    specsAr: ['القطر: ٣٥ مم', 'المادة: إيبوكسي بولي يوريثان ذاتي التثبيت', 'اللاصق: درجة صناعية من 3M'],
     stickerType: 'disc'
   },
   {
@@ -128,8 +140,6 @@ export const PRODUCTS = [
     tagAr: 'نحاس مطل بالذهب',
     descriptionEn: 'Heavyweight solid brass ring charm plated in 18k dawn gold.',
     descriptionAr: 'تعليقة حلقة من النحاس الصلب المطلية بذهب الفجر عيار ١٨.',
-    specsEn: ['Material: Solid Brass', 'Plating: 18k Dawn Gold', 'Loop: Heavy Duty Braided Wire'],
-    specsAr: ['المادة: نحاس صلب', 'الطلاء: ذهب الفجر عيار ١٨', 'الحلقة: سلك مجدول شديد التحمل'],
     charmType: 'gold-ring'
   },
   {
@@ -142,8 +152,6 @@ export const PRODUCTS = [
     tagAr: 'تركيب يدوي',
     descriptionEn: 'Dark red volcanic glass style bead with engraved accent ring.',
     descriptionAr: 'خرزة بأسلوب الزجاج البركاني الأحمر الداكن مع حلقة محفورة.',
-    specsEn: ['Material: Volcanic Epoxy Glass', 'Finish: Polished Smooth', 'Attachment: Stainless Steel Ring'],
-    specsAr: ['المادة: زجاج بركاني إيبوكسي', 'النهاية: صقل مصقول', 'التثبيت: حلقة صلب مقاومة للصدأ'],
     charmType: 'ember-bead'
   },
 
@@ -182,21 +190,17 @@ export const PHONE_MODELS = [
   'Samsung Galaxy S24 Ultra',
   'Samsung Galaxy S24',
   'Samsung Galaxy S23',
-  'Samsung Galaxy Note 20',
   'Google Pixel 9 Pro',
   'Google Pixel 9',
-  'Google Pixel 8',
-  'Xiaomi 14 Pro',
-  'OnePlus 12',
-  'Huawei P60 Pro'
+  'Xiaomi 14 Pro'
 ];
 
 export const CASE_TYPES = [
-  { id: 'matte-black', nameEn: 'Matte Black', nameAr: 'أسود مطفي', bg: '#0A0A0A', ring: '#1F1B17' },
-  { id: 'clear', nameEn: 'Clear', nameAr: 'شفاف', bg: 'rgba(20, 20, 20, 0.4)', ring: '#3A342C' },
-  { id: 'frosted-ember', nameEn: 'Frosted Ember', nameAr: 'جمر ضبابي', bg: '#2A1610', ring: '#4A2418' },
-  { id: 'gold-ring', nameEn: 'Gold Ring', nameAr: 'حلقة ذهبية', bg: '#0A0A0A', ring: '#E0A93B' },
-  { id: 'magsafe', nameEn: 'MagSafe', nameAr: 'ماج سيف', bg: '#141110', ring: '#2E2823' }
+  { id: 'clear', nameEn: 'Clear Solar', nameAr: 'شفاف الشمسي', bg: 'rgba(20, 20, 20, 0.5)', ring: '#E0A93B' },
+  { id: 'gold-ring', nameEn: 'Gold Ring Armor', nameAr: 'حلقة الذهب', bg: '#0A0A0A', ring: '#E0A93B' },
+  { id: 'carbon', nameEn: 'Carbon Techwear', nameAr: 'كربون تكتيكي', bg: '#121212', ring: '#5A5A5A' },
+  { id: 'frosted-ember', nameEn: 'Ember Crimson', nameAr: 'جمر نبيذي', bg: '#2A1610', ring: '#8B261D' },
+  { id: 'matte-black', nameEn: 'Void Matte Black', nameAr: 'أسود مطفي', bg: '#0A0A0A', ring: '#1F1B17' }
 ];
 
 export const STICKER_PRESETS = [
@@ -219,7 +223,7 @@ export const PRESET_TEMPLATES = [
     id: 'preset-dawn-rise',
     nameEn: 'Dawn Rise',
     nameAr: 'طالع نور',
-    caseTypeId: 'gold-ring',
+    caseTypeId: 'clear',
     layers: [
       { id: 'l1', type: 'sticker', stickerId: 'disc', x: 50, y: 35, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 65, scale: 1.1, rotation: 0 }
@@ -229,7 +233,7 @@ export const PRESET_TEMPLATES = [
     id: 'preset-night-crossing',
     nameEn: 'Night Crossing',
     nameAr: 'عدّي الليل',
-    caseTypeId: 'matte-black',
+    caseTypeId: 'gold-ring',
     layers: [
       { id: 'l1', type: 'sticker', stickerId: 'crescent', x: 50, y: 38, scale: 1.3, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-3addi-lel', x: 50, y: 68, scale: 1.1, rotation: 0 }
@@ -239,7 +243,7 @@ export const PRESET_TEMPLATES = [
     id: 'preset-born-dawn',
     nameEn: 'Born at Dawn',
     nameAr: 'مولود الفجر',
-    caseTypeId: 'magsafe',
+    caseTypeId: 'carbon',
     layers: [
       { id: 'l1', type: 'sticker', stickerId: 'star-4', x: 50, y: 40, scale: 1.2, rotation: 0 },
       { id: 'l2', type: 'sticker', stickerId: 'pill-born-dawn', x: 50, y: 70, scale: 1.0, rotation: 0 }
@@ -291,8 +295,8 @@ export const FAQS = [
     id: 'faq-1',
     qEn: 'How long does custom case production & shipping take?',
     qAr: 'كم يستغرق تصنيع الجراب المخصص وشحنه؟',
-    aEn: 'Every custom case is made to order in our Egypt forge within 2–3 business days. Delivery takes 1 day for Alexandria & Cairo, and 2–3 days for other governorates.',
-    aAr: 'كل جراب مخصص بيتم تصنيعه حسب الطلب في مصنعنا بمصر خلال ٢-٣ أيام عمل. التوصيل بياخد يوم واحد للإسكندرية والقاهرة، و٢-٣ أيام لباقي المحافظات.'
+    aEn: 'Every custom case is made to order in our Alexandria forge within 2–3 business days. Delivery takes 1 day for Alexandria & Cairo, and 2–3 days for other governorates.',
+    aAr: 'كل جراب مخصص بيتم تصنيعه حسب الطلب في مصنعنا بالإسكندرية خلال ٢-٣ أيام عمل. التوصيل بياخد يوم واحد للإسكندرية والقاهرة، و٢-٣ أيام لباقي المحافظات.'
   },
   {
     id: 'faq-2',

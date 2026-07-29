@@ -1,141 +1,112 @@
-import React, { useState } from 'react';
-import { X, ShoppingBag, Check, Wrench, Plus, Minus } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { SunDisc } from './SunDisc';
+import { X, ShoppingBag, Sparkles, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 
-export const ProductModal = ({ product, onClose, setView }) => {
+export const ProductModal = ({ product, onClose }) => {
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
+  const navigate = useNavigate();
 
   if (!product) return null;
 
   const name = lang === 'ar' ? product.nameAr : product.nameEn;
-  const tag = lang === 'ar' ? product.tagAr : product.tagEn;
   const description = lang === 'ar' ? product.descriptionAr : product.descriptionEn;
-  const specs = lang === 'ar' ? (product.specsAr || []) : (product.specsEn || []);
+  const tag = lang === 'ar' ? product.tagAr : product.tagEn;
+  const specs = lang === 'ar' ? product.specsAr : product.specsEn;
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
-    setAdded(true);
+    addToCart(product);
     showToast(t('itemAddedToast'), 'success');
-    setTimeout(() => setAdded(false), 1500);
   };
 
-  const handleOpenBuilder = () => {
+  const handleCustomize = () => {
     onClose();
-    setView('customizer');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/customizer', { state: { preselectedCaseTypeId: product.caseTypeId || 'clear' } });
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-void/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-stone border border-grave max-w-2xl w-full shadow-2xl relative overflow-hidden my-8 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-stone border border-grave w-full max-w-3xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row card-depth-highlight">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 text-ash hover:text-gold border border-grave bg-coal/80 transition-colors"
-          aria-label="Close"
+          className="absolute top-4 right-4 z-10 p-2 text-ash hover:text-bone bg-coal border border-grave transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          
-          {/* Visual Display */}
-          <div className="bg-coal p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-grave relative min-h-[280px]">
-            <SunDisc size={72} variant="gold" className="opacity-90 animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-ash mt-4">
-              DUAT AUTHENTIC CANVAS
-            </span>
+        {/* Visual Showcase (Left) */}
+        <div className="md:w-1/2 bg-void p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-grave relative">
+          <img
+            src={product.category === 'cases' ? '/images/transparent_hero_case.png' : product.category === 'stickers' ? '/images/stickers.png' : '/images/charms.png'}
+            alt={name}
+            className="w-full aspect-[3/4] object-cover object-center"
+          />
+          <div className="absolute top-4 left-4 bg-void/80 border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest">
+            {tag}
+          </div>
+        </div>
+
+        {/* Details & Actions (Right) */}
+        <div className="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+          <div className="space-y-4">
+            <div>
+              <span className="font-mono text-xs text-ash tracking-widest uppercase block">
+                DUAT / {product.category.toUpperCase()}
+              </span>
+              <h2 className="font-clash text-2xl sm:text-3xl uppercase text-bone mt-1">
+                {name}
+              </h2>
+              <p className="font-mono text-xl text-gold font-bold mt-2">
+                {formatPrice(product.price)}
+              </p>
+            </div>
+
+            <p className="font-space text-sm text-bone/80 font-light leading-relaxed">
+              {description}
+            </p>
+
+            {specs && specs.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-grave">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-ash font-bold">
+                  {t('productSpecs')}
+                </span>
+                <ul className="space-y-1 font-space text-xs text-bone/70">
+                  {specs.map((spec, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="w-1 h-1 bg-gold rounded-full" />
+                      <span>{spec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
-          {/* Product Specs & Purchase Options */}
-          <div className="p-6 sm:p-8 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div>
-                <span className="font-mono text-xs uppercase tracking-widest text-gold block font-bold">
-                  {tag}
-                </span>
-                <h2 className="font-archivo text-2xl uppercase text-bone mt-1">
-                  {name}
-                </h2>
-                <p className="font-mono text-lg text-gold font-bold mt-2">
-                  {formatPrice(product.price)}
-                </p>
-              </div>
+          {/* Actions */}
+          <div className="space-y-3 pt-4 border-t border-grave">
+            <button
+              onClick={handleAddToCart}
+              className="btn-primary w-full py-4 text-xs font-mono font-bold tracking-widest flex items-center justify-center gap-2 min-h-[44px]"
+            >
+              <ShoppingBag size={16} />
+              <span>{t('addToCart')}</span>
+            </button>
 
-              <p className="font-space text-sm text-bone/80 leading-relaxed border-t border-grave pt-3">
-                {description}
-              </p>
-
-              {/* Specs */}
-              {specs.length > 0 && (
-                <div className="space-y-2 border-t border-grave pt-3">
-                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-ash">
-                    {t('productSpecs')}
-                  </h4>
-                  <ul className="space-y-1 font-mono text-xs text-bone/70">
-                    {specs.map((spec, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-gold flex-shrink-0" />
-                        <span>{spec}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-3 pt-4 border-t border-grave">
-              
-              {/* Quantity Stepper */}
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-ash uppercase">{t('quantity')}</span>
-                <div className="flex items-center border border-grave bg-coal">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-1.5 text-ash hover:text-bone transition-colors"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className="px-3 font-mono text-sm text-bone font-bold">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-1.5 text-ash hover:text-bone transition-colors"
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
-              </div>
-
+            {product.category === 'cases' && (
               <button
-                onClick={handleAddToCart}
-                className="w-full btn-primary py-3.5 text-xs flex items-center justify-center gap-2"
+                onClick={handleCustomize}
+                className="btn-ghost w-full py-3 text-xs font-mono tracking-widest flex items-center justify-center gap-2 border-gold/50 text-gold hover:bg-gold hover:text-void min-h-[44px]"
               >
-                {added ? <Check size={16} /> : <ShoppingBag size={16} />}
-                <span>{added ? t('addedToCart') : t('addToCart')}</span>
+                <Sparkles size={16} />
+                <span>{t('customizeThisCase')}</span>
               </button>
-
-              {product.category === 'cases' && (
-                <button
-                  onClick={handleOpenBuilder}
-                  className="w-full btn-ghost py-3.5 text-xs flex items-center justify-center gap-2"
-                >
-                  <Wrench size={16} />
-                  <span>{t('customizeThisCase')}</span>
-                </button>
-              )}
-            </div>
-
+            )}
           </div>
 
         </div>
