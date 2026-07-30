@@ -14,6 +14,7 @@ export const Navbar = ({ onOpenTracker }) => {
   const navigate = useNavigate();
 
   const navLinks = [
+    { path: '/', label: lang === 'ar' ? 'الرئيسية' : 'Home', end: true },
     { path: '/shop', label: t('navShop') },
     { path: '/customize', label: t('navCustomize') },
     { path: '/the-duat', label: t('navDuat') }
@@ -30,16 +31,11 @@ export const Navbar = ({ onOpenTracker }) => {
         <div className="flex items-center justify-between h-20">
           
           {/* LOGO LOCKUP: SunDisc + DUAT Typography (Left in LTR, Right in RTL) */}
-          <Link to="/" className="flex items-center gap-3.5 group focus:outline-none min-h-[44px]">
-            <SunDisc size={26} variant="gold" />
-            <div className="flex flex-col text-start">
-              <span className="font-clash text-2xl tracking-tight text-bone group-hover:text-gold transition-colors leading-none">
-                DUAT
-              </span>
-              <span className="font-mono text-[9px] tracking-[0.2em] text-ash uppercase leading-none mt-1">
-                {lang === 'ar' ? 'مصر' : 'EGYPT'}
-              </span>
-            </div>
+          <Link to="/" className="flex items-center gap-3 group focus:outline-none min-h-[44px]">
+            <SunDisc size={28} variant="gold" />
+            <span className="font-clash text-2xl font-bold tracking-tight text-bone group-hover:text-gold transition-colors leading-none">
+              DUAT
+            </span>
           </Link>
 
           {/* DESKTOP NAVIGATION LINKS CENTER (MD+) */}
@@ -48,6 +44,7 @@ export const Navbar = ({ onOpenTracker }) => {
               <NavLink
                 key={link.path}
                 to={link.path}
+                end={link.end}
                 className={({ isActive }) =>
                   `font-mono text-xs uppercase tracking-[0.2em] transition-all duration-200 py-2 min-h-[44px] flex items-center relative group ${
                     isActive ? 'text-gold font-bold' : 'text-bone/80 hover:text-gold'
@@ -103,7 +100,9 @@ export const Navbar = ({ onOpenTracker }) => {
               aria-label="Toggle Language"
             >
               <Globe size={14} className="text-gold" />
-              <span>{lang === 'en' ? 'عربي' : 'EN'}</span>
+              <span className={lang === 'en' ? 'font-arabic font-bold text-xs tracking-normal' : 'font-mono text-xs'}>
+                {lang === 'en' ? 'عربي' : 'EN'}
+              </span>
             </button>
 
             {/* Cart Icon Trigger */}
@@ -184,7 +183,9 @@ export const Navbar = ({ onOpenTracker }) => {
                 className="flex-1 font-mono text-xs font-bold uppercase text-gold border border-gold bg-gold/10 py-2.5 flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <Globe size={14} />
-                <span>{lang === 'en' ? 'عربي' : 'English'}</span>
+                <span className={lang === 'en' ? 'font-arabic font-bold text-sm tracking-normal' : 'font-mono text-xs'}>
+                  {lang === 'en' ? 'عربي' : 'English'}
+                </span>
               </button>
             </div>
 

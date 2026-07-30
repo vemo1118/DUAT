@@ -2,50 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --void: #050505;
-  --stone: #14110F;
-  --coal: #1F1B17;
-  --grave: #2E2823;
-  --gold: #E0A93B;
-  --ember: #D9432E;
-  --bone: #F0EBE0;
-  --ash: #6E675D;
-}
-
-/* ==========================================================================
-   THEMES SYSTEM — NIGHT MODE (DEFAULT) & DAWN MODE (LIGHT MODE FIXED)
-   ========================================================================== */
-
-/* Night Mode (Default Dark Base with Rich Warm Dusk Gradient) */
+:root,
 html[data-theme="night"],
 html:not([data-theme]) {
   color-scheme: dark;
-  --void: #050505;
-  --stone: #14110F;
-  --coal: #1F1B17;
-  --grave: #2E2823;
-  --bone: #F0EBE0;
-  --ash: #8E877D;
+  --night: #0A0C16;
+  --twilight: #232A55;
+  --amber: #E8A33D;
+  --amber-deep: #C97B22;
+  --rose: #E0917A;
+  --bone: #EDE4D3;
+
+  --void: #0A0C16;
+  --stone: #12162B;
+  --coal: #181E3B;
+  --grave: #28305F;
+  --gold: #E8A33D;
+  --ash: #8E98BF;
+  --ember: #D9432E;
 }
 
 html[data-theme="night"] body,
 html:not([data-theme]) body {
-  background: linear-gradient(180deg, #0E0C0A 0%, #070605 40%, #050505 100%);
+  background: linear-gradient(180deg, #070812 0%, #0A0C16 46%, #12152B 100%);
   background-attachment: fixed;
-  color: #F0EBE0;
+  color: #EDE4D3;
   min-height: 100vh;
 }
 
-/* Dawn Mode (Light Mode with Warm Dawn Gradient & High Contrast Cairo Typography) */
+/* Dawn Mode (Light Mode with Warm Dawn Gradient) */
 html[data-theme="dawn"] {
   color-scheme: light;
-  --void: #FBF8F3;
+  --void: #FAF6F0;
   --stone: #EFEAE0;
   --coal: #E5DFC5;
   --grave: #DCD4C7;
-  --bone: #1A1714; /* Deep Charcoal for primary text in light mode */
-  --ash: #524C44;  /* Warm readable charcoal gray for muted text */
+  --bone: #0A0C16;
+  --ash: #524C44;
+  --gold: #C97B22;
+  --amber: #C97B22;
+}
+
+html[data-theme="dawn"] body {
+  background: linear-gradient(180deg, #FAF6F0 0%, #F4EFE6 46%, #E8DFCE 100%);
+  background-attachment: fixed;
+  color: #0A0C16;
 }
 
 html[data-theme="dawn"] body {
@@ -153,7 +154,7 @@ button, a.btn, select, input[type="submit"] {
 
 /* Display Headings with Clean Word Spacing & Tight Tracking for English */
 .font-clash {
-  font-family: 'Clash Display', 'Cairo', 'Space Grotesk', sans-serif;
+  font-family: 'Clash Display', 'Space Grotesk', sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   word-spacing: 0.12em;
@@ -162,42 +163,94 @@ button, a.btn, select, input[type="submit"] {
 
 .font-space {
   font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
   line-height: 1.6;
-}
-
-.font-kufi {
-  font-family: 'Cairo', 'Alexandria', sans-serif;
-  letter-spacing: 0 !important;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
 }
 
-/* Modern Cairo / Alexandria Arabic Typography Upgrade — CRITICAL LETTER-SPACING FIX */
-[dir="rtl"] body,
+/* IBM Plex Sans Arabic Typography System — Solid Weights 500+ */
+.font-kufi,
+.font-reem,
+.font-cairo,
+.font-tajawal,
+.font-almarai,
+.font-arabic,
+:lang(ar),
 [dir="rtl"],
-[dir="rtl"] *,
-[dir="rtl"] h1,
-[dir="rtl"] h2,
-[dir="rtl"] h3,
+[dir="rtl"] body,
 [dir="rtl"] p,
 [dir="rtl"] span,
 [dir="rtl"] button,
-.font-kufi,
-.font-cairo {
-  font-family: 'Cairo', 'Alexandria', sans-serif !important;
-  letter-spacing: 0 !important;
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea,
+[dir="rtl"] div {
+  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
   word-spacing: normal !important;
+  line-height: 1.7 !important;
 }
 
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
 [dir="rtl"] .font-clash,
 [dir="rtl"] .font-display {
-  font-family: 'Alexandria', 'Cairo', sans-serif !important;
-  font-weight: 700;
-  letter-spacing: 0 !important;
+  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
   word-spacing: normal !important;
-  line-height: 1.2;
+  line-height: 1.4 !important;
+}
+
+/* Marquee Infinite Horizontal Scroll Keyframes */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Cart Slide-out Drawer Keyframe Animations */
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes drawerSlideInRtl {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes drawerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-drawer-slide {
+  animation: drawerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[dir="rtl"] .animate-drawer-slide {
+  animation: drawerSlideInRtl 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-drawer-fade {
+  animation: drawerFadeIn 0.25s ease-out forwards;
 }
 
 /* Primary CTA hover transition gold -> ember (critical hover state) */

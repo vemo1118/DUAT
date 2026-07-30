@@ -105,7 +105,11 @@ export const TRANSLATIONS = {
     promoInvalidToast: 'Invalid promo code',
     shipping: 'Shipping',
     freeShipping: 'FREE',
-    freeShippingNotice: 'Free shipping on orders over 800 EGP',
+    freeShippingNotice: 'Free shipping on orders over 1000 EGP',
+    freeShippingUnlocked: '🎉 You unlocked FREE shipping across Egypt!',
+    freeShippingNudge: 'Add {amount} EGP more for FREE shipping',
+    customerReviews: 'Customer Reviews',
+    basedOnReviews: 'based on {count} reviews',
     checkoutBtn: 'PROCEED TO CHECKOUT',
 
     // Checkout
@@ -288,7 +292,11 @@ export const TRANSLATIONS = {
     promoInvalidToast: 'كوبون الخصم غير صحيح',
     shipping: 'الشحن',
     freeShipping: 'مجاني',
-    freeShippingNotice: 'شحن مجاني للطلبات الأكثر من ٨٠٠ ج.م',
+    freeShippingNotice: 'شحن مجاني للطلبات الأكثر من ١٠٠٠ ج.م',
+    freeShippingUnlocked: '🎉 حصلت على شحن مجاني لكافة المحافظات!',
+    freeShippingNudge: 'أضف {amount} ج.م للحصول على شحن مجاني',
+    customerReviews: 'مراجعات العملاء',
+    basedOnReviews: 'بناءً على {count} تقييم',
     checkoutBtn: 'المتابعة للشراء',
 
     // Checkout

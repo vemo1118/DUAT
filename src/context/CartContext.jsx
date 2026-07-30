@@ -56,17 +56,17 @@ export const CartProvider = ({ children }) => {
     openCart();
   };
 
-  const removeFromCart = (cartItemId) => {
-    setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
+  const removeFromCart = (targetId) => {
+    setCartItems(prev => prev.filter(item => item.cartItemId !== targetId && item.id !== targetId));
   };
 
-  const updateQuantity = (cartItemId, newQty) => {
+  const updateQuantity = (targetId, newQty) => {
     if (newQty <= 0) {
-      removeFromCart(cartItemId);
+      removeFromCart(targetId);
       return;
     }
     setCartItems(prev =>
-      prev.map(item => item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item)
+      prev.map(item => (item.cartItemId === targetId || item.id === targetId) ? { ...item, quantity: newQty } : item)
     );
   };
 
@@ -77,6 +77,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = Math.max(0, subtotal - discountAmount);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const applyPromoCode = (code) => {
@@ -98,6 +99,7 @@ export const CartProvider = ({ children }) => {
   return (
     <CartContext.Provider value={{
       cartItems,
+      items: cartItems, // Alias for backward compatibility
       isCartOpen,
       isOpen: isCartOpen, // Alias for backward compatibility
       openCart,
@@ -108,6 +110,7 @@ export const CartProvider = ({ children }) => {
       updateQuantity,
       clearCart,
       subtotal,
+      total,
       totalItems: cartCount,
       cartCount,
       promoCode,

@@ -1,8 +1,21 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
-export const SunDisc = ({ size = 20, variant = 'gold', className = '' }) => {
-  const goldColor = '#E0A93B';
+export const SunDisc = ({ size = 24, variant = 'gold', className = '' }) => {
+  let theme = 'night';
+  try {
+    const themeContext = useTheme();
+    if (themeContext?.theme) theme = themeContext.theme;
+  } catch (err) {
+    // Fallback default
+  }
+
+  const isDawn = theme === 'dawn';
   const sizePx = typeof size === 'number' ? `${size}px` : size;
+
+  // Horizon line color: bone (#EDE4D3) in dark/night, dark (#0A0C16) in light/dawn
+  const horizonColor = isDawn ? '#0A0C16' : '#EDE4D3';
+  const sunColor = '#E8A33D';
 
   return (
     <svg
@@ -14,27 +27,22 @@ export const SunDisc = ({ size = 20, variant = 'gold', className = '' }) => {
       className={`inline-block flex-shrink-0 transition-transform duration-300 ${className}`}
       aria-hidden="true"
     >
-      {/* Outer Golden Geometric Ring */}
+      {/* Rising Sun Disc */}
       <circle
         cx="50"
-        cy="50"
-        r="44"
-        stroke={goldColor}
-        strokeWidth="7"
-        strokeOpacity="0.9"
+        cy="52"
+        r="24"
+        fill={sunColor}
       />
-      {/* Solid Inner Gold Disc with Partial Eclipse Cutout */}
-      <circle
-        cx="50"
-        cy="50"
-        r="26"
-        fill={goldColor}
-      />
-      {/* Subtle Partial Eclipse Shadow Arc */}
-      <path
-        d="M50 24 A26 26 0 0 1 76 50 A26 26 0 0 0 50 24 Z"
-        fill="#050505"
-        fillOpacity="0.25"
+      {/* Horizon Line */}
+      <line
+        x1="12"
+        y1="70"
+        x2="88"
+        y2="70"
+        stroke={horizonColor}
+        strokeWidth="3"
+        strokeLinecap="round"
       />
     </svg>
   );

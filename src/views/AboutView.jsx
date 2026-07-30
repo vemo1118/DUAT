@@ -22,11 +22,11 @@ export const AboutView = () => {
       </div>
 
       {/* Story Narrative Box */}
-      <div className="bg-stone border border-grave p-8 sm:p-14 space-y-8 font-space text-lg text-bone/90 font-light leading-relaxed card-depth-highlight reveal-on-scroll">
+      <div className="bg-stone border border-grave p-8 sm:p-14 space-y-8 font-space text-lg text-bone/90 font-medium leading-relaxed card-depth-highlight reveal-on-scroll">
         <p className="text-xl sm:text-2xl font-medium text-bone leading-relaxed">
           {t('aboutP1')}
         </p>
-        <p className="text-bone/85 font-light leading-relaxed">
+        <p className="text-bone/85 font-medium leading-relaxed">
           {t('aboutP2')}
         </p>
         

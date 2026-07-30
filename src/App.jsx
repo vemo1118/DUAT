@@ -16,6 +16,8 @@ import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AnnouncementMarquee } from './components/AnnouncementMarquee';
+import { ScrollToTop } from './components/ScrollToTop';
 
 export function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -67,7 +69,11 @@ export function App() {
           <ToastProvider>
             {/* Main Container with Filmic Grain Texture Overlay */}
             <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
-              
+              <ScrollToTop />
+
+              {/* Top Announcement Marquee Strip */}
+              <AnnouncementMarquee />
+
               {/* Top Navigation Header */}
               <Navbar onOpenTracker={() => setTrackerOpen(true)} />
 
