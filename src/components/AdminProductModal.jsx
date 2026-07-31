@@ -98,7 +98,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-3xl bg-[#0b0b0d] border border-gold/40 shadow-2xl my-8 overflow-hidden">
+      <div className="relative w-full max-w-3xl bg-stone border border-gold/40 shadow-2xl my-8 overflow-hidden">
         {/* Top Decorative Border */}
         <div className="h-1 w-full bg-gradient-to-r from-gold/20 via-gold to-gold/20" />
 

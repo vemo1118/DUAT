@@ -213,7 +213,7 @@ export function AdminView() {
 
           {/* PRODUCTS KPI METRICS */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-gold" />
               <div className="flex items-center justify-between">
                 <div>
@@ -226,7 +226,7 @@ export function AdminView() {
               </div>
             </div>
 
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-amber-500" />
               <div className="flex items-center justify-between">
                 <div>
@@ -241,7 +241,7 @@ export function AdminView() {
               </div>
             </div>
 
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-emerald-500" />
               <div className="flex items-center justify-between">
                 <div>
@@ -256,7 +256,7 @@ export function AdminView() {
           </div>
 
           {/* SEARCH & CATEGORY FILTERS */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[#0b0b0d] border border-grave p-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-stone border border-grave p-4">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
               {CATEGORIES.map((cat) => (
                 <button
@@ -286,7 +286,7 @@ export function AdminView() {
           </div>
 
           {/* PRODUCTS TABLE */}
-          <div className="bg-[#0b0b0d] border border-grave overflow-hidden">
+          <div className="bg-stone border border-grave overflow-hidden">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-16 px-4 text-ash font-mono text-sm space-y-3">
                 <Package size={40} className="mx-auto text-ash/40" />
@@ -435,7 +435,7 @@ export function AdminView() {
 
           {/* ORDERS KPIS */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-blue-500" />
               <div className="flex items-center justify-between">
                 <div>
@@ -448,7 +448,7 @@ export function AdminView() {
               </div>
             </div>
 
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-gold" />
               <div className="flex items-center justify-between">
                 <div>
@@ -461,7 +461,7 @@ export function AdminView() {
               </div>
             </div>
 
-            <div className="bg-[#0b0b0d] border border-grave p-5 relative overflow-hidden">
+            <div className="bg-stone border border-grave p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-1 h-full bg-emerald-500" />
               <div className="flex items-center justify-between">
                 <div>
@@ -478,7 +478,7 @@ export function AdminView() {
           </div>
 
           {/* STATUS FILTERS & SEARCH */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[#0b0b0d] border border-grave p-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-stone border border-grave p-4">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none font-mono text-xs">
               <button
                 onClick={() => setOrderStatusFilter('all')}
@@ -535,7 +535,7 @@ export function AdminView() {
           </div>
 
           {/* ORDERS TABLE */}
-          <div className="bg-[#0b0b0d] border border-grave overflow-hidden">
+          <div className="bg-stone border border-grave overflow-hidden">
             {filteredOrders.length === 0 ? (
               <div className="text-center py-16 px-4 text-ash font-mono text-sm space-y-3">
                 <ShoppingBag size={40} className="mx-auto text-ash/40" />
@@ -642,7 +642,7 @@ export function AdminView() {
       {/* ORDER DETAILS MODAL */}
       {selectedOrderDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-[#0b0b0d] border border-gold/40 p-6 space-y-6 shadow-2xl">
+          <div className="relative w-full max-w-2xl bg-stone border border-gold/40 p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-grave pb-4">
               <div>
                 <span className="font-mono text-xs text-ash uppercase">تفاصيل الطلب الكاملة</span>

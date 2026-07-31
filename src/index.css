@@ -106,6 +106,34 @@ html[data-theme="dawn"] .border-grave {
   border-color: #DCD4C7 !important;
 }
 
+/* Dawn Mode Admin Dashboard & Table Overrides */
+html[data-theme="dawn"] table {
+  background-color: #FAF6F0 !important;
+}
+
+html[data-theme="dawn"] table th {
+  color: #1A1714 !important;
+  background-color: #E5DFC5 !important;
+  border-color: #DCD4C7 !important;
+}
+
+html[data-theme="dawn"] table td {
+  color: #1A1714 !important;
+  border-color: #DCD4C7 !important;
+}
+
+html[data-theme="dawn"] table tr:hover {
+  background-color: #EFEAE0 !important;
+}
+
+html[data-theme="dawn"] select,
+html[data-theme="dawn"] input,
+html[data-theme="dawn"] textarea {
+  background-color: #FAF6F0 !important;
+  color: #1A1714 !important;
+  border-color: #C5BCAF !important;
+}
+
 /* Fix Hero Image Mask in Light Mode so no dark/white box appears */
 html[data-theme="dawn"] .hero-image-blend {
   -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 85%);
