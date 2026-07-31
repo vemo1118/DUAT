@@ -8,6 +8,7 @@ import { CustomizerView } from './views/CustomizerView';
 import { AboutView } from './views/AboutView';
 import { CheckoutView } from './views/CheckoutView';
 import { OrderTrackerView } from './views/OrderTrackerView';
+import { AdminView } from './views/AdminView';
 import { CartDrawer } from './components/CartDrawer';
 import { ProductModal } from './components/ProductModal';
 import { OrderTrackerModal } from './components/OrderTrackerModal';
@@ -16,6 +17,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ProductsProvider } from './context/ProductsContext';
 import { AnnouncementMarquee } from './components/AnnouncementMarquee';
 import { ScrollToTop } from './components/ScrollToTop';
 
@@ -65,78 +67,81 @@ export function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <CartProvider>
-          <ToastProvider>
-            {/* Main Container with Filmic Grain Texture Overlay */}
-            <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
-              <ScrollToTop />
+        <ProductsProvider>
+          <CartProvider>
+            <ToastProvider>
+              {/* Main Container with Filmic Grain Texture Overlay */}
+              <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
+                <ScrollToTop />
 
-              {/* Top Announcement Marquee Strip */}
-              <AnnouncementMarquee />
+                {/* Top Announcement Marquee Strip */}
+                <AnnouncementMarquee />
 
-              {/* Top Navigation Header */}
-              <Navbar onOpenTracker={() => setTrackerOpen(true)} />
+                {/* Top Navigation Header */}
+                <Navbar onOpenTracker={() => setTrackerOpen(true)} />
 
-              {/* Main Content Router View */}
-              <main className="flex-grow relative z-10">
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <HomeView
-                        setSelectedCategory={handleSelectCategory}
-                        onSelectProduct={handleSelectProduct}
-                      />
-                    }
-                  />
-                  <Route
-                    path="/shop"
-                    element={
-                      <ShopView
-                        selectedCategory={selectedCategory}
-                        setSelectedCategory={setSelectedCategory}
-                        onSelectProduct={handleSelectProduct}
-                      />
-                    }
-                  />
-                  <Route path="/customize" element={<CustomizerView />} />
-                  <Route path="/customizer" element={<Navigate to="/customize" replace />} />
-                  
-                  <Route path="/the-duat" element={<AboutView />} />
-                  <Route path="/about" element={<Navigate to="/the-duat" replace />} />
-                  
-                  <Route path="/track-order" element={<OrderTrackerView />} />
-                  <Route path="/checkout" element={<CheckoutView />} />
-                  
-                  {/* Fallback unknown routes to Home */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
+                {/* Main Content Router View */}
+                <main className="flex-grow relative z-10">
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={
+                        <HomeView
+                          setSelectedCategory={handleSelectCategory}
+                          onSelectProduct={handleSelectProduct}
+                        />
+                      }
+                    />
+                    <Route
+                      path="/shop"
+                      element={
+                        <ShopView
+                          selectedCategory={selectedCategory}
+                          setSelectedCategory={setSelectedCategory}
+                          onSelectProduct={handleSelectProduct}
+                        />
+                      }
+                    />
+                    <Route path="/customize" element={<CustomizerView />} />
+                    <Route path="/customizer" element={<Navigate to="/customize" replace />} />
+                    
+                    <Route path="/the-duat" element={<AboutView />} />
+                    <Route path="/about" element={<Navigate to="/the-duat" replace />} />
+                    
+                    <Route path="/track-order" element={<OrderTrackerView />} />
+                    <Route path="/checkout" element={<CheckoutView />} />
+                    <Route path="/admin" element={<AdminView />} />
+                    
+                    {/* Fallback unknown routes to Home */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </main>
 
-              {/* Global Footer */}
-              <Footer />
+                {/* Global Footer */}
+                <Footer />
 
-              {/* Cart Slide-out Drawer Overlay */}
-              <CartDrawer />
+                {/* Cart Slide-out Drawer Overlay */}
+                <CartDrawer />
 
-              {/* Product Quick View Specs Modal */}
-              <ProductModal
-                product={selectedProduct}
-                onClose={() => setSelectedProduct(null)}
-              />
+                {/* Product Quick View Specs Modal */}
+                <ProductModal
+                  product={selectedProduct}
+                  onClose={() => setSelectedProduct(null)}
+                />
 
-              {/* Order Shipment Tracker Modal */}
-              <OrderTrackerModal
-                isOpen={trackerOpen}
-                onClose={() => setTrackerOpen(false)}
-              />
+                {/* Order Shipment Tracker Modal */}
+                <OrderTrackerModal
+                  isOpen={trackerOpen}
+                  onClose={() => setTrackerOpen(false)}
+                />
 
-              {/* Toast Notification Floating Container */}
-              <ToastContainer />
+                {/* Toast Notification Floating Container */}
+                <ToastContainer />
 
-            </div>
-          </ToastProvider>
-        </CartProvider>
+              </div>
+            </ToastProvider>
+          </CartProvider>
+        </ProductsProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

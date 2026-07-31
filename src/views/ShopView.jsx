@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES, CASE_TYPES } from '../data/products';
+import { CATEGORIES, CASE_TYPES } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useLanguage } from '../context/LanguageContext';
+import { useProducts } from '../context/ProductsContext';
 import { SunDisc } from '../components/SunDisc';
 import { Search, SlidersHorizontal, Filter, X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduct }) => {
+  const { products } = useProducts();
   const { lang, t } = useLanguage();
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -19,7 +21,7 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Filter Logic
-  let filteredProducts = PRODUCTS.filter((product) => {
+  let filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesCaseType = selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
     const matchesPrice = product.price <= maxPrice;

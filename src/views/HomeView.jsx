@@ -5,12 +5,14 @@ import { TrustNumbersBar } from '../components/TrustNumbersBar';
 import { CategoryGrid } from '../components/CategoryGrid';
 import { ProductRow } from '../components/ProductRow';
 import { SocialStrip } from '../components/SocialStrip';
-import { PRODUCTS, REVIEWS, FAQS } from '../data/products';
+import { REVIEWS, FAQS } from '../data/products';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useProducts } from '../context/ProductsContext';
 import { Star, ChevronDown, ChevronUp, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
+  const { products } = useProducts();
   const { lang, t } = useLanguage();
   const { theme } = useTheme();
   const isDawn = theme === 'dawn';
@@ -22,8 +24,8 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
   const [openFaqId, setOpenFaqId] = useState('faq-1');
 
-  const latestDrops = PRODUCTS.slice(0, 6);
-  const bestSellers = PRODUCTS.filter(p => p.category === 'cases').concat(PRODUCTS.filter(p => p.category === 'stickers')).slice(2, 8);
+  const latestDrops = products.slice(0, 6);
+  const bestSellers = products.filter(p => p.category === 'cases').concat(products.filter(p => p.category === 'stickers')).slice(2, 8);
 
   return (
     <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">
