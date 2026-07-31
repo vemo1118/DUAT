@@ -80,6 +80,12 @@ export function ProductsProvider({ children }) {
     setProducts((prev) => prev.filter((prod) => prod.id !== id));
   };
 
+  // Get single product by ID
+  const getProductById = (id) => {
+    if (!id) return null;
+    return products.find((prod) => prod.id === id);
+  };
+
   // Reset back to initial hardcoded list
   const resetProducts = () => {
     setProducts(INITIAL_PRODUCTS);
@@ -94,6 +100,7 @@ export function ProductsProvider({ children }) {
         updateProduct,
         adjustPrice,
         deleteProduct,
+        getProductById,
         resetProducts
       }}
     >

@@ -9,7 +9,9 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
     nameEn: '',
     nameAr: '',
     price: 500,
+    originalPrice: 650,
     imageUrl: '',
+    optionsText: 'Size 6, Size 7, Size 8, Size 9',
     tagEn: '',
     tagAr: '',
     craftTagEn: 'Ships in 3–5 Days • Egypt Craft',
@@ -29,7 +31,9 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         nameEn: productToEdit.nameEn || '',
         nameAr: productToEdit.nameAr || '',
         price: productToEdit.price || 0,
+        originalPrice: productToEdit.originalPrice || Math.round((productToEdit.price || 500) * 1.3),
         imageUrl: productToEdit.imageUrl || productToEdit.image || '',
+        optionsText: Array.isArray(productToEdit.options) ? productToEdit.options.join(', ') : 'Size 6, Size 7, Size 8',
         tagEn: productToEdit.tagEn || '',
         tagAr: productToEdit.tagAr || '',
         craftTagEn: productToEdit.craftTagEn || '',
@@ -47,7 +51,9 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         nameEn: '',
         nameAr: '',
         price: 500,
+        originalPrice: 650,
         imageUrl: '',
+        optionsText: 'iPhone 15 Pro Max, iPhone 15 Pro, iPhone 14 Pro Max',
         tagEn: '',
         tagAr: '',
         craftTagEn: 'Ships in 3–5 Days • Egypt Craft',
@@ -71,7 +77,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Convert specs text to arrays
+    // Convert specs & options text to arrays
     const specsEn = formData.specsEnText
       .split('\n')
       .map((s) => s.trim())
@@ -82,15 +88,23 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const options = formData.optionsText
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
+
     const payload = {
       ...formData,
       price: Number(formData.price),
+      originalPrice: Number(formData.originalPrice) || Number(formData.price),
+      options,
       specsEn,
       specsAr
     };
 
     delete payload.specsEnText;
     delete payload.specsArText;
+    delete payload.optionsText;
 
     onSave(payload);
     onClose();
@@ -149,7 +163,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
 
             <div>
               <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-2">
-                السعر بالجنيه (Price EGP)
+                السعر الحالي بالجنيه (Price EGP)
               </label>
               <input
                 type="number"
@@ -159,6 +173,22 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 value={formData.price}
                 onChange={handleChange}
                 required
+                className="w-full bg-stone border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block font-mono text-xs text-ash uppercase tracking-wider mb-2">
+                السعر الأصلي قبل الخصم (Original Price)
+              </label>
+              <input
+                type="number"
+                name="originalPrice"
+                min="0"
+                step="10"
+                value={formData.originalPrice}
+                onChange={handleChange}
+                placeholder="مثال: 1990 (لظهور شارة الخصم)"
                 className="w-full bg-stone border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-sm"
               />
             </div>
@@ -182,6 +212,22 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 </select>
               </div>
             )}
+          </div>
+
+          {/* Product Options (Sizes / Phone Models) */}
+          <div>
+            <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-2">
+              خيارات المنتج / المقاسات / موديلات الهواتف (مفصولة بفواصل)
+            </label>
+            <input
+              type="text"
+              name="optionsText"
+              value={formData.optionsText}
+              onChange={handleChange}
+              placeholder="مثال: Size 6, Size 7, Size 8 أو iPhone 15 Pro Max, iPhone 15 Pro"
+              className="w-full bg-stone border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-xs"
+              dir="ltr"
+            />
           </div>
 
           {/* Product Image URL & Local Upload with Live Thumbnail Preview */}

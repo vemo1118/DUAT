@@ -8,9 +8,11 @@ import { CustomizerView } from './views/CustomizerView';
 import { AboutView } from './views/AboutView';
 import { CheckoutView } from './views/CheckoutView';
 import { OrderTrackerView } from './views/OrderTrackerView';
+import { ProductDetailView } from './views/ProductDetailView';
 import { AdminView } from './views/AdminView';
 import { CartDrawer } from './components/CartDrawer';
 import { ProductModal } from './components/ProductModal';
+import { QuickViewDrawer } from './components/QuickViewDrawer';
 import { OrderTrackerModal } from './components/OrderTrackerModal';
 import { ToastContainer } from './components/ToastContainer';
 import { LanguageProvider } from './context/LanguageContext';
@@ -104,6 +106,7 @@ export function App() {
                         />
                       }
                     />
+                    <Route path="/product/:id" element={<ProductDetailView />} />
                     <Route path="/customize" element={<CustomizerView />} />
                     <Route path="/customizer" element={<Navigate to="/customize" replace />} />
                     
@@ -124,6 +127,13 @@ export function App() {
 
                 {/* Cart Slide-out Drawer Overlay */}
                 <CartDrawer />
+
+                {/* Quick View Options Slide-over Drawer (Screenshot 1) */}
+                <QuickViewDrawer
+                  product={selectedProduct}
+                  isOpen={!!selectedProduct}
+                  onClose={() => setSelectedProduct(null)}
+                />
 
                 {/* Product Quick View Specs Modal */}
                 <ProductModal
