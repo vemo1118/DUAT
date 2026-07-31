@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useOrders } from '../context/OrdersContext';
 import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
 import { ShieldCheck, Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -10,6 +11,7 @@ export const CheckoutView = ({ setView }) => {
   const { lang, t, formatPrice } = useLanguage();
   const { cartItems, subtotal, discount, clearCart } = useCart();
   const { showToast } = useToast();
+  const { addOrder } = useOrders();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
 
@@ -39,6 +41,14 @@ export const CheckoutView = ({ setView }) => {
     setIsSubmitting(true);
     setTimeout(() => {
       const ref = `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
+      addOrder({
+        id: ref,
+        customer: { fullName, phone, address, governorate },
+        items: cartItems,
+        total: finalTotal,
+        paymentMethod,
+        status: 'placed'
+      });
       setOrderReference(ref);
       setIsSubmitting(false);
       clearCart();

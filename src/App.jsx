@@ -18,6 +18,7 @@ import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ProductsProvider } from './context/ProductsContext';
+import { OrdersProvider } from './context/OrdersContext';
 import { AnnouncementMarquee } from './components/AnnouncementMarquee';
 import { ScrollToTop } from './components/ScrollToTop';
 
@@ -68,8 +69,9 @@ export function App() {
     <ThemeProvider>
       <LanguageProvider>
         <ProductsProvider>
-          <CartProvider>
-            <ToastProvider>
+          <OrdersProvider>
+            <CartProvider>
+              <ToastProvider>
               {/* Main Container with Filmic Grain Texture Overlay */}
               <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
                 <ScrollToTop />
@@ -141,9 +143,10 @@ export function App() {
               </div>
             </ToastProvider>
           </CartProvider>
-        </ProductsProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+        </OrdersProvider>
+      </ProductsProvider>
+    </LanguageProvider>
+  </ThemeProvider>
   );
 }
 

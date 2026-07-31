@@ -1,24 +1,47 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useOrders } from '../context/OrdersContext';
 import { SunDisc } from '../components/SunDisc';
 import { Search, CheckCircle, Clock, Truck, ShieldCheck } from 'lucide-react';
 
 export const OrderTrackerView = () => {
   const { lang, t } = useLanguage();
+  const { getOrderByCode } = useOrders();
   const [orderId, setOrderId] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const statusToStep = (status) => {
+    switch (status) {
+      case 'placed': return 0;
+      case 'forge': return 1;
+      case 'shipped': return 2;
+      case 'delivered': return 3;
+      default: return 0;
+    }
+  };
 
   const handleTrack = (e) => {
     e.preventDefault();
     if (!orderId.trim()) return;
 
-    const query = orderId.trim().toUpperCase();
-    if (query.length >= 4) {
+    const query = orderId.trim();
+    const foundOrder = getOrderByCode(query);
+
+    if (foundOrder) {
       setErrorMsg('');
       setTrackedResult({
-        code: query.startsWith('DUAT-') ? query : `DUAT-${query}`,
-        currentStep: 1, // In Production
+        code: foundOrder.id,
+        currentStep: statusToStep(foundOrder.status),
+        customerName: foundOrder.customer?.fullName,
+        updatedAt: foundOrder.createdAt ? new Date(foundOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
+      });
+    } else if (query.length >= 4) {
+      // Fallback display for arbitrary code
+      setErrorMsg('');
+      setTrackedResult({
+        code: query.toUpperCase().startsWith('DUAT-') ? query.toUpperCase() : `DUAT-${query.toUpperCase()}`,
+        currentStep: 1,
         updatedAt: new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
       });
     } else {

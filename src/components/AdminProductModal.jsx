@@ -9,6 +9,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
     nameEn: '',
     nameAr: '',
     price: 500,
+    imageUrl: '',
     tagEn: '',
     tagAr: '',
     craftTagEn: 'Ships in 3–5 Days • Egypt Craft',
@@ -28,6 +29,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         nameEn: productToEdit.nameEn || '',
         nameAr: productToEdit.nameAr || '',
         price: productToEdit.price || 0,
+        imageUrl: productToEdit.imageUrl || productToEdit.image || '',
         tagEn: productToEdit.tagEn || '',
         tagAr: productToEdit.tagAr || '',
         craftTagEn: productToEdit.craftTagEn || '',
@@ -45,6 +47,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         nameEn: '',
         nameAr: '',
         price: 500,
+        imageUrl: '',
         tagEn: '',
         tagAr: '',
         craftTagEn: 'Ships in 3–5 Days • Egypt Craft',
@@ -179,6 +182,44 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 </select>
               </div>
             )}
+          </div>
+
+          {/* Product Image URL with Live Thumbnail Preview */}
+          <div className="bg-stone/30 border border-grave p-4 space-y-3">
+            <label className="block font-mono text-xs text-gold uppercase tracking-wider">
+              رابط صورة المنتج (Product Image URL)
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
+              <input
+                type="url"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                placeholder="https://example.com/images/case.png"
+                className="w-full bg-stone border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-xs"
+                dir="ltr"
+              />
+              {formData.imageUrl ? (
+                <div className="w-12 h-12 border border-gold shrink-0 overflow-hidden bg-stone">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://placehold.co/100x100/12162B/E8A33D?text=Image+Error';
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="w-12 h-12 border border-dashed border-grave shrink-0 flex items-center justify-center font-mono text-[10px] text-ash bg-stone/40">
+                  لا صورة
+                </div>
+              )}
+            </div>
+            <p className="font-mono text-[11px] text-ash">
+              أدخل رابط الصورة مباشرة (URL)، أو اتركه فارغاً لاستخدام تصميم البطاقة الفاخر الافتراضي.
+            </p>
           </div>
 
           {/* Product Names (AR & EN) */}

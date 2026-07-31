@@ -32,6 +32,20 @@ export const ProductCard = ({ product }) => {
 
   // Render graphic using CaseGraphic or images
   const renderProductGraphic = () => {
+    const customImage = product.imageUrl || product.image;
+    if (customImage) {
+      return (
+        <img
+          src={customImage}
+          alt={name}
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            e.target.style.display = 'none';
+          }}
+        />
+      );
+    }
+
     if (product.category === 'cases') {
       return (
         <CaseGraphic

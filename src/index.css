@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* High contrast text selection fix */
+::selection {
+  background-color: #E8A33D !important;
+  color: #0A0C16 !important;
+  -webkit-text-fill-color: #0A0C16 !important;
+}
+
+::-moz-selection {
+  background-color: #E8A33D !important;
+  color: #0A0C16 !important;
+  -webkit-text-fill-color: #0A0C16 !important;
+}
+
+input::selection, textarea::selection {
+  background-color: #E8A33D !important;
+  color: #0A0C16 !important;
+}
+
 :root,
 html[data-theme="night"],
 html:not([data-theme]) {
