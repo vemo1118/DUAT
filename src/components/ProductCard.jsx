@@ -32,9 +32,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     }
   };
 
-  const name = lang === 'ar' ? product.nameAr : product.nameEn;
-  const tag = lang === 'ar' ? product.tagAr : product.tagEn;
-  const craftTag = lang === 'ar' ? product.craftTagAr : product.craftTagEn;
+  if (!product) return null;
+
+  const name = (lang === 'ar' ? product.nameAr : product.nameEn) || product.nameEn || product.nameAr || 'Product';
+  const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
+  const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
 
   // Render graphic using CaseGraphic or images
   const renderProductGraphic = () => {

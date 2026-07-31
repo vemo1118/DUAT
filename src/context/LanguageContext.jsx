@@ -56,9 +56,10 @@ export const LanguageProvider = ({ children }) => {
   };
 
   const formatPrice = (amount) => {
-    const formatted = amount.toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US');
+    const num = typeof amount === 'number' ? amount : Number(amount) || 0;
+    const formatted = num.toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US');
     const currency = t('egp');
-    return `${formatted} ${currency}`;
+    return lang === 'ar' ? `${formatted} ${currency}` : `${currency} ${formatted}`;
   };
 
   return (
