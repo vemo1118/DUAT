@@ -7,8 +7,8 @@ import { useProducts } from '../context/ProductsContext';
 import { SunDisc } from '../components/SunDisc';
 import { Search, SlidersHorizontal, Filter, X, ChevronRight, ChevronLeft } from 'lucide-react';
 
-export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduct }) => {
-  const { products } = useProducts();
+export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSelectProduct }) => {
+  const { products = [] } = useProducts();
   const { lang, t } = useLanguage();
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -17,40 +17,42 @@ export const ShopView = ({ selectedCategory, setSelectedCategory, onSelectProduc
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [selectedCaseType, setSelectedCaseType] = useState('all');
-  const [maxPrice, setMaxPrice] = useState(1000);
+  const [maxPrice, setMaxPrice] = useState(5000);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // Filter Logic
-  let filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesCaseType = selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
-    const matchesPrice = product.price <= maxPrice;
+  // Safe Filter Logic with defensive null checks
+  const safeProducts = Array.isArray(products) ? products : [];
+  let filteredProducts = safeProducts.filter((product) => {
+    if (!product) return false;
+    const matchesCategory = !selectedCategory || selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesCaseType = !selectedCaseType || selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
+    const matchesPrice = (product.price || 0) <= maxPrice;
     
-    const query = searchQuery.toLowerCase().trim();
+    const query = (searchQuery || '').toLowerCase().trim();
     const matchesSearch = !query ||
-      product.nameEn.toLowerCase().includes(query) ||
-      product.nameAr.toLowerCase().includes(query) ||
-      product.tagEn.toLowerCase().includes(query) ||
-      product.tagAr.toLowerCase().includes(query);
+      (product.nameEn && product.nameEn.toLowerCase().includes(query)) ||
+      (product.nameAr && product.nameAr.toLowerCase().includes(query)) ||
+      (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
+      (product.tagAr && product.tagAr.toLowerCase().includes(query));
 
     return matchesCategory && matchesCaseType && matchesPrice && matchesSearch;
   });
 
-  // Sort Logic
+  // Sort Logic with defensive checks
   if (sortBy === 'price-low') {
-    filteredProducts.sort((a, b) => a.price - b.price);
+    filteredProducts.sort((a, b) => (a.price || 0) - (b.price || 0));
   } else if (sortBy === 'price-high') {
-    filteredProducts.sort((a, b) => b.price - a.price);
+    filteredProducts.sort((a, b) => (b.price || 0) - (a.price || 0));
   } else if (sortBy === 'name') {
-    filteredProducts.sort((a, b) => a.nameEn.localeCompare(b.nameEn));
+    filteredProducts.sort((a, b) => (a.nameEn || '').localeCompare(b.nameEn || ''));
   }
 
-  const activeFilterCount = (selectedCategory !== 'all' ? 1 : 0) + (selectedCaseType !== 'all' ? 1 : 0) + (maxPrice < 1000 ? 1 : 0);
+  const activeFilterCount = (selectedCategory !== 'all' ? 1 : 0) + (selectedCaseType !== 'all' ? 1 : 0) + (maxPrice < 5000 ? 1 : 0);
 
   const resetFilters = () => {
     setSelectedCategory('all');
     setSelectedCaseType('all');
-    setMaxPrice(1000);
+    setMaxPrice(5000);
     setSearchQuery('');
   };
 
