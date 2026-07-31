@@ -46,7 +46,13 @@ export const ProductModal = ({ product, onClose }) => {
 
         {/* Visual Showcase (Left) */}
         <div className="md:w-1/2 bg-void p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-grave relative min-h-[320px]">
-          {product.category === 'cases' ? (
+          {product.imageUrl || product.image ? (
+            <img
+              src={product.imageUrl || product.image}
+              alt={name}
+              className="w-full aspect-[3/4] object-cover object-center border border-grave shadow-lg"
+            />
+          ) : product.category === 'cases' ? (
             <CaseGraphic
               finish={product.caseTypeId || 'matte-black'}
               size="lg"

@@ -18,21 +18,26 @@ import {
   MinusCircle,
   ShoppingBag,
   Truck,
-  CheckCircle,
-  Clock,
-  ShieldCheck,
   Eye,
   X,
   Phone,
-  MapPin,
-  Calendar,
-  User
+  Lock,
+  LogOut,
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 
 export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, deleteProduct, resetProducts } = useProducts();
   const { orders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { showToast } = useToast();
+
+  // Admin PIN Authentication State (Passcode Gate)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('duat_admin_auth') === 'true';
+  });
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState(false);
 
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders'
 
@@ -47,6 +52,25 @@ export function AdminView() {
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (pinInput.trim() === '1234' || pinInput.trim().toLowerCase() === 'admin') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('duat_admin_auth', 'true');
+      setPinError(false);
+      showToast('تم فتح لوحة التحكم بنجاح!', 'success');
+    } else {
+      setPinError(true);
+      showToast('رمز الدخول غير صحيح!', 'error');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('duat_admin_auth');
+    showToast('تم قفل لوحة التحكم وسيرة الخروج بنجاح', 'info');
+  };
 
   // Filtered Products
   const filteredProducts = products.filter((product) => {
@@ -108,7 +132,7 @@ export function AdminView() {
   const handleDeleteConfirm = (id) => {
     deleteProduct(id);
     setDeleteConfirmId(null);
-    showToast('تم حذف المنتج من القائمة!', 'warning');
+    showToast('تم حذف المنتج بنجاح!', 'warning');
   };
 
   const handleResetCatalog = () => {
@@ -123,20 +147,59 @@ export function AdminView() {
     showToast(`تم تحديث حالة الطلب #${orderId} بنجاح!`, 'success');
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'placed':
-        return <span className="px-2.5 py-1 text-[11px] font-mono uppercase border border-amber-500/50 bg-amber-500/10 text-amber-400">استلام الطلب</span>;
-      case 'forge':
-        return <span className="px-2.5 py-1 text-[11px] font-mono uppercase border border-blue-500/50 bg-blue-500/10 text-blue-400">جاري التجهيز</span>;
-      case 'shipped':
-        return <span className="px-2.5 py-1 text-[11px] font-mono uppercase border border-gold bg-gold/10 text-gold">تم الشحن</span>;
-      case 'delivered':
-        return <span className="px-2.5 py-1 text-[11px] font-mono uppercase border border-emerald-500/50 bg-emerald-500/10 text-emerald-400">تم التسليم</span>;
-      default:
-        return <span className="px-2.5 py-1 text-[11px] font-mono uppercase border border-grave text-ash">{status}</span>;
-    }
-  };
+  // ============================================================
+  // ADMIN PASSCODE GATE IF NOT AUTHENTICATED
+  // ============================================================
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-4" dir="rtl">
+        <div className="w-full max-w-md bg-stone border border-gold/40 p-8 space-y-6 shadow-2xl card-depth-highlight text-center">
+          <div className="w-16 h-16 rounded-full border border-gold/40 bg-gold/10 flex items-center justify-center mx-auto text-gold">
+            <Lock size={32} />
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="font-clash text-2xl font-bold text-bone">دخول لوحة التحكم (Admin Gate)</h1>
+            <p className="font-mono text-xs text-ash">
+              هذه الصفحة مخصصة لـ إدارة متجر DUAT فقط. يرجى إدخال رمز الدخول.
+            </p>
+          </div>
+
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div className="relative">
+              <input
+                type="password"
+                value={pinInput}
+                onChange={(e) => setPinInput(e.target.value)}
+                placeholder="رمز الدخول (مثال: 1234)"
+                autoFocus
+                className={`w-full bg-coal border px-4 py-3 text-center text-lg font-mono tracking-widest text-bone focus:outline-none ${
+                  pinError ? 'border-red-500' : 'border-grave focus:border-gold'
+                }`}
+              />
+              <KeyRound size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-ash" />
+            </div>
+
+            {pinError && (
+              <p className="font-mono text-xs text-red-400">رمز الدخول غير صحيح! الرمز الافتراضي هو 1234</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2"
+            >
+              <ShieldCheck size={18} />
+              <span>دخول لوحة التحكم</span>
+            </button>
+          </form>
+
+          <p className="font-mono text-[11px] text-ash border-t border-grave/60 pt-4">
+            الرمز الافتراضي للدخول هو: <strong className="text-gold">1234</strong>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
@@ -156,30 +219,40 @@ export function AdminView() {
           </p>
         </div>
 
-        {/* TABS SWITCHER (PRODUCTS / ORDERS) */}
-        <div className="flex items-center gap-2 bg-stone p-1.5 border border-grave rounded-none shrink-0">
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-5 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
-              activeTab === 'products'
-                ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
-                : 'text-ash hover:text-bone'
-            }`}
-          >
-            <Package size={16} />
-            <span>إدارة المنتجات ({products.length})</span>
-          </button>
+        {/* TABS SWITCHER & LOGOUT */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-stone p-1.5 border border-grave shrink-0">
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+                activeTab === 'products'
+                  ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
+                  : 'text-ash hover:text-bone'
+              }`}
+            >
+              <Package size={16} />
+              <span>المنتجات ({products.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+                activeTab === 'orders'
+                  ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
+                  : 'text-ash hover:text-bone'
+              }`}
+            >
+              <ShoppingBag size={16} />
+              <span>الطلبات ({orders.length})</span>
+            </button>
+          </div>
 
           <button
-            onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-5 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
-              activeTab === 'orders'
-                ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
-                : 'text-ash hover:text-bone'
-            }`}
+            onClick={handleAdminLogout}
+            className="p-2.5 border border-grave bg-stone/50 hover:border-red-500/50 text-ash hover:text-red-400 transition-colors"
+            title="تسجيل الخروج وقفل التحكم"
           >
-            <ShoppingBag size={16} />
-            <span>إدارة الطلبات ({orders.length})</span>
+            <LogOut size={16} />
           </button>
         </div>
       </div>
@@ -366,6 +439,7 @@ export function AdminView() {
                             </span>
                           </td>
 
+                          {/* HIGH VISIBILITY EDIT & RED DELETE BUTTONS */}
                           <td className="py-4 px-4 text-left">
                             <div className="flex items-center justify-end gap-2">
                               <button
@@ -380,13 +454,13 @@ export function AdminView() {
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => handleDeleteConfirm(product.id)}
-                                    className="px-2.5 py-1.5 bg-red-600 text-white font-mono text-xs font-bold hover:bg-red-700 transition-colors"
+                                    className="px-3 py-1.5 bg-red-600 text-white font-mono text-xs font-bold hover:bg-red-700 transition-colors shadow"
                                   >
-                                    تأكيد!
+                                    تأكيد الحذف!
                                   </button>
                                   <button
                                     onClick={() => setDeleteConfirmId(null)}
-                                    className="px-2 py-1.5 border border-grave text-ash font-mono text-xs"
+                                    className="px-2 py-1.5 border border-grave text-ash font-mono text-xs hover:text-bone"
                                   >
                                     إلغاء
                                   </button>
@@ -394,9 +468,11 @@ export function AdminView() {
                               ) : (
                                 <button
                                   onClick={() => setDeleteConfirmId(product.id)}
-                                  className="p-1.5 border border-grave text-ash hover:text-red-400 hover:border-red-500/40 bg-stone/50 transition-colors"
+                                  className="flex items-center gap-1 px-2.5 py-1.5 border border-red-500/40 text-red-500 hover:bg-red-500/10 transition-colors font-mono text-xs font-bold"
+                                  title="حذف المنتج"
                                 >
                                   <Trash2 size={14} />
+                                  <span>حذف</span>
                                 </button>
                               )}
                             </div>

@@ -184,18 +184,39 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
             )}
           </div>
 
-          {/* Product Image URL with Live Thumbnail Preview */}
+          {/* Product Image URL & Local Upload with Live Thumbnail Preview */}
           <div className="bg-stone/30 border border-grave p-4 space-y-3">
-            <label className="block font-mono text-xs text-gold uppercase tracking-wider">
-              رابط صورة المنتج (Product Image URL)
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block font-mono text-xs text-gold uppercase tracking-wider">
+                صورة المنتج (رابط أونلاين أو رفع من الجهاز)
+              </label>
+              <label className="cursor-pointer px-3 py-1 bg-gold/10 border border-gold/40 text-gold hover:bg-gold hover:text-void transition-colors font-mono text-xs">
+                <span>📁 رفع صورة من الجهاز</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-3 items-center">
               <input
-                type="url"
+                type="text"
                 name="imageUrl"
                 value={formData.imageUrl}
                 onChange={handleChange}
-                placeholder="https://example.com/images/case.png"
+                placeholder="https://example.com/image.png أو قم برفع صورة..."
                 className="w-full bg-stone border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-xs"
                 dir="ltr"
               />
@@ -205,10 +226,6 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                     src={formData.imageUrl}
                     alt="Preview"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://placehold.co/100x100/12162B/E8A33D?text=Image+Error';
-                    }}
                   />
                 </div>
               ) : (
@@ -218,7 +235,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
               )}
             </div>
             <p className="font-mono text-[11px] text-ash">
-              أدخل رابط الصورة مباشرة (URL)، أو اتركه فارغاً لاستخدام تصميم البطاقة الفاخر الافتراضي.
+              يمكنك رفع أي صورة من هاتفك/جهازك أو لصق رابط أونلاين مباشر.
             </p>
           </div>
 

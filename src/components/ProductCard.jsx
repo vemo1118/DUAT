@@ -6,7 +6,7 @@ import { useToast } from '../context/ToastContext';
 import { ShoppingBag, Check, Sparkles, Star } from 'lucide-react';
 import { CaseGraphic } from './CaseGraphic';
 
-export const ProductCard = ({ product }) => {
+export const ProductCard = ({ product, onSelectProduct }) => {
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -26,6 +26,12 @@ export const ProductCard = ({ product }) => {
     navigate('/customizer', { state: { preselectedCaseTypeId: product.caseTypeId || 'clear' } });
   };
 
+  const handleCardClick = () => {
+    if (onSelectProduct) {
+      onSelectProduct(product);
+    }
+  };
+
   const name = lang === 'ar' ? product.nameAr : product.nameEn;
   const tag = lang === 'ar' ? product.tagAr : product.tagEn;
   const craftTag = lang === 'ar' ? product.craftTagAr : product.craftTagEn;
@@ -40,7 +46,7 @@ export const ProductCard = ({ product }) => {
           alt={name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
-            e.target.style.display = 'none';
+            console.warn('Failed to load image:', customImage);
           }}
         />
       );
@@ -77,7 +83,7 @@ export const ProductCard = ({ product }) => {
 
   return (
     <div
-      onClick={handleCustomize}
+      onClick={handleCardClick}
       className="bg-stone border border-grave flex flex-col justify-between group relative overflow-hidden transition-all duration-300 cursor-pointer card-depth-highlight"
     >
       

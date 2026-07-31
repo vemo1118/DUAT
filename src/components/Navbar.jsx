@@ -17,8 +17,7 @@ export const Navbar = ({ onOpenTracker }) => {
     { path: '/', label: lang === 'ar' ? 'الرئيسية' : 'Home', end: true },
     { path: '/shop', label: t('navShop') },
     { path: '/customize', label: t('navCustomize') },
-    { path: '/the-duat', label: t('navDuat') },
-    { path: '/admin', label: lang === 'ar' ? 'لوحة التحكم' : 'Admin' }
+    { path: '/the-duat', label: t('navDuat') }
   ];
 
   const handleTrackerClick = () => {
