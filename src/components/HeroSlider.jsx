@@ -95,11 +95,11 @@ export const HeroSlider = () => {
 
   const scrimBg = isDawn
     ? isRtl
-      ? 'linear-gradient(to top left, rgba(250, 246, 240, 0.75) 0%, rgba(250, 246, 240, 0.35) 45%, transparent 75%)'
-      : 'linear-gradient(to top right, rgba(250, 246, 240, 0.75) 0%, rgba(250, 246, 240, 0.35) 45%, transparent 75%)'
+      ? 'linear-gradient(to top left, rgba(250, 246, 240, 0.94) 0%, rgba(250, 246, 240, 0.65) 50%, rgba(250, 246, 240, 0.1) 85%)'
+      : 'linear-gradient(to top right, rgba(250, 246, 240, 0.94) 0%, rgba(250, 246, 240, 0.65) 50%, rgba(250, 246, 240, 0.1) 85%)'
     : isRtl
-      ? 'linear-gradient(to top left, rgba(10, 12, 22, 0.7) 0%, rgba(10, 12, 22, 0.3) 45%, transparent 75%)'
-      : 'linear-gradient(to top right, rgba(10, 12, 22, 0.7) 0%, rgba(10, 12, 22, 0.3) 45%, transparent 75%)';
+      ? 'linear-gradient(to top left, rgba(10, 12, 22, 0.88) 0%, rgba(10, 12, 22, 0.5) 50%, rgba(10, 12, 22, 0.15) 85%)'
+      : 'linear-gradient(to top right, rgba(10, 12, 22, 0.88) 0%, rgba(10, 12, 22, 0.5) 50%, rgba(10, 12, 22, 0.15) 85%)';
 
   return (
     <section

@@ -87,10 +87,10 @@ export const CategoryGrid = ({ onSelectCategory }) => {
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-700 opacity-100"
               />
               <div
-                className={`absolute bottom-0 left-0 right-0 h-1/2 ${
+                className={`absolute bottom-0 left-0 right-0 h-3/5 ${
                   isDawn
-                    ? 'bg-gradient-to-t from-[#FAF6F0]/95 via-[#FAF6F0]/40 to-transparent'
-                    : 'bg-gradient-to-t from-[#0A0C16]/95 via-[#0A0C16]/40 to-transparent'
+                    ? 'bg-gradient-to-t from-[#FAF6F0] via-[#FAF6F0]/65 to-transparent'
+                    : 'bg-gradient-to-t from-[#0A0C16] via-[#0A0C16]/65 to-transparent'
                 } pointer-events-none`}
               />
             </div>
@@ -110,7 +110,7 @@ export const CategoryGrid = ({ onSelectCategory }) => {
               <h3 className={`font-clash text-2xl sm:text-3xl ${isDawn ? 'text-[#0A0C16]' : 'text-[#EDE4D3]'} font-bold uppercase group-hover:text-gold transition-colors drop-shadow-md`}>
                 {isAr ? cat.nameAr : cat.nameEn}
               </h3>
-              <p className={`font-space text-xs sm:text-sm ${isDawn ? 'text-[#0A0C16]/90' : 'text-[#EDE4D3]/90'} font-medium drop-shadow-sm`}>
+              <p className={`font-space text-xs sm:text-sm ${isDawn ? 'text-[#1C1814]' : 'text-[#EDE4D3]/90'} font-semibold drop-shadow-sm`}>
                 {isAr ? cat.subtitleAr : cat.subtitleEn}
               </p>
               

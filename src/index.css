@@ -56,16 +56,14 @@ html[data-theme="dawn"] body {
   min-height: 100vh;
 }
 
-/* Dawn Mode Class Overrides for High Contrast & No White Boxes */
+/* Dawn Mode Class Overrides for High Contrast */
 html[data-theme="dawn"] .text-bone,
 html[data-theme="dawn"] h1,
 html[data-theme="dawn"] h2,
 html[data-theme="dawn"] h3,
 html[data-theme="dawn"] h4,
-html[data-theme="dawn"] p,
-html[data-theme="dawn"] span,
-html[data-theme="dawn"] .font-clash {
-  color: #1A1714 !important;
+html[data-theme="dawn"] p {
+  color: #1A1714;
 }
 
 html[data-theme="dawn"] .text-ash {
@@ -177,6 +175,10 @@ button, a.btn, select, input[type="submit"] {
 .font-reem,
 .font-cairo,
 .font-tajawal,
+.font-mono {
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
 .font-almarai,
 .font-arabic,
 :lang(ar),

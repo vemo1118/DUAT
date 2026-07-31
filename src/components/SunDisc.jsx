@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export const SunDisc = ({ size = 24, variant = 'gold', className = '' }) => {
+export const SunDisc = ({ size = 24, variant = 'gold', className = '', strokeColor }) => {
   let theme = 'night';
   try {
     const themeContext = useTheme();
@@ -13,8 +13,8 @@ export const SunDisc = ({ size = 24, variant = 'gold', className = '' }) => {
   const isDawn = theme === 'dawn';
   const sizePx = typeof size === 'number' ? `${size}px` : size;
 
-  // Horizon line color: bone (#EDE4D3) in dark/night, dark (#0A0C16) in light/dawn
-  const horizonColor = isDawn ? '#0A0C16' : '#EDE4D3';
+  // Horizon line color: explicit strokeColor prop OR bone (#EDE4D3) in dark/night OR dark (#0A0C16) in light/dawn
+  const horizonColor = strokeColor || (isDawn ? '#0A0C16' : '#EDE4D3');
   const sunColor = '#E8A33D';
 
   return (

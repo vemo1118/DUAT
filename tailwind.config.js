@@ -19,14 +19,14 @@ export default {
       fontFamily: {
         clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
-        kufi: ['"Reem Kufi"', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        kufi: ['"IBM Plex Sans Arabic"', 'sans-serif'],
+        mono: ['"Space Grotesk"', 'sans-serif'], // Replaced JetBrains Mono with Space Grotesk sitewide
         display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.04em',
         tight: '-0.03em',
-        widest: '0.25em',
+        widest: '0.12em',
       },
       lineHeight: {
         display: '0.92',

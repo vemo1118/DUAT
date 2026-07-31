@@ -59,8 +59,9 @@ export const CustomizerContent = () => {
   const location = useLocation();
 
   const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0].name : PHONE_MODELS[0];
+  const defaultCaseType = CASE_TYPES.find((c) => c.id === 'matte-black') || CASE_TYPES[0];
   const [selectedModel, setSelectedModel] = useState(defaultModelName);
-  const [selectedCaseType, setSelectedCaseType] = useState(CASE_TYPES[0] || { id: 'clear', nameEn: 'Clear Solar', nameAr: 'شفاف', color: '#FFFFFF' });
+  const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
 
   // Pre-select case finish if navigated from Product Card or Modal
   useEffect(() => {
@@ -307,6 +308,10 @@ export const CustomizerContent = () => {
   const caseBgColor = selectedCaseType?.color || selectedCaseType?.bg || '#14110F';
   const caseRingColor = selectedCaseType?.color || selectedCaseType?.ring || '#E8A33D';
 
+  const isLightCase = selectedCaseType?.id === 'clear' || selectedCaseType?.id === 'frost' || selectedCaseType?.id === 'bone';
+  const logoHorizonColor = isLightCase ? '#0A0C16' : '#EDE4D3';
+  const logoTextColor = isLightCase ? 'text-[#0A0C16] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]' : 'text-[#E8A33D] drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]';
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       
@@ -439,9 +444,13 @@ export const CustomizerContent = () => {
                 </div>
               )}
 
-              {/* FIXED BRANDING WORDMARK AT BOTTOM CENTER OF PHONE CASE */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-20 opacity-80 select-none">
-                <span className="font-clash text-[11px] font-bold tracking-[0.25em] text-bone/90 uppercase leading-none">
+              {/* FIXED BRANDING MARK AT BOTTOM CENTER OF PHONE CASE */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none z-20 select-none bg-[#12162B] px-3.5 py-1.5 rounded-full border border-[#E8A33D]/60 shadow-[0_4px_20px_rgba(0,0,0,0.85)]">
+                <SunDisc size={16} strokeColor="#EDE4D3" />
+                <span
+                  style={{ color: '#E8A33D' }}
+                  className="font-space text-xs font-bold tracking-[0.25em] uppercase leading-none drop-shadow-md"
+                >
                   DUAT
                 </span>
               </div>
