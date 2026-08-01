@@ -31,7 +31,7 @@ export const CheckoutView = ({ setView }) => {
     showToast(t('instaCopiedToast'), 'info');
   };
 
-  const handleSubmitOrder = (e) => {
+  const handleSubmitOrder = async (e) => {
     e.preventDefault();
     if (!fullName || !phone || !address) {
       showToast(lang === 'ar' ? 'يرجى إكمال جميع البيانات الحقول المطلوبة' : 'Please complete all required fields', 'error');
@@ -39,20 +39,39 @@ export const CheckoutView = ({ setView }) => {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const ref = `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
-      addOrder({
-        id: ref,
-        customer: { fullName, phone, address, governorate },
-        items: cartItems,
-        total: finalTotal,
-        paymentMethod,
-        status: 'placed'
-      });
-      setOrderReference(ref);
-      setIsSubmitting(false);
-      clearCart();
-    }, 1200);
+    const ref = `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderData = {
+      id: ref,
+      ref: ref,
+      customer: { name: fullName, fullName, phone, address, governorate },
+      items: cartItems,
+      total: finalTotal,
+      paymentMethod: paymentMethod,
+      payment_method: paymentMethod,
+      status: 'placed',
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      await addOrder(orderData);
+    } catch (err) {
+      console.error('Error adding order to database:', err);
+    }
+
+    // Keep local copy of order ref & details for customer tracking
+    try {
+      const LOCAL_TRACKING_KEY = 'duat_customer_orders';
+      const existing = JSON.parse(localStorage.getItem(LOCAL_TRACKING_KEY) || '[]');
+      const updatedList = [orderData, ...existing.filter((item) => item.ref !== ref && item.id !== ref)];
+      localStorage.setItem(LOCAL_TRACKING_KEY, JSON.stringify(updatedList));
+      localStorage.setItem('duat_latest_order_ref', ref);
+    } catch (err) {
+      console.error('Failed to save order to localStorage:', err);
+    }
+
+    setOrderReference(ref);
+    setIsSubmitting(false);
+    clearCart();
   };
 
   if (orderReference) {

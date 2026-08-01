@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductsContext';
 import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
 import { useToast } from '../context/ToastContext';
+import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { CATEGORIES } from '../data/products';
@@ -29,23 +30,42 @@ import {
   ShieldCheck,
   Image as ImageIcon,
   Sliders,
-  ExternalLink
+  ExternalLink,
+  Loader2,
+  Mail
 } from 'lucide-react';
 
 export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, deleteProduct, resetProducts } = useProducts();
-  const { orders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
+  const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, deleteSlide, resetSlides } = useHeroBanners();
   const { showToast } = useToast();
 
-  // Admin PIN Authentication State (Passcode Gate)
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('duat_admin_auth') === 'true';
-  });
-  const [pinInput, setPinInput] = useState('');
-  const [pinError, setPinError] = useState(false);
+  // Supabase Auth State
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero'
+
+  // Check initial session & listen for auth changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthLoading(false);
+      if (session && fetchOrders) fetchOrders();
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+      if (currentSession && fetchOrders) fetchOrders();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Products Tab State
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -63,23 +83,45 @@ export function AdminView() {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    if (pinInput.trim() === '1234' || pinInput.trim().toLowerCase() === 'admin') {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('duat_admin_auth', 'true');
-      setPinError(false);
-      showToast('تم فتح لوحة التحكم بنجاح!', 'success');
-    } else {
-      setPinError(true);
-      showToast('رمز الدخول غير صحيح!', 'error');
+    setAuthError('');
+    if (!emailInput || !passwordInput) {
+      setAuthError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+      return;
+    }
+
+    setIsSubmittingAuth(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailInput.trim(),
+        password: passwordInput
+      });
+
+      if (error) {
+        setAuthError(error.message || 'بيانات الدخول غير صحيحة');
+        showToast('فشل تسجيل الدخول: ' + error.message, 'error');
+      } else {
+        setSession(data.session);
+        showToast('تم تسجيل الدخول بنجاح!', 'success');
+        if (fetchOrders) fetchOrders();
+      }
+    } catch (err) {
+      setAuthError('حدث خطأ غير متوقع أثناء تسجيل الدخول');
+      showToast('حدث خطأ أثناء تسجيل الدخول', 'error');
+    } finally {
+      setIsSubmittingAuth(false);
     }
   };
 
-  const handleAdminLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('duat_admin_auth');
-    showToast('تم قفل لوحة التحكم وتسجيل الخروج بنجاح', 'info');
+  const handleAdminLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setSession(null);
+      showToast('تم تسجيل الخروج بنجاح', 'info');
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
   };
 
   // Filtered Products
@@ -194,9 +236,20 @@ export function AdminView() {
   };
 
   // ============================================================
-  // ADMIN PASSCODE GATE IF NOT AUTHENTICATED
+  // ADMIN SUPABASE AUTH GATE IF NOT AUTHENTICATED
   // ============================================================
-  if (!isAuthenticated) {
+  if (authLoading) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-4" dir="rtl">
+        <div className="flex items-center gap-3 text-gold font-mono text-sm">
+          <Loader2 size={24} className="animate-spin" />
+          <span>جاري التحقق من جلسة المسؤول...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center p-4" dir="rtl">
         <div className="w-full max-w-md bg-stone border border-gold/40 p-8 space-y-6 shadow-2xl card-depth-highlight text-center">
@@ -207,41 +260,54 @@ export function AdminView() {
           <div className="space-y-2">
             <h1 className="font-clash text-2xl font-bold text-bone">دخول لوحة التحكم (Admin Gate)</h1>
             <p className="font-mono text-xs text-ash">
-              هذه الصفحة مخصصة لـ إدارة متجر DUAT فقط. يرجى إدخال رمز الدخول.
+              هذه الصفحة مخصصة لـ إدارة متجر DUAT فقط. يرجى إدخال حساب المسؤول المصرح له.
             </p>
           </div>
 
-          <form onSubmit={handleAdminLogin} className="space-y-4">
-            <div className="relative">
-              <input
-                type="password"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                placeholder="رمز الدخول (مثال: 1234)"
-                autoFocus
-                className={`w-full bg-coal border px-4 py-3 text-center text-lg font-mono tracking-widest text-bone focus:outline-none ${
-                  pinError ? 'border-red-500' : 'border-grave focus:border-gold'
-                }`}
-              />
-              <KeyRound size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-ash" />
+          <form onSubmit={handleAdminLogin} className="space-y-4 text-right">
+            <div className="space-y-1">
+              <label className="block text-xs font-mono text-ash">البريد الإلكتروني</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="admin@duat.store"
+                  className="w-full bg-coal border border-grave px-4 py-3 text-sm font-mono text-bone focus:border-gold focus:outline-none"
+                />
+                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-ash" />
+              </div>
             </div>
 
-            {pinError && (
-              <p className="font-mono text-xs text-red-400">رمز الدخول غير صحيح! الرمز الافتراضي هو 1234</p>
+            <div className="space-y-1">
+              <label className="block text-xs font-mono text-ash">كلمة المرور</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-coal border border-grave px-4 py-3 text-sm font-mono text-bone focus:border-gold focus:outline-none"
+                />
+                <KeyRound size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-ash" />
+              </div>
+            </div>
+
+            {authError && (
+              <p className="font-mono text-xs text-red-400 text-center">{authError}</p>
             )}
 
             <button
               type="submit"
+              disabled={isSubmittingAuth}
               className="w-full py-3 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2"
             >
-              <ShieldCheck size={18} />
+              {isSubmittingAuth ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
               <span>دخول لوحة التحكم</span>
             </button>
           </form>
-
-          <p className="font-mono text-[11px] text-ash border-t border-grave/60 pt-4">
-            الرمز الافتراضي للدخول هو: <strong className="text-gold">1234</strong>
-          </p>
         </div>
       </div>
     );

@@ -1,123 +1,145 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const OrdersContext = createContext();
-const STORAGE_KEY = 'duat_orders';
 
-// Demo initial orders so the admin dashboard has sample orders to manage right away
-const INITIAL_ORDERS = [
-  {
-    id: 'DUAT-9482',
-    createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(), // 2 days ago
-    status: 'shipped', // placed, forge, shipped, delivered
-    customer: {
-      fullName: 'أحمد محمود',
-      phone: '01012345678',
-      address: 'شارع التسعين الشمالي، التجمع الخامس',
-      governorate: { nameAr: 'القاهرة', fee: 50 }
-    },
-    items: [
-      { id: 'case-solar', nameAr: 'جراب الشمسي الشفاف', nameEn: 'Clear Solar Case', price: 720, quantity: 1 }
-    ],
-    total: 770,
-    paymentMethod: 'cod'
-  },
-  {
-    id: 'DUAT-7104',
-    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(), // 5 hours ago
-    status: 'forge',
-    customer: {
-      fullName: 'مريم علي',
-      phone: '01198765432',
-      address: 'حي الجامعة، المنصورة',
-      governorate: { nameAr: 'الدقهلية', fee: 65 }
-    },
-    items: [
-      { id: 'case-gold-ring', nameAr: 'جراب حلقة الذهب التكتيكي', nameEn: 'Gold Ring Armor Case', price: 780, quantity: 1 },
-      { id: 'charm-scarab', nameAr: 'تعليقة الجعران الذهبي', nameEn: 'Scarab Gold Charm', price: 290, quantity: 1 }
-    ],
-    total: 1135,
-    paymentMethod: 'instapay'
-  }
-];
+function mapFromDb(ord) {
+  if (!ord) return null;
+  const ref = ord.ref || ord.id;
+  return {
+    id: ref,
+    ref: ref,
+    createdAt: ord.created_at || new Date().toISOString(),
+    updatedAt: ord.updated_at,
+    status: ord.status || 'placed',
+    customer: ord.customer || {},
+    items: Array.isArray(ord.items) ? ord.items : [],
+    total: Number(ord.total) || 0,
+    paymentMethod: ord.payment_method || ord.paymentMethod || 'cod'
+  };
+}
+
+function mapToDb(ord) {
+  const refCode = ord.ref || ord.id || `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
+  return {
+    ref: refCode,
+    status: ord.status || 'placed',
+    customer: ord.customer || {},
+    items: Array.isArray(ord.items) ? ord.items : [],
+    total: Number(ord.total) || 0,
+    payment_method: ord.paymentMethod || ord.payment_method || 'cod'
+  };
+}
 
 export function OrdersProvider({ children }) {
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load orders from localStorage:', e);
-    }
-    return INITIAL_ORDERS;
-  });
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Save to localStorage
-  useEffect(() => {
+  const fetchOrders = async () => {
+    setLoading(true);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    } catch (e) {
-      console.error('Failed to save orders to localStorage:', e);
+      const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.error('Failed to fetch orders from Supabase (may be unauthenticated):', error);
+        setOrders([]);
+      } else if (Array.isArray(data)) {
+        setOrders(data.map(mapFromDb));
+      }
+    } catch (err) {
+      console.error('Unexpected error loading orders:', err);
+      setOrders([]);
+    } finally {
+      setLoading(false);
     }
-  }, [orders]);
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   // Add a new order
-  const addOrder = (orderData) => {
+  const addOrder = async (orderData) => {
+    const refCode = orderData.ref || orderData.id || `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder = {
-      id: orderData.id || `DUAT-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: refCode,
+      ref: refCode,
       createdAt: new Date().toISOString(),
       status: orderData.status || 'placed',
       customer: orderData.customer || {},
       items: orderData.items || [],
       total: orderData.total || 0,
-      paymentMethod: orderData.paymentMethod || 'cod'
+      paymentMethod: orderData.paymentMethod || orderData.payment_method || 'cod'
     };
+
     setOrders((prev) => [newOrder, ...prev]);
+
+    try {
+      const dbPayload = mapToDb(newOrder);
+      const { error } = await supabase.from('orders').insert(dbPayload);
+      if (error) {
+        console.error('Supabase add order error:', error);
+      }
+    } catch (err) {
+      console.error('Supabase add order error:', err);
+    }
+
     return newOrder;
   };
 
-  // Update order status (placed, forge, shipped, delivered)
-  const updateOrderStatus = (orderId, newStatus) => {
+  // Update order status
+  const updateOrderStatus = async (orderId, newStatus) => {
     setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return { ...ord, status: newStatus, updatedAt: new Date().toISOString() };
-        }
-        return ord;
-      })
+      prev.map((ord) => (ord.id === orderId || ord.ref === orderId ? { ...ord, status: newStatus } : ord))
     );
+
+    try {
+      const { error: errRef } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('ref', orderId);
+      if (errRef) {
+        await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+      }
+    } catch (err) {
+      console.error('Supabase update order status error:', err);
+    }
   };
 
   // Delete an order
-  const deleteOrder = (orderId) => {
-    setOrders((prev) => prev.filter((ord) => ord.id !== orderId));
+  const deleteOrder = async (orderId) => {
+    setOrders((prev) => prev.filter((ord) => ord.id !== orderId && ord.ref !== orderId));
+    try {
+      const { error: errRef } = await supabase.from('orders').delete().eq('ref', orderId);
+      if (errRef) {
+        await supabase.from('orders').delete().eq('id', orderId);
+      }
+    } catch (err) {
+      console.error('Supabase delete order error:', err);
+    }
   };
 
-  // Find order by code (supports prefix matching e.g. "9482" or "DUAT-9482")
+  // Find order by code
   const getOrderByCode = (code) => {
     if (!code) return null;
     const cleanCode = code.trim().toUpperCase();
     return orders.find(
       (ord) =>
-        ord.id.toUpperCase() === cleanCode ||
-        ord.id.replace('DUAT-', '').toUpperCase() === cleanCode
+        (ord.id && ord.id.toUpperCase() === cleanCode) ||
+        (ord.ref && ord.ref.toUpperCase() === cleanCode) ||
+        (ord.id && ord.id.replace('DUAT-', '').toUpperCase() === cleanCode)
     );
   };
 
-  // Reset to initial sample orders
   const resetOrders = () => {
-    setOrders(INITIAL_ORDERS);
-    localStorage.removeItem(STORAGE_KEY);
+    fetchOrders();
   };
 
   return (
     <OrdersContext.Provider
       value={{
         orders,
+        loading,
+        fetchOrders,
         addOrder,
         updateOrderStatus,
         deleteOrder,

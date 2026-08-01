@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const HeroBannersContext = createContext();
-
-const STORAGE_KEY = 'duat_hero_slides';
 
 export const INITIAL_HERO_SLIDES = [
   {
@@ -23,7 +22,8 @@ export const INITIAL_HERO_SLIDES = [
     ctaPrimaryLink: '/customize',
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
-    ctaSecondaryLink: '/shop'
+    ctaSecondaryLink: '/shop',
+    sort_order: 1
   },
   {
     id: 'hero-slide-2',
@@ -43,70 +43,155 @@ export const INITIAL_HERO_SLIDES = [
     ctaPrimaryLink: '/shop',
     ctaSecondaryTextEn: 'TRACK YOUR ORDER',
     ctaSecondaryTextAr: 'تتبع طلبك الحقيقي',
-    ctaSecondaryLink: '/track-order'
+    ctaSecondaryLink: '/track-order',
+    sort_order: 2
   }
 ];
 
+function mapFromDb(row) {
+  if (!row) return null;
+  const data = row.data && typeof row.data === 'object' ? row.data : {};
+  return {
+    ...data,
+    id: row.id || data.id,
+    eyebrowEn: data.eyebrowEn || row.eyebrow_en || '',
+    eyebrowAr: data.eyebrowAr || row.eyebrow_ar || '',
+    headline1En: data.headline1En || row.headline1_en || '',
+    headline1Ar: data.headline1Ar || row.headline1_ar || '',
+    headline2En: data.headline2En || row.headline2_en || '',
+    headline2Ar: data.headline2Ar || row.headline2_ar || '',
+    subEn: data.subEn || row.sub_en || '',
+    subAr: data.subAr || row.sub_ar || '',
+    badgeEn: data.badgeEn || row.badge_ar || '',
+    badgeAr: data.badgeAr || row.badge_ar || '',
+    imageUrl: data.imageUrl || row.image_url || '',
+    ctaPrimaryTextEn: data.ctaPrimaryTextEn || row.cta_primary_text_en || '',
+    ctaPrimaryTextAr: data.ctaPrimaryTextAr || row.cta_primary_text_ar || '',
+    ctaPrimaryLink: data.ctaPrimaryLink || row.cta_primary_link || '',
+    ctaSecondaryTextEn: data.ctaSecondaryTextEn || row.cta_secondary_text_en || '',
+    ctaSecondaryTextAr: data.ctaSecondaryTextAr || row.cta_secondary_text_ar || '',
+    ctaSecondaryLink: data.ctaSecondaryLink || row.cta_secondary_link || '',
+    sort_order: row.sort_order ?? data.sort_order ?? 0
+  };
+}
+
+function mapToDb(slide, index = 0) {
+  return {
+    id: slide.id,
+    sort_order: slide.sort_order ?? index + 1,
+    data: slide
+  };
+}
+
 export function HeroBannersProvider({ children }) {
-  const [slides, setSlides] = useState(() => {
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSlides = async () => {
+    setLoading(true);
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const sanitized = parsed.map((s, idx) => {
-            const fallback = INITIAL_HERO_SLIDES[idx % INITIAL_HERO_SLIDES.length];
-            return {
-              ...fallback,
-              ...s,
-              imageUrl: s.imageUrl || fallback.imageUrl
-            };
-          });
-          return sanitized;
+      let query = supabase.from('hero_slides').select('*');
+      try {
+        query = query.order('sort_order', { ascending: true });
+      } catch (e) {
+        // ignore order error if sort_order missing
+      }
+      const { data, error } = await query;
+      if (error) {
+        console.error('Failed to fetch hero slides from Supabase:', error);
+        setSlides([]);
+      } else if (Array.isArray(data) && data.length > 0) {
+        setSlides(data.map(mapFromDb));
+      } else {
+        // Seed default slides if empty
+        try {
+          const seedPayload = INITIAL_HERO_SLIDES.map((s, idx) => mapToDb(s, idx));
+          const { data: seededData, error: seedErr } = await supabase
+            .from('hero_slides')
+            .upsert(seedPayload, { onConflict: 'id' })
+            .select();
+          if (!seedErr && Array.isArray(seededData) && seededData.length > 0) {
+            setSlides(seededData.map(mapFromDb));
+          } else {
+            console.error('Seeding hero slides error:', seedErr);
+            setSlides(INITIAL_HERO_SLIDES);
+          }
+        } catch (sErr) {
+          console.error('Error seeding hero slides:', sErr);
+          setSlides(INITIAL_HERO_SLIDES);
         }
       }
-    } catch (e) {
-      console.error('Failed to load hero slides from localStorage:', e);
+    } catch (err) {
+      console.error('Unexpected error loading hero slides:', err);
+      setSlides([]);
+    } finally {
+      setLoading(false);
     }
-    return INITIAL_HERO_SLIDES;
-  });
+  };
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(slides));
-    } catch (e) {
-      console.error('Failed to save hero slides to localStorage:', e);
-    }
-  }, [slides]);
+    fetchSlides();
+  }, []);
 
-  const addSlide = (slideData) => {
+  const addSlide = async (slideData) => {
     const newSlide = {
       ...slideData,
       id: slideData.id || `hero-slide-${Date.now()}`
     };
     setSlides((prev) => [newSlide, ...prev]);
+
+    try {
+      const { error } = await supabase.from('hero_slides').upsert(mapToDb(newSlide), { onConflict: 'id' });
+      if (error) console.error('Supabase add hero slide error:', error);
+    } catch (err) {
+      console.error('Supabase add hero slide error:', err);
+    }
+
     return newSlide;
   };
 
-  const updateSlide = (id, updatedFields) => {
+  const updateSlide = async (id, updatedFields) => {
+    let targetSlide = null;
     setSlides((prev) =>
-      prev.map((slide) => (slide.id === id ? { ...slide, ...updatedFields } : slide))
+      prev.map((slide) => {
+        if (slide.id === id) {
+          const updated = { ...slide, ...updatedFields };
+          targetSlide = updated;
+          return updated;
+        }
+        return slide;
+      })
     );
+
+    if (targetSlide) {
+      try {
+        const { error } = await supabase.from('hero_slides').upsert(mapToDb(targetSlide), { onConflict: 'id' });
+        if (error) console.error('Supabase update hero slide error:', error);
+      } catch (err) {
+        console.error('Supabase update hero slide error:', err);
+      }
+    }
   };
 
-  const deleteSlide = (id) => {
+  const deleteSlide = async (id) => {
     setSlides((prev) => prev.filter((slide) => slide.id !== id));
+    try {
+      const { error } = await supabase.from('hero_slides').delete().eq('id', id);
+      if (error) console.error('Supabase delete hero slide error:', error);
+    } catch (err) {
+      console.error('Supabase delete hero slide error:', err);
+    }
   };
 
   const resetSlides = () => {
-    setSlides(INITIAL_HERO_SLIDES);
-    localStorage.removeItem(STORAGE_KEY);
+    fetchSlides();
   };
 
   return (
     <HeroBannersContext.Provider
       value={{
         slides,
+        loading,
         addSlide,
         updateSlide,
         deleteSlide,

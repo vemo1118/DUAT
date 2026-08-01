@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrders } from '../context/OrdersContext';
+import { supabase } from '../lib/supabase';
 import { SunDisc } from '../components/SunDisc';
-import { Search, CheckCircle, Clock, Truck, ShieldCheck } from 'lucide-react';
+import { Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2 } from 'lucide-react';
 
 export const OrderTrackerView = () => {
   const { lang, t } = useLanguage();
   const { getOrderByCode } = useOrders();
   const [orderId, setOrderId] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const statusToStep = (status) => {
@@ -21,32 +23,82 @@ export const OrderTrackerView = () => {
     }
   };
 
-  const handleTrack = (e) => {
+  const handleTrack = async (e) => {
     e.preventDefault();
     if (!orderId.trim()) return;
 
-    const query = orderId.trim();
-    const foundOrder = getOrderByCode(query);
+    setIsLoading(true);
+    setErrorMsg('');
+    const rawQuery = orderId.trim().toUpperCase();
+    const cleanCode = rawQuery.startsWith('DUAT-') ? rawQuery : `DUAT-${rawQuery}`;
 
-    if (foundOrder) {
-      setErrorMsg('');
-      setTrackedResult({
-        code: foundOrder.id,
-        currentStep: statusToStep(foundOrder.status),
-        customerName: foundOrder.customer?.fullName,
-        updatedAt: foundOrder.createdAt ? new Date(foundOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
-      });
-    } else if (query.length >= 4) {
-      // Fallback display for arbitrary code
-      setErrorMsg('');
-      setTrackedResult({
-        code: query.toUpperCase().startsWith('DUAT-') ? query.toUpperCase() : `DUAT-${query.toUpperCase()}`,
-        currentStep: 1,
-        updatedAt: new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
-      });
-    } else {
-      setTrackedResult(null);
-      setErrorMsg(t('trackerNotFound'));
+    // 1. Check local copy in localStorage
+    let localOrder = null;
+    try {
+      const savedLocal = JSON.parse(localStorage.getItem('duat_customer_orders') || '[]');
+      localOrder = savedLocal.find(
+        (item) =>
+          (item.ref && item.ref.toUpperCase() === cleanCode) ||
+          (item.id && item.id.toUpperCase() === cleanCode)
+      );
+    } catch (e) {
+      console.error('Failed reading local tracking orders:', e);
+    }
+
+    if (!localOrder) {
+      localOrder = getOrderByCode(cleanCode);
+    }
+
+    // 2. Call safe RPC get_order_status(order_ref)
+    try {
+      const { data, error } = await supabase.rpc('get_order_status', { order_ref: cleanCode });
+      
+      const rpcResult = Array.isArray(data) ? data[0] : data;
+
+      if (!error && rpcResult && rpcResult.status) {
+        setTrackedResult({
+          code: rpcResult.ref || cleanCode,
+          currentStep: statusToStep(rpcResult.status),
+          status: rpcResult.status,
+          customerName: localOrder?.customer?.fullName || localOrder?.customer?.name,
+          items: localOrder?.items || [],
+          total: localOrder?.total,
+          updatedAt: rpcResult.created_at
+            ? new Date(rpcResult.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
+            : (localOrder?.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن')
+        });
+      } else if (localOrder) {
+        setTrackedResult({
+          code: localOrder.ref || localOrder.id,
+          currentStep: statusToStep(localOrder.status),
+          status: localOrder.status,
+          customerName: localOrder.customer?.fullName || localOrder.customer?.name,
+          items: localOrder.items || [],
+          total: localOrder.total,
+          updatedAt: localOrder.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
+        });
+      } else {
+        setTrackedResult(null);
+        setErrorMsg(t('trackerNotFound'));
+      }
+    } catch (err) {
+      console.error('RPC tracking error:', err);
+      if (localOrder) {
+        setTrackedResult({
+          code: localOrder.ref || localOrder.id,
+          currentStep: statusToStep(localOrder.status),
+          status: localOrder.status,
+          customerName: localOrder.customer?.fullName || localOrder.customer?.name,
+          items: localOrder.items || [],
+          total: localOrder.total,
+          updatedAt: localOrder.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
+        });
+      } else {
+        setTrackedResult(null);
+        setErrorMsg(t('trackerNotFound'));
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,9 +138,10 @@ export const OrderTrackerView = () => {
           />
           <button
             type="submit"
+            disabled={isLoading}
             className="btn-primary px-8 text-xs font-mono tracking-widest flex items-center justify-center gap-2 min-h-[44px]"
           >
-            <Search size={16} />
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
             <span>{t('trackerBtn')}</span>
           </button>
         </form>
@@ -104,6 +157,13 @@ export const OrderTrackerView = () => {
               <span className="font-mono text-xs text-ash">ORDER REFERENCE:</span>
               <span className="font-mono text-base font-bold text-gold tracking-widest">{trackedResult.code}</span>
             </div>
+
+            {trackedResult.customerName && (
+              <div className="font-mono text-xs text-bone/80">
+                <span className="text-ash">CUSTOMER: </span>
+                <span>{trackedResult.customerName}</span>
+              </div>
+            )}
 
             <div className="space-y-6">
               {steps.map((step, idx) => {
