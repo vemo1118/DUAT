@@ -177,7 +177,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                       {cat.id === 'accessories' && t('catAccessories')}
                     </span>
                     <span className="text-[10px] text-ash">
-                      {cat.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.category === cat.id).length}
+                      {cat.id === 'all' ? safeProducts.length : safeProducts.filter(p => p.category === cat.id).length}
                     </span>
                   </button>
                 );
