@@ -61,7 +61,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center justify-center font-sans"
+      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center justify-center font-sans"
     >
       {/* Background Graphic or Uploaded Image Layer */}
       {bgImage ? (

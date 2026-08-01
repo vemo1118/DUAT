@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { X, Minus, Plus, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { CaseGraphic } from './CaseGraphic';
 
 export function QuickViewDrawer({ product, isOpen, onClose }) {
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
+  const isDawn = theme === 'dawn';
 
   const [selectedOption, setSelectedOption] = useState('');
   const [quantity, setQuantity] = useState(1);
 
-  // Available options or default phone models/sizes
   const options = Array.isArray(product?.options) && product.options.length > 0
     ? product.options
     : product?.category === 'cases'
@@ -63,36 +66,36 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
     navigate(`/product/${product.id}`);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden font-sans">
+  const drawerContent = (
+    <div className="fixed inset-0 z-[9999] overflow-hidden font-sans" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-void/80 backdrop-blur-sm transition-opacity animate-fade-in"
+        className="fixed inset-0 bg-[#000000]/80 backdrop-blur-sm animate-drawer-fade z-[9999]"
       />
 
       {/* Slide-over Drawer Panel */}
-      <div className={`fixed inset-y-0 ${isRtl ? 'left-0' : 'right-0'} max-w-full flex ${isRtl ? 'pl-10' : 'pr-10'}`}>
-        <div className="w-screen max-w-md bg-stone border-x border-grave shadow-2xl flex flex-col justify-between overflow-y-auto animate-slide-in-right">
+      <div className={`fixed inset-y-0 ${isRtl ? 'left-0' : 'right-0'} w-full max-w-md z-[10000] flex flex-col`}>
+        <div className={`w-full h-full ${isDawn ? 'bg-[#EFEAE0] text-[#1A1714] border-[#DCD4C7]' : 'bg-[#14110F] text-[#F0EBE0] border-[#2E2823]'} border-x shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col relative z-[10001] overflow-hidden animate-drawer-slide`}>
           
           {/* Top Header */}
-          <div className="p-6 border-b border-grave flex items-center justify-between bg-stone/90 backdrop-blur">
-            <h2 className="font-clash text-lg font-bold uppercase tracking-wider text-bone">
-              {isAr ? 'اختر الخيارات (Choose options)' : 'Choose options'}
+          <div className={`p-6 ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} border-b flex items-center justify-between flex-shrink-0`}>
+            <h2 className="font-clash text-lg font-bold uppercase tracking-wider">
+              {isAr ? 'اختر الخيارات (CHOOSE OPTIONS)' : 'CHOOSE OPTIONS'}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 text-ash hover:text-gold border border-transparent hover:border-grave transition-colors"
+              className={`p-2.5 transition-colors border ${isDawn ? 'bg-[#EFEAE0] border-[#DCD4C7] text-[#524C44] hover:text-[#C97B22]' : 'bg-[#14110F] border-[#2E2823] text-[#8E877D] hover:text-[#E0A93B]'}`}
             >
               <X size={20} />
             </button>
           </div>
 
-          {/* Drawer Content */}
+          {/* Drawer Body Content */}
           <div className="p-6 space-y-6 flex-1 overflow-y-auto">
             {/* Product Summary Lockup */}
-            <div className="flex gap-4 items-start border-b border-grave/60 pb-6">
-              <div className="w-24 h-28 bg-void border border-grave shrink-0 overflow-hidden flex items-center justify-center p-2">
+            <div className={`flex gap-4 items-start border-b ${isDawn ? 'border-[#DCD4C7]' : 'border-[#2E2823]'} pb-6`}>
+              <div className={`w-24 h-28 ${isDawn ? 'bg-[#FAF6F0] border-[#DCD4C7]' : 'bg-[#0A0C16] border-[#28305F]'} border shrink-0 overflow-hidden flex items-center justify-center p-2`}>
                 {mainImage ? (
                   <img src={mainImage} alt={name} className="w-full h-full object-cover" />
                 ) : (
@@ -101,18 +104,18 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
               </div>
 
               <div className="space-y-1 font-space">
-                <span className="font-mono text-[10px] uppercase text-gold tracking-widest font-bold block">
+                <span className={`font-mono text-[10px] uppercase tracking-widest font-bold block ${isDawn ? 'text-[#C97B22]' : 'text-[#E0A93B]'}`}>
                   DUAT CRAFT
                 </span>
-                <h3 className="font-bold text-bone text-base leading-snug">{name}</h3>
+                <h3 className="font-bold text-base leading-snug">{name}</h3>
                 
-                {/* Price Display with Strikethrough Discount */}
+                {/* Price Display */}
                 <div className="flex items-center gap-3 pt-1 font-mono">
                   <span className="text-red-500 font-bold text-lg">
                     {formatPrice(product.price)}
                   </span>
                   {originalPrice > product.price && (
-                    <span className="text-ash/60 line-through text-sm">
+                    <span className={`line-through text-sm ${isDawn ? 'text-[#8E877D]' : 'text-[#8E98BF]/60'}`}>
                       {formatPrice(originalPrice)}
                     </span>
                   )}
@@ -122,44 +125,51 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
 
             {/* Option Selector Pills */}
             <div className="space-y-3">
-              <label className="font-mono text-xs text-ash uppercase tracking-widest block">
-                {product.category === 'cases' ? (isAr ? 'موديل الهاتف:' : 'Phone Model:') : (isAr ? 'المقاس / الخيار:' : 'Option / Size:')}
-                <span className="text-bone font-bold mr-2 ml-2">{selectedOption}</span>
+              <label className={`font-mono text-xs uppercase tracking-widest block ${isDawn ? 'text-[#524C44]' : 'text-[#8E98BF]'}`}>
+                {product.category === 'cases' ? (isAr ? 'موديل الهاتف:' : 'PHONE MODEL:') : (isAr ? 'المقاس / الخيار:' : 'OPTION / SIZE:')}
+                <span className="font-bold ml-2 mr-2">{selectedOption}</span>
               </label>
 
               <div className="flex flex-wrap gap-2.5">
-                {options.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setSelectedOption(opt)}
-                    className={`px-4 py-2 font-mono text-xs border transition-all ${
-                      selectedOption === opt
-                        ? 'border-gold bg-gold/15 text-gold font-bold shadow-md shadow-gold/10 scale-[1.02]'
-                        : 'border-grave bg-coal/60 text-bone hover:border-gold/50'
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
+                {options.map((opt) => {
+                  const isSelected = selectedOption === opt;
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => setSelectedOption(opt)}
+                      className={`px-4 py-2.5 font-mono text-xs border transition-all ${
+                        isSelected
+                          ? isDawn
+                            ? 'border-[#C97B22] bg-[#C97B22]/15 text-[#C97B22] font-bold shadow-sm'
+                            : 'border-[#E0A93B] bg-[#E0A93B]/15 text-[#E0A93B] font-bold shadow-sm'
+                          : isDawn
+                            ? 'border-[#DCD4C7] bg-[#FAF6F0] text-[#1A1714] hover:border-[#C97B22]'
+                            : 'border-[#2E2823] bg-[#1F1B17] text-[#F0EBE0] hover:border-[#E0A93B]'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Quantity Selector */}
             <div className="space-y-2 pt-2">
-              <label className="font-mono text-xs text-ash uppercase tracking-widest block">
-                {isAr ? 'الكمية:' : 'Quantity:'}
+              <label className={`font-mono text-xs uppercase tracking-widest block ${isDawn ? 'text-[#524C44]' : 'text-[#8E98BF]'}`}>
+                {isAr ? 'الكمية:' : 'QUANTITY:'}
               </label>
-              <div className="flex items-center w-36 border border-grave bg-coal">
+              <div className={`flex items-center w-36 border ${isDawn ? 'border-[#DCD4C7] bg-[#FAF6F0]' : 'border-[#2E2823] bg-[#1F1B17]'}`}>
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-3 text-ash hover:text-bone transition-colors"
+                  className="p-3 transition-colors"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="flex-1 text-center font-mono font-bold text-bone text-sm">{quantity}</span>
+                <span className="flex-1 text-center font-mono font-bold text-sm">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="p-3 text-ash hover:text-bone transition-colors"
+                  className="p-3 transition-colors"
                 >
                   <Plus size={14} />
                 </button>
@@ -167,11 +177,11 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-4 border-t border-grave/60 font-mono text-xs font-bold uppercase tracking-wider">
+            <div className={`space-y-3 pt-4 border-t ${isDawn ? 'border-[#DCD4C7]' : 'border-[#2E2823]'} font-mono text-xs font-bold uppercase tracking-wider`}>
               {/* ADD TO CART */}
               <button
                 onClick={handleAddToCart}
-                className="w-full py-4 border border-grave bg-coal hover:border-gold hover:text-gold text-bone transition-colors flex items-center justify-center gap-2"
+                className={`w-full py-4 border ${isDawn ? 'border-[#DCD4C7] bg-[#E5DFC5] text-[#1A1714] hover:border-[#C97B22] hover:text-[#C97B22]' : 'border-[#2E2823] bg-[#1F1B17] text-[#F0EBE0] hover:border-[#E0A93B] hover:text-[#E0A93B]'} transition-colors flex items-center justify-center gap-2`}
               >
                 <ShoppingBag size={16} />
                 <span>{isAr ? 'أضف إلى السلة' : 'ADD TO CART'}</span>
@@ -180,9 +190,9 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
               {/* BUY IT NOW */}
               <button
                 onClick={handleBuyNow}
-                className="w-full py-4 bg-gold text-[#050505] hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2"
+                className={`w-full py-4 ${isDawn ? 'bg-[#C97B22] text-[#0A0C16] hover:bg-[#B56A15]' : 'bg-[#E0A93B] text-[#0A0C16] hover:bg-[#D4982A]'} transition-colors shadow-lg flex items-center justify-center gap-2 font-bold`}
               >
-                <span>{isAr ? 'الشراء الآن (Direct Checkout)' : 'BUY IT NOW'}</span>
+                <span>{isAr ? 'الشراء الآن (DIRECT CHECKOUT)' : 'BUY IT NOW'}</span>
               </button>
             </div>
 
@@ -190,9 +200,9 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
             <div className="text-center pt-2">
               <button
                 onClick={handleViewDetails}
-                className="font-mono text-xs text-ash hover:text-gold underline underline-offset-4 transition-colors uppercase tracking-widest"
+                className={`font-mono text-xs underline underline-offset-4 transition-colors uppercase tracking-widest ${isDawn ? 'text-[#524C44] hover:text-[#C97B22]' : 'text-[#8E98BF] hover:text-[#E0A93B]'}`}
               >
-                {isAr ? 'مشاهدة التفاصيل كاملة (View details)' : 'View details'}
+                {isAr ? 'مشاهدة التفاصيل كاملة' : 'VIEW DETAILS'}
               </button>
             </div>
           </div>
@@ -200,4 +210,6 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(drawerContent, document.body);
 }
