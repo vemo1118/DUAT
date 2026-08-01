@@ -270,11 +270,12 @@ export function AdminView() {
           <div className="flex flex-wrap items-center gap-2 bg-coal/90 p-1.5 border border-grave w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
+              style={
                 activeTab === 'products'
-                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
-                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
-              }`}
+                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
+                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
+              }
+              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
             >
               <Package size={16} />
               <span>المنتجات ({products.length})</span>
@@ -282,11 +283,12 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
+              style={
                 activeTab === 'orders'
-                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
-                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
-              }`}
+                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
+                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
+              }
+              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
             >
               <ShoppingBag size={16} />
               <span>الطلبات ({orders.length})</span>
@@ -294,11 +296,12 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('hero')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
+              style={
                 activeTab === 'hero'
-                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
-                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
-              }`}
+                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
+                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
+              }
+              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
             >
               <ImageIcon size={16} />
               <span>السلايدر والعروض ({slides.length})</span>
@@ -393,11 +396,12 @@ export function AdminView() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border ${
+                  style={
                     selectedCategory === cat.id
-                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
-                      : 'bg-coal text-bone border-grave hover:text-gold hover:border-gold/50'
-                  }`}
+                      ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
+                      : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
+                  }
+                  className="px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border shadow-sm"
                 >
                   {cat.id === 'all' ? 'جميع المنتجات' : cat.id.toUpperCase()}
                 </button>
