@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useProducts } from '../context/ProductsContext';
 import { useOrders } from '../context/OrdersContext';
+import { useHeroBanners } from '../context/HeroBannersContext';
 import { useToast } from '../context/ToastContext';
 import { AdminProductModal } from '../components/AdminProductModal';
+import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { CATEGORIES } from '../data/products';
 import {
   Plus,
@@ -24,12 +26,16 @@ import {
   Lock,
   LogOut,
   KeyRound,
-  ShieldCheck
+  ShieldCheck,
+  Image as ImageIcon,
+  Sliders,
+  ExternalLink
 } from 'lucide-react';
 
 export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, deleteProduct, resetProducts } = useProducts();
   const { orders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
+  const { slides, addSlide, updateSlide, deleteSlide, resetSlides } = useHeroBanners();
   const { showToast } = useToast();
 
   // Admin PIN Authentication State (Passcode Gate)
@@ -39,14 +45,18 @@ export function AdminView() {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
 
-  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders'
+  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero'
 
   // Products Tab State
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [productSearchQuery, setProductSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+  // Hero Slides Tab State
+  const [isHeroModalOpen, setIsHeroModalOpen] = useState(false);
+  const [editingSlide, setEditingSlide] = useState(null);
 
   // Orders Tab State
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
@@ -69,7 +79,7 @@ export function AdminView() {
   const handleAdminLogout = () => {
     setIsAuthenticated(false);
     sessionStorage.removeItem('duat_admin_auth');
-    showToast('تم قفل لوحة التحكم وسيرة الخروج بنجاح', 'info');
+    showToast('تم قفل لوحة التحكم وتسجيل الخروج بنجاح', 'info');
   };
 
   // Filtered Products
@@ -109,14 +119,15 @@ export function AdminView() {
   const shippedOrdersCount = orders.filter((o) => o.status === 'shipped' || o.status === 'delivered').length;
   const totalRevenue = orders.reduce((acc, o) => acc + (o.total || 0), 0);
 
-  const handleOpenAddModal = () => {
+  // Product Modal Handlers
+  const handleOpenAddProductModal = () => {
     setEditingProduct(null);
-    setIsModalOpen(true);
+    setIsProductModalOpen(true);
   };
 
-  const handleOpenEditModal = (product) => {
+  const handleOpenEditProductModal = (product) => {
     setEditingProduct(product);
-    setIsModalOpen(true);
+    setIsProductModalOpen(true);
   };
 
   const handleSaveProduct = (productData) => {
@@ -129,7 +140,7 @@ export function AdminView() {
     }
   };
 
-  const handleDeleteConfirm = (id) => {
+  const handleDeleteProductConfirm = (id) => {
     deleteProduct(id);
     setDeleteConfirmId(null);
     showToast('تم حذف المنتج بنجاح!', 'warning');
@@ -139,6 +150,41 @@ export function AdminView() {
     if (window.confirm('هل أنت تأكد من إعادة ضبط قائمة المنتجات إلى المنتجات الافتراضية؟ سيتم إلغاء أي تعديلات محليّة.')) {
       resetProducts();
       showToast('تم استعادة المنتجات الافتراضية بنجاح!', 'info');
+    }
+  };
+
+  // Hero Slide Handlers
+  const handleOpenAddHeroModal = () => {
+    setEditingSlide(null);
+    setIsHeroModalOpen(true);
+  };
+
+  const handleOpenEditHeroModal = (slide) => {
+    setEditingSlide(slide);
+    setIsHeroModalOpen(true);
+  };
+
+  const handleSaveHeroSlide = (slideData) => {
+    if (editingSlide) {
+      updateSlide(editingSlide.id, slideData);
+      showToast('تم تحديث بنر العرض بنجاح!', 'success');
+    } else {
+      addSlide(slideData);
+      showToast('تمت إضافة البنر/العرض الجديد بنجاح!', 'success');
+    }
+  };
+
+  const handleDeleteHeroSlide = (id) => {
+    if (window.confirm('هل أنت تأكد من حذف هذا البنر من الشاشة الرئيسية؟')) {
+      deleteSlide(id);
+      showToast('تم حذف البنر بنجاح!', 'warning');
+    }
+  };
+
+  const handleResetHeroSlides = () => {
+    if (window.confirm('هل أنت تأكد من إعادة ضبط السلايدر الرئيسي إلى العروض الافتراضية؟')) {
+      resetSlides();
+      showToast('تم استعادة البنرات الافتراضية!', 'info');
     }
   };
 
@@ -215,19 +261,19 @@ export function AdminView() {
             </h1>
           </div>
           <p className="font-mono text-xs text-ash">
-            تحكم كامل بالمنتجات والصور، واستلام وتتبع طلبات العملاء وتعديل حالتها فوراً.
+            تحكم كامل بالمنتجات والصور، بنرات الشاشة الرئيسية، والعروض وتتبع الطلبات.
           </p>
         </div>
 
         {/* TABS SWITCHER & LOGOUT */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-stone p-1.5 border border-grave shrink-0">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-2 bg-coal/90 p-1.5 border border-grave w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
                 activeTab === 'products'
-                  ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
-                  : 'text-ash hover:text-bone'
+                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
+                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
               }`}
             >
               <Package size={16} />
@@ -236,20 +282,32 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
                 activeTab === 'orders'
-                  ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/20'
-                  : 'text-ash hover:text-bone'
+                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
+                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
               }`}
             >
               <ShoppingBag size={16} />
               <span>الطلبات ({orders.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('hero')}
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all ${
+                activeTab === 'hero'
+                  ? 'bg-gold text-[#0A0C16] shadow-lg shadow-gold/30 ring-1 ring-gold'
+                  : 'bg-stone/80 text-bone hover:text-gold hover:bg-stone border border-grave/60'
+              }`}
+            >
+              <ImageIcon size={16} />
+              <span>السلايدر والعروض ({slides.length})</span>
+            </button>
           </div>
 
           <button
             onClick={handleAdminLogout}
-            className="p-2.5 border border-grave bg-stone/50 hover:border-red-500/50 text-ash hover:text-red-400 transition-colors"
+            className="p-2.5 border border-grave bg-stone/80 hover:border-red-500/50 text-ash hover:text-red-400 transition-colors shrink-0"
             title="تسجيل الخروج وقفل التحكم"
           >
             <LogOut size={16} />
@@ -275,7 +333,7 @@ export function AdminView() {
               </button>
 
               <button
-                onClick={handleOpenAddModal}
+                onClick={handleOpenAddProductModal}
                 className="flex items-center gap-2 px-5 py-2 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
               >
                 <Plus size={18} />
@@ -335,10 +393,10 @@ export function AdminView() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-1.5 font-mono text-xs uppercase transition-colors whitespace-nowrap ${
+                  className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border ${
                     selectedCategory === cat.id
-                      ? 'bg-gold text-[#050505] font-bold shadow-md shadow-gold/10'
-                      : 'bg-stone/50 text-ash hover:text-bone hover:bg-stone'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                      : 'bg-coal text-bone border-grave hover:text-gold hover:border-gold/50'
                   }`}
                 >
                   {cat.id === 'all' ? 'جميع المنتجات' : cat.id.toUpperCase()}
@@ -439,11 +497,10 @@ export function AdminView() {
                             </span>
                           </td>
 
-                          {/* HIGH VISIBILITY EDIT & RED DELETE BUTTONS */}
                           <td className="py-4 px-4 text-left">
                             <div className="flex items-center justify-end gap-2">
                               <button
-                                onClick={() => handleOpenEditModal(product)}
+                                onClick={() => handleOpenEditProductModal(product)}
                                 className="flex items-center gap-1 px-3 py-1.5 border border-grave bg-stone/50 hover:border-gold hover:text-gold text-ash transition-colors font-mono text-xs"
                               >
                                 <Edit2 size={14} />
@@ -453,7 +510,7 @@ export function AdminView() {
                               {deleteConfirmId === product.id ? (
                                 <div className="flex items-center gap-1">
                                   <button
-                                    onClick={() => handleDeleteConfirm(product.id)}
+                                    onClick={() => handleDeleteProductConfirm(product.id)}
                                     className="px-3 py-1.5 bg-red-600 text-white font-mono text-xs font-bold hover:bg-red-700 transition-colors shadow"
                                   >
                                     تأكيد الحذف!
@@ -632,7 +689,6 @@ export function AdminView() {
                   <tbody className="divide-y divide-grave font-sans text-sm">
                     {filteredOrders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-stone/30 transition-colors">
-                        {/* ORDER CODE & DATE */}
                         <td className="py-4 px-4">
                           <div className="font-mono text-base font-bold text-gold tracking-widest">{ord.id}</div>
                           <p className="font-mono text-xs text-ash mt-0.5">
@@ -640,7 +696,6 @@ export function AdminView() {
                           </p>
                         </td>
 
-                        {/* CUSTOMER INFO */}
                         <td className="py-4 px-4">
                           <div className="font-bold text-bone">{ord.customer?.fullName || 'عميل DUAT'}</div>
                           <div className="font-mono text-xs text-ash flex items-center gap-1.5 mt-0.5">
@@ -649,7 +704,6 @@ export function AdminView() {
                           </div>
                         </td>
 
-                        {/* TOTAL & PAYMENT */}
                         <td className="py-4 px-4">
                           <div className="font-mono font-bold text-bone">
                             {ord.total} <span className="text-xs text-gold">ج.م</span>
@@ -659,7 +713,6 @@ export function AdminView() {
                           </span>
                         </td>
 
-                        {/* LIVE STATUS DROPDOWN SELECTOR */}
                         <td className="py-4 px-4">
                           <select
                             value={ord.status}
@@ -673,7 +726,6 @@ export function AdminView() {
                           </select>
                         </td>
 
-                        {/* ACTIONS */}
                         <td className="py-4 px-4 text-left">
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -707,12 +759,125 @@ export function AdminView() {
         </div>
       )}
 
+      {/* ============================================================ */}
+      {/* TAB 3: HERO SLIDER & OFFERS MANAGEMENT */}
+      {/* ============================================================ */}
+      {activeTab === 'hero' && (
+        <div className="space-y-8 animate-fade-in">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="font-clash text-xl font-bold text-bone">إدارة بنرات العروض وسلايدر الصفحة الرئيسية</h2>
+              <p className="font-mono text-xs text-ash mt-1">
+                يمكنك تغيير الصورة خلف البنر، العناوين، شارات العروض (مثل خصم ٣٠٪)، وأزرار وروابط التنقل.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleResetHeroSlides}
+                className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
+              >
+                <RotateCcw size={15} />
+                <span>إعادة ضبط البنرات</span>
+              </button>
+
+              <button
+                onClick={handleOpenAddHeroModal}
+                className="flex items-center gap-2 px-5 py-2 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
+              >
+                <Plus size={18} />
+                <span>إضافة بنر / عرض جديد</span>
+              </button>
+            </div>
+          </div>
+
+          {/* SLIDES GRID DISPLAY */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {slides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className="bg-stone border border-grave overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between"
+              >
+                {/* Slide Image / Visual Preview Box */}
+                <div className="h-48 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-4">
+                  {slide.imageUrl ? (
+                    <img src={slide.imageUrl} alt="Banner" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center space-y-2 text-ash">
+                      <ImageIcon size={36} className="mx-auto text-gold/40" />
+                      <span className="font-mono text-xs block">خلفية زاد النقوش الفرعونية الافتراضية</span>
+                    </div>
+                  )}
+
+                  <div className="absolute top-3 right-3 bg-void/80 backdrop-blur border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
+                    بنر #{index + 1}
+                  </div>
+
+                  {slide.badgeAr && (
+                    <div className="absolute top-3 left-3 bg-red-600/90 text-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider">
+                      {slide.badgeAr}
+                    </div>
+                  )}
+                </div>
+
+                {/* Slide Details Content */}
+                <div className="p-6 space-y-4 flex-1">
+                  <span className="font-mono text-xs text-gold uppercase tracking-widest block font-bold">
+                    {slide.eyebrowAr || slide.eyebrowEn}
+                  </span>
+
+                  <h3 className="font-clash text-2xl font-bold text-bone leading-snug">
+                    {slide.headline1Ar} <span className="text-gold">{slide.headline2Ar}</span>
+                  </h3>
+
+                  <p className="font-space text-xs text-ash leading-relaxed line-clamp-2">
+                    {slide.subAr || slide.subEn}
+                  </p>
+
+                  <div className="pt-2 border-t border-grave/60 flex items-center justify-between font-mono text-xs text-ash">
+                    <span>الزر الأول: <strong className="text-bone">{slide.ctaPrimaryTextAr}</strong> ({slide.ctaPrimaryLink})</span>
+                  </div>
+                </div>
+
+                {/* Card Action Buttons */}
+                <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => handleOpenEditHeroModal(slide)}
+                    className="flex items-center gap-1.5 px-4 py-2 border border-grave bg-stone/80 hover:border-gold hover:text-gold text-bone font-mono text-xs font-bold transition-colors"
+                  >
+                    <Edit2 size={14} />
+                    <span>تعديل البنر</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteHeroSlide(slide.id)}
+                    className="flex items-center gap-1.5 px-3 py-2 border border-red-500/40 text-red-500 hover:bg-red-500/10 font-mono text-xs font-bold transition-colors"
+                    title="حذف البنر"
+                  >
+                    <Trash2 size={14} />
+                    <span>حذف</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ADMIN PRODUCT MODAL */}
       <AdminProductModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
         onSave={handleSaveProduct}
         productToEdit={editingProduct}
+      />
+
+      {/* ADMIN HERO SLIDE MODAL */}
+      <AdminHeroSlideModal
+        isOpen={isHeroModalOpen}
+        onClose={() => setIsHeroModalOpen(false)}
+        onSave={handleSaveHeroSlide}
+        slideToEdit={editingSlide}
       />
 
       {/* ORDER DETAILS MODAL */}
@@ -732,7 +897,6 @@ export function AdminView() {
               </button>
             </div>
 
-            {/* CUSTOMER INFO SUMMARY */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-stone/40 border border-grave p-4 font-mono text-xs space-y-1">
               <div>
                 <span className="text-ash block">اسم العميل:</span>
@@ -750,7 +914,6 @@ export function AdminView() {
               </div>
             </div>
 
-            {/* ORDERED ITEMS LIST */}
             <div className="space-y-3">
               <h4 className="font-mono text-xs text-gold uppercase tracking-wider">المنتجات المطلوبة</h4>
               <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-48 overflow-y-auto">
@@ -768,7 +931,6 @@ export function AdminView() {
               </div>
             </div>
 
-            {/* TOTAL & STATUS UPDATE */}
             <div className="flex items-center justify-between border-t border-grave pt-4">
               <div>
                 <span className="font-mono text-xs text-ash">إجمالي المطلوب:</span>

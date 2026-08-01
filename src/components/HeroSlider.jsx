@@ -1,250 +1,195 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
+import { useHeroBanners } from '../context/HeroBannersContext';
 import { SunDisc } from './SunDisc';
 import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, ShieldCheck, Truck, Clock } from 'lucide-react';
 
-export const HERO_SLIDES = [
-  {
-    id: 'slide-1',
-    eyebrowEn: 'DUAT / PASSAGE COLLECTION',
-    eyebrowAr: 'دوات / تشكيلة العبور',
-    titleEn: 'THROUGH THE NIGHT \nBORN AT DAWN.',
-    titleAr: 'عَبْرَ اللَّيْلِ \nيُولَدُ مَعَ الفَجْرِ.',
-    subEn: 'Objects for the night crossing. Precision optical acrylic cases, 3D epoxy slogan pills, and gold passage charms. Crafted in Egypt.',
-    subAr: 'معدات فاخرة للعبور التكتيكي. جراب أكريليك بصري عالي الدقة، ملصقات إيبوكسي مجسمة، وتواشيح نحاسية مطلية بالذهب.',
-    ctaTextEn: 'SHOP NOW',
-    ctaTextAr: 'تسوق الآن',
-    ctaLink: '/shop',
-    secondaryCtaEn: 'BUILD YOUR CASE',
-    secondaryCtaAr: 'صمّم جرابك',
-    secondaryCtaLink: '/customize',
-    image: '/images/transparent_hero_case.png',
-    badgeEn: 'C.2026 • EGYPT',
-    badgeAr: 'اصدار ٢٠٢٦ • مصر'
-  },
-  {
-    id: 'slide-2',
-    eyebrowEn: 'DUAT / THE FORGE',
-    eyebrowAr: 'دوات / المشغل التكتيكي',
-    titleEn: 'CRAFT YOUR OWN \nCUSTOM ARMOR.',
-    titleAr: 'صَمِّمْ دِرْعَكَ \nالتَّكْتِيكِيَّ الخَاصَّ.',
-    subEn: 'Interactive 3D dome builder. Select phone model, armor finish, raised slogan pills, Arabic motifs, and custom engravings.',
-    subAr: 'أداة التصميم المجسمة ثلاثية الأبعاد. اختر موديل موبايلك، إنهاء الدرع، ملصقات الإيبوكسي والخطوط العربية.',
-    ctaTextEn: 'START BUILDING',
-    ctaTextAr: 'ابنِ جرابك الآن',
-    ctaLink: '/customize',
-    secondaryCtaEn: 'VIEW GALLERY',
-    secondaryCtaAr: 'معرض الأقسام',
-    secondaryCtaLink: '/shop',
-    image: '/images/stickers.png',
-    badgeEn: '3D DOME BUILDER',
-    badgeAr: 'أداة الإيبوكسي المجسمة'
-  },
-  {
-    id: 'slide-3',
-    eyebrowEn: 'DUAT / GOLD RING ARMOR',
-    eyebrowAr: 'دوات / درع حلقة الذهب',
-    titleEn: '18K GOLD BEZEL \nMAGSAFE DAWN.',
-    titleAr: 'إِطَارُ الدَّهَبِ عِيَار ١٨ \nمَاكُ سِيف الفَجْرِ.',
-    subEn: 'High-density stealth black armor with 18k anodized dawn-gold camera ring and N52 neodymium alignment magnets.',
-    subAr: 'درع أسود عالي الكثافة مع حلقة كاميرا مؤكسدة بذهب الفجر عيار ١٨ ومغناطيس N52 الفائق.',
-    ctaTextEn: 'EXPLORE CASES',
-    ctaTextAr: 'استكشف الجرابات',
-    ctaLink: '/shop',
-    secondaryCtaEn: 'CUSTOMIZE',
-    secondaryCtaAr: 'صمّم الآن',
-    secondaryCtaLink: '/customize',
-    image: '/images/charms.png',
-    badgeEn: 'STEALTH & GOLD',
-    badgeAr: 'أسود مطفي وذهب'
-  }
-];
+export const HeroSlider = ({ setSelectedCategory }) => {
+  const { lang, t } = useLanguage();
+  const { slides } = useHeroBanners();
+  const navigate = useNavigate();
+  
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-export const HeroSlider = () => {
-  const { lang } = useLanguage();
-  const { theme } = useTheme();
-  const isDawn = theme === 'dawn';
+  const activeSlides = Array.isArray(slides) && slides.length > 0 ? slides : [];
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
-  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
-  const navigate = useNavigate();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
+  // Auto-advance slide every 6 seconds
   useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 5500);
-    return () => clearInterval(timer);
-  }, [isPaused]);
+    if (isPaused || activeSlides.length <= 1) return;
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
-  };
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
+    }, 6000);
+
+    return () => clearInterval(timer);
+  }, [isPaused, activeSlides.length]);
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    if (activeSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
   };
 
-  const currentSlide = HERO_SLIDES[currentIndex];
+  const handlePrev = () => {
+    if (activeSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
+  };
 
-  const scrimBg = isDawn
-    ? isRtl
-      ? 'linear-gradient(to top left, rgba(250, 246, 240, 0.94) 0%, rgba(250, 246, 240, 0.65) 50%, rgba(250, 246, 240, 0.1) 85%)'
-      : 'linear-gradient(to top right, rgba(250, 246, 240, 0.94) 0%, rgba(250, 246, 240, 0.65) 50%, rgba(250, 246, 240, 0.1) 85%)'
-    : isRtl
-      ? 'linear-gradient(to top left, rgba(10, 12, 22, 0.88) 0%, rgba(10, 12, 22, 0.5) 50%, rgba(10, 12, 22, 0.15) 85%)'
-      : 'linear-gradient(to top right, rgba(10, 12, 22, 0.88) 0%, rgba(10, 12, 22, 0.5) 50%, rgba(10, 12, 22, 0.15) 85%)';
+  if (activeSlides.length === 0) return null;
+
+  const current = activeSlides[currentSlide] || activeSlides[0];
+
+  const eyebrow = isAr ? current.eyebrowAr || current.eyebrowEn : current.eyebrowEn || current.eyebrowAr;
+  const headline1 = isAr ? current.headline1Ar || current.headline1En : current.headline1En || current.headline1Ar;
+  const headline2 = isAr ? current.headline2Ar || current.headline2En : current.headline2En || current.headline2Ar;
+  const sub = isAr ? current.subAr || current.subEn : current.subEn || current.subAr;
+  const badge = isAr ? current.badgeAr || current.badgeEn : current.badgeEn || current.badgeAr;
+
+  const primaryBtnText = (isAr ? current.ctaPrimaryTextAr : current.ctaPrimaryTextEn) || (isAr ? 'تسوق الآن' : 'START BUILDING');
+  const primaryBtnLink = current.ctaPrimaryLink || '/customize';
+
+  const secondaryBtnText = (isAr ? current.ctaSecondaryTextAr : current.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
+  const secondaryBtnLink = current.ctaSecondaryLink || '/shop';
+
+  const bgImage = current.imageUrl || current.image;
 
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className={`relative w-full min-h-[82vh] lg:min-h-[88vh] ${isDawn ? 'bg-[#FAF6F0] text-[#0A0C16]' : 'bg-[#0A0C16] text-[#EDE4D3]'} overflow-hidden flex flex-col justify-between border-b border-grave`}
+      className="relative w-full bg-void border-b border-grave overflow-hidden min-h-[560px] sm:min-h-[640px] flex items-center justify-center font-sans"
     >
-      {/* BACKGROUND SLIDE IMAGES STACK (FULL BLEED COVER) */}
-      <div className="absolute inset-0 z-0">
-        {HERO_SLIDES.map((slide, idx) => {
-          const isActive = idx === currentIndex;
-          return (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-              }`}
-            >
-              {/* Background Image / Texture */}
-              <div className={`absolute inset-0 ${isDawn ? 'bg-[#FAF6F0]' : 'bg-[#0A0C16]'}`}>
-                <img
-                  src={slide.image}
-                  alt={isAr ? slide.titleAr : slide.titleEn}
-                  className="w-full h-full object-cover object-center scale-105 transition-transform duration-10000 ease-linear"
-                />
-              </div>
+      {/* Background Graphic or Uploaded Image Layer */}
+      {bgImage ? (
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            src={bgImage}
+            alt="Hero Background"
+            className="w-full h-full object-cover object-center animate-pulse-subtle scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone via-void/80 to-void/50 backdrop-blur-[2px]" />
+        </div>
+      ) : (
+        /* Fallback Egyptian Ancient Texture Pattern */
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#E0A93B_1px,transparent_1px)] [background-size:24px_24px]" />
+      )}
 
-              {/* HEAVY GRADIENT SCRIM OVERLAY (Theme-aware legibility scrim) */}
-              <div
-                className="absolute inset-0 z-10 pointer-events-none"
-                style={{ background: scrimBg }}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* AMBIENT GLOW OVERLAY */}
-      <div className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] ${isDawn ? 'bg-[#C97B22]/[0.08]' : 'bg-[#E8A33D]/[0.1]'} rounded-full blur-[140px] pointer-events-none z-10`} />
-
-      {/* MAIN SLIDE CONTENT OVERLAY */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full flex-1 flex flex-col justify-center py-16 sm:py-24">
-        <div className="max-w-2xl space-y-6 sm:space-y-8 animate-in fade-in duration-700">
+      {/* Main Content Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10 w-full">
+        <div className="max-w-3xl space-y-6 animate-fade-in" key={current.id}>
           
-          {/* Eyebrow */}
-          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold">
-            <SunDisc size={18} variant="gold" />
-            <span>{isAr ? currentSlide.eyebrowAr : currentSlide.eyebrowEn}</span>
-          </div>
+          {/* Eyebrow & Offer Badge */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/10 px-3 py-1 border border-gold/30">
+              <SunDisc size={14} variant="gold" />
+              <span>{eyebrow}</span>
+            </div>
 
-          {/* Headline */}
-          <h1 className={`font-clash text-4xl sm:text-6xl lg:text-[76px] uppercase ${isDawn ? 'text-[#0A0C16]' : 'text-[#EDE4D3]'} leading-[1.05] drop-shadow-xl tracking-tight font-bold whitespace-pre-line`}>
-            {isAr ? currentSlide.titleAr : currentSlide.titleEn}
-          </h1>
-
-          {/* Subcopy */}
-          <p className={`font-space text-base sm:text-xl ${isDawn ? 'text-[#0A0C16]/90' : 'text-[#EDE4D3]/90'} font-medium leading-relaxed max-w-xl drop-shadow-sm`}>
-            {isAr ? currentSlide.subAr : currentSlide.subEn}
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
-            <button
-              onClick={() => navigate(currentSlide.ctaLink)}
-              className="btn-primary group text-xs sm:text-sm py-4 px-8 flex items-center justify-center gap-3 shadow-[0_4px_30px_rgba(232,163,61,0.3)] min-h-[48px]"
-            >
-              <ShoppingBag size={18} />
-              <span>{isAr ? currentSlide.ctaTextAr : currentSlide.ctaTextEn}</span>
-              <ArrowIcon size={18} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            {currentSlide.secondaryCtaLink && (
-              <button
-                onClick={() => navigate(currentSlide.secondaryCtaLink)}
-                className="btn-ghost text-xs sm:text-sm py-4 px-8 flex items-center justify-center gap-3 border-gold/50 text-gold hover:bg-gold hover:text-void min-h-[48px]"
-              >
-                <Sparkles size={18} />
-                <span>{isAr ? currentSlide.secondaryCtaAr : currentSlide.secondaryCtaEn}</span>
-              </button>
+            {badge && (
+              <span className="font-mono text-xs uppercase tracking-widest text-red-400 bg-red-600/20 border border-red-500/40 px-3 py-1 font-bold animate-pulse">
+                {badge}
+              </span>
             )}
           </div>
 
-        </div>
-      </div>
-
-      {/* BOTTOM CONTROLS & TRUST BAR */}
-      <div className={`relative z-20 w-full border-t border-grave/60 ${isDawn ? 'bg-[#E5DFC5]/90 text-[#0A0C16]' : 'bg-[#0A0C16]/80 text-[#EDE4D3]'} backdrop-blur-md`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          
-          {/* Trust Signals Row */}
-          <div className="grid grid-cols-3 gap-4 font-mono text-[10px] sm:text-xs text-ash uppercase font-medium">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-gold flex-shrink-0" />
-              <span>{isAr ? 'ضمان لمدة سنة' : '1-Year Warranty'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Truck size={16} className="text-gold flex-shrink-0" />
-              <span>{isAr ? 'شحن لكافة المحافظات' : 'Fast Shipping'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-gold flex-shrink-0" />
-              <span>{isAr ? 'صنع في مصر' : 'Made In Egypt'}</span>
-            </div>
+          {/* Headlines */}
+          <div className="space-y-1">
+            <h1 className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase text-bone tracking-tight font-bold leading-none">
+              {headline1}
+            </h1>
+            {headline2 && (
+              <h2 className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase text-gold tracking-tight font-bold leading-none">
+                {headline2}
+              </h2>
+            )}
           </div>
 
-          {/* Slide Navigation Controls: Manual Dots + Arrow Buttons */}
-          <div className="flex items-center gap-4">
-            {/* Dots */}
-            <div className="flex items-center gap-2">
-              {HERO_SLIDES.map((slide, idx) => (
-                <button
-                  key={slide.id}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx === currentIndex ? 'w-8 bg-gold' : 'w-2 bg-grave hover:bg-ash'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
+          {/* Subtitle / Description */}
+          <p className="font-space text-sm sm:text-base text-ash font-light max-w-2xl leading-relaxed">
+            {sub}
+          </p>
 
-            {/* Arrows */}
-            <div className="flex items-center gap-1.5 border-l border-grave pl-3">
-              <button
-                onClick={handlePrev}
-                className="p-2 border border-grave text-bone hover:border-gold hover:text-gold transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center bg-stone"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-2 border border-grave text-bone hover:border-gold hover:text-gold transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center bg-stone"
-                aria-label="Next slide"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider">
+            {/* Primary Action Button */}
+            <button
+              onClick={() => navigate(primaryBtnLink)}
+              className="py-4 px-8 bg-gold text-[#050505] hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm"
+            >
+              <ShoppingBag size={18} />
+              <span>{primaryBtnText}</span>
+              {isRtl ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+            </button>
+
+            {/* Secondary Action Button */}
+            <button
+              onClick={() => navigate(secondaryBtnLink)}
+              className="py-4 px-8 border border-grave bg-coal/70 hover:border-gold hover:text-gold text-bone transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+            >
+              <Sparkles size={16} />
+              <span>{secondaryBtnText}</span>
+            </button>
           </div>
 
         </div>
       </div>
 
+      {/* Manual Slide Controls & Dots Bar (Bottom) */}
+      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-4 bg-stone/90 border border-grave px-4 py-2 backdrop-blur">
+        {/* Slide Counter / Indicators */}
+        <div className="flex items-center gap-1.5 font-mono text-xs text-ash">
+          {activeSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`h-1.5 transition-all rounded-full ${
+                currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-grave hover:bg-ash'
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Prev / Next Arrows */}
+        {activeSlides.length > 1 && (
+          <div className="flex items-center gap-1 border-l border-grave pl-3 pr-1">
+            <button
+              onClick={handlePrev}
+              className="p-1.5 text-ash hover:text-gold transition-colors"
+              title="السلايد السابق"
+            >
+              <ChevronRight size={18} />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-1.5 text-ash hover:text-gold transition-colors"
+              title="السلايد التالي"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Micro Trust Bar Overlay */}
+      <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/60 border-t border-r border-grave font-mono text-[11px] text-ash">
+        <span className="flex items-center gap-1.5">
+          <ShieldCheck size={14} className="text-gold" />
+          <span>ضمان سنة استبدال</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Truck size={14} className="text-gold" />
+          <span>شحن لكافة المحافظات</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Clock size={14} className="text-gold" />
+          <span>تقفيل مصري فاخر</span>
+        </span>
+      </div>
     </section>
   );
 };
-
-export default HeroSlider;
