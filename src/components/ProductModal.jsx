@@ -85,11 +85,11 @@ export const ProductModal = ({ product, onClose }) => {
                 <span className="font-mono text-xs text-ash tracking-widest uppercase block">
                   DUAT / {product.category.toUpperCase()}
                 </span>
-                {product.rating && (
+                {Array.isArray(product.reviews) && product.reviews.length > 0 && (
                   <div className="flex items-center gap-1 font-mono text-xs text-gold font-bold">
                     <Star size={13} className="fill-gold text-gold" />
-                    <span>{product.rating}</span>
-                    <span className="text-ash font-normal">({product.reviewCount || 12})</span>
+                    <span>{product.rating || 5.0}</span>
+                    <span className="text-ash font-normal">({product.reviews.length})</span>
                   </div>
                 )}
               </div>

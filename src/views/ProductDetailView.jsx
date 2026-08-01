@@ -187,15 +187,17 @@ export function ProductDetailView() {
             </h1>
 
             {/* Rating Stars */}
-            <div className="flex items-center gap-2 font-mono text-xs text-gold pt-1">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-gold text-gold" />
-                ))}
+            {Array.isArray(product.reviews) && product.reviews.length > 0 && (
+              <div className="flex items-center gap-2 font-mono text-xs text-gold pt-1">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} className="fill-gold text-gold" />
+                  ))}
+                </div>
+                <span className="font-bold text-bone">{product.rating || 5.0}</span>
+                <span className="text-ash font-normal">({product.reviews.length} {isAr ? 'تقييم' : 'reviews'})</span>
               </div>
-              <span className="font-bold text-bone">{product.rating || 5.0}</span>
-              <span className="text-ash font-normal">({product.reviewCount || 12} {isAr ? 'تقييم' : 'reviews'})</span>
-            </div>
+            )}
           </div>
 
           {/* Price Block */}
@@ -345,56 +347,55 @@ export function ProductDetailView() {
         </div>
       </div>
 
-      {/* 3. CUSTOMER REVIEWS SECTION */}
-      <div className="border-t border-grave pt-16 space-y-10">
-        <div className="text-center space-y-3">
-          <span className="font-mono text-xs text-gold uppercase tracking-widest font-bold">CUSTOMER REVIEWS</span>
-          <h2 className="font-clash text-3xl uppercase text-bone font-bold">
-            {isAr ? 'آراء وتقييمات العملاء' : 'Let customers speak for us'}
-          </h2>
-        </div>
-
-        {/* Rating Summary Bar */}
-        <div className="bg-stone border border-grave p-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
-          <div className="text-center sm:text-right space-y-1">
-            <div className="font-clash text-5xl font-bold text-bone">5.0</div>
-            <div className="flex items-center justify-center sm:justify-start text-gold">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={18} className="fill-gold text-gold" />
-              ))}
-            </div>
-            <p className="font-mono text-xs text-ash">بناءً على {product.reviews?.length || 15} تقييم حقيقي</p>
+      {/* 3. CUSTOMER REVIEWS SECTION — HIDE IF EMPTY */}
+      {Array.isArray(product.reviews) && product.reviews.length > 0 && (
+        <div className="border-t border-grave pt-16 space-y-10">
+          <div className="text-center space-y-3">
+            <span className="font-mono text-xs text-gold uppercase tracking-widest font-bold">CUSTOMER REVIEWS</span>
+            <h2 className="font-clash text-3xl uppercase text-bone font-bold">
+              {isAr ? 'آراء وتقييمات العملاء' : 'Let customers speak for us'}
+            </h2>
           </div>
 
-          <button
-            onClick={() => showToast('شكراً لتعبيرك عن رأيك! تم تفعيل التقييم.', 'info')}
-            className="px-6 py-3 bg-coal border border-grave text-bone hover:border-gold hover:text-gold font-mono text-xs uppercase tracking-wider transition-colors"
-          >
-            {isAr ? 'كتابة تقييم جديد' : 'Write a review'}
-          </button>
-        </div>
-
-        {/* Customer Reviews List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {(product.reviews || [
-            { name: 'كريم أحمد', rating: 5, date: '2026-07-28', commentAr: 'التقفيل خيالي والخامة ممتازة جداً، التوصيل وصل في يومين.' },
-            { name: 'سارة محمود', rating: 5, date: '2026-07-25', commentAr: 'جراب أوريجينال وفخم جداً، الإيبوكسي 3D شكله عظمة في الحقيقة.' }
-          ]).map((rev, idx) => (
-            <div key={idx} className="bg-stone border border-grave p-6 space-y-3 font-sans">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-bone text-sm">{rev.name}</span>
-                <span className="font-mono text-xs text-ash">{rev.date}</span>
-              </div>
-              <div className="flex items-center text-gold">
-                {[...Array(rev.rating || 5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-gold text-gold" />
+          {/* Rating Summary Bar */}
+          <div className="bg-stone border border-grave p-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
+            <div className="text-center sm:text-right space-y-1">
+              <div className="font-clash text-5xl font-bold text-bone">5.0</div>
+              <div className="flex items-center justify-center sm:justify-start text-gold">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={18} className="fill-gold text-gold" />
                 ))}
               </div>
-              <p className="text-sm text-ash leading-relaxed">{rev.commentAr || rev.commentEn}</p>
+              <p className="font-mono text-xs text-ash">بناءً على {product.reviews.length} تقييم حقيقي</p>
             </div>
-          ))}
+
+            <button
+              onClick={() => showToast('شكراً لتعبيرك عن رأيك! تم تفعيل التقييم.', 'info')}
+              className="px-6 py-3 bg-coal border border-grave text-bone hover:border-gold hover:text-gold font-mono text-xs uppercase tracking-wider transition-colors"
+            >
+              {isAr ? 'كتابة تقييم جديد' : 'Write a review'}
+            </button>
+          </div>
+
+          {/* Customer Reviews List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {product.reviews.map((rev, idx) => (
+              <div key={idx} className="bg-stone border border-grave p-6 space-y-3 font-sans">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-bone text-sm">{rev.name}</span>
+                  <span className="font-mono text-xs text-ash">{rev.date}</span>
+                </div>
+                <div className="flex items-center text-gold">
+                  {[...Array(rev.rating || 5)].map((_, i) => (
+                    <Star key={i} size={14} className="fill-gold text-gold" />
+                  ))}
+                </div>
+                <p className="text-sm text-ash leading-relaxed">{rev.commentAr || rev.commentEn}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 4. YOU MAY ALSO LIKE GRID */}
       {relatedProducts.length > 0 && (

@@ -7,7 +7,6 @@ export const CATEGORIES = [
 ];
 
 export const PRODUCTS = [
-  // 8 DISTINCT CASE FINISHES
   {
     id: 'case-solar',
     category: 'cases',
@@ -23,12 +22,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Optical Grade Acrylic + TPU', 'Finish: Anti-Yellowing Clear', 'Weight: 42g', 'Domes: 3D Polyurethane Epoxy'],
     specsAr: ['المادة: أكريليك بصري + TPU', 'النهاية: شفاف مقاوم للاصفرار', 'الوزن: ٤٢ جرام', 'الملصقات: إيبوكسي مجسم ثلاثي الأبعاد'],
     caseTypeId: 'clear',
-    rating: 4.9,
-    reviewCount: 34,
-    reviews: [
-      { name: 'Kareem A.', rating: 5, date: '2026-07-20', commentEn: 'The 3D epoxy domes feel incredible in hand. Real craftsmanship.', commentAr: 'ملصقات الإيبوكسي المجسمة ملمسها رائع جداً ومتقنة.' },
-      { name: 'Youssef M.', rating: 5, date: '2026-07-15', commentEn: 'Cleanest clear case in Egypt. No yellowing after weeks.', commentAr: 'أنظف جراب شفاف في مصر، لم يتغير لونه أبداً.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-gold-ring',
@@ -45,12 +40,8 @@ export const PRODUCTS = [
     specsEn: ['Material: High-Density Polycarbonate', 'Bezel: 18k Gold Anodized Alloy', 'Weight: 44g', 'Magnets: N52 Neodymium Array'],
     specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'الإطار: سبيكة مؤكسدة بذهب ١٨', 'الوزن: ٤٤ جرام', 'المغناطيس: مصفوفة نيويميوم N52'],
     caseTypeId: 'gold-ring',
-    rating: 4.9,
-    reviewCount: 42,
-    reviews: [
-      { name: 'Nour E.', rating: 5, date: '2026-07-22', commentEn: 'The gold ring alignment magnet is super strong with my MagSafe charger.', commentAr: 'حلقة المغناطيس الذهبية قوية جداً وثابتة مع شاحن ماج سيف.' },
-      { name: 'Ahmed S.', rating: 5, date: '2026-07-18', commentEn: 'Premium luxury finish. Worth every EGP.', commentAr: 'فخامة غير طبيعية في الملمس والتقفيل.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-ember',
@@ -67,11 +58,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Matte Translucent Composite', 'Finish: Soft-Touch Frosted', 'Weight: 40g', 'Drop Protection: 3 Meters'],
     specsAr: ['المادة: مركب مطفي شبه شفاف', 'النهاية: ملمس ناعم ضبابي', 'الوزن: ٤٠ جرام', 'حماية السقوط: ٣ أمتار'],
     caseTypeId: 'frosted-ember',
-    rating: 4.9,
-    reviewCount: 28,
-    reviews: [
-      { name: 'Salma K.', rating: 5, date: '2026-07-21', commentEn: 'The deep burgundy shade in sunlight is unbelievable.', commentAr: 'اللون النبيذي الدافئ في الشمس في غاية الروعة.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-void',
@@ -88,11 +76,8 @@ export const PRODUCTS = [
     specsEn: ['Material: High-Density Polycarbonate', 'Finish: Ultra-Matte Shockproof', 'Weight: 38g', 'Warranty: 1 Year Replacement'],
     specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'النهاية: مطفي مضاد للصدمات', 'الوزن: ٣٨ جرام', 'الضمان: سنة استبدال كامل'],
     caseTypeId: 'matte-black',
-    rating: 4.9,
-    reviewCount: 56,
-    reviews: [
-      { name: 'Omar F.', rating: 5, date: '2026-07-25', commentEn: 'Minimal, sleek, no fingerprints. Best stealth case.', commentAr: 'بسيط وأنيق ولا يترك أي بصمات.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-frost',
@@ -109,11 +94,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Frosted Polycarbonate + TPU', 'Finish: Satin Touch Frosted', 'Weight: 39g', 'Protection: Air-Cushion Corners'],
     specsAr: ['المادة: بوليكاربونات ضبابي + TPU', 'النهاية: ملمس حريري ضبابي', 'الوزن: ٣٩ جرام', 'الحماية: حواف وسائد هوائية'],
     caseTypeId: 'frost',
-    rating: 4.8,
-    reviewCount: 22,
-    reviews: [
-      { name: 'Haya T.', rating: 5, date: '2026-07-19', commentEn: 'Looks so clean on a white iPhone.', commentAr: 'شيك جداً ومميز على الموبايل.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-tide',
@@ -130,11 +112,8 @@ export const PRODUCTS = [
     specsEn: ['Material: High-Density Composite', 'Finish: Midnight Maritime Matte', 'Weight: 41g', 'Drop Rating: 3 Meters'],
     specsAr: ['المادة: مركب عالي الكثافة', 'النهاية: أزرق مطفي داكن', 'الوزن: ٤١ جرام', 'حماية السقوط: ٣ أمتار'],
     caseTypeId: 'tide',
-    rating: 4.9,
-    reviewCount: 17,
-    reviews: [
-      { name: 'Tarek B.', rating: 5, date: '2026-07-23', commentEn: 'Deep navy color is stunning. Quality feels top notch.', commentAr: 'درجة الأزرق خرافية والخامة ممتازة.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-sage',
@@ -151,11 +130,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Soft-Touch Polymer', 'Finish: Egyptian Sage Satin', 'Weight: 40g', 'Drop Protection: 3 Meters'],
     specsAr: ['المادة: بوليمر ناعم الملمس', 'النهاية: أخضر مرامي حريري', 'الوزن: ٤٠ جرام', 'حماية السقوط: ٣ أمتار'],
     caseTypeId: 'sage',
-    rating: 4.9,
-    reviewCount: 25,
-    reviews: [
-      { name: 'Dina H.', rating: 5, date: '2026-07-24', commentEn: 'The muted sage color is so elegant. Highly recommend!', commentAr: 'درجة الأخضر راقية وجذابة جداً.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-bone',
@@ -172,11 +148,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Dense Polymer Composite', 'Finish: Warm Cream Satin', 'Weight: 42g', 'Screen Lip: 1.5mm Protection'],
     specsAr: ['المادة: مركب بوليمر كثيف', 'النهاية: عاجي حريري دافئ', 'الوزن: ٤٢ جرام', 'بروز الشاشة: ١٫٥ مم للحماية'],
     caseTypeId: 'bone',
-    rating: 4.9,
-    reviewCount: 31,
-    reviews: [
-      { name: 'Mostafa Z.', rating: 5, date: '2026-07-26', commentEn: 'Refined warm cream color. Looks like an art piece.', commentAr: 'لون العاج مع التفاصيل الذهبية تحفة فنية.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'case-carbon',
@@ -193,11 +166,8 @@ export const PRODUCTS = [
     specsEn: ['Material: Real Carbon Fiber Weave', 'Finish: Matte Textured Weave', 'Weight: 36g', 'Drop Rating: 3.5 Meters'],
     specsAr: ['المادة: ألياف كربون حقيقية', 'النهاية: نسيج مطفي ملموس', 'الوزن: ٣٦ جرام', 'حماية السقوط: ٣٫٥ أمتار'],
     caseTypeId: 'carbon',
-    rating: 4.8,
-    reviewCount: 19,
-    reviews: [
-      { name: 'Ziad N.', rating: 5, date: '2026-07-22', commentEn: 'Lightweight carbon weave, handles drops like a shield.', commentAr: 'خفيف وجاهز للصدمات كأنه درع.' }
-    ]
+    reviewCount: 0,
+    reviews: []
   },
 
   // DOME STICKERS
@@ -214,8 +184,8 @@ export const PRODUCTS = [
     descriptionEn: 'High-gloss raised 3D epoxy sticker featuring a minimal solid disc motif.',
     descriptionAr: 'ملصق إيبوكسي ثلاثي الأبعاد بارز بحجم ناعم.',
     stickerType: 'disc',
-    rating: 4.9,
-    reviewCount: 18
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'sticker-tale3-noor',
@@ -230,8 +200,8 @@ export const PRODUCTS = [
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "طالع نور".',
     descriptionAr: 'ملصق بيضاوي مجسم ثلاثي الأبعاد بارز بعبارة "طالع نور".',
     stickerType: 'pill-tale3-noor',
-    rating: 4.9,
-    reviewCount: 45
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'sticker-3addi-lel',
@@ -246,8 +216,8 @@ export const PRODUCTS = [
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "عدّي الليل".',
     descriptionAr: 'ملصق بيضاوي مجسم ثلاثي الأبعاد بارز بعبارة "عدّي الليل".',
     stickerType: 'pill-3addi-lel',
-    rating: 4.9,
-    reviewCount: 39
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'sticker-born-dawn',
@@ -262,8 +232,8 @@ export const PRODUCTS = [
     descriptionEn: 'High-gloss raised 3D epoxy slogan pill: "BORN AT DAWN".',
     descriptionAr: 'ملصق مجسم ثلاثي الأبعاد بارز بعبارة "BORN AT DAWN".',
     stickerType: 'pill-born-dawn',
-    rating: 4.9,
-    reviewCount: 27
+    reviewCount: 0,
+    reviews: []
   },
 
   // CHARMS
@@ -280,8 +250,8 @@ export const PRODUCTS = [
     descriptionEn: 'Heavyweight solid brass ring charm plated in 18k dawn gold.',
     descriptionAr: 'تعليقة حلقة من النحاس الصلب المطلية بذهب الفجر عيار ١٨.',
     charmType: 'gold-ring',
-    rating: 4.9,
-    reviewCount: 14
+    reviewCount: 0,
+    reviews: []
   },
   {
     id: 'charm-ember-bead',
@@ -296,8 +266,8 @@ export const PRODUCTS = [
     descriptionEn: 'Deep crimson ruby hand-blown glass bead charm with woven cord.',
     descriptionAr: 'خرزة زجاجية حمراء منفوخة يدوياً مع حبل منسوج أنيق.',
     charmType: 'ember-bead',
-    rating: 4.8,
-    reviewCount: 12
+    reviewCount: 0,
+    reviews: []
   }
 ];
 
@@ -357,24 +327,7 @@ export const PRESET_TEMPLATES = [
   }
 ];
 
-export const REVIEWS = [
-  {
-    id: 'r1',
-    author: 'Karim E.',
-    location: 'Cairo, Egypt',
-    rating: 5,
-    textEn: 'The 3D epoxy domes feel like real jewelry attached to my phone. Best quality case in Egypt.',
-    textAr: 'ملصقات الإيبوكسي المجسمة تبدو كالمجوهرات تماماً على الموبايل. أفضل جراب صنعت في مصر.'
-  },
-  {
-    id: 'r2',
-    author: 'Nour M.',
-    location: 'Cairo, Egypt',
-    rating: 5,
-    textEn: 'Fast shipping to my doorstep. The dusk-to-dawn aesthetic is top tier.',
-    textAr: 'توصيل سريع جداً وتغليف فخم للغاية.'
-  }
-];
+export const REVIEWS = [];
 
 export const FAQS = [
   {
@@ -394,19 +347,38 @@ export const FAQS = [
 ];
 
 export const GOVERNORATES = [
-  { id: 'alex', nameEn: 'Alexandria', nameAr: 'الإسكندرية', fee: 40 },
-  { id: 'cairo', nameEn: 'Cairo', nameAr: 'القاهرة', fee: 55 },
-  { id: 'giza', nameEn: 'Giza', nameAr: 'الجيزة', fee: 55 },
-  { id: 'dakahlia', nameEn: 'Dakahlia (Mansoura)', nameAr: 'الدقهلية (المنصورة)', fee: 65 },
-  { id: 'sharqia', nameEn: 'Sharqia (Zagazig)', nameAr: 'الشرقية (الزقازيق)', fee: 65 },
-  { id: 'gharbia', nameEn: 'Gharbia (Tanta)', nameAr: 'الغربية (طنطا)', fee: 65 },
-  { id: 'monufia', nameEn: 'Monufia', nameAr: 'المنوفية', fee: 65 },
-  { id: 'qalyubia', nameEn: 'Qalyubia', nameAr: 'القليوبية', fee: 60 },
-  { id: 'beheira', nameEn: 'Beheira (Damanhour)', nameAr: 'البحيرة (دمنهور)', fee: 60 },
-  { id: 'ismailia', nameEn: 'Ismailia', nameAr: 'الإسماعيلية', fee: 70 },
-  { id: 'suez', nameEn: 'Suez', nameAr: 'السويس', fee: 70 },
-  { id: 'port-said', nameEn: 'Port Said', nameAr: 'بورسعيد', fee: 70 },
-  { id: 'red-sea', nameEn: 'Red Sea (Hurghada)', nameAr: 'البحر الأحمر (الغردقة)', fee: 85 },
-  { id: 'south-sinai', nameEn: 'South Sinai (Sharm)', nameAr: 'جنوب سيناء (شرم الشيخ)', fee: 90 },
-  { id: 'upper-egypt', nameEn: 'Upper Egypt (Luxor / Aswan)', nameAr: 'الصعيد (الأقصر / أسوان)', fee: 95 }
+  // Zone 1 — 110 EGP
+  { id: 'cairo', nameEn: 'Cairo', nameAr: 'القاهرة', fee: 110 },
+  { id: 'giza', nameEn: 'Giza', nameAr: 'الجيزة', fee: 110 },
+  { id: 'qalyubia', nameEn: 'Qalyubia', nameAr: 'القليوبية', fee: 110 },
+
+  // Zone 2 — 125 EGP
+  { id: 'alexandria', nameEn: 'Alexandria', nameAr: 'الإسكندرية', fee: 125 },
+  { id: 'beheira', nameEn: 'Beheira', nameAr: 'البحيرة', fee: 125 },
+  { id: 'gharbia', nameEn: 'Gharbia', nameAr: 'الغربية', fee: 125 },
+  { id: 'monufia', nameEn: 'Monufia', nameAr: 'المنوفية', fee: 125 },
+  { id: 'dakahlia', nameEn: 'Dakahlia', nameAr: 'الدقهلية', fee: 125 },
+  { id: 'kafr-el-sheikh', nameEn: 'Kafr El Sheikh', nameAr: 'كفر الشيخ', fee: 125 },
+  { id: 'damietta', nameEn: 'Damietta', nameAr: 'دمياط', fee: 125 },
+  { id: 'sharqia', nameEn: 'Sharqia', nameAr: 'الشرقية', fee: 125 },
+  { id: 'port-said', nameEn: 'Port Said', nameAr: 'بورسعيد', fee: 125 },
+  { id: 'ismailia', nameEn: 'Ismailia', nameAr: 'الإسماعيلية', fee: 125 },
+  { id: 'suez', nameEn: 'Suez', nameAr: 'السويس', fee: 125 },
+
+  // Zone 3 — 155 EGP
+  { id: 'beni-suef', nameEn: 'Beni Suef', nameAr: 'بني سويف', fee: 155 },
+  { id: 'faiyum', nameEn: 'Faiyum', nameAr: 'الفيوم', fee: 155 },
+  { id: 'minya', nameEn: 'Minya', nameAr: 'المنيا', fee: 155 },
+  { id: 'asyut', nameEn: 'Asyut', nameAr: 'أسيوط', fee: 155 },
+  { id: 'sohag', nameEn: 'Sohag', nameAr: 'سوهاج', fee: 155 },
+  { id: 'qena', nameEn: 'Qena', nameAr: 'قنا', fee: 155 },
+  { id: 'luxor', nameEn: 'Luxor', nameAr: 'الأقصر', fee: 155 },
+  { id: 'aswan', nameEn: 'Aswan', nameAr: 'أسوان', fee: 155 },
+  { id: 'red-sea', nameEn: 'Red Sea', nameAr: 'البحر الأحمر', fee: 155 },
+  { id: 'matrouh', nameEn: 'Matrouh', nameAr: 'مطروح', fee: 155 },
+
+  // Zone 4 — 185 EGP
+  { id: 'north-sinai', nameEn: 'North Sinai', nameAr: 'شمال سيناء', fee: 185 },
+  { id: 'south-sinai', nameEn: 'South Sinai', nameAr: 'جنوب سيناء', fee: 185 },
+  { id: 'new-valley', nameEn: 'New Valley', nameAr: 'الوادي الجديد', fee: 185 }
 ];

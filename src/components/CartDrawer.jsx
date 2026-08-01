@@ -190,9 +190,9 @@ export const CartDrawer = () => {
                 </div>
               )}
 
-              {/* Free Shipping Progress Bar Nudge */}
+              {/* Free Shipping Progress Bar Nudge (800 EGP Target) */}
               {(() => {
-                const target = 1500;
+                const target = 800;
                 const needed = Math.max(0, target - subtotal);
                 const percent = Math.min(100, (subtotal / target) * 100);
                 return (
@@ -200,8 +200,8 @@ export const CartDrawer = () => {
                     <div className="flex justify-between items-center font-mono text-xs">
                       <span className="font-medium">
                         {needed > 0
-                          ? (isRtl ? `أضف ${needed} ج.م للحصول على شحن مجاني` : `Add ${needed} EGP more for FREE shipping`)
-                          : (isRtl ? '🎉 حصلت على شحن مجاني لكافة المحافظات!' : '🎉 You unlocked FREE shipping across Egypt!')}
+                          ? (isRtl ? `أضف ${needed} ج للحصول على شحن مجاني (فوق ٨٠٠ ج)` : `Add ${needed} EGP for FREE shipping (over 800 EGP)`)
+                          : (isRtl ? '🎉 شحن مجاني فوق ٨٠٠ ج!' : '🎉 Free shipping unlocked!')}
                       </span>
                       <span className="text-[#E0A93B] font-bold">{Math.round(percent)}%</span>
                     </div>

@@ -76,7 +76,7 @@ export const Footer = () => {
               CONNECT
             </h4>
             <p className="text-ash">{t('footerSocial')}</p>
-            <p className="text-ash">Support: WhatsApp +20 100 000 0000</p>
+            <p className="text-ash">Support: {lang === 'ar' ? 'واتساب الدعم المباشر' : 'WhatsApp Direct Support'}</p>
           </div>
 
         </div>

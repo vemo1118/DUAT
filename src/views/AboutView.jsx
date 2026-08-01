@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SunDisc } from '../components/SunDisc';
+import { StickerIcon } from '../components/StickerIcon';
 import { useLanguage } from '../context/LanguageContext';
 import { Check, ArrowRight, ArrowLeft, Sparkles, ShoppingBag } from 'lucide-react';
 
@@ -17,11 +18,11 @@ export const AboutView = () => {
     { nameKey: 'aboutCraft3Name', bodyKey: 'aboutCraft3Body', badge: '03' }
   ];
 
-  const symbolItems = [
-    { labelKey: 'aboutSym1Label', bodyKey: 'aboutSym1Body', symbol: '☥' },
-    { labelKey: 'aboutSym2Label', bodyKey: 'aboutSym2Body', symbol: '𓆣' },
-    { labelKey: 'aboutSym3Label', bodyKey: 'aboutSym3Body', symbol: 'disc' },
-    { labelKey: 'aboutSym4Label', bodyKey: 'aboutSym4Body', symbol: '𓃀' }
+  const passageStages = [
+    { titleKey: 'aboutStage1Title', bodyKey: 'aboutStage1Body', motif: 'crescent' },
+    { titleKey: 'aboutStage2Title', bodyKey: 'aboutStage2Body', motif: 'ring' },
+    { titleKey: 'aboutStage3Title', bodyKey: 'aboutStage3Body', motif: 'arrow-up' },
+    { titleKey: 'aboutStage4Title', bodyKey: 'aboutStage4Body', motif: 'sun-disc' }
   ];
 
   const promiseKeys = [
@@ -106,7 +107,7 @@ export const AboutView = () => {
         </div>
       </section>
 
-      {/* 4. THE SYMBOLS */}
+      {/* 4. THE PASSAGE */}
       <section className="space-y-8 reveal-on-scroll">
         <div className="space-y-2 border-b border-grave pb-4">
           <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
@@ -119,24 +120,24 @@ export const AboutView = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {symbolItems.map((sym, idx) => (
+          {passageStages.map((stage, idx) => (
             <div
               key={idx}
               className="bg-stone border border-grave p-6 space-y-4 card-depth-highlight flex flex-col justify-between"
             >
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-full bg-coal border border-grave flex items-center justify-center text-gold">
-                  {sym.symbol === 'disc' ? (
-                    <SunDisc size={20} variant="gold" />
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-full bg-coal border border-grave flex items-center justify-center text-gold">
+                  {stage.motif === 'sun-disc' ? (
+                    <SunDisc size={24} variant="gold" />
                   ) : (
-                    <span className="text-xl font-bold">{sym.symbol}</span>
+                    <StickerIcon stickerId={stage.motif} size={24} />
                   )}
                 </div>
-                <h3 className="font-clash text-lg text-bone font-bold uppercase pt-2">
-                  {t(sym.labelKey)}
+                <h3 className="font-clash text-xl text-bone font-bold uppercase pt-1">
+                  {t(stage.titleKey)}
                 </h3>
                 <p className="font-space text-sm text-bone/80 font-medium leading-relaxed">
-                  {t(sym.bodyKey)}
+                  {t(stage.bodyKey)}
                 </p>
               </div>
             </div>

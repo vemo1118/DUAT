@@ -98,60 +98,53 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         />
       </div>
 
-      {/* 7. REVIEWS SECTION — SOFTENED THEME-AWARE GRADIENT BAND 3 */}
-      <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-20 sm:py-28 shadow-inner`}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-grave pb-6 gap-4">
-            <div>
-              <span className="font-mono text-xs text-gold font-bold uppercase tracking-[0.25em] block">
-                {t('reviewsEyebrow')}
-              </span>
-              <h2 className="font-clash text-3xl sm:text-4xl text-bone font-bold uppercase mt-1">
-                {t('reviewsTitle')}
-              </h2>
-            </div>
-            
-            <div className="flex items-center gap-2 bg-stone border border-grave px-4 py-2 font-mono text-xs text-gold font-bold">
-              <div className="flex text-gold">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-gold" />
-                ))}
+      {/* 7. REVIEWS SECTION — HIDE IF EMPTY */}
+      {REVIEWS && REVIEWS.length > 0 && (
+        <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-20 sm:py-28 shadow-inner`}>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-grave pb-6 gap-4">
+              <div>
+                <span className="font-mono text-xs text-gold font-bold uppercase tracking-[0.25em] block">
+                  {t('reviewsEyebrow')}
+                </span>
+                <h2 className="font-clash text-3xl sm:text-4xl text-bone font-bold uppercase mt-1">
+                  {t('reviewsTitle')}
+                </h2>
               </div>
-              <span>4.9★ FROM 1000+ REVIEWS</span>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {REVIEWS.map((rev) => (
-              <div
-                key={rev.id}
-                className="bg-stone border border-grave p-8 space-y-4 card-depth-highlight relative flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex text-gold">
-                      {[...Array(rev.rating)].map((_, i) => (
-                        <Star key={i} size={14} className="fill-gold" />
-                      ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {REVIEWS.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-stone border border-grave p-8 space-y-4 card-depth-highlight relative flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex text-gold">
+                        {[...Array(rev.rating)].map((_, i) => (
+                          <Star key={i} size={14} className="fill-gold" />
+                        ))}
+                      </div>
+                      <span className="font-mono text-[10px] text-ash uppercase tracking-widest font-bold">
+                        VERIFIED BUYER
+                      </span>
                     </div>
-                    <span className="font-mono text-[10px] text-ash uppercase tracking-widest font-bold">
-                      VERIFIED BUYER
-                    </span>
+                    <p className="font-space text-base text-bone/90 font-medium italic leading-relaxed">
+                      "{isAr ? rev.textAr : rev.textEn}"
+                    </p>
                   </div>
-                  <p className="font-space text-base text-bone/90 font-medium italic leading-relaxed">
-                    "{isAr ? rev.textAr : rev.textEn}"
-                  </p>
-                </div>
 
-                <div className="border-t border-grave/60 pt-4 flex justify-between items-center font-mono text-xs">
-                  <span className="text-bone font-bold">{rev.author}</span>
-                  <span className="text-ash font-medium">{rev.location}</span>
+                  <div className="border-t border-grave/60 pt-4 flex justify-between items-center font-mono text-xs">
+                    <span className="text-bone font-bold">{rev.author}</span>
+                    <span className="text-ash font-medium">{rev.location}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* 8. SOCIAL STRIP */}
       <SocialStrip />

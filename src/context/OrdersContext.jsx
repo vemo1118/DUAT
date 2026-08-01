@@ -15,7 +15,9 @@ function mapFromDb(ord) {
     customer: ord.customer || {},
     items: Array.isArray(ord.items) ? ord.items : [],
     total: Number(ord.total) || 0,
-    paymentMethod: ord.payment_method || ord.paymentMethod || 'cod'
+    paymentMethod: ord.payment_method || ord.paymentMethod || 'cod',
+    payment_proof_path: ord.payment_proof_path || null,
+    paymentProofPath: ord.payment_proof_path || null
   };
 }
 
@@ -27,7 +29,8 @@ function mapToDb(ord) {
     customer: ord.customer || {},
     items: Array.isArray(ord.items) ? ord.items : [],
     total: Number(ord.total) || 0,
-    payment_method: ord.paymentMethod || ord.payment_method || 'cod'
+    payment_method: ord.paymentMethod || ord.payment_method || 'cod',
+    payment_proof_path: ord.payment_proof_path || ord.paymentProofPath || null
   };
 }
 

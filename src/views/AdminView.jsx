@@ -82,6 +82,29 @@ export function AdminView() {
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [signedProofUrl, setSignedProofUrl] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    const fetchSignedProofUrl = async () => {
+      setSignedProofUrl(null);
+      const proofPath = selectedOrderDetails?.payment_proof_path || selectedOrderDetails?.paymentProofPath;
+      if (proofPath) {
+        try {
+          const { data } = await supabase.storage.from('payment-proofs').createSignedUrl(proofPath, 3600);
+          if (active && data?.signedUrl) {
+            setSignedProofUrl(data.signedUrl);
+          }
+        } catch (err) {
+          console.error('Error generating signed URL for payment proof:', err);
+        }
+      }
+    };
+    if (selectedOrderDetails) {
+      fetchSignedProofUrl();
+    }
+    return () => { active = false; };
+  }, [selectedOrderDetails]);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -1011,6 +1034,41 @@ export function AdminView() {
                 ))}
               </div>
             </div>
+
+            {/* Payment Method & Proof Section */}
+            {(selectedOrderDetails.payment_proof_path || selectedOrderDetails.paymentProofPath) && (
+              <div className="space-y-2 border border-gold/40 bg-coal p-4 font-mono text-xs">
+                <span className="text-gold font-bold uppercase block flex items-center gap-1.5">
+                  <ExternalLink size={14} />
+                  <span>إثبات التحويل (إنستاباي / InstaPay Proof):</span>
+                </span>
+                {signedProofUrl ? (
+                  <div className="space-y-2">
+                    <a
+                      href={signedProofUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block group relative overflow-hidden border border-grave max-h-64 flex items-center justify-center bg-void"
+                    >
+                      <img src={signedProofUrl} alt="Payment Proof" className="max-h-60 object-contain mx-auto" />
+                      <div className="absolute inset-0 bg-void/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-gold font-bold transition-opacity">
+                        عرض صورة إثبات التحويل بالحجم الكامل ↗
+                      </div>
+                    </a>
+                    <a
+                      href={signedProofUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gold underline hover:text-gold-light text-xs font-bold block"
+                    >
+                      فتح اسكرين شوت التحويل في نافذة جديدة ↗
+                    </a>
+                  </div>
+                ) : (
+                  <div className="text-ash py-2 font-mono">جاري استخراج رابط المعاينة الآمن...</div>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center justify-between border-t border-grave pt-4">
               <div>
