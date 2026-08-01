@@ -84,7 +84,7 @@ function mapToDb(slide, index = 0) {
 }
 
 export function HeroBannersProvider({ children }) {
-  const [slides, setSlides] = useState([]);
+  const [slides, setSlides] = useState(INITIAL_HERO_SLIDES);
   const [loading, setLoading] = useState(true);
 
   const fetchSlides = async () => {
@@ -94,12 +94,12 @@ export function HeroBannersProvider({ children }) {
       try {
         query = query.order('sort_order', { ascending: true });
       } catch (e) {
-        // ignore order error if sort_order missing
+        // ignore order error
       }
       const { data, error } = await query;
       if (error) {
         console.error('Failed to fetch hero slides from Supabase:', error);
-        setSlides([]);
+        setSlides(INITIAL_HERO_SLIDES);
       } else if (Array.isArray(data) && data.length > 0) {
         setSlides(data.map(mapFromDb));
       } else {
@@ -123,7 +123,7 @@ export function HeroBannersProvider({ children }) {
       }
     } catch (err) {
       console.error('Unexpected error loading hero slides:', err);
-      setSlides([]);
+      setSlides(INITIAL_HERO_SLIDES);
     } finally {
       setLoading(false);
     }

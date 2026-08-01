@@ -40,7 +40,7 @@ function mapToDb(p) {
 }
 
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
   const [loading, setLoading] = useState(true);
 
   // Fetch products from Supabase
@@ -50,7 +50,7 @@ export function ProductsProvider({ children }) {
       const { data, error } = await supabase.from('products').select('*');
       if (error) {
         console.error('Failed to fetch products from Supabase:', error);
-        setProducts([]);
+        setProducts(INITIAL_PRODUCTS);
       } else if (Array.isArray(data) && data.length > 0) {
         setProducts(data.map(mapFromDb));
       } else {
@@ -75,7 +75,7 @@ export function ProductsProvider({ children }) {
       }
     } catch (err) {
       console.error('Unexpected error loading products:', err);
-      setProducts([]);
+      setProducts(INITIAL_PRODUCTS);
     } finally {
       setLoading(false);
     }
