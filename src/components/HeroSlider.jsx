@@ -118,7 +118,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             {/* Primary Action Button */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              className="py-4 px-8 bg-gold text-[#050505] hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm"
+              style={{ backgroundColor: '#E8A33D', color: '#0A0C16' }}
+              className="py-4 px-8 font-bold hover:brightness-110 transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm border border-gold"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
@@ -128,7 +129,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             {/* Secondary Action Button */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              className="py-4 px-8 border border-grave bg-coal/70 hover:border-gold hover:text-gold text-bone transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+              style={{ backgroundColor: 'rgba(24, 30, 59, 0.8)', color: '#EDE4D3', borderColor: '#28305F' }}
+              className="py-4 px-8 border hover:border-gold hover:text-gold transition-all duration-300 flex items-center justify-center gap-2 text-sm"
             >
               <Sparkles size={16} />
               <span>{secondaryBtnText}</span>
@@ -146,8 +148,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-1.5 transition-all rounded-full ${
-                currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-grave hover:bg-ash'
+              style={currentSlide === idx ? { backgroundColor: '#E8A33D' } : { backgroundColor: '#28305F' }}
+              className={`h-2 transition-all rounded-full shrink-0 ${
+                currentSlide === idx ? 'w-6' : 'w-2 hover:bg-ash'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />

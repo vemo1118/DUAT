@@ -17,7 +17,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
     badgeEn: '3D BUILDER',
     badgeAr: 'أداة 3D الحصرية',
-    imageUrl: '',
+    imageUrl: '/images/transparent_hero_case.png',
     ctaPrimaryTextEn: 'START BUILDING',
     ctaPrimaryTextAr: 'ابدأ التصميم الآن',
     ctaPrimaryLink: '/customize',
@@ -37,7 +37,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'جرابات مصنوعة يدوياً في مصر بخامات فاخرة تشطيب إطار ذهبي وضمان استبدال كامل سنة.',
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
-    imageUrl: '',
+    imageUrl: '/images/stickers.png',
     ctaPrimaryTextEn: 'SHOP COLLECTION',
     ctaPrimaryTextAr: 'تسوق العروض الآن',
     ctaPrimaryLink: '/shop',
@@ -54,7 +54,15 @@ export function HeroBannersProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          const sanitized = parsed.map((s, idx) => {
+            const fallback = INITIAL_HERO_SLIDES[idx % INITIAL_HERO_SLIDES.length];
+            return {
+              ...fallback,
+              ...s,
+              imageUrl: s.imageUrl || fallback.imageUrl
+            };
+          });
+          return sanitized;
         }
       }
     } catch (e) {
