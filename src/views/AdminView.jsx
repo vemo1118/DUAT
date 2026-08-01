@@ -99,16 +99,31 @@ export function AdminView() {
       });
 
       if (error) {
-        setAuthError(error.message || 'بيانات الدخول غير صحيحة');
-        showToast('فشل تسجيل الدخول: ' + error.message, 'error');
+        const isFetchError = error.message && (
+          error.message.toLowerCase().includes('failed to fetch') ||
+          error.message.toLowerCase().includes('networkerror') ||
+          error.message.toLowerCase().includes('fetch')
+        );
+
+        if (isFetchError) {
+          const userFriendlyMsg = 'تعذر الاتصال بالسيرفر (Failed to fetch). يرجى التأكد من اتصال الإنترنيت وإيقاف مانع الإعلانات (AdBlocker / Brave Shields / VPN) ثم المحاولة مرة أخرى.';
+          setAuthError(userFriendlyMsg);
+          showToast('تعذر الاتصال بالسيرفر - يرجى تعطيل AdBlocker أو التأكد من الإنترنيت', 'error');
+        } else if (error.message.includes('Invalid login credentials')) {
+          setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التأكد من إضافة المستخدم في Supabase Dashboard > Authentication > Users.');
+          showToast('بيانات الدخول غير صحيحة', 'error');
+        } else {
+          setAuthError(error.message || 'بيانات الدخول غير صحيحة');
+          showToast('فشل تسجيل الدخول: ' + error.message, 'error');
+        }
       } else {
         setSession(data.session);
         showToast('تم تسجيل الدخول بنجاح!', 'success');
         if (fetchOrders) fetchOrders();
       }
     } catch (err) {
-      setAuthError('حدث خطأ غير متوقع أثناء تسجيل الدخول');
-      showToast('حدث خطأ أثناء تسجيل الدخول', 'error');
+      setAuthError('تعذر الاتصال بالخادم. يرجى مراجعة الاتصال وإيقاف مانع الإعلانات.');
+      showToast('حدث خطأ أثناء الاتصال بالخادم', 'error');
     } finally {
       setIsSubmittingAuth(false);
     }
