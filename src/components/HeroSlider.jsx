@@ -61,7 +61,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full bg-void border-b border-grave overflow-hidden min-h-[560px] sm:min-h-[640px] flex items-center justify-center font-sans"
+      className="relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center justify-center font-sans"
     >
       {/* Background Graphic or Uploaded Image Layer */}
       {bgImage ? (
@@ -69,9 +69,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           <img
             src={bgImage}
             alt="Hero Background"
-            className="w-full h-full object-cover object-center animate-pulse-subtle scale-105"
+            className="w-full h-full object-cover object-center scale-100 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone via-void/80 to-void/50 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone via-void/75 to-void/40 backdrop-blur-[1px]" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
@@ -157,40 +157,40 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           ))}
         </div>
 
-        {/* Prev / Next Arrows */}
+        {/* Corrected Prev / Next Arrow Directions */}
         {activeSlides.length > 1 && (
           <div className="flex items-center gap-1 border-l border-grave pl-3 pr-1">
             <button
               onClick={handlePrev}
               className="p-1.5 text-ash hover:text-gold transition-colors"
-              title="السلايد السابق"
+              title={isAr ? 'السابق' : 'Previous'}
             >
-              <ChevronRight size={18} />
+              {isRtl ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
             <button
               onClick={handleNext}
               className="p-1.5 text-ash hover:text-gold transition-colors"
-              title="السلايد التالي"
+              title={isAr ? 'التالي' : 'Next'}
             >
-              <ChevronLeft size={18} />
+              {isRtl ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </button>
           </div>
         )}
       </div>
 
-      {/* Micro Trust Bar Overlay */}
+      {/* Micro Trust Bar Overlay with Strict Language Switching */}
       <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/60 border-t border-r border-grave font-mono text-[11px] text-ash">
         <span className="flex items-center gap-1.5">
           <ShieldCheck size={14} className="text-gold" />
-          <span>ضمان سنة استبدال</span>
+          <span>{isAr ? 'ضمان سنة استبدال' : '1-YEAR WARRANTY'}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <Truck size={14} className="text-gold" />
-          <span>شحن لكافة المحافظات</span>
+          <span>{isAr ? 'شحن لكافة المحافظات' : 'FAST EGYPT SHIPPING'}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <Clock size={14} className="text-gold" />
-          <span>تقفيل مصري فاخر</span>
+          <span>{isAr ? 'تقفيل مصري فاخر' : 'HAND-FINISHED IN EGYPT'}</span>
         </span>
       </div>
     </section>
