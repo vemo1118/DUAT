@@ -270,12 +270,11 @@ export function AdminView() {
           <div className="flex flex-wrap items-center gap-2 bg-coal/90 p-1.5 border border-grave w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('products')}
-              style={
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'products'
-                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
-                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
-              }
-              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
             >
               <Package size={16} />
               <span>المنتجات ({products.length})</span>
@@ -283,12 +282,11 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('orders')}
-              style={
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'orders'
-                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
-                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
-              }
-              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
             >
               <ShoppingBag size={16} />
               <span>الطلبات ({orders.length})</span>
@@ -296,12 +294,11 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('hero')}
-              style={
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'hero'
-                  ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
-                  : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
-              }
-              className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border shadow-sm"
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
             >
               <ImageIcon size={16} />
               <span>السلايدر والعروض ({slides.length})</span>
@@ -396,12 +393,11 @@ export function AdminView() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  style={
+                  className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border ${
                     selectedCategory === cat.id
-                      ? { backgroundColor: '#E8A33D', color: '#0A0C16', borderColor: '#E8A33D' }
-                      : { backgroundColor: '#181E3B', color: '#EDE4D3', borderColor: '#28305F' }
-                  }
-                  className="px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border shadow-sm"
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                      : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  }`}
                 >
                   {cat.id === 'all' ? 'جميع المنتجات' : cat.id.toUpperCase()}
                 </button>
