@@ -135,12 +135,6 @@ export function App() {
                   onClose={() => setSelectedProduct(null)}
                 />
 
-                {/* Product Quick View Specs Modal */}
-                <ProductModal
-                  product={selectedProduct}
-                  onClose={() => setSelectedProduct(null)}
-                />
-
                 {/* Order Shipment Tracker Modal */}
                 <OrderTrackerModal
                   isOpen={trackerOpen}

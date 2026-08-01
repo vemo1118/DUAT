@@ -12,7 +12,24 @@ export function ProductsProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          const sanitized = parsed.map((p, idx) => {
+            const fallback = INITIAL_PRODUCTS.find((initP) => initP.id === p?.id) || INITIAL_PRODUCTS[0];
+            return {
+              ...fallback,
+              ...p,
+              id: p?.id || `product-${idx}`,
+              nameEn: p?.nameEn || p?.nameAr || fallback.nameEn,
+              nameAr: p?.nameAr || p?.nameEn || fallback.nameAr,
+              price: Number(p?.price) || fallback.price || 500,
+              originalPrice: Number(p?.originalPrice) || Number(p?.price) || Math.round((fallback.price || 500) * 1.3),
+              category: p?.category || fallback.category || 'cases',
+              tagEn: p?.tagEn || fallback.tagEn || '',
+              tagAr: p?.tagAr || fallback.tagAr || '',
+              craftTagEn: p?.craftTagEn || fallback.craftTagEn || '',
+              craftTagAr: p?.craftTagAr || fallback.craftTagAr || ''
+            };
+          });
+          return sanitized;
         }
       }
     } catch (e) {
