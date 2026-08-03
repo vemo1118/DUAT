@@ -294,6 +294,24 @@ export const CustomizerContent = () => {
       category: 'cases',
       tagEn: selectedCaseType?.nameEn || 'Custom Case',
       tagAr: selectedCaseType?.nameAr || 'جراب مخصص',
+      customConfig: {
+        phoneModel: currentModelName,
+        caseFinish: selectedCaseType?.nameAr || selectedCaseType?.nameEn,
+        caseTypeId: selectedCaseType?.id,
+        layers: layers.map((l) => ({
+          id: l.id,
+          type: l.type,
+          stickerId: l.stickerId,
+          text: l.text,
+          color: l.color,
+          fontFamily: l.fontFamily,
+          x: l.x,
+          y: l.y,
+          scale: l.scale,
+          rotation: l.rotation,
+          src: l.src || null
+        }))
+      },
       customDetails: {
         model: currentModelName,
         caseType: selectedCaseType?.nameEn || 'Clear Solar',

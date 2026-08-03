@@ -1234,18 +1234,81 @@ export function AdminView() {
 
             <div className="space-y-3">
               <h4 className="font-mono text-xs text-gold uppercase tracking-wider">المنتجات المطلوبة</h4>
-              <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-48 overflow-y-auto">
-                {selectedOrderDetails.items?.map((item, idx) => (
-                  <div key={idx} className="p-3 flex items-center justify-between font-sans text-xs">
-                    <div>
-                      <span className="font-bold text-bone">{item.nameAr || item.nameEn}</span>
-                      <span className="font-mono text-ash block text-[11px]">الكمية: {item.quantity || 1}</span>
+              <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-80 overflow-y-auto">
+                {selectedOrderDetails.items?.map((item, idx) => {
+                  const cfg = item.customConfig || item.customDetails;
+                  const layers = item.customConfig?.layers || [];
+                  const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
+
+                  return (
+                    <div key={idx} className="p-3 space-y-2 font-sans text-xs">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-bold text-bone">{item.nameAr || item.nameEn}</span>
+                          <span className="font-mono text-ash block text-[11px]">الكمية: {item.quantity || 1}</span>
+                        </div>
+                        <div className="font-mono font-bold text-gold">
+                          {(item.price || 0) * (item.quantity || 1)} ج.م
+                        </div>
+                      </div>
+
+                      {/* Custom Case Specifications & Layers Breakdown */}
+                      {cfg && (
+                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px]">
+                          <div className="flex flex-wrap gap-3 text-gold font-bold">
+                            <span>📱 الموديل: {cfg.phoneModel || cfg.model || 'غير محدد'}</span>
+                            <span>🎨 التقفيل: {cfg.caseFinish || cfg.caseType || 'جراب شفاف'}</span>
+                          </div>
+
+                          {layers.length > 0 && (
+                            <div className="space-y-1 text-ash border-t border-grave/40 pt-2">
+                              <span className="text-bone font-bold block">الموتيفات والطبقات المصممة ({layers.length}):</span>
+                              {layers.map((l, lIdx) => (
+                                <div key={lIdx} className="flex items-center justify-between gap-2">
+                                  <span>
+                                    • {l.type === 'text' ? `نص محفور: "${l.text}"` : l.type === 'image' ? 'صورة استيكر مرفوعة من العميل' : `موتيف: ${l.stickerId || 'قرص مجسم'}`}
+                                  </span>
+                                  {l.src && (
+                                    <a
+                                      href={l.src}
+                                      download={`custom-sticker-${lIdx + 1}.png`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-gold underline hover:text-gold-light font-bold flex items-center gap-1"
+                                    >
+                                      <span>تحميل الصورة الأصلية للطباعة 📥</span>
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Render Uploaded Image Thumbnail Preview */}
+                          {uploadedImages.length > 0 && (
+                            <div className="pt-2 border-t border-grave/40 space-y-1">
+                              <span className="text-gold font-bold block">معاينة الصور المرفوعة من العميل:</span>
+                              <div className="flex flex-wrap gap-2">
+                                {uploadedImages.map((img, iIdx) => (
+                                  <div key={iIdx} className="relative group border border-gold/50 bg-void p-1 rounded">
+                                    <img src={img.src} alt="Uploaded Sticker" className="w-16 h-16 object-contain" />
+                                    <a
+                                      href={img.src}
+                                      download={`sticker-uploaded-${iIdx + 1}.png`}
+                                      className="absolute inset-0 bg-void/80 text-gold text-[10px] flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      تحميل 📥
+                                    </a>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="font-mono font-bold text-gold">
-                      {(item.price || 0) * (item.quantity || 1)} ج.م
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
