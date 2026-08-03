@@ -81,6 +81,10 @@ function mapFromDb(row) {
     headline2Color: data.headline2Color || row.headline2_color || '',
     subColor: data.subColor || row.sub_color || '',
     overlayStrength: data.overlayStrength || row.overlay_strength || 'medium',
+    posX: data.posX ?? row.pos_x ?? 10,
+    posY: data.posY ?? row.pos_y ?? 50,
+    maxWidth: data.maxWidth ?? row.max_width ?? 55,
+    fontSizeScale: data.fontSizeScale ?? row.font_size_scale ?? 100,
     sort_order: row.sort_order ?? data.sort_order ?? 0
   };
 }

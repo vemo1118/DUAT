@@ -80,13 +80,16 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     ? 'justify-end'
     : 'justify-start';
 
-  const overlayStrength = current?.overlayStrength || 'medium';
+  const posX = current?.posX !== undefined ? Number(current.posX) : 5;
+  const posY = current?.posY !== undefined ? Number(current.posY) : 30;
+  const maxWidth = current?.maxWidth !== undefined ? Number(current.maxWidth) : 55;
+  const fontSizeScale = current?.fontSizeScale !== undefined ? Number(current.fontSizeScale) / 100 : 1;
 
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center justify-center font-sans"
+      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans"
     >
       {/* Background Graphic or Uploaded Image Layer */}
       {bgImage ? (
@@ -117,9 +120,19 @@ export const HeroSlider = ({ setSelectedCategory }) => {
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#E0A93B_1px,transparent_1px)] [background-size:24px_24px]" />
       )}
 
-      {/* Main Content Container */}
+      {/* Main Content Container with Free 2D Position & Scaling */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10 w-full">
-        <div className={`max-w-3xl flex flex-col space-y-6 animate-fade-in ${alignClass}`} key={current.id}>
+        <div
+          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 ${alignClass}`}
+          key={current.id}
+          style={{
+            position: 'relative',
+            left: `${posX}%`,
+            top: `${posY - 30}%`,
+            maxWidth: `${maxWidth}%`,
+            fontSize: `${fontSizeScale}rem`
+          }}
+        >
           
           {/* Eyebrow & Offer Badge */}
           <div className={`flex flex-wrap items-center gap-3 ${flexJustifyClass}`}>

@@ -28,6 +28,10 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     headline2Color: '#E8A33D',
     subColor: '#8E98BF',
     overlayStrength: 'medium',
+    posX: 5,
+    posY: 30,
+    maxWidth: 55,
+    fontSizeScale: 100,
     is_active: true
   });
 
@@ -57,6 +61,10 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         headline2Color: slideToEdit.headline2Color || '#E8A33D',
         subColor: slideToEdit.subColor || '#8E98BF',
         overlayStrength: slideToEdit.overlayStrength || 'medium',
+        posX: slideToEdit.posX !== undefined ? Number(slideToEdit.posX) : 5,
+        posY: slideToEdit.posY !== undefined ? Number(slideToEdit.posY) : 30,
+        maxWidth: slideToEdit.maxWidth !== undefined ? Number(slideToEdit.maxWidth) : 55,
+        fontSizeScale: slideToEdit.fontSizeScale !== undefined ? Number(slideToEdit.fontSizeScale) : 100,
         is_active: slideToEdit.is_active !== undefined ? Boolean(slideToEdit.is_active) : true
       });
     } else {
@@ -84,6 +92,10 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         headline2Color: '#E8A33D',
         subColor: '#8E98BF',
         overlayStrength: 'medium',
+        posX: 5,
+        posY: 30,
+        maxWidth: 55,
+        fontSizeScale: 100,
         is_active: true
       });
     }
@@ -500,11 +512,104 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
               </h3>
             </div>
 
+            {/* 2D FREE POSITIONING & SIZE CONTROLS (X & Y Axis Sliders) */}
+            <div className="bg-coal/60 border border-gold/40 p-4 space-y-4 rounded">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs text-gold uppercase tracking-wider font-bold block">
+                  🎯 تحكم تحريك النص في المحاور الـ 2D (Free Position X & Y Coordinates)
+                </span>
+                <span className="font-mono text-[11px] text-ash">
+                  X: {formData.posX || 5}% | Y: {formData.posY || 30}% | Width: {formData.maxWidth || 55}%
+                </span>
+              </div>
+
+              {/* Sliders Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Position X (Horizontal) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-bone font-bold">الموقع الأفقي X (Horizontal %):</span>
+                    <span className="text-gold font-bold">{formData.posX || 5}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    name="posX"
+                    min="0"
+                    max="80"
+                    value={formData.posX !== undefined ? formData.posX : 5}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, posX: Number(e.target.value) }))}
+                    className="w-full accent-gold cursor-pointer"
+                  />
+                  <div className="flex justify-between gap-1 text-[10px] font-mono">
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posX: 3 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">اقصى اليسار 3%</button>
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posX: 25 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">منتصف يسار 25%</button>
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posX: 50 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">المنتصف 50%</button>
+                  </div>
+                </div>
+
+                {/* Position Y (Vertical) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-bone font-bold">الموقع الرأسي Y (Vertical %):</span>
+                    <span className="text-gold font-bold">{formData.posY || 30}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    name="posY"
+                    min="5"
+                    max="85"
+                    value={formData.posY !== undefined ? formData.posY : 30}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, posY: Number(e.target.value) }))}
+                    className="w-full accent-gold cursor-pointer"
+                  />
+                  <div className="flex justify-between gap-1 text-[10px] font-mono">
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posY: 10 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">أعلى 10%</button>
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posY: 35 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">وسط 35%</button>
+                    <button type="button" onClick={() => setFormData((p) => ({ ...p, posY: 65 }))} className="px-1.5 py-0.5 bg-stone border border-grave text-ash hover:text-gold">أسفل 65%</button>
+                  </div>
+                </div>
+
+                {/* Container Max Width % */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-bone font-bold">أقصى عرض لكادر النص (Width %):</span>
+                    <span className="text-gold font-bold">{formData.maxWidth || 55}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    name="maxWidth"
+                    min="25"
+                    max="100"
+                    value={formData.maxWidth !== undefined ? formData.maxWidth : 55}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, maxWidth: Number(e.target.value) }))}
+                    className="w-full accent-gold cursor-pointer"
+                  />
+                </div>
+
+                {/* Font Size Scale % */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-bone font-bold">مقاس وحجم الخطوط (Font Size %):</span>
+                    <span className="text-gold font-bold">{formData.fontSizeScale || 100}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    name="fontSizeScale"
+                    min="70"
+                    max="150"
+                    value={formData.fontSizeScale !== undefined ? formData.fontSizeScale : 100}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, fontSizeScale: Number(e.target.value) }))}
+                    className="w-full accent-gold cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Text Alignment */}
               <div>
                 <label className="block font-mono text-xs text-bone uppercase tracking-wider mb-2 font-bold">
-                  مكان ومحاذاة النصوص والأزرار (Text Alignment)
+                  اتجاه المحاذاة الداخلية (Text Alignment)
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   <button
