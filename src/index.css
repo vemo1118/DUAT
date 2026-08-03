@@ -85,28 +85,25 @@ html[data-theme="dawn"] body:not(.hero-section) p {
 }
 
 /* Hero Section Text Color Protection across all Themes (especially Dawn Mode) */
-.hero-section h1,
-.hero-section .text-bone,
-html[data-theme="dawn"] .hero-section h1,
-html[data-theme="dawn"] .hero-section .text-bone {
-  color: #EDE4D3 !important;
-  -webkit-text-fill-color: #EDE4D3 !important;
+.hero-section h1:not([style*="color"]),
+.hero-section .text-bone:not([style*="color"]),
+html[data-theme="dawn"] .hero-section h1:not([style*="color"]),
+html[data-theme="dawn"] .hero-section .text-bone:not([style*="color"]) {
+  color: #EDE4D3;
 }
 
-.hero-section h2,
-.hero-section .text-gold,
-html[data-theme="dawn"] .hero-section h2,
-html[data-theme="dawn"] .hero-section .text-gold {
-  color: #E8A33D !important;
-  -webkit-text-fill-color: #E8A33D !important;
+.hero-section h2:not([style*="color"]),
+.hero-section .text-gold:not([style*="color"]),
+html[data-theme="dawn"] .hero-section h2:not([style*="color"]),
+html[data-theme="dawn"] .hero-section .text-gold:not([style*="color"]) {
+  color: #E8A33D;
 }
 
-.hero-section p,
-.hero-section .text-ash,
-html[data-theme="dawn"] .hero-section p,
-html[data-theme="dawn"] .hero-section .text-ash {
-  color: #8E98BF !important;
-  -webkit-text-fill-color: #8E98BF !important;
+.hero-section p:not([style*="color"]),
+.hero-section .text-ash:not([style*="color"]),
+html[data-theme="dawn"] .hero-section p:not([style*="color"]),
+html[data-theme="dawn"] .hero-section .text-ash:not([style*="color"]) {
+  color: #8E98BF;
 }
 
 html[data-theme="dawn"] :not(.hero-section) .text-ash {
