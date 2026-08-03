@@ -22,7 +22,10 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
 
-  const activeProducts = products.filter((p) => p && p.is_active !== false && p.isActive !== false);
+  const filteredProducts = Array.isArray(products)
+    ? products.filter((p) => p && p.is_active !== false && p.isActive !== false)
+    : [];
+  const activeProducts = filteredProducts.length > 0 ? filteredProducts : (Array.isArray(products) ? products : []);
   const latestDrops = activeProducts.slice(0, 6);
   const bestSellers = activeProducts.filter((p) => p.category === 'cases').concat(activeProducts.filter((p) => p.category === 'stickers')).slice(2, 8);
 
