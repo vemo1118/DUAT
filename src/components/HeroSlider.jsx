@@ -130,7 +130,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       {/* Main Content Container with Free 2D Position & Scaling across full screen */}
       <div className="w-full px-4 sm:px-12 lg:px-16 py-16 sm:py-24 relative z-10">
         <div
-          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 ${alignClass}`}
+          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-sm:!max-w-full max-sm:!left-0 max-sm:!top-0 ${alignClass}`}
           key={current.id}
           style={{
             position: 'relative',

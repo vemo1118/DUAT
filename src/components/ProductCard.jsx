@@ -143,10 +143,10 @@ export const ProductCard = ({ product, onSelectProduct }) => {
         </div>
 
         {/* Dual Action Buttons: Add to Cart & Customize */}
-        <div className="pt-1 grid grid-cols-2 gap-2">
+        <div className="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
           <button
             onClick={handleAdd}
-            className={`min-h-[44px] py-3 text-[11px] font-mono font-bold uppercase tracking-wider border transition-all duration-300 flex items-center justify-center gap-1.5 ${
+            className={`min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border transition-all duration-300 flex items-center justify-center gap-1 ${
               added
                 ? 'bg-gold text-void border-gold'
                 : 'bg-coal text-bone border-grave hover:bg-gold hover:text-void hover:border-gold'
@@ -154,12 +154,12 @@ export const ProductCard = ({ product, onSelectProduct }) => {
           >
             {added ? (
               <>
-                <Check size={14} />
+                <Check size={13} />
                 <span>{t('addedToCart')}</span>
               </>
             ) : (
               <>
-                <ShoppingBag size={14} />
+                <ShoppingBag size={13} />
                 <span>{t('addToCart')}</span>
               </>
             )}
@@ -168,7 +168,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
           {/* Customize Navigation Button */}
           <button
             onClick={handleCustomize}
-            className="min-h-[44px] py-3 text-[11px] font-mono font-bold uppercase tracking-wider border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all duration-300 flex items-center justify-center gap-1"
+            className="min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all duration-300 flex items-center justify-center gap-1"
           >
             <Sparkles size={13} />
             <span>CUSTOMIZE</span>
