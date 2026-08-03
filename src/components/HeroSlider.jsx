@@ -80,9 +80,11 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           <img
             src={bgImage}
             alt="Hero Background"
-            className="w-full h-full object-cover object-center scale-100 transition-transform duration-700"
+            className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone via-void/75 to-void/40 backdrop-blur-[1px]" />
+          {/* Crisp Gradient Overlay: Text readable on left, image HD sharp on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/70 to-transparent sm:w-2/3" />
+          <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
