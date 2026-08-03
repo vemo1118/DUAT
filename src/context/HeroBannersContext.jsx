@@ -76,6 +76,11 @@ function mapFromDb(row) {
     ctaSecondaryTextEn: data.ctaSecondaryTextEn || row.cta_secondary_text_en || '',
     ctaSecondaryTextAr: data.ctaSecondaryTextAr || row.cta_secondary_text_ar || '',
     ctaSecondaryLink: data.ctaSecondaryLink || row.cta_secondary_link || '',
+    textAlign: data.textAlign || row.text_align || 'left',
+    headline1Color: data.headline1Color || row.headline1_color || '',
+    headline2Color: data.headline2Color || row.headline2_color || '',
+    subColor: data.subColor || row.sub_color || '',
+    overlayStrength: data.overlayStrength || row.overlay_strength || 'medium',
     sort_order: row.sort_order ?? data.sort_order ?? 0
   };
 }

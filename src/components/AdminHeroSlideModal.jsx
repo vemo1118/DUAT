@@ -23,6 +23,11 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
     ctaSecondaryLink: '/shop',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
+    overlayStrength: 'medium',
     is_active: true
   });
 
@@ -47,6 +52,11 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         ctaSecondaryTextEn: slideToEdit.ctaSecondaryTextEn || '',
         ctaSecondaryTextAr: slideToEdit.ctaSecondaryTextAr || '',
         ctaSecondaryLink: slideToEdit.ctaSecondaryLink || '/shop',
+        textAlign: slideToEdit.textAlign || 'left',
+        headline1Color: slideToEdit.headline1Color || '#EDE4D3',
+        headline2Color: slideToEdit.headline2Color || '#E8A33D',
+        subColor: slideToEdit.subColor || '#8E98BF',
+        overlayStrength: slideToEdit.overlayStrength || 'medium',
         is_active: slideToEdit.is_active !== undefined ? Boolean(slideToEdit.is_active) : true
       });
     } else {
@@ -69,6 +79,11 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         ctaSecondaryTextEn: 'CUSTOMIZE',
         ctaSecondaryTextAr: 'تخصيص بنفسك',
         ctaSecondaryLink: '/customize',
+        textAlign: 'left',
+        headline1Color: '#EDE4D3',
+        headline2Color: '#E8A33D',
+        subColor: '#8E98BF',
+        overlayStrength: 'medium',
         is_active: true
       });
     }
@@ -473,6 +488,150 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 <option value="/track-order">/track-order (تتبع الطلب)</option>
                 <option value="/the-duat">/the-duat (عن دوات)</option>
               </select>
+            </div>
+          </div>
+
+          {/* Design, Layout & Color Customization Block */}
+          <div className="bg-stone border border-gold/30 p-5 space-y-5 rounded-sm">
+            <div className="flex items-center gap-2 border-b border-grave pb-2">
+              <Sparkles size={16} className="text-gold" />
+              <h3 className="font-mono text-xs text-gold uppercase tracking-wider font-bold">
+                تحكم مظهر البنر، المحاذاة والألوان (Layout & Color Design Controls)
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Text Alignment */}
+              <div>
+                <label className="block font-mono text-xs text-bone uppercase tracking-wider mb-2 font-bold">
+                  مكان ومحاذاة النصوص والأزرار (Text Alignment)
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, textAlign: 'left' }))}
+                    className={`py-2 px-3 text-xs font-mono border transition-all ${
+                      formData.textAlign === 'left'
+                        ? 'bg-gold text-[#0A0C16] border-gold font-bold'
+                        : 'bg-coal text-ash border-grave hover:text-bone'
+                    }`}
+                  >
+                    👈 يسار (Left)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, textAlign: 'center' }))}
+                    className={`py-2 px-3 text-xs font-mono border transition-all ${
+                      formData.textAlign === 'center'
+                        ? 'bg-gold text-[#0A0C16] border-gold font-bold'
+                        : 'bg-coal text-ash border-grave hover:text-bone'
+                    }`}
+                  >
+                    ↔️ وسط (Center)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, textAlign: 'right' }))}
+                    className={`py-2 px-3 text-xs font-mono border transition-all ${
+                      formData.textAlign === 'right'
+                        ? 'bg-gold text-[#0A0C16] border-gold font-bold'
+                        : 'bg-coal text-ash border-grave hover:text-bone'
+                    }`}
+                  >
+                    👉 يمين (Right)
+                  </button>
+                </div>
+              </div>
+
+              {/* Background Overlay Strength */}
+              <div>
+                <label className="block font-mono text-xs text-bone uppercase tracking-wider mb-2 font-bold">
+                  درجة التظليل خلف النصوص (Background Vignette Overlay)
+                </label>
+                <select
+                  name="overlayStrength"
+                  value={formData.overlayStrength || 'medium'}
+                  onChange={handleChange}
+                  className="w-full bg-coal border border-grave px-3 py-2 text-bone font-mono text-xs"
+                >
+                  <option value="medium">متوسط (Medium - متناسق مع معظم الصور)</option>
+                  <option value="subtle">خفيف جداً (Subtle - للصورة الصافية الداكنة)</option>
+                  <option value="heavy">قوي وداكن (Heavy - لتوضيح النص فوق الصور الفاتحة جداً)</option>
+                  <option value="none">بدون تظليل (None - إيقاف الـ Overlay)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Colors Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-grave/40">
+              {/* Headline 1 Color */}
+              <div>
+                <label className="block font-mono text-[11px] text-ash uppercase tracking-wider mb-1 font-bold">
+                  لون السطر الأول
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    name="headline1Color"
+                    value={formData.headline1Color || '#EDE4D3'}
+                    onChange={handleChange}
+                    className="w-8 h-8 rounded border border-grave bg-coal cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    name="headline1Color"
+                    value={formData.headline1Color || '#EDE4D3'}
+                    onChange={handleChange}
+                    className="flex-1 bg-coal border border-grave px-2 py-1.5 text-bone font-mono text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Headline 2 Color */}
+              <div>
+                <label className="block font-mono text-[11px] text-ash uppercase tracking-wider mb-1 font-bold">
+                  لون السطر الثاني
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    name="headline2Color"
+                    value={formData.headline2Color || '#E8A33D'}
+                    onChange={handleChange}
+                    className="w-8 h-8 rounded border border-grave bg-coal cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    name="headline2Color"
+                    value={formData.headline2Color || '#E8A33D'}
+                    onChange={handleChange}
+                    className="flex-1 bg-coal border border-grave px-2 py-1.5 text-bone font-mono text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Subtitle Color */}
+              <div>
+                <label className="block font-mono text-[11px] text-ash uppercase tracking-wider mb-1 font-bold">
+                  لون الوصف الفرعي
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    name="subColor"
+                    value={formData.subColor || '#8E98BF'}
+                    onChange={handleChange}
+                    className="w-8 h-8 rounded border border-grave bg-coal cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    name="subColor"
+                    value={formData.subColor || '#8E98BF'}
+                    onChange={handleChange}
+                    className="flex-1 bg-coal border border-grave px-2 py-1.5 text-bone font-mono text-xs"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

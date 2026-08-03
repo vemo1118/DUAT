@@ -68,6 +68,20 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
   const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg';
 
+  const alignClass = current?.textAlign === 'center'
+    ? 'text-center items-center mx-auto'
+    : current?.textAlign === 'right'
+    ? 'text-right items-end ml-auto'
+    : 'text-left items-start mr-auto';
+
+  const flexJustifyClass = current?.textAlign === 'center'
+    ? 'justify-center'
+    : current?.textAlign === 'right'
+    ? 'justify-end'
+    : 'justify-start';
+
+  const overlayStrength = current?.overlayStrength || 'medium';
+
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
@@ -82,9 +96,21 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             alt="Hero Background"
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
-          {/* Crisp Gradient Overlay: Text readable on left, image HD sharp on right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/70 to-transparent sm:w-2/3" />
-          <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
+          {/* Dynamic Background Overlay Vignette */}
+          {overlayStrength !== 'none' && (
+            <>
+              <div
+                className={`absolute inset-0 ${
+                  overlayStrength === 'heavy'
+                    ? 'bg-gradient-to-r from-void/98 via-void/90 to-void/40 sm:w-3/4'
+                    : overlayStrength === 'subtle'
+                    ? 'bg-gradient-to-r from-void/80 via-void/40 to-transparent sm:w-1/2'
+                    : 'bg-gradient-to-r from-void/95 via-void/70 to-transparent sm:w-2/3'
+                }`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
+            </>
+          )}
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
@@ -93,10 +119,10 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10 w-full">
-        <div className="max-w-3xl space-y-6 animate-fade-in" key={current.id}>
+        <div className={`max-w-3xl flex flex-col space-y-6 animate-fade-in ${alignClass}`} key={current.id}>
           
           {/* Eyebrow & Offer Badge */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className={`flex flex-wrap items-center gap-3 ${flexJustifyClass}`}>
             <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/10 px-3 py-1 border border-gold/30">
               <SunDisc size={14} variant="gold" />
               <span>{eyebrow}</span>
@@ -110,24 +136,33 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           </div>
 
           {/* Headlines */}
-          <div className="space-y-1">
-            <h1 className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase text-bone tracking-tight font-bold leading-none">
+          <div className="space-y-1 w-full">
+            <h1
+              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone"
+              style={{ color: current?.headline1Color || undefined }}
+            >
               {headline1}
             </h1>
             {headline2 && (
-              <h2 className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase text-gold tracking-tight font-bold leading-none">
+              <h2
+                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold"
+                style={{ color: current?.headline2Color || undefined }}
+              >
                 {headline2}
               </h2>
             )}
           </div>
 
           {/* Subtitle / Description */}
-          <p className="font-space text-sm sm:text-base text-ash font-light max-w-2xl leading-relaxed">
+          <p
+            className="font-space text-sm sm:text-base font-light max-w-2xl leading-relaxed text-ash"
+            style={{ color: current?.subColor || undefined }}
+          >
             {sub}
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider">
+          <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
             {/* Primary Action Button */}
             <button
               onClick={() => navigate(primaryBtnLink)}
