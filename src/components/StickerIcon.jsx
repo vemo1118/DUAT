@@ -1,8 +1,8 @@
 import React from 'react';
 
-export const StickerIcon = ({ stickerId, size = 40 }) => {
-  const strokeColor = '#E0A93B';
-  const fillColor = '#E0A93B';
+export const StickerIcon = ({ stickerId, size = 40, color, bgColor }) => {
+  const strokeColor = color || '#E0A93B';
+  const fillColor = color || '#E0A93B';
 
   // Dynamic prefix matching for Arabic Letters, English Letters, Numbers/Years, and Quotes
   if (typeof stickerId === 'string') {
@@ -10,12 +10,18 @@ export const StickerIcon = ({ stickerId, size = 40 }) => {
       const char = stickerId.replace('ar-letter-', '');
       return (
         <div
-          style={{ width: `${size}px`, height: `${size}px` }}
-          className="rounded-full bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            color: color || '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="rounded-full border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none"
         >
           {/* Epoxy Dome Specular Highlight */}
           <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <span className="font-kufi font-bold text-gold text-lg leading-none transform translate-y-[-1px]">
+          <span style={{ color: color || '#E8A33D' }} className="font-kufi font-bold text-lg leading-none transform translate-y-[-1px]">
             {char}
           </span>
         </div>
@@ -26,12 +32,18 @@ export const StickerIcon = ({ stickerId, size = 40 }) => {
       const char = stickerId.replace('en-letter-', '');
       return (
         <div
-          style={{ width: `${size}px`, height: `${size}px` }}
-          className="rounded-full bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            color: color || '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="rounded-full border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none"
         >
           {/* Epoxy Dome Specular Highlight */}
           <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <span className="font-mono font-bold text-gold text-base leading-none">
+          <span style={{ color: color || '#E8A33D' }} className="font-mono font-bold text-base leading-none">
             {char}
           </span>
         </div>
@@ -47,14 +59,17 @@ export const StickerIcon = ({ stickerId, size = 40 }) => {
             minWidth: isYear ? `${size * 1.6}px` : `${size}px`,
             height: `${size}px`,
             paddingLeft: isYear ? '8px' : '0',
-            paddingRight: isYear ? '8px' : '0'
+            paddingRight: isYear ? '8px' : '0',
+            color: color || '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
+            borderColor: color || '#E8A33D'
           }}
           className={`${
             isYear ? 'rounded-full px-3' : 'rounded-full'
-          } bg-gradient-to-br from-[#2E2823] via-[#14110F] to-[#050505] border-2 border-gold flex items-center justify-center shadow-lg relative overflow-hidden select-none`}
+          } border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none`}
         >
           <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <span className="font-mono font-bold text-gold text-xs tracking-wider">
+          <span style={{ color: color || '#E8A33D' }} className="font-mono font-bold text-xs tracking-wider">
             {val}
           </span>
         </div>
@@ -75,7 +90,14 @@ export const StickerIcon = ({ stickerId, size = 40 }) => {
       const isAr = /[\u0600-\u06FF]/.test(text);
 
       return (
-        <div className={`bg-gradient-to-r from-coal via-stone to-void text-gold border-2 border-gold px-3.5 py-1.5 rounded-full shadow-md text-xs whitespace-nowrap select-none relative overflow-hidden ${isAr ? 'font-kufi' : 'font-mono uppercase tracking-widest'}`}>
+        <div
+          style={{
+            color: color || '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
+            borderColor: color || '#E8A33D'
+          }}
+          className={`border-2 px-3.5 py-1.5 rounded-full shadow-md text-xs whitespace-nowrap select-none relative overflow-hidden ${isAr ? 'font-kufi' : 'font-mono uppercase tracking-widest'}`}
+        >
           <div className="absolute top-0.5 left-2 w-1/4 h-1/2 bg-white/15 rounded-full blur-[1px] pointer-events-none" />
           {text}
         </div>
@@ -175,28 +197,56 @@ export const StickerIcon = ({ stickerId, size = 40 }) => {
 
     case 'pill-tale3-noor':
       return (
-        <div className="bg-gold text-[#050505] font-kufi font-bold px-3.5 py-1.5 rounded-full border border-stone shadow-md text-xs whitespace-nowrap select-none">
+        <div
+          style={{
+            color: color || '#050505',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#E8A33D'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
+        >
           طالع نور
         </div>
       );
 
     case 'pill-3addi-lel':
       return (
-        <div className="bg-coal text-bone font-kufi font-bold px-3.5 py-1.5 rounded-full border border-gold shadow-md text-xs whitespace-nowrap select-none">
+        <div
+          style={{
+            color: color || '#EDE4D3',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
+        >
           عدّي الليل
         </div>
       );
 
     case 'pill-bokra-ahla':
       return (
-        <div className="bg-stone text-bone font-kufi font-bold px-3.5 py-1.5 rounded-full border border-grave shadow-md text-xs whitespace-nowrap select-none">
+        <div
+          style={{
+            color: color || '#EDE4D3',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#2E2823'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
+        >
           بكرة أحلى
         </div>
       );
 
     case 'pill-born-dawn':
       return (
-        <div className="bg-void text-gold font-mono font-bold px-3 py-1 rounded-full border border-gold shadow-md text-[10px] tracking-widest uppercase whitespace-nowrap select-none">
+        <div
+          style={{
+            color: color || '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#050505'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="font-mono font-bold px-3 py-1 rounded-full border shadow-md text-[10px] tracking-widest uppercase whitespace-nowrap select-none"
+        >
           BORN AT DAWN
         </div>
       );

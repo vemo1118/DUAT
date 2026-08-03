@@ -587,7 +587,12 @@ export const CustomizerContent = () => {
 
                       {/* Render Sticker SVG Artwork */}
                       {layer.type === 'sticker' && (
-                        <StickerIcon stickerId={layer.stickerId} size={46} />
+                        <StickerIcon
+                          stickerId={layer.stickerId}
+                          size={46}
+                          color={layer.color}
+                          bgColor={layer.bgColor}
+                        />
                       )}
 
                       {/* Render Custom Text Sticker Pill */}
