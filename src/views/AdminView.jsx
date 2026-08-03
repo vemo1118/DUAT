@@ -42,6 +42,7 @@ import {
 import {
   exportOrdersToCSV,
   sendTestTelegramNotification,
+  saveNotificationSettingsToSupabase,
   TELEGRAM_TOKEN_KEY,
   TELEGRAM_CHAT_ID_KEY,
   ADMIN_WHATSAPP_NUMBER_KEY
@@ -67,12 +68,10 @@ export function AdminView() {
   const [telegramChatId, setTelegramChatId] = useState(() => localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '');
   const [adminWhatsApp, setAdminWhatsApp] = useState(() => localStorage.getItem(ADMIN_WHATSAPP_NUMBER_KEY) || '201000000000');
 
-  const handleSaveNotificationSettings = (e) => {
+  const handleSaveNotificationSettings = async (e) => {
     e.preventDefault();
-    localStorage.setItem(TELEGRAM_TOKEN_KEY, telegramToken.trim());
-    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, telegramChatId.trim());
-    localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, adminWhatsApp.trim());
-    showToast('تم حفظ إعدادات الإشعارات الفورية على الموبايل بنجاح!', 'success');
+    await saveNotificationSettingsToSupabase(telegramToken, telegramChatId, adminWhatsApp);
+    showToast('تم حفظ إعدادات الإشعارات الفورية ومزامنتها عالمياً لجميع العملاء والموبايلات بنجاح!', 'success');
   };
 
   const handleTestNotification = async () => {
@@ -80,14 +79,13 @@ export function AdminView() {
       showToast('يرجى إدخال الـ Bot Token والـ Chat ID أولاً لاختبار الإشعار!', 'error');
       return;
     }
-    localStorage.setItem(TELEGRAM_TOKEN_KEY, telegramToken.trim());
-    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, telegramChatId.trim());
+    await saveNotificationSettingsToSupabase(telegramToken, telegramChatId, adminWhatsApp);
     showToast('جاري إرسال إشعار تجريبي لموبايلك عبر تليجرام...', 'info');
     const ok = await sendTestTelegramNotification();
     if (ok) {
       showToast('وصل الإشعار التجريبي بنجاح! تفقّد هاتفك المحمول 📱✨', 'success');
     } else {
-      showToast('تعذر الإرسال! تأكد من الـ Token والـ Chat ID وأنك اضطت /start للبوت في تليجرام.', 'error');
+      showToast('تعذر الإرسال! تأكد من الـ Token والـ Chat ID وأنك اضغطت /start للبوت في تليجرام.', 'error');
     }
   };
 

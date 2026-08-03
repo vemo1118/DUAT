@@ -1,4 +1,4 @@
-// Instant Mobile Notification & Logistics Utilities for DUAT E-Commerce
+import { supabase } from '../lib/supabase';
 
 export const TELEGRAM_TOKEN_KEY = 'duat_telegram_bot_token';
 export const TELEGRAM_CHAT_ID_KEY = 'duat_telegram_chat_id';
@@ -6,13 +6,73 @@ export const ADMIN_WHATSAPP_NUMBER_KEY = 'duat_admin_whatsapp_number';
 
 export const DEFAULT_ADMIN_WHATSAPP = '201000000000'; // Default phone number for WhatsApp orders
 
+let cachedCredentials = null;
+
+export async function getTelegramCredentials() {
+  let token = localStorage.getItem(TELEGRAM_TOKEN_KEY);
+  let chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
+
+  if (token && chatId) {
+    return { token, chatId };
+  }
+
+  if (cachedCredentials) {
+    return cachedCredentials;
+  }
+
+  // Fetch global admin notification settings from Supabase if not present in local storage
+  try {
+    const { data } = await supabase
+      .from('hero_slides')
+      .select('*')
+      .eq('id', 'settings_telegram')
+      .maybeSingle();
+
+    if (data && data.data) {
+      const { token: dbToken, chatId: dbChatId, whatsapp: dbWa } = data.data;
+      if (dbToken && dbChatId) {
+        cachedCredentials = { token: dbToken, chatId: dbChatId };
+        localStorage.setItem(TELEGRAM_TOKEN_KEY, dbToken);
+        localStorage.setItem(TELEGRAM_CHAT_ID_KEY, dbChatId);
+        if (dbWa) localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, dbWa);
+        return cachedCredentials;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed fetching Telegram credentials from Supabase:', err);
+  }
+
+  return { token: null, chatId: null };
+}
+
+export async function saveNotificationSettingsToSupabase(token, chatId, whatsapp) {
+  const cleanToken = (token || '').trim();
+  const cleanChatId = (chatId || '').trim();
+  const cleanWa = (whatsapp || '').trim();
+
+  localStorage.setItem(TELEGRAM_TOKEN_KEY, cleanToken);
+  localStorage.setItem(TELEGRAM_CHAT_ID_KEY, cleanChatId);
+  localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, cleanWa);
+  cachedCredentials = { token: cleanToken, chatId: cleanChatId };
+
+  try {
+    await supabase.from('hero_slides').upsert({
+      id: 'settings_telegram',
+      is_active: false,
+      sort_order: 999,
+      data: { token: cleanToken, chatId: cleanChatId, whatsapp: cleanWa }
+    });
+  } catch (err) {
+    console.warn('Failed saving telegram settings to Supabase:', err);
+  }
+}
+
 /**
  * Sends an instant push notification with sound to the store owner's Telegram app when an order is placed.
  */
 export async function sendTelegramOrderNotification(order) {
   try {
-    const token = localStorage.getItem(TELEGRAM_TOKEN_KEY);
-    const chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
+    const { token, chatId } = await getTelegramCredentials();
 
     if (!token || !chatId) {
       console.warn('Telegram Bot Token or Chat ID not configured in Admin Settings.');
