@@ -169,6 +169,22 @@ async function saveSlideToSupabase(slide, index = 0) {
   }
 }
 
+function mergeWithLocalSlides(fetchedFromDb) {
+  const local = loadLocalSlides();
+  if (!Array.isArray(local) || local.length === 0) return fetchedFromDb;
+  const localMap = new Map(local.map((s) => [String(s.id), s]));
+
+  return fetchedFromDb.map((dbSlide) => {
+    const loc = localMap.get(String(dbSlide.id));
+    if (!loc) return dbSlide;
+    return {
+      ...dbSlide,
+      ...loc,
+      is_active: loc.is_active !== undefined ? Boolean(loc.is_active) : Boolean(dbSlide.is_active)
+    };
+  });
+}
+
 export function HeroBannersProvider({ children }) {
   const [slides, setSlides] = useState(() => loadLocalSlides() || INITIAL_HERO_SLIDES);
   const [loading, setLoading] = useState(true);
@@ -186,8 +202,9 @@ export function HeroBannersProvider({ children }) {
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
         if (fetched.length > 0) {
-          setSlides(fetched);
-          saveLocalSlides(fetched);
+          const merged = mergeWithLocalSlides(fetched);
+          setSlides(merged);
+          saveLocalSlides(merged);
         }
       } else {
         const local = loadLocalSlides();

@@ -5,6 +5,11 @@ import { useHeroBanners } from '../context/HeroBannersContext';
 import { SunDisc } from './SunDisc';
 import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, ShieldCheck, Truck, Clock } from 'lucide-react';
 
+function safeNum(val, fallback) {
+  const n = Number(val);
+  return isNaN(n) ? fallback : n;
+}
+
 export const HeroSlider = ({ setSelectedCategory }) => {
   const { lang, t } = useLanguage();
   const { slides } = useHeroBanners();
@@ -80,10 +85,12 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     ? 'justify-end'
     : 'justify-start';
 
-  const posX = current?.posX !== undefined ? Number(current.posX) : 5;
-  const posY = current?.posY !== undefined ? Number(current.posY) : 30;
-  const maxWidth = current?.maxWidth !== undefined ? Number(current.maxWidth) : 55;
-  const fontSizeScale = current?.fontSizeScale !== undefined ? Number(current.fontSizeScale) / 100 : 1;
+  const overlayStrength = current?.overlayStrength || 'medium';
+
+  const posX = safeNum(current?.posX, 5);
+  const posY = safeNum(current?.posY, 30);
+  const maxWidth = safeNum(current?.maxWidth, 55);
+  const fontSizeScale = safeNum(current?.fontSizeScale, 100) / 100;
 
   return (
     <section
