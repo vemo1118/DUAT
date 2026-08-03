@@ -21,6 +21,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const isRtl = isAr;
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
+  const [openFaqId, setOpenFaqId] = useState(null);
 
   const filteredProducts = Array.isArray(products)
     ? products.filter((p) => p && p.is_active !== false && p.isActive !== false)
