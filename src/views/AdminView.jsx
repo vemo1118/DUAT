@@ -43,6 +43,7 @@ import {
   exportOrdersToCSV,
   sendTestTelegramNotification,
   saveNotificationSettingsToSupabase,
+  wipeAllOrdersAndStorage,
   TELEGRAM_TOKEN_KEY,
   TELEGRAM_CHAT_ID_KEY,
   ADMIN_WHATSAPP_NUMBER_KEY
@@ -736,16 +737,22 @@ export function AdminView() {
               </button>
 
               <button
-                onClick={() => {
-                  if (window.confirm('هل أنت تأكد من استعادة الطلبات التجريبية الأصلية؟')) {
-                    resetOrders();
-                    showToast('تم استعادة قائمة الطلبات التجريبية!', 'info');
+                onClick={async () => {
+                  if (window.confirm('هل أنت متاكد من مسح جميع الأوردرات والصور المرفوعة وإعادة عداد الأوردرات للبدء من DUAT-0001؟')) {
+                    const ok = await wipeAllOrdersAndStorage();
+                    if (ok) {
+                      resetOrders();
+                      fetchOrders();
+                      showToast('تم مسح جميع الأوردرات بنجاح! الأوردر القادم سيكون DUAT-0001 🧹', 'success');
+                    } else {
+                      showToast('حدث خطأ أثناء المسح، يرجى المحاولة مرة أخرى', 'error');
+                    }
                   }
                 }}
-                className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
+                className="flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-mono text-xs uppercase font-bold transition-colors"
               >
-                <RotateCcw size={15} />
-                <span>إعادة ضبط الطلبات</span>
+                <Trash2 size={15} />
+                <span>مسح جميع الأوردرات (إعادة العداد لـ DUAT-0001) 🧹</span>
               </button>
             </div>
           </div>

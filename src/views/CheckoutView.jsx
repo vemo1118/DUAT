@@ -8,7 +8,7 @@ import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
 import { ShieldCheck, Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
 
-import { sendTelegramOrderNotification } from '../utils/orderNotifier';
+import { sendTelegramOrderNotification, generateSequentialOrderRef } from '../utils/orderNotifier';
 
 const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 
@@ -16,7 +16,7 @@ export const CheckoutView = ({ setView }) => {
   const { lang, t, formatPrice } = useLanguage();
   const { cartItems, subtotal, discount, clearCart } = useCart();
   const { showToast } = useToast();
-  const { addOrder } = useOrders();
+  const { addOrder, orders } = useOrders();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
 
@@ -94,7 +94,7 @@ export const CheckoutView = ({ setView }) => {
       setIsSubmitting(true);
     }
 
-    const ref = `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const ref = await generateSequentialOrderRef(orders);
     const orderData = {
       id: ref,
       ref: ref,

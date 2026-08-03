@@ -233,3 +233,65 @@ export function exportOrdersToCSV(orders = []) {
   link.click();
   document.body.removeChild(link);
 }
+
+/**
+ * Calculates the next sequential order ref (DUAT-0001, DUAT-0002, etc.).
+ * Resets to DUAT-0001 if all orders are wiped.
+ */
+export async function generateSequentialOrderRef(currentOrders = []) {
+  let activeOrders = currentOrders;
+
+  try {
+    const { data } = await supabase.from('orders').select('id, ref');
+    if (Array.isArray(data)) {
+      activeOrders = data;
+    }
+  } catch (err) {
+    console.warn('Failed fetching active orders count for sequential ref:', err);
+  }
+
+  if (!Array.isArray(activeOrders) || activeOrders.length === 0) {
+    return 'DUAT-0001';
+  }
+
+  let maxNum = 0;
+  for (const ord of activeOrders) {
+    const code = ord.id || ord.ref || '';
+    const match = code.match(/DUAT-(\d+)/i);
+    if (match && match[1]) {
+      const num = parseInt(match[1], 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+  }
+
+  const nextNum = maxNum + 1;
+  return `DUAT-${String(nextNum).padStart(4, '0')}`;
+}
+
+/**
+ * Wipes all orders from Supabase database, local storage, and uploaded files.
+ */
+export async function wipeAllOrdersAndStorage() {
+  localStorage.removeItem('duat_customer_orders');
+  localStorage.removeItem('duat_latest_order_ref');
+
+  try {
+    const { data: sel } = await supabase.from('orders').select('id');
+    if (sel && sel.length > 0) {
+      const ids = sel.map((o) => o.id);
+      await supabase.from('orders').delete().in('id', ids);
+    }
+    await supabase.from('orders').delete().neq('id', 'dummy_wipe_id');
+
+    const { data: files } = await supabase.storage.from('payment-proofs').list();
+    if (files && files.length > 0) {
+      await supabase.storage.from('payment-proofs').remove(files.map((f) => f.name));
+    }
+    return true;
+  } catch (err) {
+    console.error('Wipe orders error:', err);
+    return false;
+  }
+}
