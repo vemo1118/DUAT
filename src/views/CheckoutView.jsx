@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -13,6 +14,7 @@ import { sendTelegramOrderNotification, generateSequentialOrderRef } from '../ut
 const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 
 export const CheckoutView = ({ setView }) => {
+  const navigate = useNavigate();
   const { lang, t, formatPrice } = useLanguage();
   const { cartItems, subtotal, discount, clearCart } = useCart();
   const { showToast } = useToast();
@@ -162,7 +164,11 @@ export const CheckoutView = ({ setView }) => {
         </div>
 
         <button
-          onClick={() => setView('shop')}
+          onClick={() => {
+            if (typeof setView === 'function') setView('shop');
+            navigate('/shop');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           className="btn-primary py-4 px-8 text-xs font-mono tracking-widest"
         >
           {t('backToShop')}
