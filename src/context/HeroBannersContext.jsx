@@ -118,7 +118,10 @@ function loadLocalSlides() {
     const saved = localStorage.getItem(HERO_SLIDES_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const valid = parsed.filter((item) => item && typeof item === 'object' && item.id);
+        if (valid.length > 0) return valid;
+      }
     }
   } catch (e) {
     // ignore

@@ -21,8 +21,9 @@ class GlobalErrorBoundary extends Component {
   handleReset = () => {
     try {
       localStorage.clear();
+      sessionStorage.clear();
     } catch (e) {}
-    window.location.reload();
+    window.location.href = window.location.origin + window.location.pathname + '?reset=' + Date.now();
   };
 
   render() {

@@ -48,21 +48,25 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
   if (activeSlides.length === 0) return null;
 
-  const current = activeSlides[currentSlide] || activeSlides[0];
+  const current = (activeSlides[currentSlide] && typeof activeSlides[currentSlide] === 'object')
+    ? activeSlides[currentSlide]
+    : (activeSlides[0] && typeof activeSlides[0] === 'object')
+    ? activeSlides[0]
+    : INITIAL_HERO_SLIDES[0];
 
-  const eyebrow = isAr ? current.eyebrowAr || current.eyebrowEn : current.eyebrowEn || current.eyebrowAr;
-  const headline1 = isAr ? current.headline1Ar || current.headline1En : current.headline1En || current.headline1Ar;
-  const headline2 = isAr ? current.headline2Ar || current.headline2En : current.headline2En || current.headline2Ar;
-  const sub = isAr ? current.subAr || current.subEn : current.subEn || current.subAr;
-  const badge = isAr ? current.badgeAr || current.badgeEn : current.badgeEn || current.badgeAr;
+  const eyebrow = isAr ? current?.eyebrowAr || current?.eyebrowEn || '' : current?.eyebrowEn || current?.eyebrowAr || '';
+  const headline1 = isAr ? current?.headline1Ar || current?.headline1En || '' : current?.headline1En || current?.headline1Ar || '';
+  const headline2 = isAr ? current?.headline2Ar || current?.headline2En || '' : current?.headline2En || current?.headline2Ar || '';
+  const sub = isAr ? current?.subAr || current?.subEn || '' : current?.subEn || current?.subAr || '';
+  const badge = isAr ? current?.badgeAr || current?.badgeEn || '' : current?.badgeEn || current?.badgeAr || '';
 
-  const primaryBtnText = (isAr ? current.ctaPrimaryTextAr : current.ctaPrimaryTextEn) || (isAr ? 'تسوق الآن' : 'START BUILDING');
-  const primaryBtnLink = current.ctaPrimaryLink || '/customize';
+  const primaryBtnText = (isAr ? current?.ctaPrimaryTextAr : current?.ctaPrimaryTextEn) || (isAr ? 'تسوق الآن' : 'START BUILDING');
+  const primaryBtnLink = current?.ctaPrimaryLink || '/customize';
 
-  const secondaryBtnText = (isAr ? current.ctaSecondaryTextAr : current.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
-  const secondaryBtnLink = current.ctaSecondaryLink || '/shop';
+  const secondaryBtnText = (isAr ? current?.ctaSecondaryTextAr : current?.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
+  const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';
 
-  const bgImage = current.imageUrl || current.image;
+  const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg';
 
   return (
     <section
