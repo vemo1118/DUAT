@@ -49,8 +49,52 @@ function mapToDb(p) {
   };
 }
 
+const PRODUCTS_STORAGE_KEY = 'duat_products_v2';
+
+function loadLocalProducts() {
+  try {
+    const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
+function saveLocalProducts(products) {
+  try {
+    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+  } catch (e) {
+    // ignore
+  }
+}
+
+async function saveProductToSupabase(p) {
+  if (!p || !p.id) return;
+  try {
+    const { error: fullErr } = await supabase.from('products').upsert(mapToDb(p), { onConflict: 'id' });
+    if (fullErr) {
+      console.warn('Full product upsert failed, trying minimal payload:', fullErr);
+      const minimalPayload = {
+        id: String(p.id),
+        category: p.category || 'cases',
+        price: Number(p.price) || 0,
+        is_active: p.is_active !== undefined ? Boolean(p.is_active) : true,
+        data: p
+      };
+      const { error: minErr } = await supabase.from('products').upsert(minimalPayload, { onConflict: 'id' });
+      if (minErr) console.error('Minimal product upsert failed:', minErr);
+    }
+  } catch (err) {
+    console.error('Error saving product to Supabase:', err);
+  }
+}
+
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState(() => loadLocalProducts() || INITIAL_PRODUCTS);
   const [loading, setLoading] = useState(true);
 
   // Fetch products from Supabase
@@ -58,34 +102,23 @@ export function ProductsProvider({ children }) {
     setLoading(true);
     try {
       const { data, error } = await supabase.from('products').select('*');
-      if (error) {
-        console.error('Failed to fetch products from Supabase:', error);
-        setProducts(INITIAL_PRODUCTS);
-      } else if (Array.isArray(data) && data.length > 0) {
-        setProducts(data.map(mapFromDb));
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const fetched = data.map(mapFromDb);
+        setProducts(fetched);
+        saveLocalProducts(fetched);
       } else {
-        // Database table is empty -> seed once from PRODUCTS array
-        try {
-          const seedPayload = INITIAL_PRODUCTS.map(mapToDb);
-          const { data: seededData, error: seedErr } = await supabase
-            .from('products')
-            .upsert(seedPayload, { onConflict: 'id' })
-            .select();
-
-          if (!seedErr && Array.isArray(seededData) && seededData.length > 0) {
-            setProducts(seededData.map(mapFromDb));
-          } else {
-            console.error('Seeding products error:', seedErr);
-            setProducts(INITIAL_PRODUCTS);
-          }
-        } catch (sErr) {
-          console.error('Error during initial product seeding:', sErr);
+        const local = loadLocalProducts();
+        if (local && local.length > 0) {
+          setProducts(local);
+        } else {
           setProducts(INITIAL_PRODUCTS);
+          saveLocalProducts(INITIAL_PRODUCTS);
         }
       }
     } catch (err) {
       console.error('Unexpected error loading products:', err);
-      setProducts(INITIAL_PRODUCTS);
+      const local = loadLocalProducts();
+      if (local && local.length > 0) setProducts(local);
     } finally {
       setLoading(false);
     }
@@ -95,57 +128,37 @@ export function ProductsProvider({ children }) {
     fetchProducts();
   }, []);
 
-  // Add a new product
-  const addProduct = async (newProductData) => {
+  const addProduct = async (prodData) => {
     const newProduct = {
-      ...newProductData,
-      id: newProductData.id || `product-${Date.now()}`,
-      price: Number(newProductData.price) || 0,
-      category: newProductData.category || 'cases',
-      rating: newProductData.rating || 5.0,
-      reviewCount: newProductData.reviewCount || 0,
-      reviews: newProductData.reviews || [],
-      specsEn: Array.isArray(newProductData.specsEn) ? newProductData.specsEn : [],
-      specsAr: Array.isArray(newProductData.specsAr) ? newProductData.specsAr : []
+      ...prodData,
+      id: prodData.id || `prod-${Date.now()}`
     };
-
-    setProducts((prev) => [newProduct, ...prev]);
-
-    try {
-      const { error } = await supabase.from('products').upsert(mapToDb(newProduct), { onConflict: 'id' });
-      if (error) console.error('Supabase add product error:', error);
-    } catch (err) {
-      console.error('Supabase add product error:', err);
-    }
-
+    setProducts((prev) => {
+      const updated = [newProduct, ...prev];
+      saveLocalProducts(updated);
+      return updated;
+    });
+    await saveProductToSupabase(newProduct);
     return newProduct;
   };
 
-  // Update existing product by ID
   const updateProduct = async (id, updatedFields) => {
     let targetProduct = null;
-    setProducts((prev) =>
-      prev.map((prod) => {
+    setProducts((prev) => {
+      const updatedList = prev.map((prod) => {
         if (prod.id === id) {
-          const updated = {
-            ...prod,
-            ...updatedFields,
-            price: updatedFields.price !== undefined ? Number(updatedFields.price) : prod.price
-          };
+          const updated = { ...prod, ...updatedFields };
           targetProduct = updated;
           return updated;
         }
         return prod;
-      })
-    );
+      });
+      saveLocalProducts(updatedList);
+      return updatedList;
+    });
 
     if (targetProduct) {
-      try {
-        const { error } = await supabase.from('products').upsert(mapToDb(targetProduct), { onConflict: 'id' });
-        if (error) console.error('Supabase update product error:', error);
-      } catch (err) {
-        console.error('Supabase update product error:', err);
-      }
+      await saveProductToSupabase(targetProduct);
     }
   };
 
@@ -174,11 +187,10 @@ export function ProductsProvider({ children }) {
     }
   };
 
-  // Toggle Product Visibility (Hide / Show)
   const toggleProductVisibility = async (id) => {
     let targetProduct = null;
-    setProducts((prev) =>
-      prev.map((prod) => {
+    setProducts((prev) => {
+      const updatedList = prev.map((prod) => {
         if (prod.id === id) {
           const currentStatus = prod.is_active !== undefined ? Boolean(prod.is_active) : (prod.isActive !== undefined ? Boolean(prod.isActive) : true);
           const newStatus = !currentStatus;
@@ -187,22 +199,22 @@ export function ProductsProvider({ children }) {
           return updated;
         }
         return prod;
-      })
-    );
+      });
+      saveLocalProducts(updatedList);
+      return updatedList;
+    });
 
     if (targetProduct) {
-      try {
-        const { error } = await supabase.from('products').upsert(mapToDb(targetProduct), { onConflict: 'id' });
-        if (error) console.error('Supabase toggle product visibility error:', error);
-      } catch (err) {
-        console.error('Supabase toggle product visibility exception:', err);
-      }
+      await saveProductToSupabase(targetProduct);
     }
   };
 
-  // Delete product by ID
   const deleteProduct = async (id) => {
-    setProducts((prev) => prev.filter((prod) => prod.id !== id));
+    setProducts((prev) => {
+      const updatedList = prev.filter((prod) => prod.id !== id);
+      saveLocalProducts(updatedList);
+      return updatedList;
+    });
     try {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) console.error('Supabase delete product error:', error);

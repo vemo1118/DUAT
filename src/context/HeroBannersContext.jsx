@@ -109,8 +109,54 @@ function mapToDb(slide, index = 0) {
   };
 }
 
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v2';
+
+function loadLocalSlides() {
+  try {
+    const saved = localStorage.getItem(HERO_SLIDES_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
+function saveLocalSlides(slides) {
+  try {
+    localStorage.setItem(HERO_SLIDES_STORAGE_KEY, JSON.stringify(slides));
+  } catch (e) {
+    // ignore
+  }
+}
+
+async function saveSlideToSupabase(slide, index = 0) {
+  if (!slide || !slide.id) return;
+  const fullPayload = mapToDb(slide, index);
+  try {
+    const { error: fullErr } = await supabase.from('hero_slides').upsert(fullPayload, { onConflict: 'id' });
+    if (fullErr) {
+      console.warn('Full hero slide upsert failed, attempting minimal payload upsert:', fullErr);
+      const minimalPayload = {
+        id: String(slide.id),
+        is_active: slide.is_active !== undefined ? Boolean(slide.is_active) : true,
+        sort_order: slide.sort_order ?? index + 1,
+        data: slide
+      };
+      const { error: minErr } = await supabase.from('hero_slides').upsert(minimalPayload, { onConflict: 'id' });
+      if (minErr) {
+        console.error('Minimal hero slide upsert also failed:', minErr);
+      }
+    }
+  } catch (err) {
+    console.error('Unexpected error saving hero slide to Supabase:', err);
+  }
+}
+
 export function HeroBannersProvider({ children }) {
-  const [slides, setSlides] = useState(INITIAL_HERO_SLIDES);
+  const [slides, setSlides] = useState(() => loadLocalSlides() || INITIAL_HERO_SLIDES);
   const [loading, setLoading] = useState(true);
 
   const fetchSlides = async () => {
@@ -123,33 +169,23 @@ export function HeroBannersProvider({ children }) {
         // ignore order error
       }
       const { data, error } = await query;
-      if (error) {
-        console.error('Failed to fetch hero slides from Supabase:', error);
-        setSlides(INITIAL_HERO_SLIDES);
-      } else if (Array.isArray(data) && data.length > 0) {
-        setSlides(data.map(mapFromDb));
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const fetched = data.map(mapFromDb);
+        setSlides(fetched);
+        saveLocalSlides(fetched);
       } else {
-        // Seed default slides if empty
-        try {
-          const seedPayload = INITIAL_HERO_SLIDES.map((s, idx) => mapToDb(s, idx));
-          const { data: seededData, error: seedErr } = await supabase
-            .from('hero_slides')
-            .upsert(seedPayload, { onConflict: 'id' })
-            .select();
-          if (!seedErr && Array.isArray(seededData) && seededData.length > 0) {
-            setSlides(seededData.map(mapFromDb));
-          } else {
-            console.error('Seeding hero slides error:', seedErr);
-            setSlides(INITIAL_HERO_SLIDES);
-          }
-        } catch (sErr) {
-          console.error('Error seeding hero slides:', sErr);
+        const local = loadLocalSlides();
+        if (local && local.length > 0) {
+          setSlides(local);
+        } else {
           setSlides(INITIAL_HERO_SLIDES);
+          saveLocalSlides(INITIAL_HERO_SLIDES);
         }
       }
     } catch (err) {
       console.error('Unexpected error loading hero slides:', err);
-      setSlides(INITIAL_HERO_SLIDES);
+      const local = loadLocalSlides();
+      if (local && local.length > 0) setSlides(local);
     } finally {
       setLoading(false);
     }
@@ -164,68 +200,68 @@ export function HeroBannersProvider({ children }) {
       ...slideData,
       id: slideData.id || `hero-slide-${Date.now()}`
     };
-    setSlides((prev) => [newSlide, ...prev]);
+    setSlides((prev) => {
+      const updated = [newSlide, ...prev];
+      saveLocalSlides(updated);
+      return updated;
+    });
 
-    try {
-      const { error } = await supabase.from('hero_slides').upsert(mapToDb(newSlide), { onConflict: 'id' });
-      if (error) console.error('Supabase add hero slide error:', error);
-    } catch (err) {
-      console.error('Supabase add hero slide error:', err);
-    }
-
+    await saveSlideToSupabase(newSlide, 0);
     return newSlide;
   };
 
   const updateSlide = async (id, updatedFields) => {
     let targetSlide = null;
-    setSlides((prev) =>
-      prev.map((slide) => {
+    let targetIdx = 0;
+    setSlides((prev) => {
+      const updatedList = prev.map((slide, idx) => {
         if (slide.id === id) {
           const updated = { ...slide, ...updatedFields };
           targetSlide = updated;
+          targetIdx = idx;
           return updated;
         }
         return slide;
-      })
-    );
+      });
+      saveLocalSlides(updatedList);
+      return updatedList;
+    });
 
     if (targetSlide) {
-      try {
-        const { error } = await supabase.from('hero_slides').upsert(mapToDb(targetSlide), { onConflict: 'id' });
-        if (error) console.error('Supabase update hero slide error:', error);
-      } catch (err) {
-        console.error('Supabase update hero slide error:', err);
-      }
+      await saveSlideToSupabase(targetSlide, targetIdx);
     }
   };
 
   const toggleSlideVisibility = async (id) => {
     let targetSlide = null;
-    setSlides((prev) =>
-      prev.map((slide) => {
+    let targetIdx = 0;
+    setSlides((prev) => {
+      const updatedList = prev.map((slide, idx) => {
         if (slide.id === id) {
           const currentStatus = slide.is_active !== undefined ? Boolean(slide.is_active) : (slide.isActive !== undefined ? Boolean(slide.isActive) : true);
           const newStatus = !currentStatus;
           const updated = { ...slide, is_active: newStatus, isActive: newStatus };
           targetSlide = updated;
+          targetIdx = idx;
           return updated;
         }
         return slide;
-      })
-    );
+      });
+      saveLocalSlides(updatedList);
+      return updatedList;
+    });
 
     if (targetSlide) {
-      try {
-        const { error } = await supabase.from('hero_slides').upsert(mapToDb(targetSlide), { onConflict: 'id' });
-        if (error) console.error('Supabase toggle hero slide visibility error:', error);
-      } catch (err) {
-        console.error('Supabase toggle hero slide visibility error:', err);
-      }
+      await saveSlideToSupabase(targetSlide, targetIdx);
     }
   };
 
   const deleteSlide = async (id) => {
-    setSlides((prev) => prev.filter((slide) => slide.id !== id));
+    setSlides((prev) => {
+      const updatedList = prev.filter((slide) => slide.id !== id);
+      saveLocalSlides(updatedList);
+      return updatedList;
+    });
     try {
       const { error } = await supabase.from('hero_slides').delete().eq('id', id);
       if (error) console.error('Supabase delete hero slide error:', error);
@@ -235,6 +271,9 @@ export function HeroBannersProvider({ children }) {
   };
 
   const resetSlides = () => {
+    localStorage.removeItem(HERO_SLIDES_STORAGE_KEY);
+    setSlides(INITIAL_HERO_SLIDES);
+    saveLocalSlides(INITIAL_HERO_SLIDES);
     fetchSlides();
   };
 
