@@ -245,6 +245,8 @@ export const CustomizerContent = () => {
       id: `sticker-${Date.now()}`,
       type: 'sticker',
       stickerId,
+      color: textColor || '#E8A33D',
+      bgColor: textBgColor || '#14110F',
       x: 50,
       y: 50,
       scale: 1.0,
@@ -780,6 +782,61 @@ export const CustomizerContent = () => {
             {/* TAB CONTENTS — DRAGGABLE STICKER PREVIEWS */}
             {activeTab === 'stickers' && (
               <div className="space-y-4">
+                {/* Color Selector Bar for Preset Stickers */}
+                <div className="bg-coal p-3 border border-grave space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-xs text-gold font-bold">🎨 اختر لون الخط/الرمز:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { name: 'ذهب مصري', value: '#E8A33D' },
+                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'أسود فحمي', value: '#0A0C16' },
+                        { name: 'أبيض ناصع', value: '#FFFFFF' },
+                        { name: 'أحمر قاني', value: '#8B0000' },
+                        { name: 'زمردي', value: '#1B4332' }
+                      ].map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => setTextColor(c.value)}
+                          className={`w-5 h-5 rounded-full border-2 transition-transform ${
+                            textColor === c.value ? 'border-gold scale-125 shadow-md' : 'border-grave/60'
+                          }`}
+                          style={{ backgroundColor: c.value }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-grave/40 pt-2">
+                    <span className="font-mono text-xs text-gold font-bold">🏷️ اختر لون خلفية الاستيكر:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { name: 'داكن مائل للأسود', value: '#14110F' },
+                        { name: 'ذهب مصري', value: '#E8A33D' },
+                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'كحلي ملكي', value: '#0B132B' },
+                        { name: 'زمردي', value: '#1B4332' },
+                        { name: 'شفاف 🚫', value: 'transparent' }
+                      ].map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => setTextBgColor(c.value)}
+                          className={`w-5 h-5 rounded-full border-2 transition-transform flex items-center justify-center font-mono text-[8px] font-bold ${
+                            textBgColor === c.value ? 'border-gold scale-125 shadow-md' : 'border-grave/60'
+                          }`}
+                          style={{ backgroundColor: c.value === 'transparent' ? '#000000' : c.value }}
+                          title={c.name}
+                        >
+                          {c.value === 'transparent' && <span className="text-ash text-[7px]">🚫</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 <p className="font-mono text-[11px] text-ash uppercase tracking-wider">
                   💡 Tip: Click or drag & drop any 3D dome onto the phone canvas
                 </p>
@@ -793,7 +850,7 @@ export const CustomizerContent = () => {
                       className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-all min-h-[84px] cursor-grab active:cursor-grabbing hover:scale-105"
                       title="Click or Drag onto phone"
                     >
-                      <StickerIcon stickerId={st.id} size={36} />
+                      <StickerIcon stickerId={st.id} size={36} color={textColor} bgColor={textBgColor} />
                       <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full">
                         {lang === 'ar' ? st.nameAr : st.nameEn}
                       </span>

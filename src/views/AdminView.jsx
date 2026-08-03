@@ -881,7 +881,14 @@ export function AdminView() {
                     {filteredOrders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-stone/30 transition-colors">
                         <td className="py-4 px-4">
-                          <div className="font-mono text-base font-bold text-gold tracking-widest">{ord.id}</div>
+                          <div className="font-mono text-base font-bold text-gold tracking-widest flex items-center gap-2">
+                            <span>{ord.id}</span>
+                            {ord.items?.some(i => i.designSnapshot || i.customConfig?.designSnapshot) && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded">
+                                🖼️ جراب مخصص
+                              </span>
+                            )}
+                          </div>
                           <p className="font-mono text-xs text-ash mt-0.5">
                             {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString('ar-EG') : 'الآن'}
                           </p>
