@@ -23,6 +23,15 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
     ctaSecondaryLink: '/shop',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 46,
+    fontSizeScale: 92,
     is_active: true,
     sort_order: 1
   },
@@ -45,6 +54,15 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextEn: 'TRACK YOUR ORDER',
     ctaSecondaryTextAr: 'تتبع طلبك الحقيقي',
     ctaSecondaryLink: '/track-order',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 50,
+    fontSizeScale: 100,
     is_active: true,
     sort_order: 2
   }
@@ -77,14 +95,14 @@ function mapFromDb(row) {
     ctaSecondaryTextAr: data.ctaSecondaryTextAr || row.cta_secondary_text_ar || '',
     ctaSecondaryLink: data.ctaSecondaryLink || row.cta_secondary_link || '',
     textAlign: data.textAlign || row.text_align || 'left',
-    headline1Color: data.headline1Color || row.headline1_color || '',
-    headline2Color: data.headline2Color || row.headline2_color || '',
-    subColor: data.subColor || row.sub_color || '',
+    headline1Color: data.headline1Color || row.headline1_color || '#EDE4D3',
+    headline2Color: data.headline2Color || row.headline2_color || '#E8A33D',
+    subColor: data.subColor || row.sub_color || '#8E98BF',
     overlayStrength: data.overlayStrength || row.overlay_strength || 'medium',
-    posX: data.posX ?? row.pos_x ?? 10,
-    posY: data.posY ?? row.pos_y ?? 50,
-    maxWidth: data.maxWidth ?? row.max_width ?? 55,
-    fontSizeScale: data.fontSizeScale ?? row.font_size_scale ?? 100,
+    posX: data.posX !== undefined ? Number(data.posX) : (row.pos_x !== undefined ? Number(row.pos_x) : 0),
+    posY: data.posY !== undefined ? Number(data.posY) : (row.pos_y !== undefined ? Number(row.pos_y) : 30),
+    maxWidth: data.maxWidth !== undefined ? Number(data.maxWidth) : (row.max_width !== undefined ? Number(row.max_width) : 46),
+    fontSizeScale: data.fontSizeScale !== undefined ? Number(data.fontSizeScale) : (row.font_size_scale !== undefined ? Number(row.font_size_scale) : 92),
     sort_order: row.sort_order ?? data.sort_order ?? 0
   };
 }
@@ -114,13 +132,22 @@ function mapToDb(slide, index = 0) {
     sort_order: slide.sort_order ?? index + 1,
     data: {
       ...slide,
+      textAlign: slide.textAlign || 'left',
+      headline1Color: slide.headline1Color || '#EDE4D3',
+      headline2Color: slide.headline2Color || '#E8A33D',
+      subColor: slide.subColor || '#8E98BF',
+      overlayStrength: slide.overlayStrength || 'medium',
+      posX: slide.posX !== undefined ? Number(slide.posX) : 0,
+      posY: slide.posY !== undefined ? Number(slide.posY) : 30,
+      maxWidth: slide.maxWidth !== undefined ? Number(slide.maxWidth) : 46,
+      fontSizeScale: slide.fontSizeScale !== undefined ? Number(slide.fontSizeScale) : 92,
       is_active: isActiveVal,
       isActive: isActiveVal
     }
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v3';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v4';
 
 function loadLocalSlides() {
   try {

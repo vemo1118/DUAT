@@ -87,10 +87,10 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
   const overlayStrength = current?.overlayStrength || 'medium';
 
-  const posX = safeNum(current?.posX, 5);
+  const posX = safeNum(current?.posX, 0);
   const posY = safeNum(current?.posY, 30);
-  const maxWidth = safeNum(current?.maxWidth, 55);
-  const fontSizeScale = safeNum(current?.fontSizeScale, 100) / 100;
+  const maxWidth = safeNum(current?.maxWidth, 46);
+  const fontSizeScale = safeNum(current?.fontSizeScale, 92) / 100;
 
   return (
     <section
@@ -127,8 +127,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#E0A93B_1px,transparent_1px)] [background-size:24px_24px]" />
       )}
 
-      {/* Main Content Container with Free 2D Position & Scaling */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10 w-full">
+      {/* Main Content Container with Free 2D Position & Scaling across full screen */}
+      <div className="w-full px-4 sm:px-12 lg:px-16 py-16 sm:py-24 relative z-10">
         <div
           className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 ${alignClass}`}
           key={current.id}
