@@ -103,9 +103,11 @@ export function ProductsProvider({ children }) {
     try {
       const { data, error } = await supabase.from('products').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
-        const fetched = data.map(mapFromDb);
-        setProducts(fetched);
-        saveLocalProducts(fetched);
+        const fetched = data.map(mapFromDb).filter(Boolean);
+        if (fetched.length > 0) {
+          setProducts(fetched);
+          saveLocalProducts(fetched);
+        }
       } else {
         const local = loadLocalProducts();
         if (local && local.length > 0) {

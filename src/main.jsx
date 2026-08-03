@@ -39,6 +39,11 @@ class GlobalErrorBoundary extends Component {
               <p className="text-xs text-[#8E98BF] leading-relaxed">
                 تم كشف تحديث جديد للمشروع. انقر أدناه لتنشيط الصفحة والبدء فوراً.
               </p>
+              {this.state.error && (
+                <div className="mt-3 p-3 bg-[#0A0C16] border border-[#D9432E]/40 text-[#D9432E] font-mono text-[11px] text-right overflow-x-auto max-h-32 dir-ltr select-text">
+                  {this.state.error.toString()}
+                </div>
+              )}
             </div>
             <button
               onClick={this.handleReset}

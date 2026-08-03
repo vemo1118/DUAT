@@ -175,9 +175,11 @@ export function HeroBannersProvider({ children }) {
       }
       const { data, error } = await query;
       if (!error && Array.isArray(data) && data.length > 0) {
-        const fetched = data.map(mapFromDb);
-        setSlides(fetched);
-        saveLocalSlides(fetched);
+        const fetched = data.map(mapFromDb).filter(Boolean);
+        if (fetched.length > 0) {
+          setSlides(fetched);
+          saveLocalSlides(fetched);
+        }
       } else {
         const local = loadLocalSlides();
         if (local && local.length > 0) {
