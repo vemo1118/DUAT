@@ -109,9 +109,15 @@ export const CheckoutView = ({ setView }) => {
       createdAt: new Date().toISOString()
     };
 
+    // Guarantee Telegram Notification fires instantly to store owner's mobile phone
+    try {
+      sendTelegramOrderNotification(orderData);
+    } catch (notifErr) {
+      console.error('Notification dispatch exception:', notifErr);
+    }
+
     try {
       await addOrder(orderData);
-      sendTelegramOrderNotification(orderData);
     } catch (err) {
       console.error('Error adding order to database:', err);
     }

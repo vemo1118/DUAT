@@ -21,7 +21,8 @@ export async function sendTelegramOrderNotification(order) {
 
     const customerName = order.customerName || order.customer?.fullName || order.customer?.name || 'عميل DUAT';
     const customerPhone = order.customerPhone || order.customer?.phone || 'غير محدد';
-    const customerGov = order.customerGovernorate || order.customer?.governorate || '';
+    const govObj = order.customerGovernorate || order.customer?.governorate;
+    const customerGov = typeof govObj === 'object' ? (govObj?.nameAr || govObj?.nameEn || '') : (govObj || '');
     const customerAddr = order.customerAddress || order.customer?.address || 'عنوان مباشر';
     const totalAmount = order.totalPrice || order.total || 0;
     const orderItems = order.items || order.cartItems || [];
