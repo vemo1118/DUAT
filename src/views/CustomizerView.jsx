@@ -52,6 +52,151 @@ class CustomizerErrorBoundary extends Component {
   }
 }
 
+function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110F', caseRingColor = '#E8A33D', selectedCaseType = null) {
+  try {
+    const canvas = document.createElement('canvas');
+    const width = 360;
+    const height = 640;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Phone Case Base Fill
+    ctx.fillStyle = caseBgColor || '#14110F';
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(15, 15, width - 30, height - 30, 42);
+    } else {
+      ctx.rect(15, 15, width - 30, height - 30);
+    }
+    ctx.fill();
+    ctx.strokeStyle = '#383838';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // 2. Camera Island Top Right
+    ctx.fillStyle = '#050505';
+    ctx.strokeStyle = caseRingColor || '#E8A33D';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(width - 105, 30, 75, 75, 20);
+    } else {
+      ctx.rect(width - 105, 30, 75, 75);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Lenses Inside Camera Island
+    ctx.fillStyle = '#111';
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(width - 82, 52, 11, 0, Math.PI * 2);
+    ctx.arc(width - 50, 52, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 3. MagSafe Ring
+    if (selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') {
+      ctx.strokeStyle = 'rgba(232, 163, 61, 0.55)';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, 75, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 4. DUAT Branding Pill at Bottom Center
+    ctx.fillStyle = '#12162B';
+    ctx.strokeStyle = 'rgba(232, 163, 61, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(width / 2 - 55, height - 55, 110, 26, 13);
+    } else {
+      ctx.rect(width / 2 - 55, height - 55, 110, 26);
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#E8A33D';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('DUAT HORIZON', width / 2, height - 42);
+
+    // 5. Draw Layers
+    for (const layer of layers) {
+      const lx = (layer.x / 100) * width;
+      const ly = (layer.y / 100) * height;
+      const scale = layer.scale || 1.0;
+      const rotRad = ((layer.rotation || 0) * Math.PI) / 180;
+
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(rotRad);
+      ctx.scale(scale, scale);
+
+      if (layer.type === 'text') {
+        const txt = layer.text || '';
+        ctx.font = 'bold 15px sans-serif';
+        const txtWidth = ctx.measureText(txt).width;
+        const padX = 14;
+        const padY = 8;
+
+        // Draw Rounded Pill Sticker Background
+        ctx.fillStyle = layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F');
+        if (layer.bgColor !== 'transparent') {
+          ctx.strokeStyle = 'rgba(232, 163, 61, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          const pw = txtWidth + padX * 2;
+          const ph = 24 + padY * 2;
+          if (ctx.roundRect) {
+            ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
+          } else {
+            ctx.rect(-pw / 2, -ph / 2, pw, ph);
+          }
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        // Draw Text
+        ctx.fillStyle = layer.color || '#E8A33D';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(txt, 0, 0);
+      } else {
+        // Draw Preset Sticker Pill
+        const pillText = layer.stickerId ? layer.stickerId.replace(/-/g, ' ').toUpperCase() : 'STICKER';
+        ctx.fillStyle = layer.bgColor || '#14110F';
+        ctx.strokeStyle = '#E8A33D';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(-45, -18, 90, 36, 18);
+        } else {
+          ctx.rect(-45, -18, 90, 36);
+        }
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = layer.color || '#E8A33D';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pillText.slice(0, 11), 0, 0);
+      }
+
+      ctx.restore();
+    }
+
+    return canvas.toDataURL('image/png');
+  } catch (err) {
+    console.error('Failed generating case mockup snapshot:', err);
+    return null;
+  }
+}
+
 export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
@@ -77,6 +222,7 @@ export const CustomizerContent = () => {
 
   const [customText, setCustomText] = useState('');
   const [textColor, setTextColor] = useState('#E8A33D');
+  const [textBgColor, setTextBgColor] = useState('#14110F');
   const [textFont, setTextFont] = useState('kufi'); // 'clash', 'kufi', 'mono'
 
   // Global Pointer Drag State
@@ -115,6 +261,7 @@ export const CustomizerContent = () => {
       type: 'text',
       text: customText,
       color: textColor,
+      bgColor: textBgColor,
       font: textFont,
       x: 50,
       y: 50,
@@ -286,6 +433,14 @@ export const CustomizerContent = () => {
   };
 
   const handleAddToCart = () => {
+    const mockupSnapshotUrl = generateCaseMockupSnapshot(
+      canvasRef.current,
+      layers,
+      caseBgColor,
+      caseRingColor,
+      selectedCaseType
+    );
+
     const customCaseProduct = {
       id: `custom-case-${Date.now()}`,
       nameEn: `Custom ${currentModelName} Case`,
@@ -294,17 +449,20 @@ export const CustomizerContent = () => {
       category: 'cases',
       tagEn: selectedCaseType?.nameEn || 'Custom Case',
       tagAr: selectedCaseType?.nameAr || 'جراب مخصص',
+      designSnapshot: mockupSnapshotUrl,
       customConfig: {
         phoneModel: currentModelName,
         caseFinish: selectedCaseType?.nameAr || selectedCaseType?.nameEn,
         caseTypeId: selectedCaseType?.id,
+        designSnapshot: mockupSnapshotUrl,
         layers: layers.map((l) => ({
           id: l.id,
           type: l.type,
           stickerId: l.stickerId,
           text: l.text,
           color: l.color,
-          fontFamily: l.fontFamily,
+          bgColor: l.bgColor,
+          fontFamily: l.font,
           x: l.x,
           y: l.y,
           scale: l.scale,
@@ -432,11 +590,14 @@ export const CustomizerContent = () => {
                         <StickerIcon stickerId={layer.stickerId} size={46} />
                       )}
 
-                      {/* Render Custom Text */}
+                      {/* Render Custom Text Sticker Pill */}
                       {layer.type === 'text' && (
                         <div
-                          style={{ color: layer.color }}
-                          className={`whitespace-nowrap font-bold text-sm select-none ${
+                          style={{
+                            color: layer.color || '#E8A33D',
+                            backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F')
+                          }}
+                          className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-gold/50 shadow-xl backdrop-blur-sm ${
                             layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
                           }`}
                         >
@@ -723,38 +884,117 @@ export const CustomizerContent = () => {
                 </button>
               </div>
 
-              {/* Transform Controls Sliders */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
-                    <span>Scale</span>
-                    <span>{selectedLayer.scale.toFixed(1)}x</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="0.5"
-                    max="2.8"
-                    step="0.1"
-                    value={selectedLayer.scale}
-                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
-                    className="w-full accent-gold cursor-pointer"
-                  />
+              {/* Transform Controls & Color Pickers */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Scale Controls */}
+                  <div className="space-y-1">
+                    <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
+                      <span>الحجم (Scale)</span>
+                      <span>{selectedLayer.scale.toFixed(1)}x</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleLayerTransform(selectedLayer.id, 'scale', Math.max(0.4, parseFloat((selectedLayer.scale - 0.1).toFixed(1))))}
+                        className="w-8 h-8 border border-grave bg-coal hover:border-gold text-bone font-mono font-bold text-sm flex items-center justify-center"
+                        title="تصغير"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="range"
+                        min="0.4"
+                        max="3.0"
+                        step="0.1"
+                        value={selectedLayer.scale}
+                        onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
+                        className="flex-1 accent-gold cursor-pointer"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleLayerTransform(selectedLayer.id, 'scale', Math.min(3.0, parseFloat((selectedLayer.scale + 0.1).toFixed(1))))}
+                        className="w-8 h-8 border border-grave bg-coal hover:border-gold text-bone font-mono font-bold text-sm flex items-center justify-center"
+                        title="تكبير"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rotation Controls */}
+                  <div className="space-y-1">
+                    <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
+                      <span>التدوير (Rotation)</span>
+                      <span>{selectedLayer.rotation}°</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="-180"
+                      max="180"
+                      step="5"
+                      value={selectedLayer.rotation}
+                      onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
+                      className="w-full accent-gold cursor-pointer"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
-                    <span>Rotation</span>
-                    <span>{selectedLayer.rotation}°</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="-180"
-                    max="180"
-                    step="5"
-                    value={selectedLayer.rotation}
-                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
-                    className="w-full accent-gold cursor-pointer"
-                  />
+                {/* Color Pickers for Text / Sticker Background */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-grave/40 pt-3">
+                  {/* Text Color Picker */}
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[10px] text-gold uppercase block font-bold">لون الخط (Text Color)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { name: 'ذهب مصري', value: '#E8A33D' },
+                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'أسود فحمي', value: '#0A0C16' },
+                        { name: 'أبيض ناصع', value: '#FFFFFF' },
+                        { name: 'أحمر قاني', value: '#8B0000' },
+                        { name: 'زمردي', value: '#1B4332' }
+                      ].map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => handleLayerTransform(selectedLayer.id, 'color', c.value)}
+                          className={`w-6 h-6 rounded-full border-2 transition-transform ${
+                            (selectedLayer.color || '#E8A33D') === c.value ? 'border-gold scale-125 shadow-lg' : 'border-grave/60'
+                          }`}
+                          style={{ backgroundColor: c.value }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Background Pill Color Picker */}
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[10px] text-gold uppercase block font-bold">خلفية الاستيكر (Background Pill)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { name: 'داكن مائل للأسود', value: '#14110F' },
+                        { name: 'ذهب مصري', value: '#E8A33D' },
+                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'كحلي ملكي', value: '#0B132B' },
+                        { name: 'زمردي', value: '#1B4332' },
+                        { name: 'بدون خلفية (شفاف)', value: 'transparent' }
+                      ].map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => handleLayerTransform(selectedLayer.id, 'bgColor', c.value)}
+                          className={`w-6 h-6 rounded-full border-2 transition-transform flex items-center justify-center font-mono text-[9px] font-bold ${
+                            (selectedLayer.bgColor || '#14110F') === c.value ? 'border-gold scale-125 shadow-lg' : 'border-grave/60'
+                          }`}
+                          style={{ backgroundColor: c.value === 'transparent' ? '#000000' : c.value }}
+                          title={c.name}
+                        >
+                          {c.value === 'transparent' && <span className="text-ash text-[8px]">🚫</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1309,6 +1309,36 @@ export function AdminView() {
                               </div>
                             </div>
                           )}
+
+                          {/* Render Design Snapshot Visual Mockup */}
+                          {(item.designSnapshot || cfg.designSnapshot) && (
+                            <div className="pt-3 border-t border-grave/40 space-y-2">
+                              <span className="text-gold font-bold block flex items-center gap-1.5">
+                                <ImageIcon size={14} />
+                                <span>معاينة صورة تصميم الجراب المخصص بالكامل (Mockup):</span>
+                              </span>
+                              <div className="flex flex-col sm:flex-row items-center gap-4 bg-void p-3 border border-gold/40 rounded">
+                                <img
+                                  src={item.designSnapshot || cfg.designSnapshot}
+                                  alt="Case Design Mockup"
+                                  className="w-36 h-60 object-contain border border-grave bg-coal rounded-lg shadow-xl"
+                                />
+                                <div className="space-y-2 font-mono text-xs text-ash">
+                                  <p className="text-bone">معاينة بصرية دقيقة لتنسيق الجراب كما قام العميل بتصميمه على المتجر.</p>
+                                  <a
+                                    href={item.designSnapshot || cfg.designSnapshot}
+                                    download={`case-design-${selectedOrderDetails.id}-${idx + 1}.png`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-4 py-2 bg-gold/15 hover:bg-gold hover:text-void text-gold border border-gold text-[11px] inline-flex items-center gap-1.5 font-bold uppercase tracking-wider transition-colors"
+                                  >
+                                    <ImageIcon size={14} />
+                                    <span>تحميل صورة تصميم الجراب الكامل 🖼️</span>
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
