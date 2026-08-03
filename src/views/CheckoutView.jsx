@@ -8,6 +8,8 @@ import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
 import { ShieldCheck, Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
 
+import { sendTelegramOrderNotification } from '../utils/orderNotifier';
+
 const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 
 export const CheckoutView = ({ setView }) => {
@@ -109,6 +111,7 @@ export const CheckoutView = ({ setView }) => {
 
     try {
       await addOrder(orderData);
+      sendTelegramOrderNotification(orderData);
     } catch (err) {
       console.error('Error adding order to database:', err);
     }

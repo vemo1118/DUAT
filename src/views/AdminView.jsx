@@ -34,8 +34,17 @@ import {
   ExternalLink,
   Loader2,
   Mail,
-  CreditCard
+  CreditCard,
+  FileSpreadsheet,
+  Bell,
+  Save
 } from 'lucide-react';
+import {
+  exportOrdersToCSV,
+  TELEGRAM_TOKEN_KEY,
+  TELEGRAM_CHAT_ID_KEY,
+  ADMIN_WHATSAPP_NUMBER_KEY
+} from '../utils/orderNotifier';
 
 export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
@@ -51,7 +60,19 @@ export function AdminView() {
   const [authError, setAuthError] = useState('');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
-  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero'
+  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero' | 'notifications'
+
+  const [telegramToken, setTelegramToken] = useState(() => localStorage.getItem(TELEGRAM_TOKEN_KEY) || '');
+  const [telegramChatId, setTelegramChatId] = useState(() => localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '');
+  const [adminWhatsApp, setAdminWhatsApp] = useState(() => localStorage.getItem(ADMIN_WHATSAPP_NUMBER_KEY) || '201000000000');
+
+  const handleSaveNotificationSettings = (e) => {
+    e.preventDefault();
+    localStorage.setItem(TELEGRAM_TOKEN_KEY, telegramToken.trim());
+    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, telegramChatId.trim());
+    localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, adminWhatsApp.trim());
+    showToast('تم حفظ إعدادات الإشعارات الفورية على الموبايل بنجاح!', 'success');
+  };
 
   // Check initial session & listen for auth changes
   useEffect(() => {
@@ -413,6 +434,18 @@ export function AdminView() {
               <ImageIcon size={16} />
               <span>السلايدر والعروض ({slides.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+                activeTab === 'notifications'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
+            >
+              <Bell size={16} />
+              <span>إشعارات الموبايل 📲</span>
+            </button>
           </div>
 
           <button
@@ -676,20 +709,30 @@ export function AdminView() {
       {/* ============================================================ */}
       {activeTab === 'orders' && (
         <div className="space-y-8 animate-fade-in">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <h2 className="font-clash text-xl font-bold text-bone">طلبات العملاء والتتبع الحقيقي</h2>
-            <button
-              onClick={() => {
-                if (window.confirm('هل أنت تأكد من استعادة الطلبات التجريبية الأصلية؟')) {
-                  resetOrders();
-                  showToast('تم استعادة قائمة الطلبات التجريبية!', 'info');
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
-            >
-              <RotateCcw size={15} />
-              <span>إعادة ضبط الطلبات</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => exportOrdersToCSV(orders)}
+                className="flex items-center gap-2 px-4 py-2 border border-gold bg-gold/10 hover:bg-gold hover:text-void text-gold transition-colors font-mono text-xs uppercase font-bold shadow-md"
+              >
+                <FileSpreadsheet size={15} />
+                <span>تصدير لشيت الشحن (CSV) 📊</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (window.confirm('هل أنت تأكد من استعادة الطلبات التجريبية الأصلية؟')) {
+                    resetOrders();
+                    showToast('تم استعادة قائمة الطلبات التجريبية!', 'info');
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
+              >
+                <RotateCcw size={15} />
+                <span>إعادة ضبط الطلبات</span>
+              </button>
+            </div>
           </div>
 
           {/* ORDERS KPIS */}
@@ -1030,6 +1073,84 @@ export function AdminView() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 4: MOBILE NOTIFICATIONS SETTINGS */}
+      {/* ============================================================ */}
+      {activeTab === 'notifications' && (
+        <div className="bg-stone border border-gold/40 p-6 sm:p-8 space-y-6 animate-fade-in max-w-3xl mx-auto shadow-2xl">
+          <div className="flex items-center gap-3 border-b border-grave pb-4">
+            <Bell className="text-gold" size={26} />
+            <div>
+              <h2 className="font-clash text-xl font-bold text-bone">إعدادات الإشعارات الفورية لكل أوردر على الموبايل</h2>
+              <p className="font-mono text-xs text-ash">احصل على إشعار فوري بصوت واهتزاز على تليجرام فور قيام أي عميل بالشراء!</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveNotificationSettings} className="space-y-5 font-mono text-xs">
+            <div>
+              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
+                Telegram Bot Token (من @BotFather)
+              </label>
+              <input
+                type="text"
+                value={telegramToken}
+                onChange={(e) => setTelegramToken(e.target.value)}
+                placeholder="مثال: 7123456789:AAFx...XYZ"
+                className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
+                Telegram Chat ID (من @userinfobot)
+              </label>
+              <input
+                type="text"
+                value={telegramChatId}
+                onChange={(e) => setTelegramChatId(e.target.value)}
+                placeholder="مثال: 123456789"
+                className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
+                رقم الواتساب لاستلام طلبات الشات المباشرة
+              </label>
+              <input
+                type="text"
+                value={adminWhatsApp}
+                onChange={(e) => setAdminWhatsApp(e.target.value)}
+                placeholder="مثال: 201012345678"
+                className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
+                dir="ltr"
+              />
+            </div>
+
+            <div className="bg-coal p-5 border border-grave/60 space-y-2 text-ash text-[12px] leading-relaxed">
+              <p className="font-bold text-gold flex items-center gap-2">
+                <span>💡 طريقة التفعيل المجاني في 60 ثانية:</span>
+              </p>
+              <ol className="list-decimal list-inside space-y-1.5 font-sans">
+                <li>افتح تطبيق تليجرام وابحث عن <b>@BotFather</b> وارسل <code>/newbot</code> واحصل على الـ <b>Bot Token</b>.</li>
+                <li>ابحث عن <b>@userinfobot</b> وارسل أي كلمة لمعرفة الـ <b>Chat ID</b> الخاص بك.</li>
+                <li>ضع البيانات أعلاه واضغط حفظ الإعدادات، وستصلك كافة الأوردرات فوراً بصوت واهتزاز على هاتفك المحمول!</li>
+              </ol>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary w-full py-4 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
+            >
+              <Save size={16} />
+              <span>حفظ إعدادات الإشعارات الفورية</span>
+            </button>
+          </form>
         </div>
       )}
 

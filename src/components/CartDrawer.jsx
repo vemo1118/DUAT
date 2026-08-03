@@ -5,7 +5,8 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
-import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag, MessageSquare } from 'lucide-react';
+import { sendTelegramOrderNotification, generateWhatsAppOrderLink } from '../utils/orderNotifier';
 
 export const CartDrawer = () => {
   const {
@@ -49,6 +50,18 @@ export const CartDrawer = () => {
   const handleProceedCheckout = () => {
     toggleCart();
     navigate('/checkout');
+  };
+
+  const handleWhatsAppCheckout = () => {
+    const tempOrder = {
+      id: `WA-${Date.now().toString().slice(-6)}`,
+      items: cartList,
+      totalPrice: calculatedTotal,
+      customerName: 'طلب مباشر عبر واتساب'
+    };
+    sendTelegramOrderNotification(tempOrder);
+    const waUrl = generateWhatsAppOrderLink(tempOrder);
+    window.open(waUrl, '_blank');
   };
 
   const isDawn = theme === 'dawn';
@@ -235,14 +248,24 @@ export const CartDrawer = () => {
                 </div>
               </div>
 
-              {/* Checkout CTA */}
-              <button
-                onClick={handleProceedCheckout}
-                className="btn-primary w-full py-4 text-xs font-mono font-bold tracking-widest flex items-center justify-center gap-2"
-              >
-                <span>{t('checkoutBtn')}</span>
-                <ArrowIcon size={16} />
-              </button>
+              {/* Checkout CTA Buttons */}
+              <div className="space-y-2 pt-1">
+                <button
+                  onClick={handleProceedCheckout}
+                  className="btn-primary w-full py-3.5 text-xs font-mono font-bold tracking-widest flex items-center justify-center gap-2"
+                >
+                  <span>{t('checkoutBtn')}</span>
+                  <ArrowIcon size={16} />
+                </button>
+
+                <button
+                  onClick={handleWhatsAppCheckout}
+                  className="w-full py-3 bg-[#25D366] hover:bg-[#20bd5a] text-[#0A0C16] font-mono text-xs font-bold tracking-wider transition-colors flex items-center justify-center gap-2 rounded-sm shadow-md"
+                >
+                  <MessageSquare size={15} />
+                  <span>طلب مباشر عبر الواتساب</span>
+                </button>
+              </div>
 
             </div>
           )}
