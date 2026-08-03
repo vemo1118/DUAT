@@ -9,10 +9,10 @@ export const INITIAL_HERO_SLIDES = [
     eyebrowEn: 'DUAT / THE FORGE',
     eyebrowAr: 'دوات / كور الفن والتشطيب',
     headline1En: 'CRAFT YOUR OWN',
-    headline1Ar: 'صمم درعك الخاص',
-    headline2En: 'CUSTOM ARMOR.',
-    headline2Ar: 'بلمسة فرعونية فاخرة.',
-    subEn: 'Interactive 3D dome builder. Select phone model, armor finish, raised slogan pills, Arabic motifs, and custom engravings.',
+    headline1Ar: 'صمم جرابك الخاص',
+    headline2En: 'CUSTOM LUXURY CASE.',
+    headline2Ar: 'بلمسة مصرية فاخرة.',
+    subEn: 'Interactive 3D dome builder. Select phone model, case finish, raised slogan pills, Arabic motifs, and custom engravings.',
     subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
     badgeEn: '3D BUILDER',
     badgeAr: 'أداة 3D الحصرية',
@@ -147,7 +147,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v4';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v5';
 
 function loadLocalSlides() {
   try {

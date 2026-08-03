@@ -29,6 +29,8 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const handleCardClick = () => {
     if (onSelectProduct) {
       onSelectProduct(product);
+    } else {
+      navigate(`/product/${product.id}`);
     }
   };
 

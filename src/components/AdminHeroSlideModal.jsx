@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Upload, Sparkles, Languages } from 'lucide-react';
+import { X, Save, Upload, Sparkles, Languages, Link as LinkIcon } from 'lucide-react';
+import { useProducts } from '../context/ProductsContext';
 
 export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = null }) {
+  const { products = [] } = useProducts();
   const [activeLangTab, setActiveLangTab] = useState('ar'); // 'ar' | 'en'
 
   const [formData, setFormData] = useState({
@@ -9,10 +11,10 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     eyebrowEn: 'DUAT / THE FORGE',
     eyebrowAr: 'دوات / كور الفن والتشطيب',
     headline1En: 'CRAFT YOUR OWN',
-    headline1Ar: 'صمم درعك الخاص',
-    headline2En: 'CUSTOM ARMOR.',
-    headline2Ar: 'بلمسة فرعونية فاخرة.',
-    subEn: 'Interactive 3D dome builder. Select phone model, armor finish, raised slogan pills, Arabic motifs, and custom engravings.',
+    headline1Ar: 'صمم جرابك الخاص',
+    headline2En: 'CUSTOM LUXURY CASE.',
+    headline2Ar: 'بلمسة مصرية فاخرة.',
+    subEn: 'Interactive 3D dome builder. Select phone model, case finish, raised slogan pills, Arabic motifs, and custom engravings.',
     subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
@@ -467,8 +469,9 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
           {/* Navigation Links Target (Shared) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-stone/40 border border-grave p-4">
             <div>
-              <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-1 font-bold">
-                رابط التوجه للزر الأول (Primary Link)
+              <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-1 font-bold flex items-center justify-between">
+                <span>رابط التوجه للزر الأول (Primary Link)</span>
+                <span className="text-[10px] text-ash font-normal">اختر صفحة أو منتج محدد</span>
               </label>
               <select
                 name="ctaPrimaryLink"
@@ -477,16 +480,35 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 className="w-full bg-coal border border-grave px-3 py-2 text-bone font-mono text-xs"
                 dir="ltr"
               >
-                <option value="/customize">/customize (صفحة التخصيص والـ 3D)</option>
-                <option value="/shop">/shop (المتجر والكتالوج)</option>
-                <option value="/track-order">/track-order (تتبع الطلب)</option>
-                <option value="/the-duat">/the-duat (عن دوات)</option>
+                <optgroup label="🌐 الصفحات الرئيسية (Main Pages)">
+                  <option value="/customize">/customize (صفحة التخصيص والـ 3D)</option>
+                  <option value="/shop">/shop (المتجر والكتالوج)</option>
+                  <option value="/track-order">/track-order (تتبع الطلب)</option>
+                  <option value="/the-duat">/the-duat (عن دوات)</option>
+                </optgroup>
+                <optgroup label="📱 التوجه لمنتج محدد من المتجر (Direct Product Page)">
+                  {products.map((p) => (
+                    <option key={p.id} value={`/product/${p.id}`}>
+                      /product/{p.id} — ({p.nameAr || p.nameEn})
+                    </option>
+                  ))}
+                </optgroup>
               </select>
+              <input
+                type="text"
+                name="ctaPrimaryLink"
+                value={formData.ctaPrimaryLink}
+                onChange={handleChange}
+                placeholder="أو ادخل رابط مخصص بنفسك..."
+                className="w-full bg-coal border border-grave px-3 py-1.5 text-bone font-mono text-xs mt-2"
+                dir="ltr"
+              />
             </div>
 
             <div>
-              <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-1 font-bold">
-                رابط التوجه للزر الثاني (Secondary Link)
+              <label className="block font-mono text-xs text-gold uppercase tracking-wider mb-1 font-bold flex items-center justify-between">
+                <span>رابط التوجه للزر الثاني (Secondary Link)</span>
+                <span className="text-[10px] text-ash font-normal">اختر صفحة أو منتج محدد</span>
               </label>
               <select
                 name="ctaSecondaryLink"
@@ -495,11 +517,29 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 className="w-full bg-coal border border-grave px-3 py-2 text-bone font-mono text-xs"
                 dir="ltr"
               >
-                <option value="/shop">/shop (المتجر والكتالوج)</option>
-                <option value="/customize">/customize (صفحة التخصيص)</option>
-                <option value="/track-order">/track-order (تتبع الطلب)</option>
-                <option value="/the-duat">/the-duat (عن دوات)</option>
+                <optgroup label="🌐 الصفحات الرئيسية (Main Pages)">
+                  <option value="/shop">/shop (المتجر والكتالوج)</option>
+                  <option value="/customize">/customize (صفحة التخصيص والـ 3D)</option>
+                  <option value="/track-order">/track-order (تتبع الطلب)</option>
+                  <option value="/the-duat">/the-duat (عن دوات)</option>
+                </optgroup>
+                <optgroup label="📱 التوجه لمنتج محدد من المتجر (Direct Product Page)">
+                  {products.map((p) => (
+                    <option key={p.id} value={`/product/${p.id}`}>
+                      /product/{p.id} — ({p.nameAr || p.nameEn})
+                    </option>
+                  ))}
+                </optgroup>
               </select>
+              <input
+                type="text"
+                name="ctaSecondaryLink"
+                value={formData.ctaSecondaryLink}
+                onChange={handleChange}
+                placeholder="أو ادخل رابط مخصص بنفسك..."
+                className="w-full bg-coal border border-grave px-3 py-1.5 text-bone font-mono text-xs mt-2"
+                dir="ltr"
+              />
             </div>
           </div>
 

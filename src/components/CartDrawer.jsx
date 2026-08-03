@@ -115,7 +115,7 @@ export const CartDrawer = () => {
                       {isRtl ? item.nameAr : item.nameEn}
                     </h3>
                     <p className="font-mono text-[10px] uppercase tracking-wider opacity-75">
-                      ARMOR: {isRtl ? item.tagAr : item.tagEn}
+                      CASE: {isRtl ? item.tagAr : item.tagEn}
                     </p>
                     {item.customConfig?.phoneModel && (
                       <p className="font-mono text-[10px] text-[#E0A93B] uppercase font-bold">

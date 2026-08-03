@@ -19,8 +19,8 @@ export const CategoryGrid = ({ onSelectCategory }) => {
       id: 'cases',
       nameEn: 'Phone Cases',
       nameAr: 'جرابات الهواتف',
-      subtitleEn: 'Optical acrylic & stealth armor',
-      subtitleAr: 'درع ومجسم تكتيكي فاخر',
+      subtitleEn: 'Optical acrylic & custom luxury cases',
+      subtitleAr: 'جرابات فاخرة بتشطيب يدوي أنيق',
       image: '/images/transparent_hero_case.png',
       badge: '01'
     },

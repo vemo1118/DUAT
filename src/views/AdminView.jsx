@@ -937,7 +937,7 @@ export function AdminView() {
                   ) : (
                     <div className="text-center space-y-2 text-ash">
                       <ImageIcon size={36} className="mx-auto text-gold/40" />
-                      <span className="font-mono text-xs block">خلفية زاد النقوش الفرعونية الافتراضية</span>
+                      <span className="font-mono text-xs block">خلفية دوات النقوش المصرية الافتراضية</span>
                     </div>
                   )}
 

@@ -36,7 +36,7 @@ export const PRODUCTS = [
     craftTagEn: 'Hand-finished in Egypt',
     craftTagAr: 'تشطيب يدوي في مصر',
     descriptionEn: 'High-density stealth black armor with an 18k anodized dawn-gold camera ring and MagSafe alignment ring.',
-    descriptionAr: 'درع أسود عالي الكثافة مع حلقة كاميرا مؤكسدة بذهب الفجر عيار ١٨ وحلقة ماج سيف.',
+    descriptionAr: 'جراب أسود عالي الكثافة مع حلقة كاميرا مؤكسدة بذهب الفجر عيار ١٨ وحلقة ماج سيف.',
     specsEn: ['Material: High-Density Polycarbonate', 'Bezel: 18k Gold Anodized Alloy', 'Weight: 44g', 'Magnets: N52 Neodymium Array'],
     specsAr: ['المادة: بوليكاربونات عالي الكثافة', 'الإطار: سبيكة مؤكسدة بذهب ١٨', 'الوزن: ٤٤ جرام', 'المغناطيس: مصفوفة نيويميوم N52'],
     caseTypeId: 'gold-ring',

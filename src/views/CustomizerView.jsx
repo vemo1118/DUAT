@@ -292,8 +292,8 @@ export const CustomizerContent = () => {
       nameAr: `جراب مخصص ${currentModelName}`,
       price: 850,
       category: 'cases',
-      tagEn: selectedCaseType?.nameEn || 'Custom Armor',
-      tagAr: selectedCaseType?.nameAr || 'درع مخصص',
+      tagEn: selectedCaseType?.nameEn || 'Custom Case',
+      tagAr: selectedCaseType?.nameAr || 'جراب مخصص',
       customDetails: {
         model: currentModelName,
         caseType: selectedCaseType?.nameEn || 'Clear Solar',
