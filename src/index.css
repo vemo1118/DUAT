@@ -366,20 +366,46 @@ button, a.btn, select, input[type="submit"] {
   color: var(--gold);
 }
 
-/* Custom Scrollbar */
+/* Custom Smooth Luxury Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--void);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--grave);
+  background: var(--gold);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--ember);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) var(--void);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(18, 22, 43, 0.7);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--gold);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--ember);
 }

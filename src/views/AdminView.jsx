@@ -1206,7 +1206,7 @@ export function AdminView() {
       {/* ORDER DETAILS MODAL */}
       {selectedOrderDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-stone border border-gold/40 p-6 space-y-6 shadow-2xl">
+          <div className="relative w-full max-w-2xl bg-stone border border-gold/40 p-6 space-y-6 shadow-2xl max-h-[88vh] overflow-y-auto custom-scrollbar rounded-lg">
             <div className="flex items-center justify-between border-b border-grave pb-4">
               <div>
                 <span className="font-mono text-xs text-ash uppercase">تفاصيل الطلب الكاملة</span>
@@ -1214,7 +1214,7 @@ export function AdminView() {
               </div>
               <button
                 onClick={() => setSelectedOrderDetails(null)}
-                className="p-2 text-ash hover:text-gold border border-grave"
+                className="p-2 text-ash hover:text-gold border border-grave rounded"
               >
                 <X size={18} />
               </button>
@@ -1239,7 +1239,7 @@ export function AdminView() {
 
             <div className="space-y-3">
               <h4 className="font-mono text-xs text-gold uppercase tracking-wider">المنتجات المطلوبة</h4>
-              <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-80 overflow-y-auto">
+              <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-96 overflow-y-auto custom-scrollbar rounded">
                 {selectedOrderDetails.items?.map((item, idx) => {
                   const cfg = item.customConfig || item.customDetails;
                   const layers = item.customConfig?.layers || [];
