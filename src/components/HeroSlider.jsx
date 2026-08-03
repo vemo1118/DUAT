@@ -158,15 +158,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           {/* Headlines */}
           <div className="space-y-1 w-full">
             <h1
-              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone"
-              style={{ color: current?.headline1Color || undefined }}
+              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none"
+              style={{ color: current?.headline1Color || '#EDE4D3' }}
             >
               {headline1}
             </h1>
             {headline2 && (
               <h2
-                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold"
-                style={{ color: current?.headline2Color || undefined }}
+                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none"
+                style={{ color: current?.headline2Color || '#E8A33D' }}
               >
                 {headline2}
               </h2>
@@ -175,8 +175,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
           {/* Subtitle / Description */}
           <p
-            className="font-space text-sm sm:text-base font-light max-w-2xl leading-relaxed text-ash"
-            style={{ color: current?.subColor || undefined }}
+            className="font-space text-sm sm:text-base font-light max-w-2xl leading-relaxed"
+            style={{ color: current?.subColor || '#8E98BF' }}
           >
             {sub}
           </p>
