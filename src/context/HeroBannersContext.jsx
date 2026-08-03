@@ -16,13 +16,14 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
     badgeEn: '3D BUILDER',
     badgeAr: 'أداة 3D الحصرية',
-    imageUrl: '/images/transparent_hero_case.png',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg',
     ctaPrimaryTextEn: 'START BUILDING',
     ctaPrimaryTextAr: 'ابدأ التصميم الآن',
     ctaPrimaryLink: '/customize',
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
     ctaSecondaryLink: '/shop',
+    is_active: true,
     sort_order: 1
   },
   {
@@ -44,6 +45,7 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextEn: 'TRACK YOUR ORDER',
     ctaSecondaryTextAr: 'تتبع طلبك الحقيقي',
     ctaSecondaryLink: '/track-order',
+    is_active: true,
     sort_order: 2
   }
 ];
@@ -67,7 +69,7 @@ function mapFromDb(row) {
     subAr: data.subAr || row.sub_ar || '',
     badgeEn: data.badgeEn || row.badge_en || row.badge_ar || '',
     badgeAr: data.badgeAr || row.badge_ar || '',
-    imageUrl: data.imageUrl || row.image_url || '',
+    imageUrl: data.imageUrl || row.image_url || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg',
     ctaPrimaryTextEn: data.ctaPrimaryTextEn || row.cta_primary_text_en || '',
     ctaPrimaryTextAr: data.ctaPrimaryTextAr || row.cta_primary_text_ar || '',
     ctaPrimaryLink: data.ctaPrimaryLink || row.cta_primary_link || '',
@@ -92,7 +94,7 @@ function mapToDb(slide, index = 0) {
     sub_ar: slide.subAr || slide.sub_ar || '',
     badge_en: slide.badgeEn || slide.badge_en || '',
     badge_ar: slide.badgeAr || slide.badge_ar || '',
-    image_url: slide.imageUrl || slide.image_url || '',
+    image_url: slide.imageUrl || slide.image_url || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg',
     cta_primary_text_en: slide.ctaPrimaryTextEn || slide.cta_primary_text_en || '',
     cta_primary_text_ar: slide.ctaPrimaryTextAr || slide.cta_primary_text_ar || '',
     cta_primary_link: slide.ctaPrimaryLink || slide.cta_primary_link || '',
@@ -109,7 +111,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v2';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v3';
 
 function loadLocalSlides() {
   try {
