@@ -7,11 +7,14 @@ const ProductsContext = createContext();
 function mapFromDb(row) {
   if (!row) return null;
   const data = row.data && typeof row.data === 'object' ? row.data : {};
+  const isActiveVal = row.is_active !== undefined ? Boolean(row.is_active) : (data.is_active !== undefined ? Boolean(data.is_active) : (data.isActive !== undefined ? Boolean(data.isActive) : true));
   return {
     ...data,
     id: row.id || data.id,
     category: row.category || data.category || 'cases',
     price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || 0),
+    is_active: isActiveVal,
+    isActive: isActiveVal,
     nameEn: data.nameEn || row.name_en || '',
     nameAr: data.nameAr || row.name_ar || '',
     tagEn: data.tagEn || row.tag_en || '',
@@ -30,12 +33,19 @@ function mapFromDb(row) {
 }
 
 function mapToDb(p) {
+  const isActiveVal = p.is_active !== undefined ? Boolean(p.is_active) : (p.isActive !== undefined ? Boolean(p.isActive) : true);
   return {
     id: p.id,
     category: p.category || 'cases',
+    name_en: p.nameEn || p.name_en || '',
+    name_ar: p.nameAr || p.name_ar || '',
     price: Number(p.price) || 0,
-    is_active: true,
-    data: p
+    is_active: isActiveVal,
+    data: {
+      ...p,
+      is_active: isActiveVal,
+      isActive: isActiveVal
+    }
   };
 }
 
@@ -164,6 +174,32 @@ export function ProductsProvider({ children }) {
     }
   };
 
+  // Toggle Product Visibility (Hide / Show)
+  const toggleProductVisibility = async (id) => {
+    let targetProduct = null;
+    setProducts((prev) =>
+      prev.map((prod) => {
+        if (prod.id === id) {
+          const currentStatus = prod.is_active !== undefined ? Boolean(prod.is_active) : (prod.isActive !== undefined ? Boolean(prod.isActive) : true);
+          const newStatus = !currentStatus;
+          const updated = { ...prod, is_active: newStatus, isActive: newStatus };
+          targetProduct = updated;
+          return updated;
+        }
+        return prod;
+      })
+    );
+
+    if (targetProduct) {
+      try {
+        const { error } = await supabase.from('products').upsert(mapToDb(targetProduct), { onConflict: 'id' });
+        if (error) console.error('Supabase toggle product visibility error:', error);
+      } catch (err) {
+        console.error('Supabase toggle product visibility exception:', err);
+      }
+    }
+  };
+
   // Delete product by ID
   const deleteProduct = async (id) => {
     setProducts((prev) => prev.filter((prod) => prod.id !== id));
@@ -194,6 +230,7 @@ export function ProductsProvider({ children }) {
         addProduct,
         updateProduct,
         adjustPrice,
+        toggleProductVisibility,
         deleteProduct,
         getProductById,
         resetProducts

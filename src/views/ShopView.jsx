@@ -24,6 +24,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
   const safeProducts = Array.isArray(products) ? products : [];
   let filteredProducts = safeProducts.filter((product) => {
     if (!product) return false;
+    const isVisible = product.is_active !== false && product.isActive !== false;
     const matchesCategory = !selectedCategory || selectedCategory === 'all' || product.category === selectedCategory;
     const matchesCaseType = !selectedCaseType || selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
     const matchesPrice = (product.price || 0) <= maxPrice;
@@ -35,7 +36,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
       (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
       (product.tagAr && product.tagAr.toLowerCase().includes(query));
 
-    return matchesCategory && matchesCaseType && matchesPrice && matchesSearch;
+    return isVisible && matchesCategory && matchesCaseType && matchesPrice && matchesSearch;
   });
 
   // Sort Logic with defensive checks

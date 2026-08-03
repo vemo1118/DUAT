@@ -6,8 +6,8 @@ export const AnnouncementMarquee = () => {
   const { lang } = useLanguage();
   const isAr = lang === 'ar';
 
-  const textEn = "Free shipping on orders over 1500 EGP • Made to order in Egypt • Ships in 3–5 days • 100% Handcrafted • 14-Day Returns • ";
-  const textAr = "شحن مجاني للطلبات أكثر من ١٥٠٠ ج.م • صُنع حسب الطلب في مصر • يُشحن خلال ٣-٥ أيام • تشطيب يدوي ٪١٠٠ • إرجاع خلال ١٤ يوماً • ";
+  const textEn = "Free shipping on orders over 800 EGP • Made to order in Egypt • Ships in 3–5 days • 100% Handcrafted • 14-Day Returns • ";
+  const textAr = "شحن مجاني للطلبات أكثر من ٨٠٠ ج.م • صُنع حسب الطلب في مصر • يُشحن خلال ٣-٥ أيام • تشطيب يدوي ٪١٠٠ • إرجاع خلال ١٤ يوماً • ";
 
   const content = isAr ? textAr : textEn;
 

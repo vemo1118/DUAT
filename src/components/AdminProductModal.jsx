@@ -111,19 +111,22 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-3xl bg-stone border border-gold/40 shadow-2xl my-8 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-void/85 backdrop-blur-md overflow-hidden animate-fade-in" dir="rtl">
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-3xl h-full max-h-[88vh] bg-stone border border-gold/40 shadow-2xl flex flex-col overflow-hidden my-auto"
+      >
         {/* Top Decorative Border */}
-        <div className="h-1 w-full bg-gradient-to-r from-gold/20 via-gold to-gold/20" />
+        <div className="h-1 w-full bg-gradient-to-r from-gold/20 via-gold to-gold/20 shrink-0" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-grave bg-stone/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-grave bg-stone shrink-0 z-10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded border border-gold/50 flex items-center justify-center bg-gold/10 text-gold">
               <Sparkles size={16} />
             </div>
             <div>
-              <h2 className="font-clash text-xl font-bold tracking-wide text-bone">
+              <h2 className="font-clash text-lg sm:text-xl font-bold tracking-wide text-bone">
                 {productToEdit ? 'تعديل بيانات المنتج' : 'إضافة منتج جديد'}
               </h2>
               <p className="font-mono text-xs text-ash">
@@ -132,6 +135,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-2 text-ash hover:text-gold border border-transparent hover:border-grave bg-stone/50 transition-colors"
           >
@@ -139,8 +143,8 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto font-sans">
+        {/* Scrollable Form Body */}
+        <div className="p-6 space-y-6 overflow-y-auto flex-1 text-right">
           {/* Categorization & Price */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -451,26 +455,26 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
               />
             </div>
           </div>
+        </div>
 
-          {/* Submit Actions */}
-          <div className="flex items-center justify-end gap-4 pt-4 border-t border-grave">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 border border-grave text-ash hover:text-bone hover:border-gold/50 transition-colors font-mono text-xs uppercase"
-            >
-              إلغاء
-            </button>
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-6 py-2.5 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
-            >
-              <Save size={16} />
-              <span>{productToEdit ? 'حفظ التعديلات' : 'إضافة المنتج'}</span>
-            </button>
-          </div>
-        </form>
-      </div>
+        {/* Fixed Footer Actions */}
+        <div className="p-4 border-t border-grave bg-stone shrink-0 flex items-center justify-end gap-3 z-10">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 border border-grave text-ash hover:text-bone hover:border-gold/50 transition-colors font-mono text-xs uppercase"
+          >
+            إلغاء
+          </button>
+          <button
+            type="submit"
+            className="flex items-center gap-2 px-6 py-2.5 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
+          >
+            <Save size={16} />
+            <span>{productToEdit ? 'حفظ التعديلات' : 'إضافة المنتج'}</span>
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

@@ -13,7 +13,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const activeSlides = Array.isArray(slides) && slides.length > 0 ? slides : [];
+  const activeSlides = Array.isArray(slides)
+    ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false)
+    : [];
 
   const isAr = lang === 'ar';
   const isRtl = isAr;

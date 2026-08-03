@@ -51,9 +51,12 @@ export const INITIAL_HERO_SLIDES = [
 function mapFromDb(row) {
   if (!row) return null;
   const data = row.data && typeof row.data === 'object' ? row.data : {};
+  const isActiveVal = row.is_active !== undefined ? Boolean(row.is_active) : (data.is_active !== undefined ? Boolean(data.is_active) : (data.isActive !== undefined ? Boolean(data.isActive) : true));
   return {
     ...data,
     id: row.id || data.id,
+    is_active: isActiveVal,
+    isActive: isActiveVal,
     eyebrowEn: data.eyebrowEn || row.eyebrow_en || '',
     eyebrowAr: data.eyebrowAr || row.eyebrow_ar || '',
     headline1En: data.headline1En || row.headline1_en || '',
@@ -62,7 +65,7 @@ function mapFromDb(row) {
     headline2Ar: data.headline2Ar || row.headline2_ar || '',
     subEn: data.subEn || row.sub_en || '',
     subAr: data.subAr || row.sub_ar || '',
-    badgeEn: data.badgeEn || row.badge_ar || '',
+    badgeEn: data.badgeEn || row.badge_en || row.badge_ar || '',
     badgeAr: data.badgeAr || row.badge_ar || '',
     imageUrl: data.imageUrl || row.image_url || '',
     ctaPrimaryTextEn: data.ctaPrimaryTextEn || row.cta_primary_text_en || '',
@@ -76,10 +79,33 @@ function mapFromDb(row) {
 }
 
 function mapToDb(slide, index = 0) {
+  const isActiveVal = slide.is_active !== undefined ? Boolean(slide.is_active) : (slide.isActive !== undefined ? Boolean(slide.isActive) : true);
   return {
     id: slide.id,
+    eyebrow_en: slide.eyebrowEn || slide.eyebrow_en || '',
+    eyebrow_ar: slide.eyebrowAr || slide.eyebrow_ar || '',
+    headline1_en: slide.headline1En || slide.headline1_en || '',
+    headline1_ar: slide.headline1Ar || slide.headline1_ar || '',
+    headline2_en: slide.headline2En || slide.headline2_en || '',
+    headline2_ar: slide.headline2Ar || slide.headline2_ar || '',
+    sub_en: slide.subEn || slide.sub_en || '',
+    sub_ar: slide.subAr || slide.sub_ar || '',
+    badge_en: slide.badgeEn || slide.badge_en || '',
+    badge_ar: slide.badgeAr || slide.badge_ar || '',
+    image_url: slide.imageUrl || slide.image_url || '',
+    cta_primary_text_en: slide.ctaPrimaryTextEn || slide.cta_primary_text_en || '',
+    cta_primary_text_ar: slide.ctaPrimaryTextAr || slide.cta_primary_text_ar || '',
+    cta_primary_link: slide.ctaPrimaryLink || slide.cta_primary_link || '',
+    cta_secondary_text_en: slide.ctaSecondaryTextEn || slide.cta_secondary_text_en || '',
+    cta_secondary_text_ar: slide.ctaSecondaryTextAr || slide.cta_secondary_text_ar || '',
+    cta_secondary_link: slide.ctaSecondaryLink || slide.cta_secondary_link || '',
+    is_active: isActiveVal,
     sort_order: slide.sort_order ?? index + 1,
-    data: slide
+    data: {
+      ...slide,
+      is_active: isActiveVal,
+      isActive: isActiveVal
+    }
   };
 }
 
@@ -173,6 +199,31 @@ export function HeroBannersProvider({ children }) {
     }
   };
 
+  const toggleSlideVisibility = async (id) => {
+    let targetSlide = null;
+    setSlides((prev) =>
+      prev.map((slide) => {
+        if (slide.id === id) {
+          const currentStatus = slide.is_active !== undefined ? Boolean(slide.is_active) : (slide.isActive !== undefined ? Boolean(slide.isActive) : true);
+          const newStatus = !currentStatus;
+          const updated = { ...slide, is_active: newStatus, isActive: newStatus };
+          targetSlide = updated;
+          return updated;
+        }
+        return slide;
+      })
+    );
+
+    if (targetSlide) {
+      try {
+        const { error } = await supabase.from('hero_slides').upsert(mapToDb(targetSlide), { onConflict: 'id' });
+        if (error) console.error('Supabase toggle hero slide visibility error:', error);
+      } catch (err) {
+        console.error('Supabase toggle hero slide visibility error:', err);
+      }
+    }
+  };
+
   const deleteSlide = async (id) => {
     setSlides((prev) => prev.filter((slide) => slide.id !== id));
     try {
@@ -194,6 +245,7 @@ export function HeroBannersProvider({ children }) {
         loading,
         addSlide,
         updateSlide,
+        toggleSlideVisibility,
         deleteSlide,
         resetSlides
       }}

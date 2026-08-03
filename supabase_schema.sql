@@ -26,9 +26,14 @@ CREATE TABLE IF NOT EXISTS public.products (
   rating NUMERIC DEFAULT 5.0,
   review_count INTEGER DEFAULT 0,
   reviews JSONB DEFAULT '[]'::jsonb,
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migrations for Products table
+ALTER TABLE public.products ALTER COLUMN id TYPE TEXT USING id::text;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
 -- RLS & Grants for Products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -48,14 +53,21 @@ GRANT ALL ON public.products TO anon, authenticated;
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.orders (
   id TEXT PRIMARY KEY,
+  ref TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   status TEXT NOT NULL DEFAULT 'placed',
   customer JSONB NOT NULL DEFAULT '{}'::jsonb,
   items JSONB NOT NULL DEFAULT '[]'::jsonb,
   total NUMERIC NOT NULL DEFAULT 0,
-  payment_method TEXT DEFAULT 'cod'
+  payment_method TEXT DEFAULT 'cod',
+  payment_proof_path TEXT
 );
+
+-- Migration/Fix commands for existing tables in Supabase:
+ALTER TABLE public.orders ALTER COLUMN id TYPE TEXT USING id::text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS ref TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_proof_path TEXT;
 
 -- RLS & Grants for Orders
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
@@ -92,8 +104,15 @@ CREATE TABLE IF NOT EXISTS public.hero_slides (
   cta_secondary_text_en TEXT,
   cta_secondary_text_ar TEXT,
   cta_secondary_link TEXT,
+  is_active BOOLEAN DEFAULT true,
+  sort_order INT DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migrations for Hero Slides table
+ALTER TABLE public.hero_slides ALTER COLUMN id TYPE TEXT USING id::text;
+ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 1;
 
 -- RLS & Grants for Hero Slides
 ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
@@ -203,3 +222,36 @@ INSERT INTO public.hero_slides (
   'TRACK YOUR ORDER', 'تتبع طلبك الحقيقي', '/track-order'
 )
 ON CONFLICT (id) DO NOTHING;
+
+
+-- ---------------------------------------------------------------------
+-- 7. STORAGE BUCKET FOR INSTAPAY PAYMENT PROOFS
+-- ---------------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('payment-proofs', 'payment-proofs', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Allow public upload to payment-proofs" ON storage.objects;
+CREATE POLICY "Allow public upload to payment-proofs"
+ON storage.objects FOR INSERT
+TO anon, authenticated
+WITH CHECK (bucket_id = 'payment-proofs');
+
+DROP POLICY IF EXISTS "Allow public read from payment-proofs" ON storage.objects;
+CREATE POLICY "Allow public read from payment-proofs"
+ON storage.objects FOR SELECT
+TO anon, authenticated
+USING (bucket_id = 'payment-proofs');
+
+DROP POLICY IF EXISTS "Allow public update on payment-proofs" ON storage.objects;
+CREATE POLICY "Allow public update on payment-proofs"
+ON storage.objects FOR UPDATE
+TO anon, authenticated
+USING (bucket_id = 'payment-proofs');
+
+DROP POLICY IF EXISTS "Allow public delete on payment-proofs" ON storage.objects;
+CREATE POLICY "Allow public delete on payment-proofs"
+ON storage.objects FOR DELETE
+TO anon, authenticated
+USING (bucket_id = 'payment-proofs');
+

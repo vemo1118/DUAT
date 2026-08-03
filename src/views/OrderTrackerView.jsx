@@ -49,40 +49,39 @@ export const OrderTrackerView = () => {
       localOrder = getOrderByCode(cleanCode);
     }
 
-    // 2. Call safe RPC get_order_status(order_ref)
+    // 2. Query Supabase directly by id or ref
     try {
-      const { data, error } = await supabase.rpc('get_order_status', { order_ref: cleanCode });
-      
-      const rpcResult = Array.isArray(data) ? data[0] : data;
+      const { data: dbData, error: dbError } = await supabase
+        .from('orders')
+        .select('*')
+        .or(`id.eq.${cleanCode},ref.eq.${cleanCode}`)
+        .maybeSingle();
 
-      if (!error && rpcResult && rpcResult.status) {
+      const matchedOrder = dbData || localOrder;
+
+      if (matchedOrder && matchedOrder.status) {
+        const custName = matchedOrder.customer?.fullName || matchedOrder.customer?.name || localOrder?.customer?.fullName || localOrder?.customer?.name;
+        const itemsList = Array.isArray(matchedOrder.items) && matchedOrder.items.length > 0 ? matchedOrder.items : (localOrder?.items || []);
+        const totalAmount = matchedOrder.total || localOrder?.total || 0;
+        const orderDate = matchedOrder.created_at || matchedOrder.createdAt;
+
         setTrackedResult({
-          code: rpcResult.ref || cleanCode,
-          currentStep: statusToStep(rpcResult.status),
-          status: rpcResult.status,
-          customerName: localOrder?.customer?.fullName || localOrder?.customer?.name,
-          items: localOrder?.items || [],
-          total: localOrder?.total,
-          updatedAt: rpcResult.created_at
-            ? new Date(rpcResult.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
-            : (localOrder?.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن')
-        });
-      } else if (localOrder) {
-        setTrackedResult({
-          code: localOrder.ref || localOrder.id,
-          currentStep: statusToStep(localOrder.status),
-          status: localOrder.status,
-          customerName: localOrder.customer?.fullName || localOrder.customer?.name,
-          items: localOrder.items || [],
-          total: localOrder.total,
-          updatedAt: localOrder.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
+          code: matchedOrder.id || matchedOrder.ref || cleanCode,
+          currentStep: statusToStep(matchedOrder.status),
+          status: matchedOrder.status,
+          customerName: custName,
+          items: itemsList,
+          total: totalAmount,
+          updatedAt: orderDate
+            ? new Date(orderDate).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
+            : 'الآن'
         });
       } else {
         setTrackedResult(null);
         setErrorMsg(t('trackerNotFound'));
       }
     } catch (err) {
-      console.error('RPC tracking error:', err);
+      console.error('Order tracking exception:', err);
       if (localOrder) {
         setTrackedResult({
           code: localOrder.ref || localOrder.id,

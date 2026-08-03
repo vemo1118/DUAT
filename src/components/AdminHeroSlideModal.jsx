@@ -22,7 +22,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     ctaPrimaryLink: '/customize',
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
-    ctaSecondaryLink: '/shop'
+    ctaSecondaryLink: '/shop',
+    is_active: true
   });
 
   useEffect(() => {
@@ -45,7 +46,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         ctaPrimaryLink: slideToEdit.ctaPrimaryLink || '/customize',
         ctaSecondaryTextEn: slideToEdit.ctaSecondaryTextEn || '',
         ctaSecondaryTextAr: slideToEdit.ctaSecondaryTextAr || '',
-        ctaSecondaryLink: slideToEdit.ctaSecondaryLink || '/shop'
+        ctaSecondaryLink: slideToEdit.ctaSecondaryLink || '/shop',
+        is_active: slideToEdit.is_active !== undefined ? Boolean(slideToEdit.is_active) : true
       });
     } else {
       setFormData({
@@ -66,7 +68,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         ctaPrimaryLink: '/shop',
         ctaSecondaryTextEn: 'CUSTOMIZE',
         ctaSecondaryTextAr: 'تخصيص بنفسك',
-        ctaSecondaryLink: '/customize'
+        ctaSecondaryLink: '/customize',
+        is_active: true
       });
     }
   }, [slideToEdit, isOpen]);
@@ -101,17 +104,19 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto animate-fade-in" dir="rtl">
-      <div className="relative w-full max-w-3xl bg-stone border border-gold/40 p-6 space-y-6 shadow-2xl card-depth-highlight my-6 max-h-[92vh] overflow-y-auto">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-grave pb-4 pt-1">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-void/85 backdrop-blur-md overflow-hidden animate-fade-in" dir="rtl">
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-3xl h-full max-h-[88vh] bg-stone border border-gold/40 shadow-2xl flex flex-col overflow-hidden my-auto"
+      >
+        {/* Fixed Header */}
+        <div className="p-4 sm:p-5 border-b border-grave bg-stone shrink-0 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
             <span className="p-2 border border-gold/40 bg-gold/10 text-gold rounded">
               <Sparkles size={20} />
             </span>
             <div>
-              <h2 className="font-clash text-xl font-bold text-bone">
+              <h2 className="font-clash text-lg sm:text-xl font-bold text-bone">
                 {slideToEdit ? 'تعديل بنر العروض / السلايدر' : 'إضافة بنر / عرض جديد للشاشة الرئيسية'}
               </h2>
               <p className="font-mono text-xs text-ash mt-0.5">
@@ -120,6 +125,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-2 text-ash hover:text-gold border border-grave transition-colors rounded"
           >
@@ -127,8 +133,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="space-y-6 text-right">
+        {/* Scrollable Form Body */}
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 text-right">
           
           {/* Image Upload & URL Section */}
           <div className="bg-stone/40 border border-grave p-4 space-y-3">
@@ -470,26 +476,42 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
             </div>
           </div>
 
-          {/* Form Actions Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-grave sticky bottom-0 bg-stone/95 py-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 border border-grave text-ash hover:text-bone font-mono text-xs uppercase"
-            >
-              إلغاء
-            </button>
-
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-lg shadow-gold/20 flex items-center gap-2 ring-1 ring-gold"
-            >
-              <Save size={16} />
-              <span>حفظ البنر ونشره فوراً</span>
-            </button>
+          {/* Visibility Toggle Option */}
+          <div className="bg-stone/40 border border-grave p-4">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={Boolean(formData.is_active)}
+                onChange={(e) => setFormData((prev) => ({ ...prev, is_active: e.target.checked }))}
+                className="w-4 h-4 accent-gold cursor-pointer"
+              />
+              <div>
+                <span className="font-bold text-bone text-sm block">إظهار البنر في الشاشة الرئيسية (Active)</span>
+                <span className="text-xs text-ash block">عند إلغاء التحديد، سيتم إخفاء هذا البنر من الهوم بيدج للزوار دون حذفه.</span>
+              </div>
+            </label>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Fixed Form Actions Footer */}
+        <div className="p-4 border-t border-grave bg-stone shrink-0 flex items-center justify-end gap-3 z-10">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 border border-grave text-ash hover:text-bone font-mono text-xs uppercase"
+          >
+            إلغاء
+          </button>
+
+          <button
+            type="submit"
+            className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-lg shadow-gold/20 flex items-center gap-2 ring-1 ring-gold"
+          >
+            <Save size={16} />
+            <span>حفظ البنر ونشره فوراً</span>
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

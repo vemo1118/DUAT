@@ -5,7 +5,7 @@ const OrdersContext = createContext();
 
 function mapFromDb(ord) {
   if (!ord) return null;
-  const ref = ord.ref || ord.id;
+  const ref = ord.id || ord.ref;
   return {
     id: ref,
     ref: ref,
@@ -24,6 +24,7 @@ function mapFromDb(ord) {
 function mapToDb(ord) {
   const refCode = ord.ref || ord.id || `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
   return {
+    id: refCode,
     ref: refCode,
     status: ord.status || 'placed',
     customer: ord.customer || {},
@@ -43,14 +44,12 @@ export function OrdersProvider({ children }) {
     try {
       const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
       if (error) {
-        console.error('Failed to fetch orders from Supabase (may be unauthenticated):', error);
-        setOrders([]);
+        console.error('Failed to fetch orders from Supabase (may be unauthenticated or RLS blocked):', error);
       } else if (Array.isArray(data)) {
         setOrders(data.map(mapFromDb));
       }
     } catch (err) {
       console.error('Unexpected error loading orders:', err);
-      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,9 @@ export function OrdersProvider({ children }) {
       customer: orderData.customer || {},
       items: orderData.items || [],
       total: orderData.total || 0,
-      paymentMethod: orderData.paymentMethod || orderData.payment_method || 'cod'
+      paymentMethod: orderData.paymentMethod || orderData.payment_method || 'cod',
+      payment_proof_path: orderData.payment_proof_path || orderData.paymentProofPath || null,
+      paymentProofPath: orderData.payment_proof_path || orderData.paymentProofPath || null
     };
 
     setOrders((prev) => [newOrder, ...prev]);
@@ -81,9 +82,11 @@ export function OrdersProvider({ children }) {
       const { error } = await supabase.from('orders').insert(dbPayload);
       if (error) {
         console.error('Supabase add order error:', error);
+      } else {
+        console.log('Successfully saved order to Supabase:', refCode);
       }
     } catch (err) {
-      console.error('Supabase add order error:', err);
+      console.error('Supabase add order exception:', err);
     }
 
     return newOrder;
@@ -96,12 +99,15 @@ export function OrdersProvider({ children }) {
     );
 
     try {
-      const { error: errRef } = await supabase
+      const { error: errId } = await supabase
         .from('orders')
-        .update({ status: newStatus })
-        .eq('ref', orderId);
-      if (errRef) {
-        await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+      if (errId) {
+        await supabase
+          .from('orders')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq('ref', orderId);
       }
     } catch (err) {
       console.error('Supabase update order status error:', err);
@@ -112,9 +118,9 @@ export function OrdersProvider({ children }) {
   const deleteOrder = async (orderId) => {
     setOrders((prev) => prev.filter((ord) => ord.id !== orderId && ord.ref !== orderId));
     try {
-      const { error: errRef } = await supabase.from('orders').delete().eq('ref', orderId);
-      if (errRef) {
-        await supabase.from('orders').delete().eq('id', orderId);
+      const { error: errId } = await supabase.from('orders').delete().eq('id', orderId);
+      if (errId) {
+        await supabase.from('orders').delete().eq('ref', orderId);
       }
     } catch (err) {
       console.error('Supabase delete order error:', err);

@@ -22,10 +22,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
 
-  const [openFaqId, setOpenFaqId] = useState('faq-1');
-
-  const latestDrops = products.slice(0, 6);
-  const bestSellers = products.filter(p => p.category === 'cases').concat(products.filter(p => p.category === 'stickers')).slice(2, 8);
+  const activeProducts = products.filter((p) => p && p.is_active !== false && p.isActive !== false);
+  const latestDrops = activeProducts.slice(0, 6);
+  const bestSellers = activeProducts.filter((p) => p.category === 'cases').concat(activeProducts.filter((p) => p.category === 'stickers')).slice(2, 8);
 
   return (
     <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">

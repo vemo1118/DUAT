@@ -22,6 +22,7 @@ import {
   ShoppingBag,
   Truck,
   Eye,
+  EyeOff,
   X,
   Phone,
   Lock,
@@ -32,13 +33,14 @@ import {
   Sliders,
   ExternalLink,
   Loader2,
-  Mail
+  Mail,
+  CreditCard
 } from 'lucide-react';
 
 export function AdminView() {
-  const { products, addProduct, updateProduct, adjustPrice, deleteProduct, resetProducts } = useProducts();
+  const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
-  const { slides, addSlide, updateSlide, deleteSlide, resetSlides } = useHeroBanners();
+  const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
   const { showToast } = useToast();
 
   // Supabase Auth State
@@ -91,12 +93,16 @@ export function AdminView() {
       const proofPath = selectedOrderDetails?.payment_proof_path || selectedOrderDetails?.paymentProofPath;
       if (proofPath) {
         try {
+          const { data: publicData } = supabase.storage.from('payment-proofs').getPublicUrl(proofPath);
+          if (active && publicData?.publicUrl) {
+            setSignedProofUrl(publicData.publicUrl);
+          }
           const { data } = await supabase.storage.from('payment-proofs').createSignedUrl(proofPath, 3600);
           if (active && data?.signedUrl) {
             setSignedProofUrl(data.signedUrl);
           }
         } catch (err) {
-          console.error('Error generating signed URL for payment proof:', err);
+          console.error('Error generating URL for payment proof:', err);
         }
       }
     };
@@ -604,6 +610,22 @@ export function AdminView() {
                           <td className="py-4 px-4 text-left">
                             <div className="flex items-center justify-end gap-2">
                               <button
+                                onClick={() => {
+                                  toggleProductVisibility(product.id);
+                                  showToast(product.is_active !== false ? 'تم إخفاء المنتج من المتجر' : 'تم إظهار المنتج في المتجر', 'info');
+                                }}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 border transition-colors font-mono text-xs font-bold ${
+                                  product.is_active !== false
+                                    ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                                    : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
+                                }`}
+                                title={product.is_active !== false ? 'إخفاء المنتج من المتجر' : 'إظهار المنتج في المتجر'}
+                              >
+                                {product.is_active !== false ? <Eye size={14} /> : <EyeOff size={14} />}
+                                <span>{product.is_active !== false ? 'ظاهر' : 'مخفي'}</span>
+                              </button>
+
+                              <button
                                 onClick={() => handleOpenEditProductModal(product)}
                                 className="flex items-center gap-1 px-3 py-1.5 border border-grave bg-stone/50 hover:border-gold hover:text-gold text-ash transition-colors font-mono text-xs"
                               >
@@ -812,8 +834,14 @@ export function AdminView() {
                           <div className="font-mono font-bold text-bone">
                             {ord.total} <span className="text-xs text-gold">ج.م</span>
                           </div>
-                          <span className="font-mono text-[11px] text-ash uppercase">
-                            {ord.paymentMethod === 'instapay' ? 'InstaPay' : 'دفع عند الاستلام'}
+                          <span className="font-mono text-[11px] text-ash uppercase flex items-center gap-1.5 mt-0.5">
+                            <span>{ord.paymentMethod === 'instapay' ? 'InstaPay' : 'دفع عند الاستلام'}</span>
+                            {(ord.payment_proof_path || ord.paymentProofPath) && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded flex items-center gap-1">
+                                <ImageIcon size={10} />
+                                <span>صورة المرفق</span>
+                              </span>
+                            )}
                           </span>
                         </td>
 
@@ -913,8 +941,27 @@ export function AdminView() {
                     </div>
                   )}
 
-                  <div className="absolute top-3 right-3 bg-void/80 backdrop-blur border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
-                    بنر #{index + 1}
+                  <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                    <div className="bg-void/90 backdrop-blur border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
+                      بنر #{index + 1}
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSlideVisibility(slide.id);
+                        showToast(slide.is_active !== false ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                      }}
+                      className={`px-3 py-1 border font-mono text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+                        slide.is_active !== false
+                          ? 'border-emerald-500 bg-emerald-600/90 text-white hover:bg-emerald-700'
+                          : 'border-amber-500 bg-amber-600/90 text-white hover:bg-amber-700'
+                      }`}
+                      title={slide.is_active !== false ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
+                    >
+                      {slide.is_active !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                      <span>{slide.is_active !== false ? 'ظاهر (إخفاء)' : 'مخفي (إظهار)'}</span>
+                    </button>
                   </div>
 
                   {slide.badgeAr && (
@@ -944,23 +991,41 @@ export function AdminView() {
                 </div>
 
                 {/* Card Action Buttons */}
-                <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-end gap-2">
+                <div className="p-4 bg-stone/40 border-t border-grave flex flex-wrap items-center justify-between gap-2">
                   <button
-                    onClick={() => handleOpenEditHeroModal(slide)}
-                    className="flex items-center gap-1.5 px-4 py-2 border border-grave bg-stone/80 hover:border-gold hover:text-gold text-bone font-mono text-xs font-bold transition-colors"
+                    onClick={() => {
+                      toggleSlideVisibility(slide.id);
+                      showToast(slide.is_active !== false ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 border font-mono text-xs font-bold transition-colors ${
+                      slide.is_active !== false
+                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                        : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
+                    }`}
+                    title={slide.is_active !== false ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
                   >
-                    <Edit2 size={14} />
-                    <span>تعديل البنر</span>
+                    {slide.is_active !== false ? <Eye size={14} /> : <EyeOff size={14} />}
+                    <span>{slide.is_active !== false ? 'ظاهر' : 'مخفي'}</span>
                   </button>
 
-                  <button
-                    onClick={() => handleDeleteHeroSlide(slide.id)}
-                    className="flex items-center gap-1.5 px-3 py-2 border border-red-500/40 text-red-500 hover:bg-red-500/10 font-mono text-xs font-bold transition-colors"
-                    title="حذف البنر"
-                  >
-                    <Trash2 size={14} />
-                    <span>حذف</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenEditHeroModal(slide)}
+                      className="flex items-center gap-1.5 px-4 py-2 border border-grave bg-stone/80 hover:border-gold hover:text-gold text-bone font-mono text-xs font-bold transition-colors"
+                    >
+                      <Edit2 size={14} />
+                      <span>تعديل البنر</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteHeroSlide(slide.id)}
+                      className="flex items-center gap-1.5 px-3 py-2 border border-red-500/40 text-red-500 hover:bg-red-500/10 font-mono text-xs font-bold transition-colors"
+                      title="حذف البنر"
+                    >
+                      <Trash2 size={14} />
+                      <span>حذف</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1036,39 +1101,62 @@ export function AdminView() {
             </div>
 
             {/* Payment Method & Proof Section */}
-            {(selectedOrderDetails.payment_proof_path || selectedOrderDetails.paymentProofPath) && (
-              <div className="space-y-2 border border-gold/40 bg-coal p-4 font-mono text-xs">
-                <span className="text-gold font-bold uppercase block flex items-center gap-1.5">
-                  <ExternalLink size={14} />
-                  <span>إثبات التحويل (إنستاباي / InstaPay Proof):</span>
-                </span>
-                {signedProofUrl ? (
-                  <div className="space-y-2">
-                    <a
-                      href={signedProofUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block group relative overflow-hidden border border-grave max-h-64 flex items-center justify-center bg-void"
-                    >
-                      <img src={signedProofUrl} alt="Payment Proof" className="max-h-60 object-contain mx-auto" />
-                      <div className="absolute inset-0 bg-void/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-gold font-bold transition-opacity">
-                        عرض صورة إثبات التحويل بالحجم الكامل ↗
-                      </div>
-                    </a>
-                    <a
-                      href={signedProofUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gold underline hover:text-gold-light text-xs font-bold block"
-                    >
-                      فتح اسكرين شوت التحويل في نافذة جديدة ↗
-                    </a>
+            {(() => {
+              const proofPath = selectedOrderDetails.payment_proof_path || selectedOrderDetails.paymentProofPath;
+              const directPublicUrl = proofPath
+                ? (proofPath.startsWith('http') ? proofPath : `https://pgqgmrfvsvrvbddafrcf.supabase.co/storage/v1/object/public/payment-proofs/${proofPath}`)
+                : null;
+              const displayProofUrl = signedProofUrl || directPublicUrl;
+              const isInstaPay = selectedOrderDetails.paymentMethod === 'instapay' || selectedOrderDetails.payment_method === 'instapay';
+
+              return (
+                <div className="space-y-3 border border-gold/40 bg-coal p-4 font-mono text-xs">
+                  <div className="flex items-center justify-between border-b border-grave/60 pb-2">
+                    <span className="text-gold font-bold uppercase flex items-center gap-1.5">
+                      <CreditCard size={14} />
+                      <span>طريقة الدفع:</span>
+                    </span>
+                    <span className="font-bold text-bone">
+                      {isInstaPay ? 'تحويل سريع عبر إنستاباي (InstaPay)' : 'الدفع نقداً عند الاستلام (COD)'}
+                    </span>
                   </div>
-                ) : (
-                  <div className="text-ash py-2 font-mono">جاري استخراج رابط المعاينة الآمن...</div>
-                )}
-              </div>
-            )}
+
+                  {displayProofUrl ? (
+                    <div className="space-y-2 pt-1">
+                      <span className="text-ash block text-[11px] uppercase font-bold">صورة إثبات التحويل (Screenshot):</span>
+                      <a
+                        href={displayProofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block group relative overflow-hidden border border-gold/50 max-h-64 flex items-center justify-center bg-void p-2"
+                      >
+                        <img src={displayProofUrl} alt="Payment Proof" className="max-h-60 object-contain mx-auto" />
+                        <div className="absolute inset-0 bg-void/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-gold font-bold transition-opacity">
+                          عرض صورة إثبات التحويل بالحجم الكامل ↗
+                        </div>
+                      </a>
+                      <a
+                        href={displayProofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-ghost w-full text-center text-gold border-gold/40 hover:bg-gold/10 text-xs font-bold py-2 flex items-center justify-center gap-2"
+                      >
+                        <ImageIcon size={14} />
+                        <span>فتح اسكرين شوت التحويل في نافذة جديدة ↗</span>
+                      </a>
+                    </div>
+                  ) : isInstaPay ? (
+                    <div className="text-ember font-bold text-[11px] pt-1">
+                      ⚠️ تم اختيار إنستاباي، لكن لم تتم إضافة صورة إثبات أثناء الطلب.
+                    </div>
+                  ) : (
+                    <div className="text-ash text-[11px] pt-1">
+                      ✓ الطلب تحصيل نقدي (COD) عند استلام الشحنة.
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-between border-t border-grave pt-4">
               <div>
