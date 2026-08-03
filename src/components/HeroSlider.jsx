@@ -13,9 +13,14 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const activeSlides = Array.isArray(slides)
+  const filteredSlides = Array.isArray(slides)
     ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false)
     : [];
+
+  // Fallback to first slide if all slides are hidden so website never renders a blank screen
+  const activeSlides = filteredSlides.length > 0
+    ? filteredSlides
+    : (Array.isArray(slides) && slides.length > 0 ? [slides[0]] : []);
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
