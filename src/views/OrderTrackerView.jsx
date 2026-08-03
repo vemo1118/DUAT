@@ -164,6 +164,17 @@ export const OrderTrackerView = () => {
               </div>
             )}
 
+            {Array.isArray(trackedResult.items) && trackedResult.items.length > 0 && (
+              <div className="font-mono text-xs text-bone/80 border-b border-grave/40 pb-3 space-y-1">
+                <span className="text-ash block font-bold">المنتجات في هذا الطلب:</span>
+                {trackedResult.items.map((it, i) => (
+                  <div key={i} className="text-gold font-medium">
+                    • {it.nameAr || it.nameEn} (x{it.quantity || 1})
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="space-y-6">
               {steps.map((step, idx) => {
                 const Icon = step.icon;
@@ -172,22 +183,29 @@ export const OrderTrackerView = () => {
 
                 return (
                   <div key={idx} className="flex items-start gap-4 sm:gap-6">
-                    <div className={`p-3 border flex-shrink-0 transition-colors ${
+                    <div className={`p-3 border flex-shrink-0 transition-all rounded-sm ${
                       isCurrent
-                        ? 'border-gold bg-gold/20 text-gold shadow-lg shadow-gold/10'
+                        ? 'border-gold bg-gold/25 text-gold shadow-lg shadow-gold/20 scale-105'
                         : isCompleted
-                        ? 'border-grave bg-stone text-gold'
-                        : 'border-grave bg-void text-ash'
+                        ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+                        : 'border-grave bg-void text-ash/40'
                     }`}>
-                      <Icon size={20} />
+                      {isCompleted && !isCurrent ? <CheckCircle size={20} className="text-emerald-400" /> : <Icon size={20} />}
                     </div>
                     <div className="space-y-1">
-                      <h4 className={`font-mono text-sm uppercase ${
-                        isCurrent ? 'text-gold font-bold' : isCompleted ? 'text-bone font-medium' : 'text-ash'
-                      }`}>
-                        {step.title}
-                      </h4>
-                      <p className="font-space text-xs text-ash leading-relaxed">
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-mono text-sm uppercase ${
+                          isCurrent ? 'text-gold font-bold text-base' : isCompleted ? 'text-bone font-medium' : 'text-ash/60'
+                        }`}>
+                          {step.title}
+                        </h4>
+                        {isCurrent && (
+                          <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 text-[10px] font-mono font-bold animate-pulse">
+                            الحالة الحالية ⚡
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-space text-xs text-ash/90 leading-relaxed">
                         {step.desc}
                       </p>
                     </div>
