@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import {
   exportOrdersToCSV,
+  sendTestTelegramNotification,
   TELEGRAM_TOKEN_KEY,
   TELEGRAM_CHAT_ID_KEY,
   ADMIN_WHATSAPP_NUMBER_KEY
@@ -72,6 +73,22 @@ export function AdminView() {
     localStorage.setItem(TELEGRAM_CHAT_ID_KEY, telegramChatId.trim());
     localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, adminWhatsApp.trim());
     showToast('تم حفظ إعدادات الإشعارات الفورية على الموبايل بنجاح!', 'success');
+  };
+
+  const handleTestNotification = async () => {
+    if (!telegramToken.trim() || !telegramChatId.trim()) {
+      showToast('يرجى إدخال الـ Bot Token والـ Chat ID أولاً لاختبار الإشعار!', 'error');
+      return;
+    }
+    localStorage.setItem(TELEGRAM_TOKEN_KEY, telegramToken.trim());
+    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, telegramChatId.trim());
+    showToast('جاري إرسال إشعار تجريبي لموبايلك عبر تليجرام...', 'info');
+    const ok = await sendTestTelegramNotification();
+    if (ok) {
+      showToast('وصل الإشعار التجريبي بنجاح! تفقّد هاتفك المحمول 📱✨', 'success');
+    } else {
+      showToast('تعذر الإرسال! تأكد من الـ Token والـ Chat ID وأنك اضطت /start للبوت في تليجرام.', 'error');
+    }
   };
 
   // Check initial session & listen for auth changes
@@ -1143,13 +1160,24 @@ export function AdminView() {
               </ol>
             </div>
 
-            <button
-              type="submit"
-              className="btn-primary w-full py-4 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
-            >
-              <Save size={16} />
-              <span>حفظ إعدادات الإشعارات الفورية</span>
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <button
+                type="submit"
+                className="btn-primary w-full py-4 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
+              >
+                <Save size={16} />
+                <span>حفظ الإعدادات</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleTestNotification}
+                className="w-full py-4 bg-gold/15 hover:bg-gold hover:text-void text-gold border border-gold font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-lg"
+              >
+                <Bell size={16} />
+                <span>اختبار وإرسال إشعار تجريبي 🔔</span>
+              </button>
+            </div>
           </form>
         </div>
       )}

@@ -15,34 +15,41 @@ export async function sendTelegramOrderNotification(order) {
     const chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
 
     if (!token || !chatId) {
-      console.log('Telegram Bot Token or Chat ID not configured in Admin Settings.');
+      console.warn('Telegram Bot Token or Chat ID not configured in Admin Settings.');
       return false;
     }
 
-    const itemsList = Array.isArray(order.items)
-      ? order.items
+    const customerName = order.customerName || order.customer?.fullName || order.customer?.name || 'عميل DUAT';
+    const customerPhone = order.customerPhone || order.customer?.phone || 'غير محدد';
+    const customerGov = order.customerGovernorate || order.customer?.governorate || '';
+    const customerAddr = order.customerAddress || order.customer?.address || 'عنوان مباشر';
+    const totalAmount = order.totalPrice || order.total || 0;
+    const orderItems = order.items || order.cartItems || [];
+
+    const itemsList = Array.isArray(orderItems) && orderItems.length > 0
+      ? orderItems
           .map(
             (item, i) =>
               `${i + 1}. <b>${item.nameAr || item.nameEn}</b> x${item.quantity || 1} — ${
-                item.price * (item.quantity || 1)
+                (item.price || 0) * (item.quantity || 1)
               } EGP`
           )
           .join('\n')
-      : 'لا توجد تفاصيل للمنتجات';
+      : '• منتج مخصص من المتجر';
 
     const messageText = `
 🚨 <b>طلب جديد في متجر DUAT!</b>
 ━━━━━━━━━━━━━━━━━━
-🆔 <b>رقم الطلب:</b> <code>${order.id}</code>
-👤 <b>اسم العميل:</b> ${order.customerName || 'غير محدد'}
-📞 <b>رقم الهاتف:</b> <code>${order.customerPhone || 'غير محدد'}</code>
-📍 <b>المحافظة/العنوان:</b> ${order.customerGovernorate || ''} — ${order.customerAddress || 'غير محدد'}
+🆔 <b>رقم الطلب:</b> <code>${order.id || order.ref}</code>
+👤 <b>اسم العميل:</b> ${customerName}
+📞 <b>رقم الهاتف:</b> <code>${customerPhone}</code>
+📍 <b>المحافظة/العنوان:</b> ${customerGov} — ${customerAddr}
 
 🛒 <b>تفاصيل المنتجات:</b>
 ${itemsList}
 
 ====================
-💰 <b>إجمالي المبلغ المستحق (COD):</b> <b>${order.totalPrice || order.total} EGP</b>
+💰 <b>إجمالي المبلغ المستحق (COD):</b> <b>${totalAmount} EGP</b>
 📅 <b>التاريخ:</b> ${new Date().toLocaleString('ar-EG')}
 ━━━━━━━━━━━━━━━━━━
 `;
@@ -64,6 +71,21 @@ ${itemsList}
     console.error('Failed to send Telegram mobile order notification:', err);
     return false;
   }
+}
+
+export async function sendTestTelegramNotification() {
+  const testOrder = {
+    id: `TEST-${Math.floor(1000 + Math.random() * 9000)}`,
+    customerName: 'عميل تجريبي (اختبار النظام)',
+    customerPhone: '01012345678',
+    customerGovernorate: 'القاهرة',
+    customerAddress: 'شارع المعز - وسط البلد',
+    totalPrice: 850,
+    items: [
+      { nameAr: 'جراب الحلقة الذهبية (ماج سيف)', quantity: 1, price: 850 }
+    ]
+  };
+  return await sendTelegramOrderNotification(testOrder);
 }
 
 /**
