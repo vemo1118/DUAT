@@ -353,6 +353,7 @@ export const CustomizerContent = () => {
 
   // Pointer Down Handlers
   const handlePointerDownLayer = (id, e) => {
+    e.preventDefault();
     e.stopPropagation();
     setSelectedLayerId(id);
 
@@ -370,6 +371,7 @@ export const CustomizerContent = () => {
   };
 
   const handlePointerDownRotate = (id, e) => {
+    e.preventDefault();
     e.stopPropagation();
 
     const layer = layers.find((l) => l.id === id);
@@ -385,6 +387,7 @@ export const CustomizerContent = () => {
   };
 
   const handlePointerDownScale = (id, e) => {
+    e.preventDefault();
     e.stopPropagation();
 
     const layer = layers.find((l) => l.id === id);
@@ -612,7 +615,12 @@ export const CustomizerContent = () => {
 
                       {/* Render Uploaded Image */}
                       {layer.type === 'image' && (
-                        <img src={layer.src} alt="Custom Layer" className="max-w-[100px] max-h-[100px] object-contain" />
+                        <img
+                          src={layer.src}
+                          alt="Custom Layer"
+                          draggable={false}
+                          className="max-w-[120px] max-h-[120px] object-contain pointer-events-none select-none touch-none shadow-md rounded"
+                        />
                       )}
                     </div>
                   );
