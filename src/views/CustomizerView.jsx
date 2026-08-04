@@ -454,6 +454,7 @@ export const CustomizerContent = () => {
       category: 'cases',
       tagEn: selectedCaseType?.nameEn || 'Custom Case',
       tagAr: selectedCaseType?.nameAr || 'جراب مخصص',
+      image: mockupSnapshotUrl,
       designSnapshot: mockupSnapshotUrl,
       customConfig: {
         phoneModel: currentModelName,

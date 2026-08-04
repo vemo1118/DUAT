@@ -1340,35 +1340,50 @@ export function AdminView() {
                               </div>
                             </div>
                           )}
-                          {/* Render Design Snapshot Visual Mockup */}
-                          {(item.designSnapshot || cfg?.designSnapshot) && (
-                            <div className="pt-3 border-t border-grave/40 space-y-2">
-                              <span className="text-gold font-bold block flex items-center gap-1.5 text-xs">
-                                <ImageIcon size={14} />
-                                <span>معاينة صورة تصميم الجراب المخصص بالكامل (Mockup):</span>
-                              </span>
-                              <div className="flex flex-col sm:flex-row items-center gap-4 bg-void p-3 border border-gold/40 rounded">
-                                <img
-                                  src={item.designSnapshot || cfg.designSnapshot}
-                                  alt="Case Design Mockup"
-                                  className="w-36 h-60 object-contain border border-grave bg-coal rounded-lg shadow-xl"
-                                />
-                                <div className="space-y-2 font-mono text-xs text-ash">
-                                  <p className="text-bone">معاينة بصرية دقيقة لتنسيق الجراب كما قام العميل بتصميمه على المتجر.</p>
-                                  <a
-                                    href={item.designSnapshot || cfg.designSnapshot}
-                                    download={`case-design-${selectedOrderDetails.id}-${idx + 1}.png`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-4 py-2 bg-gold/15 hover:bg-gold hover:text-void text-gold border border-gold text-[11px] inline-flex items-center gap-1.5 font-bold uppercase tracking-wider transition-colors"
-                                  >
-                                    <ImageIcon size={14} />
-                                    <span>تحميل صورة تصميم الجراب الكامل 🖼️</span>
-                                  </a>
-                                </div>
+                      {/* Render Visual Case Mockup Card */}
+                      {isCustomCase && (
+                        <div className="pt-3 border-t border-grave/40 space-y-2">
+                          <span className="text-gold font-bold block flex items-center gap-1.5 text-xs">
+                            <ImageIcon size={14} />
+                            <span>معاينة صورة تصميم الجراب المخصص (Mockup Preview):</span>
+                          </span>
+                          <div className="flex flex-col sm:flex-row items-center gap-4 bg-void p-3.5 border border-gold/40 rounded-lg shadow-xl">
+                            {mockupImg ? (
+                              <img
+                                src={mockupImg}
+                                alt="Case Design Mockup"
+                                className="w-36 h-60 object-contain border border-grave bg-coal rounded-lg shadow-2xl"
+                              />
+                            ) : (
+                              <div className="w-36 h-60 bg-stone border-2 border-dashed border-gold/50 rounded-lg flex flex-col items-center justify-center p-3 text-center space-y-2">
+                                <SunDisc size={32} className="text-gold" />
+                                <span className="font-mono text-[11px] text-bone font-bold">{cfg?.phoneModel || 'جراب مخصص'}</span>
+                                <span className="font-mono text-[9px] text-gold uppercase bg-gold/15 px-2 py-0.5 rounded">{cfg?.caseFinish || 'تقفيل شفاف'}</span>
                               </div>
+                            )}
+
+                            <div className="space-y-2.5 font-mono text-xs text-ash">
+                              <p className="text-bone font-bold">هذه هي المعاينة البصرية الدقيقة لتنسيق الجراب كما قام العميل بتصميمه على المتجر.</p>
+                              <div className="text-[11px] space-y-1 text-gold bg-stone/40 p-2 rounded border border-grave/40">
+                                <p>📱 الموديل: {cfg?.phoneModel || cfg?.model || 'iPhone 16 Pro Max'}</p>
+                                <p>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'Clear Solar Canvas'}</p>
+                              </div>
+                              {mockupImg && (
+                                <a
+                                  href={mockupImg}
+                                  download={`case-design-${selectedOrderDetails.id}-${idx + 1}.png`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-4 py-2 bg-gold/15 hover:bg-gold hover:text-void text-gold border border-gold text-[11px] inline-flex items-center gap-1.5 font-bold uppercase tracking-wider transition-colors shadow-md rounded"
+                                >
+                                  <Download size={14} />
+                                  <span>تحميل صورة تصميم الجراب الكامل 🖼️</span>
+                                </a>
+                              )}
                             </div>
-                          )}
+                          </div>
+                        </div>
+                      )}
                         </div>
                       )}
                     </div>
