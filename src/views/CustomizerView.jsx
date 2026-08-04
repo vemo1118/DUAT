@@ -255,6 +255,8 @@ export const CustomizerContent = () => {
   const defaultCaseType = CASE_TYPES.find((c) => c.id === 'matte-black') || CASE_TYPES[0];
   const [selectedModel, setSelectedModel] = useState(defaultModelName);
   const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
+  const [customModelInput, setCustomModelInput] = useState('');
+  const [designNotes, setDesignNotes] = useState('');
 
   // Pre-select case finish if navigated from Product Card or Modal
   useEffect(() => {
@@ -286,6 +288,10 @@ export const CustomizerContent = () => {
   };
 
   const currentModelName = getModelName(selectedModel);
+  const isCustomModelOption = selectedModel.includes('جهاز آخر') || selectedModel === 'other-custom';
+  const effectiveModelName = isCustomModelOption
+    ? (customModelInput.trim() || 'جهاز مخصص حسب الطلب')
+    : currentModelName;
 
   // Layer Operations
   const handleAddSticker = (stickerId) => {
@@ -512,8 +518,8 @@ export const CustomizerContent = () => {
 
     const customCaseProduct = {
       id: `custom-case-${Date.now()}`,
-      nameEn: `Custom ${currentModelName} Case`,
-      nameAr: `جراب مخصص ${currentModelName}`,
+      nameEn: `Custom ${effectiveModelName} Case`,
+      nameAr: `جراب مخصص ${effectiveModelName}`,
       price: 850,
       category: 'cases',
       tagEn: selectedCaseType?.nameEn || 'Custom Case',
@@ -521,7 +527,9 @@ export const CustomizerContent = () => {
       image: mockupSnapshotUrl,
       designSnapshot: mockupSnapshotUrl,
       customConfig: {
-        phoneModel: currentModelName,
+        phoneModel: effectiveModelName,
+        customModelInput: isCustomModelOption ? customModelInput : null,
+        designNotes: designNotes.trim() || null,
         caseFinish: selectedCaseType?.nameAr || selectedCaseType?.nameEn,
         caseTypeId: selectedCaseType?.id,
         designSnapshot: mockupSnapshotUrl,
@@ -541,7 +549,9 @@ export const CustomizerContent = () => {
         }))
       },
       customDetails: {
-        model: currentModelName,
+        model: effectiveModelName,
+        customModelInput: isCustomModelOption ? customModelInput : null,
+        designNotes: designNotes.trim() || null,
         caseType: selectedCaseType?.nameEn || 'Clear Solar',
         layersCount: layers.length
       }
@@ -747,7 +757,7 @@ export const CustomizerContent = () => {
             <div className="space-y-2">
               <label className="font-mono text-xs text-ash block">{t('selectModel')}</label>
               <select
-                value={currentModelName}
+                value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
               >
@@ -761,6 +771,20 @@ export const CustomizerContent = () => {
                   );
                 })}
               </select>
+
+              {/* Custom Model Text Input if "جهاز آخر" selected */}
+              {isCustomModelOption && (
+                <div className="pt-2 animate-fadeIn space-y-1">
+                  <label className="font-mono text-xs text-gold font-bold block">📱 اكتب اسم وموديل جهازك بالتفصيل:</label>
+                  <input
+                    type="text"
+                    value={customModelInput}
+                    onChange={(e) => setCustomModelInput(e.target.value)}
+                    placeholder="مثلاً: Honor Magic 6 Pro أو Poco X6 Pro أو Huawei Mate 60"
+                    className="w-full bg-coal border border-gold/60 text-bone p-3 font-space text-sm focus:border-gold outline-none rounded"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Case Type Finishes Grid */}
@@ -790,6 +814,20 @@ export const CustomizerContent = () => {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Design Notes Textarea */}
+            <div className="space-y-2 pt-3 border-t border-grave/40">
+              <label className="font-mono text-xs text-gold font-bold block flex items-center gap-1.5">
+                <span>📝 ملاحظات خاصة بالتصميم للورشة (اختياري):</span>
+              </label>
+              <textarea
+                value={designNotes}
+                onChange={(e) => setDesignNotes(e.target.value)}
+                rows={2}
+                placeholder="مثلاً: يرجى حفر الاسم في منتصف الجراب، أو وضع استيكر القمر في أعلى اليسار..."
+                className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded custom-scrollbar resize-none"
+              />
             </div>
 
           </div>
@@ -854,11 +892,17 @@ export const CustomizerContent = () => {
                     <div className="flex flex-wrap gap-1.5">
                       {[
                         { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'عاجي ملكي', value: '#EDE4D3' },
                         { name: 'أسود فحمي', value: '#0A0C16' },
                         { name: 'أبيض ناصع', value: '#FFFFFF' },
-                        { name: 'أحمر قاني', value: '#8B0000' },
-                        { name: 'زمردي', value: '#1B4332' }
+                        { name: 'نبيذي قاني', value: '#8B1E24' },
+                        { name: 'زمردي ملكي', value: '#144D37' },
+                        { name: 'كحلي ملكي', value: '#0C1B3A' },
+                        { name: 'روز جولد', value: '#B76E79' },
+                        { name: 'عنبر دافئ', value: '#D97706' },
+                        { name: 'لافندر ملكي', value: '#7C3AED' },
+                        { name: 'تيتانيوم', value: '#9E9A93' },
+                        { name: 'بنفسجي داكن', value: '#382049' }
                       ].map((c) => (
                         <button
                           key={c.value}
@@ -878,11 +922,14 @@ export const CustomizerContent = () => {
                     <span className="font-mono text-xs text-gold font-bold">🏷️ اختر لون خلفية الاستيكر:</span>
                     <div className="flex flex-wrap gap-1.5">
                       {[
-                        { name: 'داكن مائل للأسود', value: '#14110F' },
+                        { name: 'داكن فحمي', value: '#14110F' },
                         { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي', value: '#EDE4D3' },
+                        { name: 'عاجي ملكي', value: '#EDE4D3' },
                         { name: 'كحلي ملكي', value: '#0B132B' },
                         { name: 'زمردي', value: '#1B4332' },
+                        { name: 'نبيذي جمر', value: '#8B1E24' },
+                        { name: 'وردي', value: '#E8C5C8' },
+                        { name: 'تيتانيوم', value: '#9E9A93' },
                         { name: 'شفاف 🚫', value: 'transparent' }
                       ].map((c) => (
                         <button

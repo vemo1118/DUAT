@@ -1298,8 +1298,17 @@ export function AdminView() {
                         <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px] rounded">
                           <div className="flex flex-wrap gap-3 text-gold font-bold">
                             <span>📱 الموديل: {cfg.phoneModel || cfg.model || 'غير محدد'}</span>
+                            {cfg.customModelInput && (
+                              <span className="text-bone">({cfg.customModelInput})</span>
+                            )}
                             <span>🎨 التقفيل: {cfg.caseFinish || cfg.caseType || 'جراب شفاف'}</span>
                           </div>
+
+                          {cfg.designNotes && (
+                            <div className="text-amber-300 bg-stone/60 p-2 rounded border border-amber-500/30">
+                              <strong>📝 ملاحظات التصميم والورشة:</strong> "{cfg.designNotes}"
+                            </div>
+                          )}
 
                           {layers.length > 0 && (
                             <div className="space-y-1 text-ash border-t border-grave/40 pt-2">
@@ -1437,8 +1446,16 @@ export function AdminView() {
                               <p className="text-bone font-bold text-sm">التصميم النهائي كما صممه العميل على المتجر.</p>
                               <div className="text-[11px] space-y-1 text-gold bg-stone/40 p-2.5 rounded border border-grave/40">
                                 <p>📱 الموديل: {cfg?.phoneModel || cfg?.model || 'غير محدد'}</p>
+                                {cfg?.customModelInput && (
+                                  <p className="text-bone font-bold">📱 اسم الجهاز المكتوب: {cfg.customModelInput}</p>
+                                )}
                                 <p>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'جراب شفاف'}</p>
                                 <p>🏷️ عدد الاستيكرات: {layers.length}</p>
+                                {cfg?.designNotes && (
+                                  <p className="text-amber-300 font-bold border-t border-grave/40 pt-1 mt-1">
+                                    📝 ملاحظات الورشة: "{cfg.designNotes}"
+                                  </p>
+                                )}
                               </div>
                               {mockupImg && (
                                 <a

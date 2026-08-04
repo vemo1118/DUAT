@@ -272,30 +272,70 @@ export const PRODUCTS = [
 ];
 
 export const CASE_TYPES = [
-  { id: 'clear', nameEn: 'Clear Solar Canvas', nameAr: 'قماش الشمسي الشفاف', color: '#FFFFFF' },
-  { id: 'gold-ring', nameEn: 'Gold Ring Armor (MagSafe)', nameAr: 'درع الحلقة الذهبية (ماج سيف)', color: '#E0A93B' },
-  { id: 'frosted-ember', nameEn: 'Frosted Crimson Ruby', nameAr: 'جمر نبيذي ضبابي', color: '#D9432E' },
-  { id: 'matte-black', nameEn: 'Void Stealth Black', nameAr: 'أسود مطفي نقي', color: '#0A0A0B' },
-  { id: 'frost', nameEn: 'Frost Iced White', nameAr: 'أبيض ثلجي ضبابي', color: '#F0F4F8' },
-  { id: 'tide', nameEn: 'Tide Deep Blue', nameAr: 'أزرق بحري عميق', color: '#0F2035' },
-  { id: 'sage', nameEn: 'Sage Muted Green', nameAr: 'أخضر مرامي مطفي', color: '#1C2A22' },
-  { id: 'bone', nameEn: 'Bone Alabaster Cream', nameAr: 'عاجي ألباستر دافئ', color: '#EFEAE0' },
-  { id: 'carbon', nameEn: 'Carbon Techwear', nameAr: 'كربون تكتيكي', color: '#1A1A1A' }
+  { id: 'clear', nameEn: 'Clear Acrylic Canvas', nameAr: 'شفاف أكرليك نقي', color: '#FAF9F6', bg: '#FAF9F6', ring: '#C0C0C0' },
+  { id: 'frost', nameEn: 'Frost Iced White', nameAr: 'أبيض ثلجي مطفي', color: '#F4F5F7', bg: '#F4F5F7', ring: '#D8DCE3' },
+  { id: 'matte-black', nameEn: 'Void Stealth Black', nameAr: 'أسود فحمي مطفي', color: '#121214', bg: '#121214', ring: '#333336' },
+  { id: 'bone', nameEn: 'Bone Alabaster Cream', nameAr: 'عاجي ألباستر دافئ', color: '#EFEAE0', bg: '#EFEAE0', ring: '#D8CFBC' },
+  { id: 'frosted-ember', nameEn: 'Frosted Crimson Ruby', nameAr: 'جمر نبيذي ضبابي', color: '#8B1E24', bg: '#8B1E24', ring: '#C93A43' },
+  { id: 'tide', nameEn: 'Royal Deep Navy', nameAr: 'كحلي ملكي عميق', color: '#0F1C2E', bg: '#0F1C2E', ring: '#2A4365' },
+  { id: 'sage', nameEn: 'Sage Muted Green', nameAr: 'أخضر مرامي مطفي', color: '#26382D', bg: '#26382D', ring: '#405B4A' },
+  { id: 'rose', nameEn: 'Rose Quartz Frosted', nameAr: 'وردي كوارنز ضبابي', color: '#E8C5C8', bg: '#E8C5C8', ring: '#D49DA3' },
+  { id: 'titanium', nameEn: 'Natural Titanium', nameAr: 'تيتانيوم طبيعي مصقول', color: '#9E9A93', bg: '#9E9A93', ring: '#BDBA8B' },
+  { id: 'purple', nameEn: 'Imperial Purple', nameAr: 'بنفسجي ملكي فاخر', color: '#382049', bg: '#382049', ring: '#6B4086' },
+  { id: 'desert', nameEn: 'Desert Gold Sand', nameAr: 'رمال الصحراء الذهبية', color: '#D6C0A0', bg: '#D6C0A0', ring: '#B89B70' },
+  { id: 'gold-ring', nameEn: 'Gold Ring Armor (MagSafe)', nameAr: 'درع حلقة الذهب (ماج سيف)', color: '#E0A93B', bg: '#121214', ring: '#E0A93B' },
+  { id: 'carbon', nameEn: 'Carbon Techwear', nameAr: 'كربون تكتيكي', color: '#1C1D21', bg: '#1C1D21', ring: '#444' }
 ];
 
 export const PHONE_MODELS = [
+  // Apple iPhones
   { id: 'ip16pro-max', name: 'iPhone 16 Pro Max', category: 'Apple' },
   { id: 'ip16pro', name: 'iPhone 16 Pro', category: 'Apple' },
+  { id: 'ip16plus', name: 'iPhone 16 Plus', category: 'Apple' },
   { id: 'ip16', name: 'iPhone 16', category: 'Apple' },
   { id: 'ip15pro-max', name: 'iPhone 15 Pro Max', category: 'Apple' },
   { id: 'ip15pro', name: 'iPhone 15 Pro', category: 'Apple' },
+  { id: 'ip15plus', name: 'iPhone 15 Plus', category: 'Apple' },
   { id: 'ip15', name: 'iPhone 15', category: 'Apple' },
   { id: 'ip14pro-max', name: 'iPhone 14 Pro Max', category: 'Apple' },
   { id: 'ip14pro', name: 'iPhone 14 Pro', category: 'Apple' },
+  { id: 'ip14plus', name: 'iPhone 14 Plus', category: 'Apple' },
+  { id: 'ip14', name: 'iPhone 14', category: 'Apple' },
+  { id: 'ip13pro-max', name: 'iPhone 13 Pro Max', category: 'Apple' },
+  { id: 'ip13pro', name: 'iPhone 13 Pro', category: 'Apple' },
+  { id: 'ip13', name: 'iPhone 13', category: 'Apple' },
+  { id: 'ip12pro-max', name: 'iPhone 12 Pro Max', category: 'Apple' },
+  { id: 'ip12pro', name: 'iPhone 12 Pro', category: 'Apple' },
+  { id: 'ip12', name: 'iPhone 12', category: 'Apple' },
+  { id: 'ip11', name: 'iPhone 11', category: 'Apple' },
+
+  // Samsung Galaxy
+  { id: 's25ultra', name: 'Samsung Galaxy S25 Ultra', category: 'Samsung' },
+  { id: 's25plus', name: 'Samsung Galaxy S25+', category: 'Samsung' },
+  { id: 's25', name: 'Samsung Galaxy S25', category: 'Samsung' },
   { id: 's24ultra', name: 'Samsung Galaxy S24 Ultra', category: 'Samsung' },
   { id: 's24plus', name: 'Samsung Galaxy S24+', category: 'Samsung' },
+  { id: 's24', name: 'Samsung Galaxy S24', category: 'Samsung' },
   { id: 's23ultra', name: 'Samsung Galaxy S23 Ultra', category: 'Samsung' },
-  { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' }
+  { id: 'zfold6', name: 'Samsung Galaxy Z Fold 6', category: 'Samsung' },
+  { id: 'zflip6', name: 'Samsung Galaxy Z Flip 6', category: 'Samsung' },
+  { id: 'a55', name: 'Samsung Galaxy A55 5G', category: 'Samsung' },
+
+  // Xiaomi & Poco
+  { id: 'pocox6pro', name: 'Poco X6 Pro 5G', category: 'Xiaomi' },
+  { id: 'xiaomi14ultra', name: 'Xiaomi 14 Ultra', category: 'Xiaomi' },
+  { id: 'xiaomi14', name: 'Xiaomi 14', category: 'Xiaomi' },
+  { id: 'redminote13pro', name: 'Redmi Note 13 Pro+ 5G', category: 'Xiaomi' },
+
+  // Honor, Huawei, Realme, Oppo, Vivo, OnePlus
+  { id: 'honormagic6', name: 'Honor Magic 6 Pro', category: 'Honor' },
+  { id: 'realmegt6', name: 'Realme GT 6', category: 'Realme' },
+  { id: 'oneplus12', name: 'OnePlus 12', category: 'OnePlus' },
+  { id: 'pixel9pro', name: 'Google Pixel 9 Pro XL', category: 'Google' },
+  { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' },
+
+  // Custom User Input Option
+  { id: 'other-custom', name: 'جهاز آخر (اكتب اسم موديلك 📱)', category: 'مخصص' }
 ];
 
 export const STICKER_PRESETS = [
