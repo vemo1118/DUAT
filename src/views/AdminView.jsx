@@ -1250,7 +1250,8 @@ export function AdminView() {
               <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-96 overflow-y-auto custom-scrollbar rounded">
                 {selectedOrderDetails.items?.map((item, idx) => {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
-                  const thumbImage = item.designSnapshot || item.customConfig?.designSnapshot || item.image || item.images?.[0];
+                  const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || item.image;
+                  const thumbImage = mockupImg || item.images?.[0];
                   const cfg = item.customConfig || item.customDetails;
                   const layers = item.customConfig?.layers || [];
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
