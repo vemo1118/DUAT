@@ -762,10 +762,11 @@ export const CustomizerContent = () => {
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
               >
                 {PHONE_MODELS.map((m) => {
-                  const name = typeof m === 'object' ? m.name : m;
-                  const id = typeof m === 'object' ? m.id || name : m;
+                  const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
+                  const valueName = typeof m === 'object' ? m.name : m;
+                  const id = typeof m === 'object' ? m.id || valueName : m;
                   return (
-                    <option key={id} value={name}>
+                    <option key={id} value={valueName}>
                       {name}
                     </option>
                   );
@@ -775,12 +776,12 @@ export const CustomizerContent = () => {
               {/* Custom Model Text Input if "جهاز آخر" selected */}
               {isCustomModelOption && (
                 <div className="pt-2 animate-fadeIn space-y-1">
-                  <label className="font-mono text-xs text-gold font-bold block">📱 اكتب اسم وموديل جهازك بالتفصيل:</label>
+                  <label className="font-mono text-xs text-gold font-bold block">{t('customModelLabel')}</label>
                   <input
                     type="text"
                     value={customModelInput}
                     onChange={(e) => setCustomModelInput(e.target.value)}
-                    placeholder="مثلاً: Honor Magic 6 Pro أو Poco X6 Pro أو Huawei Mate 60"
+                    placeholder={t('customModelPlaceholder')}
                     className="w-full bg-coal border border-gold/60 text-bone p-3 font-space text-sm focus:border-gold outline-none rounded"
                   />
                 </div>
@@ -819,13 +820,13 @@ export const CustomizerContent = () => {
             {/* Design Notes Textarea */}
             <div className="space-y-2 pt-3 border-t border-grave/40">
               <label className="font-mono text-xs text-gold font-bold block flex items-center gap-1.5">
-                <span>📝 ملاحظات خاصة بالتصميم للورشة (اختياري):</span>
+                <span>{t('designNotesLabel')}</span>
               </label>
               <textarea
                 value={designNotes}
                 onChange={(e) => setDesignNotes(e.target.value)}
                 rows={2}
-                placeholder="مثلاً: يرجى حفر الاسم في منتصف الجراب، أو وضع استيكر القمر في أعلى اليسار..."
+                placeholder={t('designNotesPlaceholder')}
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded custom-scrollbar resize-none"
               />
             </div>
@@ -845,7 +846,7 @@ export const CustomizerContent = () => {
                     : 'border-transparent text-ash hover:text-bone'
                 }`}
               >
-                Stickers
+                {t('tabStickers')}
               </button>
 
               <button
@@ -856,7 +857,7 @@ export const CustomizerContent = () => {
                     : 'border-transparent text-ash hover:text-bone'
                 }`}
               >
-                Presets
+                {t('tabPresets')}
               </button>
 
               <button
@@ -867,7 +868,7 @@ export const CustomizerContent = () => {
                     : 'border-transparent text-ash hover:text-bone'
                 }`}
               >
-                Text
+                {t('tabText')}
               </button>
 
               <button
@@ -878,7 +879,7 @@ export const CustomizerContent = () => {
                     : 'border-transparent text-ash hover:text-bone'
                 }`}
               >
-                Image
+                {t('tabImage')}
               </button>
             </div>
 
@@ -888,21 +889,21 @@ export const CustomizerContent = () => {
                 {/* Color Selector Bar for Preset Stickers */}
                 <div className="bg-coal p-3 border border-grave space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-mono text-xs text-gold font-bold">🎨 اختر لون الخط/الرمز:</span>
+                    <span className="font-mono text-xs text-gold font-bold">{t('textColorLabel')}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {[
-                        { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي ملكي', value: '#EDE4D3' },
-                        { name: 'أسود فحمي', value: '#0A0C16' },
-                        { name: 'أبيض ناصع', value: '#FFFFFF' },
-                        { name: 'نبيذي قاني', value: '#8B1E24' },
-                        { name: 'زمردي ملكي', value: '#144D37' },
-                        { name: 'كحلي ملكي', value: '#0C1B3A' },
-                        { name: 'روز جولد', value: '#B76E79' },
-                        { name: 'عنبر دافئ', value: '#D97706' },
-                        { name: 'لافندر ملكي', value: '#7C3AED' },
-                        { name: 'تيتانيوم', value: '#9E9A93' },
-                        { name: 'بنفسجي داكن', value: '#382049' }
+                        { name: lang === 'ar' ? 'ذهب مصري' : 'Egyptian Gold', value: '#E8A33D' },
+                        { name: lang === 'ar' ? 'عاجي ملكي' : 'Royal Ivory', value: '#EDE4D3' },
+                        { name: lang === 'ar' ? 'أسود فحمي' : 'Obsidian Black', value: '#0A0C16' },
+                        { name: lang === 'ar' ? 'أبيض ناصع' : 'Pure White', value: '#FFFFFF' },
+                        { name: lang === 'ar' ? 'نبيذي قاني' : 'Crimson Ruby', value: '#8B1E24' },
+                        { name: lang === 'ar' ? 'زمردي ملكي' : 'Royal Emerald', value: '#144D37' },
+                        { name: lang === 'ar' ? 'كحلي ملكي' : 'Royal Navy', value: '#0C1B3A' },
+                        { name: lang === 'ar' ? 'روز جولد' : 'Rose Gold', value: '#B76E79' },
+                        { name: lang === 'ar' ? 'عنبر دافئ' : 'Warm Amber', value: '#D97706' },
+                        { name: lang === 'ar' ? 'لافندر ملكي' : 'Royal Lavender', value: '#7C3AED' },
+                        { name: lang === 'ar' ? 'تيتانيوم' : 'Titanium', value: '#9E9A93' },
+                        { name: lang === 'ar' ? 'بنفسجي داكن' : 'Dark Purple', value: '#382049' }
                       ].map((c) => (
                         <button
                           key={c.value}
@@ -919,18 +920,18 @@ export const CustomizerContent = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-2 border-t border-grave/40 pt-2">
-                    <span className="font-mono text-xs text-gold font-bold">🏷️ اختر لون خلفية الاستيكر:</span>
+                    <span className="font-mono text-xs text-gold font-bold">{t('bgColorLabel')}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {[
-                        { name: 'داكن فحمي', value: '#14110F' },
-                        { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي ملكي', value: '#EDE4D3' },
-                        { name: 'كحلي ملكي', value: '#0B132B' },
-                        { name: 'زمردي', value: '#1B4332' },
-                        { name: 'نبيذي جمر', value: '#8B1E24' },
-                        { name: 'وردي', value: '#E8C5C8' },
-                        { name: 'تيتانيوم', value: '#9E9A93' },
-                        { name: 'شفاف 🚫', value: 'transparent' }
+                        { name: lang === 'ar' ? 'داكن فحمي' : 'Obsidian Black', value: '#14110F' },
+                        { name: lang === 'ar' ? 'ذهب مصري' : 'Egyptian Gold', value: '#E8A33D' },
+                        { name: lang === 'ar' ? 'عاجي ملكي' : 'Royal Ivory', value: '#EDE4D3' },
+                        { name: lang === 'ar' ? 'كحلي ملكي' : 'Royal Navy', value: '#0B132B' },
+                        { name: lang === 'ar' ? 'زمردي' : 'Emerald', value: '#1B4332' },
+                        { name: lang === 'ar' ? 'نبيذي جمر' : 'Crimson Ruby', value: '#8B1E24' },
+                        { name: lang === 'ar' ? 'وردي' : 'Rose Quartz', value: '#E8C5C8' },
+                        { name: lang === 'ar' ? 'تيتانيوم' : 'Titanium', value: '#9E9A93' },
+                        { name: lang === 'ar' ? 'شفاف 🚫' : 'Clear 🚫', value: 'transparent' }
                       ].map((c) => (
                         <button
                           key={c.value}

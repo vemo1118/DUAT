@@ -335,7 +335,7 @@ export const PHONE_MODELS = [
   { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' },
 
   // Custom User Input Option
-  { id: 'other-custom', name: 'جهاز آخر (اكتب اسم موديلك 📱)', category: 'مخصص' }
+  { id: 'other-custom', name: 'Other Device (Type model below 📱)', nameEn: 'Other Device (Type model below 📱)', nameAr: 'جهاز آخر (اكتب اسم موديلك 📱)', category: 'Other' }
 ];
 
 export const STICKER_PRESETS = [

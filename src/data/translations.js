@@ -86,6 +86,13 @@ export const TRANSLATIONS = {
     exportDesign: 'Download Render PNG',
     presetLoadedToast: 'Preset design loaded',
     designExportedToast: 'Design mockup PNG downloaded',
+    otherDeviceOption: 'Other Device (Type model below 📱)',
+    customModelLabel: '📱 Type your exact device model name:',
+    customModelPlaceholder: 'e.g. Honor Magic 6 Pro or Poco X6 Pro',
+    designNotesLabel: '📝 Workshop Design Notes (Optional):',
+    designNotesPlaceholder: 'e.g. Please engrave text in center, or place moon sticker top-left...',
+    textColorLabel: '🎨 Select Text/Sticker Color:',
+    bgColorLabel: '🏷️ Select Sticker Background Color:',
 
     // Sticker Categories
     stickerCatShapes: 'Shapes',
@@ -300,6 +307,13 @@ export const TRANSLATIONS = {
     exportDesign: 'تحميل التصميم PNG',
     presetLoadedToast: 'تم تحميل النموذج الجاهز بنجاح',
     designExportedToast: 'تم تحميل صورة التصميم',
+    otherDeviceOption: 'جهاز آخر (اكتب اسم موديلك 📱)',
+    customModelLabel: '📱 اكتب اسم وموديل جهازك بالتفصيل:',
+    customModelPlaceholder: 'مثلاً: Honor Magic 6 Pro أو Poco X6 Pro',
+    designNotesLabel: '📝 ملاحظات خاصة بالتصميم للورشة (اختياري):',
+    designNotesPlaceholder: 'مثلاً: يرجى حفر الاسم في منتصف الجراب، أو وضع استيكر القمر في أعلى اليسار...',
+    textColorLabel: '🎨 اختر لون الخط/الرمز:',
+    bgColorLabel: '🏷️ اختر لون خلفية الاستيكر:',
 
     // Sticker Categories
     stickerCatShapes: 'الأشكال',
