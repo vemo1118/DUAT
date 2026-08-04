@@ -1180,7 +1180,6 @@ export function AdminView() {
                 <Save size={16} />
                 <span>حفظ الإعدادات</span>
               </button>
-
               <button
                 type="button"
                 onClick={handleTestNotification}
@@ -1248,25 +1247,48 @@ export function AdminView() {
               <h4 className="font-mono text-xs text-gold uppercase tracking-wider">المنتجات المطلوبة</h4>
               <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-96 overflow-y-auto custom-scrollbar rounded">
                 {selectedOrderDetails.items?.map((item, idx) => {
+                  const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
+                  const thumbImage = item.designSnapshot || item.customConfig?.designSnapshot || item.image || item.images?.[0];
                   const cfg = item.customConfig || item.customDetails;
                   const layers = item.customConfig?.layers || [];
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
+                  const isCustomCase = item.category === 'cases' || !!cfg || !!item.designSnapshot;
 
                   return (
-                    <div key={idx} className="p-3 space-y-2 font-sans text-xs">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-bold text-bone">{item.nameAr || item.nameEn}</span>
-                          <span className="font-mono text-ash block text-[11px]">الكمية: {item.quantity || 1}</span>
+                    <div key={idx} className="p-4 space-y-3 font-sans text-xs bg-coal/40 rounded border border-grave/60">
+                      {/* Top Product Header Row with Thumbnail Image */}
+                      <div className="flex items-center gap-3">
+                        {/* Thumbnail Image Box */}
+                        <div className="w-16 h-20 bg-stone border border-gold/40 rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1 shadow-md">
+                          {thumbImage ? (
+                            <img src={thumbImage} alt={name} className="w-full h-full object-contain" />
+                          ) : (
+                            <SunDisc size={20} variant="gold" />
+                          )}
                         </div>
-                        <div className="font-mono font-bold text-gold">
-                          {(item.price || 0) * (item.quantity || 1)} ج.م
+
+                        {/* Title, Quantity & Price */}
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-bold text-bone text-sm truncate">{name}</span>
+                            <span className="font-mono font-bold text-gold text-sm flex-shrink-0">
+                              {(item.price || 0) * (item.quantity || 1)} ج.م
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between font-mono text-ash text-[11px]">
+                            <span>الكمية: {item.quantity || 1}</span>
+                            {isCustomCase && (
+                              <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
+                                🖼️ جراب مخصص
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Custom Case Specifications & Layers Breakdown */}
                       {cfg && (
-                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px]">
+                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px] rounded">
                           <div className="flex flex-wrap gap-3 text-gold font-bold">
                             <span>📱 الموديل: {cfg.phoneModel || cfg.model || 'غير محدد'}</span>
                             <span>🎨 التقفيل: {cfg.caseFinish || cfg.caseType || 'جراب شفاف'}</span>
@@ -1316,11 +1338,10 @@ export function AdminView() {
                               </div>
                             </div>
                           )}
-
                           {/* Render Design Snapshot Visual Mockup */}
-                          {(item.designSnapshot || cfg.designSnapshot) && (
+                          {(item.designSnapshot || cfg?.designSnapshot) && (
                             <div className="pt-3 border-t border-grave/40 space-y-2">
-                              <span className="text-gold font-bold block flex items-center gap-1.5">
+                              <span className="text-gold font-bold block flex items-center gap-1.5 text-xs">
                                 <ImageIcon size={14} />
                                 <span>معاينة صورة تصميم الجراب المخصص بالكامل (Mockup):</span>
                               </span>
