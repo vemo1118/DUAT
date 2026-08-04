@@ -3,6 +3,7 @@ import { useProducts } from '../context/ProductsContext';
 import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
+import { useCustomizerConfig } from '../context/CustomizerContext';
 import { useToast } from '../context/ToastContext';
 import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
