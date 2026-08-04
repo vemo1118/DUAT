@@ -23,6 +23,7 @@ import { ProductsProvider } from './context/ProductsContext';
 import { OrdersProvider } from './context/OrdersContext';
 import { HeroBannersProvider } from './context/HeroBannersContext';
 import { CategoryBannersProvider } from './context/CategoryBannersContext';
+import { CustomizerProvider } from './context/CustomizerContext';
 import { AnnouncementMarquee } from './components/AnnouncementMarquee';
 import { ScrollToTop } from './components/ScrollToTop';
 
@@ -76,8 +77,9 @@ export function App() {
           <OrdersProvider>
             <HeroBannersProvider>
               <CategoryBannersProvider>
-                <CartProvider>
-                  <ToastProvider>
+                <CustomizerProvider>
+                  <CartProvider>
+                    <ToastProvider>
               {/* Main Container with Filmic Grain Texture Overlay */}
               <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
                 <ScrollToTop />
@@ -151,9 +153,10 @@ export function App() {
               </div>
             </ToastProvider>
           </CartProvider>
-        </CategoryBannersProvider>
-      </HeroBannersProvider>
-    </OrdersProvider>
+        </CustomizerProvider>
+      </CategoryBannersProvider>
+    </HeroBannersProvider>
+  </OrdersProvider>
     </ProductsProvider>
   </LanguageProvider>
 </ThemeProvider>

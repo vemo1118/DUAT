@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useCustomizerConfig } from '../context/CustomizerContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import { toPng } from 'html-to-image';
@@ -249,9 +250,13 @@ export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const { activeCaseTypes, activePhoneModels, builderPrice } = useCustomizerConfig();
   const location = useLocation();
 
-  const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0].name : PHONE_MODELS[0];
+  const CASE_TYPES = activeCaseTypes.length > 0 ? activeCaseTypes : [];
+  const PHONE_MODELS = activePhoneModels.length > 0 ? activePhoneModels : [];
+
+  const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : PHONE_MODELS[0] || 'iPhone 16 Pro Max';
   const defaultCaseType = CASE_TYPES.find((c) => c.id === 'matte-black') || CASE_TYPES[0];
   const [selectedModel, setSelectedModel] = useState(defaultModelName);
   const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
@@ -520,7 +525,7 @@ export const CustomizerContent = () => {
       id: `custom-case-${Date.now()}`,
       nameEn: `Custom ${effectiveModelName} Case`,
       nameAr: `جراب مخصص ${effectiveModelName}`,
-      price: 850,
+      price: builderPrice || 850,
       category: 'cases',
       tagEn: selectedCaseType?.nameEn || 'Custom Case',
       tagAr: selectedCaseType?.nameAr || 'جراب مخصص',
@@ -739,7 +744,9 @@ export const CustomizerContent = () => {
             onClick={handleAddToCart}
             className="btn-primary w-full max-w-sm py-4 text-sm font-mono tracking-widest min-h-[48px]"
           >
-            {t('customizerAddToCart')}
+            {lang === 'ar'
+              ? `أضف إلى السلة — ${builderPrice || 850} ج.م`
+              : `ADD TO CART — ${builderPrice || 850} EGP`}
           </button>
 
         </div>

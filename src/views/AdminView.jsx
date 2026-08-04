@@ -59,8 +59,31 @@ export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
-  const { categoryBanners, updateCategoryBanner } = useCategoryBanners();
+  const {
+    builderPrice,
+    caseTypes,
+    phoneModels,
+    addCaseType,
+    updateCaseType,
+    toggleCaseTypeVisibility,
+    deleteCaseType,
+    addPhoneModel,
+    updatePhoneModel,
+    deletePhoneModel,
+    updatePrice,
+    resetCustomizerConfig
+  } = useCustomizerConfig();
   const { showToast } = useToast();
+
+  // Builder Engine Tab Form States
+  const [newPriceInput, setNewPriceInput] = useState(builderPrice || 850);
+  const [newFinishEn, setNewFinishEn] = useState('');
+  const [newFinishAr, setNewFinishAr] = useState('');
+  const [newFinishColor, setNewFinishColor] = useState('#FAF9F6');
+  const [newFinishRing, setNewFinishRing] = useState('#E8A33D');
+
+  const [newModelName, setNewModelName] = useState('');
+  const [newModelCategory, setNewModelCategory] = useState('Apple');
 
   // Supabase Auth State
   const [session, setSession] = useState(null);
@@ -472,6 +495,18 @@ export function AdminView() {
             >
               <Bell size={16} />
               <span>إشعارات الموبايل 📲</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('builder')}
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+                activeTab === 'builder'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
+            >
+              <Sliders size={16} />
+              <span>محرر الجرابات (Builder Engine) 🎨</span>
             </button>
           </div>
 
@@ -1268,6 +1303,328 @@ export function AdminView() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 5: CASE BUILDER ENGINE & ASSETS CONTROL PANEL */}
+      {/* ============================================================ */}
+      {activeTab === 'builder' && (
+        <div className="space-y-8 animate-fade-in">
+          
+          {/* Header Card */}
+          <div className="bg-stone border border-gold/40 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+            <div>
+              <span className="font-mono text-xs text-gold font-bold uppercase tracking-widest block">
+                DUAT / BUILDER ENGINE & ASSETS CONTROL
+              </span>
+              <h2 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
+                محرر الجرابات التفاعلي (Case Builder Engine)
+              </h2>
+              <p className="font-mono text-xs text-ash mt-1">
+                التحكم الكامل في ألوان وتصميمات الجرابات، موديلات الهواتف المتاحة، سعر التصميم، والإظهار/الإخفاء الفوري.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                if (window.confirm('هل أنت تأكد من إعادة ضبط ألوان الجرابات والموديلات إلى الإعدادات الافتراضية؟')) {
+                  resetCustomizerConfig();
+                  showToast('تمت إعادة ضبط إعدادات البلدر بنجاح!', 'info');
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 border border-grave bg-coal hover:border-gold text-ash hover:text-bone font-mono text-xs uppercase transition-colors"
+            >
+              <RotateCcw size={15} />
+              <span>إعادة ضبط البلدر الافتراضي</span>
+            </button>
+          </div>
+
+          {/* 1. BUILDER PRICE CONTROL CARD */}
+          <div className="bg-stone border border-grave p-6 space-y-4">
+            <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+              <DollarSign size={16} />
+              <span>سعر التصميم المخصص الافتراضي (Default Custom Case Price)</span>
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                updatePrice(newPriceInput);
+                showToast(`تم تغيير سعر التصميم إلى ${newPriceInput} ج.م بنجاح! 💰`, 'success');
+              }}
+              className="flex flex-col sm:flex-row items-center gap-3 max-w-xl"
+            >
+              <div className="relative flex-1 w-full">
+                <input
+                  type="number"
+                  value={newPriceInput}
+                  onChange={(e) => setNewPriceInput(e.target.value)}
+                  className="w-full bg-coal border border-grave px-4 py-2.5 text-bone font-mono font-bold text-sm focus:border-gold outline-none"
+                  placeholder="850"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-gold">EGP</span>
+              </div>
+              <button
+                type="submit"
+                className="btn-primary w-full sm:w-auto px-6 py-2.5 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
+              >
+                <Save size={16} />
+                <span>حفظ السعر الجديد</span>
+              </button>
+            </form>
+          </div>
+
+          {/* 2. CASE FINISHES & COLORS CONTROL TABLE */}
+          <div className="bg-stone border border-grave p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+                  <Sliders size={16} />
+                  <span>ألوان وتقفيلات الجرابات (Case Armor Finishes — {caseTypes.length})</span>
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  قم بإضافة ألوان جديدة، تغيير أسمائها بالعربي/الإنجليزي، كود اللون Hex، وإظهارها أو إخفائها بضغطة زر.
+                </p>
+              </div>
+            </div>
+
+            {/* Form to Add New Finish */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newFinishEn.trim() || !newFinishAr.trim()) {
+                  showToast('يرجى إدخال اسم التقفيل باللغتين الإنجليزية والعربية', 'error');
+                  return;
+                }
+                addCaseType({
+                  nameEn: newFinishEn,
+                  nameAr: newFinishAr,
+                  color: newFinishColor,
+                  ring: newFinishRing
+                });
+                showToast(`تمت إضافة التقفيل الجديد "${newFinishAr}" بنجاح! 🎨`, 'success');
+                setNewFinishEn('');
+                setNewFinishAr('');
+              }}
+              className="bg-coal p-4 border border-gold/30 rounded space-y-4"
+            >
+              <span className="font-mono text-xs text-gold font-bold block">🎨 إضافة تقفيل / لون جراب جديد:</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="font-mono text-[11px] text-ash block mb-1">الاسم بالإنجليزي (EN):</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Frost Blue"
+                    value={newFinishEn}
+                    onChange={(e) => setNewFinishEn(e.target.value)}
+                    className="w-full bg-stone border border-grave p-2 text-xs font-mono text-bone focus:border-gold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[11px] text-ash block mb-1">الاسم بالعربي (AR):</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="مثال: أزرق ثلجي ضبابي"
+                    value={newFinishAr}
+                    onChange={(e) => setNewFinishAr(e.target.value)}
+                    className="w-full bg-stone border border-grave p-2 text-xs font-mono text-bone focus:border-gold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[11px] text-ash block mb-1">لون الجراب (Hex Code):</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={newFinishColor}
+                      onChange={(e) => setNewFinishColor(e.target.value)}
+                      className="w-8 h-8 rounded border border-grave bg-transparent cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={newFinishColor}
+                      onChange={(e) => setNewFinishColor(e.target.value)}
+                      className="w-full bg-stone border border-grave p-2 text-xs font-mono text-bone uppercase focus:border-gold outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    className="btn-primary w-full py-2 text-xs font-mono font-bold uppercase flex items-center justify-center gap-2 min-h-[38px]"
+                  >
+                    <Plus size={16} />
+                    <span>إضافة اللون</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            {/* List of Case Finishes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {caseTypes.map((ct) => (
+                <div
+                  key={ct.id}
+                  className={`p-4 bg-coal border rounded flex flex-col justify-between space-y-3 transition-colors ${
+                    ct.is_active !== false ? 'border-grave hover:border-gold/60' : 'border-red-900/50 opacity-60'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full border-2 border-grave shadow-md flex-shrink-0"
+                      style={{ backgroundColor: ct.color || '#FFFFFF' }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-space text-xs font-bold text-bone truncate">{ct.nameAr}</p>
+                      <p className="font-mono text-[11px] text-ash truncate">{ct.nameEn}</p>
+                      <span className="font-mono text-[10px] text-gold uppercase">{ct.color}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toggleCaseTypeVisibility(ct.id);
+                        showToast(ct.is_active !== false ? `تم إخفاء التقفيل "${ct.nameAr}"` : `تم إظهار التقفيل "${ct.nameAr}"`, 'info');
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono font-bold border transition-colors ${
+                        ct.is_active !== false
+                          ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                          : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
+                      }`}
+                    >
+                      {ct.is_active !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                      <span>{ct.is_active !== false ? 'ظاهر (إخفاء)' : 'مخفي (إظهار)'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(`هل أنت تأكد من حذف التقفيل "${ct.nameAr}"؟`)) {
+                          deleteCaseType(ct.id);
+                          showToast('تم حذف التقفيل بنجاح', 'warning');
+                        }
+                      }}
+                      className="p-1.5 text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 rounded transition-colors"
+                      title="حذف التقفيل"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. PHONE MODELS CONTROL TABLE */}
+          <div className="bg-stone border border-grave p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+                  <Package size={16} />
+                  <span>موديلات الهواتف الذكية (Phone Models — {phoneModels.length})</span>
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  إضافة موديلات آيفون وسامسونج وشاومي جديدة لتظهر تلقائياً في قائمة اختيار الموديل لدى العميل.
+                </p>
+              </div>
+            </div>
+
+            {/* Form to Add New Model */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newModelName.trim()) {
+                  showToast('يرجى إدخال اسم الموديل', 'error');
+                  return;
+                }
+                addPhoneModel({
+                  name: newModelName,
+                  category: newModelCategory
+                });
+                showToast(`تمت إضافة الموديل الجديد "${newModelName}" بنجاح! 📱`, 'success');
+                setNewModelName('');
+              }}
+              className="bg-coal p-4 border border-gold/30 rounded space-y-4"
+            >
+              <span className="font-mono text-xs text-gold font-bold block">📱 إضافة موديل موبايل جديد:</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="font-mono text-[11px] text-ash block mb-1">اسم وموديل الجهاز:</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="مثال: iPhone 17 Pro Max"
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    className="w-full bg-stone border border-grave p-2 text-xs font-mono text-bone focus:border-gold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[11px] text-ash block mb-1">الشركة / الماركة:</label>
+                  <select
+                    value={newModelCategory}
+                    onChange={(e) => setNewModelCategory(e.target.value)}
+                    className="w-full bg-stone border border-grave p-2 text-xs font-mono text-bone focus:border-gold outline-none"
+                  >
+                    <option value="Apple">Apple iPhone</option>
+                    <option value="Samsung">Samsung Galaxy</option>
+                    <option value="Xiaomi">Xiaomi & Poco</option>
+                    <option value="Honor">Honor</option>
+                    <option value="Google">Google Pixel</option>
+                    <option value="Realme">Realme</option>
+                    <option value="OnePlus">OnePlus</option>
+                    <option value="Other">شركة أخرى</option>
+                  </select>
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    className="btn-primary w-full py-2 text-xs font-mono font-bold uppercase flex items-center justify-center gap-2 min-h-[38px]"
+                  >
+                    <Plus size={16} />
+                    <span>إضافة الموديل</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            {/* Grid of Phone Models */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-96 overflow-y-auto custom-scrollbar p-1">
+              {phoneModels.map((m) => (
+                <div
+                  key={m.id}
+                  className="p-3 bg-coal border border-grave rounded flex items-center justify-between gap-2 hover:border-gold/50 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="font-mono text-xs font-bold text-bone truncate">{m.name}</p>
+                    <span className="font-mono text-[10px] text-gold uppercase">{m.category}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm(`حذف موديل "${m.name}"؟`)) {
+                        deletePhoneModel(m.id);
+                        showToast('تم حذف الموديل', 'warning');
+                      }
+                    }}
+                    className="text-ash hover:text-red-400 p-1 flex-shrink-0"
+                    title="حذف الموديل"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       )}
 
