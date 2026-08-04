@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductsContext';
 import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
+import { useCategoryBanners } from '../context/CategoryBannersContext';
 import { useToast } from '../context/ToastContext';
 import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
+import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { StickerIcon } from '../components/StickerIcon';
@@ -57,6 +59,7 @@ export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
+  const { categoryBanners, updateCategoryBanner } = useCategoryBanners();
   const { showToast } = useToast();
 
   // Supabase Auth State
@@ -120,6 +123,10 @@ export function AdminView() {
   // Hero Slides Tab State
   const [isHeroModalOpen, setIsHeroModalOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState(null);
+
+  // Category Banners Tab State
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategoryBanner, setEditingCategoryBanner] = useState(null);
 
   // Orders Tab State
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
@@ -1106,6 +1113,73 @@ export function AdminView() {
               </div>
             ))}
           </div>
+
+          {/* ============================================================ */}
+          {/* CATEGORY SHOWCASE CARDS MANAGEMENT */}
+          {/* ============================================================ */}
+          <div className="pt-10 border-t border-gold/40 space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <span className="font-mono text-xs text-gold font-bold uppercase tracking-widest block">
+                  DUAT / CATEGORY SHOWCASE BANNERS
+                </span>
+                <h3 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
+                  إدارة كروت وصور الأقسام الرئيسية (THE FOUR HOURS)
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  التحكم الكامل في الصور والعناوين والوصف للـ 4 أقسام الرئيسية في الصفحة الرئيسية.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {categoryBanners.map((cat, catIdx) => (
+                <div
+                  key={cat.id}
+                  className="bg-stone border border-grave overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between"
+                >
+                  {/* Category Image Preview Box */}
+                  <div className="h-44 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-2">
+                    <img
+                      src={cat.imageUrl || cat.image || '/images/transparent_hero_case.png'}
+                      alt={cat.nameEn}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 right-3 bg-void/90 border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
+                      قسم #{cat.badge || `0${catIdx + 1}`}
+                    </div>
+                  </div>
+
+                  {/* Category Card Details */}
+                  <div className="p-5 space-y-2 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-clash text-xl font-bold text-bone">
+                        {cat.nameAr} <span className="text-gold font-mono text-sm">({cat.nameEn})</span>
+                      </h4>
+                    </div>
+                    <p className="font-space text-xs text-ash">
+                      {cat.subtitleAr} / {cat.subtitleEn}
+                    </p>
+                  </div>
+
+                  {/* Edit Action Button */}
+                  <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-end">
+                    <button
+                      onClick={() => {
+                        setEditingCategoryBanner(cat);
+                        setIsCategoryModalOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all shadow-md rounded"
+                    >
+                      <Edit2 size={14} />
+                      <span>تعديل صورة وكارت القسم 🖼️</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -1211,6 +1285,14 @@ export function AdminView() {
         onClose={() => setIsHeroModalOpen(false)}
         onSave={handleSaveHeroSlide}
         slideToEdit={editingSlide}
+      />
+
+      {/* ADMIN CATEGORY BANNER MODAL */}
+      <AdminCategoryBannerModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        banner={editingCategoryBanner}
+        onSave={(bannerId, updatedFields) => updateCategoryBanner(bannerId, updatedFields)}
       />
 
       {/* ORDER DETAILS MODAL */}

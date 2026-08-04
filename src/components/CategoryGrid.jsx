@@ -2,11 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useCategoryBanners } from '../context/CategoryBannersContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const CategoryGrid = ({ onSelectCategory }) => {
   const { lang } = useLanguage();
   const { theme } = useTheme();
+  const { categoryBanners } = useCategoryBanners();
   const isDawn = theme === 'dawn';
 
   const isAr = lang === 'ar';
@@ -14,44 +16,10 @@ export const CategoryGrid = ({ onSelectCategory }) => {
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
 
-  const categories = [
-    {
-      id: 'cases',
-      nameEn: 'Phone Cases',
-      nameAr: 'جرابات الهواتف',
-      subtitleEn: 'Optical acrylic & custom luxury cases',
-      subtitleAr: 'جرابات فاخرة بتشطيب يدوي أنيق',
-      image: '/images/transparent_hero_case.png',
-      badge: '01'
-    },
-    {
-      id: 'stickers',
-      nameEn: '3D Epoxy Domes',
-      nameAr: 'ملصقات إيبوكسي مجسمة',
-      subtitleEn: 'Raised slogan pills & motifs',
-      subtitleAr: 'ملصقات بيضاوية وبارزة ثلاثية الأبعاد',
-      image: '/images/stickers.png',
-      badge: '02'
-    },
-    {
-      id: 'charms',
-      nameEn: 'Passage Charms',
-      nameAr: 'تعليقات الهواتف',
-      subtitleEn: '18k gold plate & ember glass',
-      subtitleAr: 'نحاس مطل بالذهب وزجاج مصري',
-      image: '/images/charms.png',
-      badge: '03'
-    },
-    {
-      id: 'accessories',
-      nameEn: 'Tech Accessories',
-      nameAr: 'إكسسوارات تكتيكية',
-      subtitleEn: 'MagSafe rings & protective gear',
-      subtitleAr: 'حلقات ماج سيف ومعدات الحماية',
-      image: '/images/transparent_hero_case.png',
-      badge: '04'
-    }
-  ];
+  const categories = categoryBanners.map((cat) => ({
+    ...cat,
+    image: cat.imageUrl || cat.image || '/images/transparent_hero_case.png'
+  }));
 
   const handleClick = (catId) => {
     if (onSelectCategory) onSelectCategory(catId);
