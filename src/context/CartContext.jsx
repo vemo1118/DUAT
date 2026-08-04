@@ -14,8 +14,8 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, customConfig = null) => {
     setCartItems(prevItems => {
-      if (customConfig || product.customDetails) {
-        const cfg = customConfig || product.customDetails;
+      const cfg = customConfig || product.customConfig || product.customDetails;
+      if (cfg) {
         const newItem = {
           cartItemId: `custom-${Date.now()}`,
           id: product.id || 'custom-case',
@@ -24,9 +24,11 @@ export const CartProvider = ({ children }) => {
           price: product.price || 850,
           tagEn: product.tagEn || cfg.phoneModel || 'Custom',
           tagAr: product.tagAr || cfg.phoneModel || 'مخصص',
+          image: product.image || product.designSnapshot || cfg.designSnapshot,
+          designSnapshot: product.designSnapshot || cfg.designSnapshot,
           quantity: 1,
           isCustom: true,
-          customConfig: cfg
+          customConfig: product.customConfig || cfg
         };
         return [...prevItems, newItem];
       }
