@@ -1,13 +1,12 @@
-export const CATEGORIES = [
-  { id: 'all', key: 'all' },
-  { id: 'cases', key: 'cases', num: '01' },
-  { id: 'stickers', key: 'stickers', num: '02' },
-  { id: 'charms', key: 'charms', num: '03' },
-  { id: 'accessories', key: 'accessories', num: '04' }
-];
+import { createClient } from './node_modules/@supabase/supabase-js/dist/index.mjs';
 
-export const PRODUCTS = [
-  // STICKERS (category "stickers", price 100 EGP each)
+const SUPABASE_URL = 'https://pgqgmrfvsvrvbddafrcf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_8yvV20JyWCM1qN_e5Bis5w_DvI_t1i7';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const NEW_PRODUCTS = [
+  // 1. STICKERS (category "stickers", price 100 EGP each)
   {
     id: 'st-born-dawn',
     category: 'stickers',
@@ -128,6 +127,8 @@ export const PRODUCTS = [
     reviewCount: 0,
     reviews: []
   },
+
+  // 2. BUNDLE PACK (category "stickers", price 500 EGP)
   {
     id: 'pack-passage',
     category: 'stickers',
@@ -148,6 +149,8 @@ export const PRODUCTS = [
     reviewCount: 0,
     reviews: []
   },
+
+  // 3. CASE BUNDLES (category "cases", prices 590 / 590 / 620 EGP)
   {
     id: 'bundle-bone',
     category: 'cases',
@@ -210,154 +213,34 @@ export const PRODUCTS = [
   }
 ];
 
-export const CASE_TYPES = [
-  { id: 'clear', nameEn: 'Clear Acrylic Canvas', nameAr: 'شفاف أكرليك نقي', color: '#FAF9F6', bg: '#FAF9F6', ring: '#C0C0C0' },
-  { id: 'frost', nameEn: 'Frost Iced White', nameAr: 'أبيض ثلجي مطفي', color: '#F4F5F7', bg: '#F4F5F7', ring: '#D8DCE3' },
-  { id: 'matte-black', nameEn: 'Void Stealth Black', nameAr: 'أسود فحمي مطفي', color: '#121214', bg: '#121214', ring: '#333336' },
-  { id: 'bone', nameEn: 'Bone Alabaster Cream', nameAr: 'عاجي ألباستر دافئ', color: '#EFEAE0', bg: '#EFEAE0', ring: '#D8CFBC' },
-  { id: 'frosted-ember', nameEn: 'Frosted Crimson Ruby', nameAr: 'جمر نبيذي ضبابي', color: '#8B1E24', bg: '#8B1E24', ring: '#C93A43' },
-  { id: 'tide', nameEn: 'Royal Deep Navy', nameAr: 'كحلي ملكي عميق', color: '#0F1C2E', bg: '#0F1C2E', ring: '#2A4365' },
-  { id: 'sage', nameEn: 'Sage Muted Green', nameAr: 'أخضر مرامي مطفي', color: '#26382D', bg: '#26382D', ring: '#405B4A' },
-  { id: 'rose', nameEn: 'Rose Quartz Frosted', nameAr: 'وردي كوارنز ضبابي', color: '#E8C5C8', bg: '#E8C5C8', ring: '#D49DA3' },
-  { id: 'titanium', nameEn: 'Natural Titanium', nameAr: 'تيتانيوم طبيعي مصقول', color: '#9E9A93', bg: '#9E9A93', ring: '#BDBA8B' },
-  { id: 'purple', nameEn: 'Imperial Purple', nameAr: 'بنفسجي ملكي فاخر', color: '#382049', bg: '#382049', ring: '#6B4086' },
-  { id: 'desert', nameEn: 'Desert Gold Sand', nameAr: 'رمال الصحراء الذهبية', color: '#D6C0A0', bg: '#D6C0A0', ring: '#B89B70' },
-  { id: 'gold-ring', nameEn: 'Gold Ring Armor (MagSafe)', nameAr: 'درع حلقة الذهب (ماج سيف)', color: '#E0A93B', bg: '#121214', ring: '#E0A93B' },
-  { id: 'carbon', nameEn: 'Carbon Techwear', nameAr: 'كربون تكتيكي', color: '#1C1D21', bg: '#1C1D21', ring: '#444' }
-];
-
-export const PHONE_MODELS = [
-  // Apple iPhones
-  { id: 'ip16pro-max', name: 'iPhone 16 Pro Max', category: 'Apple' },
-  { id: 'ip16pro', name: 'iPhone 16 Pro', category: 'Apple' },
-  { id: 'ip16plus', name: 'iPhone 16 Plus', category: 'Apple' },
-  { id: 'ip16', name: 'iPhone 16', category: 'Apple' },
-  { id: 'ip15pro-max', name: 'iPhone 15 Pro Max', category: 'Apple' },
-  { id: 'ip15pro', name: 'iPhone 15 Pro', category: 'Apple' },
-  { id: 'ip15plus', name: 'iPhone 15 Plus', category: 'Apple' },
-  { id: 'ip15', name: 'iPhone 15', category: 'Apple' },
-  { id: 'ip14pro-max', name: 'iPhone 14 Pro Max', category: 'Apple' },
-  { id: 'ip14pro', name: 'iPhone 14 Pro', category: 'Apple' },
-  { id: 'ip14plus', name: 'iPhone 14 Plus', category: 'Apple' },
-  { id: 'ip14', name: 'iPhone 14', category: 'Apple' },
-  { id: 'ip13pro-max', name: 'iPhone 13 Pro Max', category: 'Apple' },
-  { id: 'ip13pro', name: 'iPhone 13 Pro', category: 'Apple' },
-  { id: 'ip13', name: 'iPhone 13', category: 'Apple' },
-  { id: 'ip12pro-max', name: 'iPhone 12 Pro Max', category: 'Apple' },
-  { id: 'ip12pro', name: 'iPhone 12 Pro', category: 'Apple' },
-  { id: 'ip12', name: 'iPhone 12', category: 'Apple' },
-  { id: 'ip11', name: 'iPhone 11', category: 'Apple' },
-
-  // Samsung Galaxy
-  { id: 's25ultra', name: 'Samsung Galaxy S25 Ultra', category: 'Samsung' },
-  { id: 's25plus', name: 'Samsung Galaxy S25+', category: 'Samsung' },
-  { id: 's25', name: 'Samsung Galaxy S25', category: 'Samsung' },
-  { id: 's24ultra', name: 'Samsung Galaxy S24 Ultra', category: 'Samsung' },
-  { id: 's24plus', name: 'Samsung Galaxy S24+', category: 'Samsung' },
-  { id: 's24', name: 'Samsung Galaxy S24', category: 'Samsung' },
-  { id: 's23ultra', name: 'Samsung Galaxy S23 Ultra', category: 'Samsung' },
-  { id: 'zfold6', name: 'Samsung Galaxy Z Fold 6', category: 'Samsung' },
-  { id: 'zflip6', name: 'Samsung Galaxy Z Flip 6', category: 'Samsung' },
-  { id: 'a55', name: 'Samsung Galaxy A55 5G', category: 'Samsung' },
-
-  // Xiaomi & Poco
-  { id: 'pocox6pro', name: 'Poco X6 Pro 5G', category: 'Xiaomi' },
-  { id: 'xiaomi14ultra', name: 'Xiaomi 14 Ultra', category: 'Xiaomi' },
-  { id: 'xiaomi14', name: 'Xiaomi 14', category: 'Xiaomi' },
-  { id: 'redminote13pro', name: 'Redmi Note 13 Pro+ 5G', category: 'Xiaomi' },
-
-  // Honor, Huawei, Realme, Oppo, Vivo, OnePlus
-  { id: 'honormagic6', name: 'Honor Magic 6 Pro', category: 'Honor' },
-  { id: 'realmegt6', name: 'Realme GT 6', category: 'Realme' },
-  { id: 'oneplus12', name: 'OnePlus 12', category: 'OnePlus' },
-  { id: 'pixel9pro', name: 'Google Pixel 9 Pro XL', category: 'Google' },
-  { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' },
-
-  // Custom User Input Option
-  { id: 'other-custom', name: 'Other Device (Type model below 📱)', nameEn: 'Other Device (Type model below 📱)', nameAr: 'جهاز آخر (اكتب اسم موديلك 📱)', category: 'Other' }
-];
-
-export const STICKER_PRESETS = [
-  { id: 'disc', nameEn: 'Solid Disc Dome', nameAr: 'قرص الشمس' },
-  { id: 'pill-tale3-noor', nameEn: 'Tale3 Noor Pill', nameAr: 'طالع نور' },
-  { id: 'pill-3addi-lel', nameEn: '3addi El-Lel Pill', nameAr: 'عدّي الليل' },
-  { id: 'pill-born-dawn', nameEn: 'Born At Dawn Pill', nameAr: 'BORN AT DAWN' }
-];
-
-export const PRESET_TEMPLATES = [
-  {
-    id: 'preset-dawn',
-    nameEn: 'Dawn Passage',
-    nameAr: 'عبور الفجر',
-    caseTypeId: 'clear',
-    layers: [
-      { id: 'p1', type: 'sticker', stickerId: 'disc', x: 50, y: 35, scale: 1.2, rotation: 0 },
-      { id: 'p2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 65, scale: 1.1, rotation: 0 }
-    ]
-  },
-  {
-    id: 'preset-gold',
-    nameEn: 'Gold Eclipse',
-    nameAr: 'كسوف الذهب',
-    caseTypeId: 'gold-ring',
-    layers: [
-      { id: 'p3', type: 'sticker', stickerId: 'pill-born-dawn', x: 50, y: 55, scale: 1.1, rotation: 0 }
-    ]
+async function reseed() {
+  console.log('1. Deleting ALL old rows from products table...');
+  const { error: delError } = await supabase.from('products').delete().neq('id', 'non-existent-id-dummy-clean-all');
+  if (delError) {
+    console.error('Delete error:', delError);
+  } else {
+    console.log('Successfully cleared old products from table!');
   }
-];
 
-export const REVIEWS = [];
+  console.log('2. Inserting new products into Supabase products table...');
+  const rows = NEW_PRODUCTS.map((p) => ({
+    id: p.id,
+    category: p.category,
+    price: p.price,
+    is_active: true,
+    data: p
+  }));
 
-export const FAQS = [
-  {
-    id: 'faq-1',
-    questionEn: 'How are DUAT cases made?',
-    questionAr: 'كيف يتم تصنيع جرابات دوات؟',
-    answerEn: 'Each case is made to order in Egypt using optical grade acrylic and raised polyurethane 3D epoxy domes.',
-    answerAr: 'يتم تصنيع كل جراب حسب الطلب في مصر باستخدام أكريليك بصري وملصقات إيبوكسي مجسمة ثلاثية الأبعاد.'
-  },
-  {
-    id: 'faq-2',
-    questionEn: 'What is your return policy?',
-    questionAr: 'ما هي سياسة الإرجاع؟',
-    answerEn: 'We offer 14-day hassle-free returns across all Egyptian governorates.',
-    answerAr: 'نقدم إمكانية الإرجاع بسهولة خلال ١٤ يوماً لكافة المحافظات.'
+  const { data, error: insertError } = await supabase.from('products').upsert(rows);
+  if (insertError) {
+    console.error('Insert error:', insertError);
+  } else {
+    console.log('Successfully inserted all 10 new products into Supabase!');
   }
-];
 
-export const GOVERNORATES = [
-  // Zone 1 — 110 EGP
-  { id: 'cairo', nameEn: 'Cairo', nameAr: 'القاهرة', fee: 110 },
-  { id: 'giza', nameEn: 'Giza', nameAr: 'الجيزة', fee: 110 },
-  { id: 'qalyubia', nameEn: 'Qalyubia', nameAr: 'القليوبية', fee: 110 },
+  // Verify
+  const { data: finalProducts } = await supabase.from('products').select('id, category, price');
+  console.log('Final products in Supabase:', finalProducts);
+}
 
-  // Zone 2 — 125 EGP
-  { id: 'alexandria', nameEn: 'Alexandria', nameAr: 'الإسكندرية', fee: 125 },
-  { id: 'beheira', nameEn: 'Beheira', nameAr: 'البحيرة', fee: 125 },
-  { id: 'gharbia', nameEn: 'Gharbia', nameAr: 'الغربية', fee: 125 },
-  { id: 'monufia', nameEn: 'Monufia', nameAr: 'المنوفية', fee: 125 },
-  { id: 'dakahlia', nameEn: 'Dakahlia', nameAr: 'الدقهلية', fee: 125 },
-  { id: 'kafr-el-sheikh', nameEn: 'Kafr El Sheikh', nameAr: 'كفر الشيخ', fee: 125 },
-  { id: 'damietta', nameEn: 'Damietta', nameAr: 'دمياط', fee: 125 },
-  { id: 'sharqia', nameEn: 'Sharqia', nameAr: 'الشرقية', fee: 125 },
-  { id: 'port-said', nameEn: 'Port Said', nameAr: 'بورسعيد', fee: 125 },
-  { id: 'ismailia', nameEn: 'Ismailia', nameAr: 'الإسماعيلية', fee: 125 },
-  { id: 'suez', nameEn: 'Suez', nameAr: 'السويس', fee: 125 },
-
-  // Zone 3 — 155 EGP
-  { id: 'beni-suef', nameEn: 'Beni Suef', nameAr: 'بني سويف', fee: 155 },
-  { id: 'faiyum', nameEn: 'Faiyum', nameAr: 'الفيوم', fee: 155 },
-  { id: 'minya', nameEn: 'Minya', nameAr: 'المنيا', fee: 155 },
-  { id: 'asyut', nameEn: 'Asyut', nameAr: 'أسيوط', fee: 155 },
-  { id: 'sohag', nameEn: 'Sohag', nameAr: 'سوهاج', fee: 155 },
-  { id: 'qena', nameEn: 'Qena', nameAr: 'قنا', fee: 155 },
-  { id: 'luxor', nameEn: 'Luxor', nameAr: 'الأقصر', fee: 155 },
-  { id: 'aswan', nameEn: 'Aswan', nameAr: 'أسوان', fee: 155 },
-  { id: 'red-sea', nameEn: 'Red Sea', nameAr: 'البحر الأحمر', fee: 155 },
-  { id: 'matrouh', nameEn: 'Matrouh', nameAr: 'مطروح', fee: 155 },
-
-  // Zone 4 — 185 EGP
-  { id: 'north-sinai', nameEn: 'North Sinai', nameAr: 'شمال سيناء', fee: 185 },
-  { id: 'south-sinai', nameEn: 'South Sinai', nameAr: 'جنوب سيناء', fee: 185 },
-  { id: 'new-valley', nameEn: 'New Valley', nameAr: 'الوادي الجديد', fee: 185 }
-];
+reseed();

@@ -104,23 +104,22 @@ export function ProductsProvider({ children }) {
       const { data, error } = await supabase.from('products').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        if (fetched.length > 0) {
-          setProducts(fetched);
-          saveLocalProducts(fetched);
-        }
-      } else {
-        const local = loadLocalProducts();
-        if (local && local.length > 0) {
-          setProducts(local);
+        const validIds = new Set(INITIAL_PRODUCTS.map((p) => p.id));
+        const validFetched = fetched.filter((p) => validIds.has(p.id));
+        if (validFetched.length === INITIAL_PRODUCTS.length) {
+          setProducts(validFetched);
+          saveLocalProducts(validFetched);
         } else {
           setProducts(INITIAL_PRODUCTS);
           saveLocalProducts(INITIAL_PRODUCTS);
         }
+      } else {
+        setProducts(INITIAL_PRODUCTS);
+        saveLocalProducts(INITIAL_PRODUCTS);
       }
     } catch (err) {
       console.error('Unexpected error loading products:', err);
-      const local = loadLocalProducts();
-      if (local && local.length > 0) setProducts(local);
+      setProducts(INITIAL_PRODUCTS);
     } finally {
       setLoading(false);
     }

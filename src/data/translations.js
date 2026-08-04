@@ -14,7 +14,7 @@ export const TRANSLATIONS = {
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
     heroHeadline1: 'THROUGH THE NIGHT',
     heroHeadline2: 'BORN AT DAWN.',
-    heroSub: 'Objects for the night crossing. Phone cases, 3D epoxy slogan pills, and charms — designed for the passage from dusk to dawn.',
+    heroSub: 'Objects for the night crossing. Custom 3D epoxy stickers and made-to-order cases.',
     heroCtaPrimary: 'BUILD YOUR CASE',
     heroCtaSecondary: 'SEE THE COLLECTION',
 
@@ -235,7 +235,7 @@ export const TRANSLATIONS = {
     heroEyebrow: 'دوات / ٠٠ — العبور',
     heroHeadline1: 'عبر ظلمة الليل',
     heroHeadline2: 'مولود مع الفجر.',
-    heroSub: 'جرابات هواتف، ملصقات مجسمة، وتعليقات — مُصممة للعبور من الغروب إلى الفجر.',
+    heroSub: 'أغراض مخصصة لعبور الليل. ملصقات إيبوكسي مجسمة وجرابات مُصنعة حسب الطلب.',
     heroCtaPrimary: 'صمم جرابك الآن',
     heroCtaSecondary: 'استكشف التشكيلة',
 
