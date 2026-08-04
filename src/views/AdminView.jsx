@@ -1253,7 +1253,7 @@ export function AdminView() {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
                   const cfg = item.customConfig || item.customDetails;
                   const layers = item.customConfig?.layers || item.customDetails?.layers || [];
-                  const dynamicSnapshot = layers.length > 0 ? generateCaseMockupSnapshot(null, layers, '#14110F', '#E8A33D') : null;
+                  const dynamicSnapshot = generateCaseMockupSnapshot(null, layers, '#14110F', '#E8A33D', cfg);
                   const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || (item.image && item.image.startsWith('data:image') ? item.image : null) || dynamicSnapshot;
                   const thumbImage = mockupImg || item.image || item.images?.[0];
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
