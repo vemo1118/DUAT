@@ -8,6 +8,7 @@ import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot } from './CustomizerView';
+import { StickerIcon } from '../components/StickerIcon';
 import {
   Plus,
   Edit2,
@@ -1350,26 +1351,90 @@ export function AdminView() {
                             <ImageIcon size={14} />
                             <span>معاينة صورة تصميم الجراب المخصص (Mockup Preview):</span>
                           </span>
-                          <div className="flex flex-col sm:flex-row items-center gap-4 bg-void p-3.5 border border-gold/40 rounded-lg shadow-xl">
-                            {mockupImg ? (
-                              <img
-                                src={mockupImg}
-                                alt="Case Design Mockup"
-                                className="w-36 h-60 object-contain border border-grave bg-coal rounded-lg shadow-2xl"
-                              />
-                            ) : (
-                              <div className="w-36 h-60 bg-stone border-2 border-dashed border-gold/50 rounded-lg flex flex-col items-center justify-center p-3 text-center space-y-2">
-                                <SunDisc size={32} className="text-gold" />
-                                <span className="font-mono text-[11px] text-bone font-bold">{cfg?.phoneModel || 'جراب مخصص'}</span>
-                                <span className="font-mono text-[9px] text-gold uppercase bg-gold/15 px-2 py-0.5 rounded">{cfg?.caseFinish || 'تقفيل شفاف'}</span>
+                          <div className="flex flex-col md:flex-row items-center gap-4 bg-void p-4 border border-gold/40 rounded-lg shadow-xl overflow-x-auto">
+                            {/* 1. Captured Base64 PNG Image Frame */}
+                            {mockupImg && (
+                              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                                <span className="font-mono text-[10px] text-ash uppercase font-bold">صورة تصميم الجراب PNG</span>
+                                <img
+                                  src={mockupImg}
+                                  alt="Case Design Mockup"
+                                  className="w-36 h-60 object-contain border border-grave bg-coal rounded-lg shadow-2xl"
+                                />
                               </div>
                             )}
 
-                            <div className="space-y-2.5 font-mono text-xs text-ash">
-                              <p className="text-bone font-bold">هذه هي المعاينة البصرية الدقيقة لتنسيق الجراب كما قام العميل بتصميمه على المتجر.</p>
-                              <div className="text-[11px] space-y-1 text-gold bg-stone/40 p-2 rounded border border-grave/40">
-                                <p>📱 الموديل: {cfg?.phoneModel || cfg?.model || 'iPhone 16 Pro Max'}</p>
-                                <p>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'Clear Solar Canvas'}</p>
+                            {/* 2. 1-to-1 Real-time React DOM Phone Case Canvas Frame */}
+                            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                              <span className="font-mono text-[10px] text-gold uppercase font-bold">معاينة الاستيكرات المباشرة 2D</span>
+                              <div className="w-[170px] h-[280px] bg-[#14110F] rounded-[28px] border-2 border-grave relative overflow-hidden shadow-2xl p-2 select-none flex-shrink-0">
+                                {/* Camera Island */}
+                                <div className="absolute top-2 right-2 w-10 h-10 rounded-lg border border-[#E8A33D] bg-black flex items-center justify-center gap-1 z-20">
+                                  <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
+                                  <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
+                                </div>
+
+                                {/* MagSafe Ring */}
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-gold/40 pointer-events-none" />
+
+                                {/* Render All Customer Dragged Layers in 1-to-1 Exact Layout */}
+                                <div className="absolute inset-0 pointer-events-none">
+                                  {layers.map((l) => (
+                                    <div
+                                      key={l.id || l.stickerId}
+                                      style={{
+                                        left: `${l.x}%`,
+                                        top: `${l.y}%`,
+                                        transform: `translate(-50%, -50%) scale(${l.scale || 1.0}) rotate(${l.rotation || 0}deg)`
+                                      }}
+                                      className="absolute z-10"
+                                    >
+                                      {l.type === 'text' && (
+                                        <div
+                                          style={{
+                                            color: l.color || '#E8A33D',
+                                            backgroundColor: l.bgColor === 'transparent' ? 'transparent' : (l.bgColor || '#14110F')
+                                          }}
+                                          className="whitespace-nowrap font-bold text-[10px] px-2 py-0.5 rounded-full border border-gold/50 shadow-md"
+                                        >
+                                          {l.text}
+                                        </div>
+                                      )}
+
+                                      {l.type === 'sticker' && (
+                                        <StickerIcon
+                                          stickerId={l.stickerId}
+                                          size={28}
+                                          color={l.color}
+                                          bgColor={l.bgColor}
+                                        />
+                                      )}
+
+                                      {l.type === 'image' && l.src && (
+                                        <img
+                                          src={l.src}
+                                          alt="Custom Sticker"
+                                          className="w-10 h-10 object-contain shadow-md rounded"
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* DUAT Bottom Branding Pill */}
+                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#12162B] px-2 py-0.5 rounded-full border border-gold/60 text-[#E8A33D] font-mono text-[7px] font-bold tracking-widest z-20">
+                                  DUAT
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 3. Specifications & Download Action */}
+                            <div className="space-y-2.5 font-mono text-xs text-ash flex-1 min-w-[200px]">
+                              <p className="text-bone font-bold text-sm">التصميم النهائي كما صممه العميل على المتجر.</p>
+                              <div className="text-[11px] space-y-1 text-gold bg-stone/40 p-2.5 rounded border border-grave/40">
+                                <p>📱 الموديل: {cfg?.phoneModel || cfg?.model || 'غير محدد'}</p>
+                                <p>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'جراب شفاف'}</p>
+                                <p>🏷️ عدد الاستيكرات: {layers.length}</p>
                               </div>
                               {mockupImg && (
                                 <a

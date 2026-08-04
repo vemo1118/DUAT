@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
+import { toPng } from 'html-to-image';
 import { PHONE_MODELS, CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
 import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2 } from 'lucide-react';
 
@@ -470,14 +471,30 @@ export const CustomizerContent = () => {
     setSelectedLayerId(newLayer.id);
   };
 
-  const handleAddToCart = () => {
-    const mockupSnapshotUrl = generateCaseMockupSnapshot(
-      canvasRef.current,
-      layers,
-      caseBgColor,
-      caseRingColor,
-      selectedCaseType
-    );
+  const handleAddToCart = async () => {
+    let mockupSnapshotUrl = null;
+    if (canvasRef.current) {
+      try {
+        setSelectedLayerId(null);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        mockupSnapshotUrl = await toPng(canvasRef.current, {
+          quality: 0.95,
+          cacheBust: true
+        });
+      } catch (snapErr) {
+        console.error('html-to-image snapshot error:', snapErr);
+      }
+    }
+
+    if (!mockupSnapshotUrl) {
+      mockupSnapshotUrl = generateCaseMockupSnapshot(
+        canvasRef.current,
+        layers,
+        caseBgColor,
+        caseRingColor,
+        selectedCaseType
+      );
+    }
 
     const customCaseProduct = {
       id: `custom-case-${Date.now()}`,
