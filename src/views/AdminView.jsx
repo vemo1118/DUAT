@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { CATEGORIES } from '../data/products';
+import { generateCaseMockupSnapshot } from './CustomizerView';
 import {
   Plus,
   Edit2,
@@ -1250,12 +1251,13 @@ export function AdminView() {
               <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-96 overflow-y-auto custom-scrollbar rounded">
                 {selectedOrderDetails.items?.map((item, idx) => {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
-                  const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || item.image;
-                  const thumbImage = mockupImg || item.images?.[0];
                   const cfg = item.customConfig || item.customDetails;
-                  const layers = item.customConfig?.layers || [];
+                  const layers = item.customConfig?.layers || item.customDetails?.layers || [];
+                  const dynamicSnapshot = layers.length > 0 ? generateCaseMockupSnapshot(null, layers, '#14110F', '#E8A33D') : null;
+                  const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || (item.image && item.image.startsWith('data:image') ? item.image : null) || dynamicSnapshot;
+                  const thumbImage = mockupImg || item.image || item.images?.[0];
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
-                  const isCustomCase = item.category === 'cases' || !!cfg || !!item.designSnapshot;
+                  const isCustomCase = item.category === 'cases' || !!cfg || !!item.designSnapshot || layers.length > 0;
 
                   return (
                     <div key={idx} className="p-4 space-y-3 font-sans text-xs bg-coal/40 rounded border border-grave/60">

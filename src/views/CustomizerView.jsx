@@ -52,7 +52,7 @@ class CustomizerErrorBoundary extends Component {
   }
 }
 
-function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110F', caseRingColor = '#E8A33D', selectedCaseType = null) {
+export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110F', caseRingColor = '#E8A33D', selectedCaseType = null) {
   try {
     const canvas = document.createElement('canvas');
     const width = 360;
@@ -125,11 +125,13 @@ function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110
     ctx.fillText('DUAT HORIZON', width / 2, height - 42);
 
     // 5. Draw Layers
-    for (const layer of layers) {
+    for (const layer of (layers || [])) {
       const lx = (layer.x / 100) * width;
       const ly = (layer.y / 100) * height;
       const scale = layer.scale || 1.0;
       const rotRad = ((layer.rotation || 0) * Math.PI) / 180;
+      const fgColor = layer.color || '#E8A33D';
+      const bgColor = layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F');
 
       ctx.save();
       ctx.translate(lx, ly);
@@ -143,10 +145,9 @@ function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110
         const padX = 14;
         const padY = 8;
 
-        // Draw Rounded Pill Sticker Background
-        ctx.fillStyle = layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F');
-        if (layer.bgColor !== 'transparent') {
-          ctx.strokeStyle = 'rgba(232, 163, 61, 0.6)';
+        if (bgColor !== 'transparent') {
+          ctx.fillStyle = bgColor;
+          ctx.strokeStyle = fgColor;
           ctx.lineWidth = 1.5;
           ctx.beginPath();
           const pw = txtWidth + padX * 2;
@@ -160,31 +161,63 @@ function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110
           ctx.stroke();
         }
 
-        // Draw Text
-        ctx.fillStyle = layer.color || '#E8A33D';
+        ctx.fillStyle = fgColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(txt, 0, 0);
-      } else {
-        // Draw Preset Sticker Pill
-        const pillText = layer.stickerId ? layer.stickerId.replace(/-/g, ' ').toUpperCase() : 'STICKER';
-        ctx.fillStyle = layer.bgColor || '#14110F';
-        ctx.strokeStyle = '#E8A33D';
+      } else if (layer.type === 'image' && layer.src) {
+        ctx.fillStyle = '#14110F';
+        ctx.strokeStyle = fgColor;
         ctx.lineWidth = 2;
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(-45, -18, 90, 36, 18);
+          ctx.roundRect(-40, -40, 80, 80, 12);
         } else {
-          ctx.rect(-45, -18, 90, 36);
+          ctx.rect(-40, -40, 80, 80);
         }
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = layer.color || '#E8A33D';
+        ctx.fillStyle = fgColor;
         ctx.font = 'bold 10px monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(pillText.slice(0, 11), 0, 0);
+        ctx.fillText('🖼️ صورة مرفوعة', 0, 0);
+      } else {
+        let displayText = layer.stickerId || 'STICKER';
+        if (displayText.startsWith('ar-letter-')) displayText = displayText.replace('ar-letter-', '');
+        else if (displayText.startsWith('en-letter-')) displayText = displayText.replace('en-letter-', '');
+        else if (displayText.startsWith('num-')) displayText = displayText.replace('num-', '');
+        else if (displayText.startsWith('quote-')) displayText = displayText.replace('quote-', '');
+        else if (displayText === 'slogan-1') displayText = 'طالع نور';
+        else if (displayText === 'slogan-2') displayText = 'عدّي الليل';
+        else if (displayText === 'slogan-3') displayText = 'بكرة أحلى';
+        else if (displayText === 'slogan-4') displayText = 'BORN AT DAWN';
+        else if (displayText.startsWith('dome-')) displayText = displayText.replace('dome-', '✨ ').toUpperCase();
+
+        ctx.font = 'bold 13px sans-serif';
+        const txtWidth = ctx.measureText(displayText).width;
+        const pw = Math.max(70, txtWidth + 24);
+        const ph = 34;
+
+        if (bgColor !== 'transparent') {
+          ctx.fillStyle = bgColor;
+          ctx.strokeStyle = fgColor;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
+          } else {
+            ctx.rect(-pw / 2, -ph / 2, pw, ph);
+          }
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = fgColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(displayText, 0, 0);
       }
 
       ctx.restore();
