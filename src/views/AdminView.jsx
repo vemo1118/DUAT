@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { CATEGORIES } from '../data/products';
-import { generateCaseMockupSnapshot } from './CustomizerView';
+import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { StickerIcon } from '../components/StickerIcon';
 import {
   Plus,
@@ -1254,7 +1254,8 @@ export function AdminView() {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
                   const cfg = item.customConfig || item.customDetails;
                   const layers = item.customConfig?.layers || item.customDetails?.layers || [];
-                  const dynamicSnapshot = generateCaseMockupSnapshot(null, layers, '#14110F', '#E8A33D', cfg);
+                  const caseBgColor = getCaseFinishColor(cfg?.caseFinish || cfg?.caseType || cfg?.caseTypeId);
+                  const dynamicSnapshot = generateCaseMockupSnapshot(null, layers, caseBgColor, '#E8A33D', cfg);
                   const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || (item.image && item.image.startsWith('data:image') ? item.image : null) || dynamicSnapshot;
                   const thumbImage = mockupImg || item.image || item.images?.[0];
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
@@ -1367,7 +1368,10 @@ export function AdminView() {
                             {/* 2. 1-to-1 Real-time React DOM Phone Case Canvas Frame */}
                             <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                               <span className="font-mono text-[10px] text-gold uppercase font-bold">معاينة الاستيكرات المباشرة 2D</span>
-                              <div className="w-[170px] h-[280px] bg-[#14110F] rounded-[28px] border-2 border-grave relative overflow-hidden shadow-2xl p-2 select-none flex-shrink-0">
+                              <div
+                                style={{ backgroundColor: caseBgColor }}
+                                className="w-[170px] h-[280px] rounded-[28px] border-2 border-grave relative overflow-hidden shadow-2xl p-2 select-none flex-shrink-0"
+                              >
                                 {/* Camera Island */}
                                 <div className="absolute top-2 right-2 w-10 h-10 rounded-lg border border-[#E8A33D] bg-black flex items-center justify-center gap-1 z-20">
                                   <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />

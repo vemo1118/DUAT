@@ -53,8 +53,22 @@ class CustomizerErrorBoundary extends Component {
   }
 }
 
-export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = '#14110F', caseRingColor = '#E8A33D', selectedCaseType = null) {
+export function getCaseFinishColor(finishNameOrId) {
+  if (!finishNameOrId) return '#14110F';
+  const val = String(finishNameOrId).toLowerCase();
+  if (val.includes('frost') || val.includes('white') || val.includes('أبيض') || val.includes('ثلجي')) return '#F0F4F8';
+  if (val.includes('bone') || val.includes('cream') || val.includes('عاجي') || val.includes('ألباستر')) return '#EFEAE0';
+  if (val.includes('clear') || val.includes('شفاف')) return '#222533';
+  if (val.includes('ember') || val.includes('crimson') || val.includes('جمر') || val.includes('نبيذي')) return '#D9432E';
+  if (val.includes('gold') || val.includes('ذهب')) return '#E0A93B';
+  if (val.includes('tide') || val.includes('blue') || val.includes('أزرق')) return '#0F2035';
+  if (val.includes('sage') || val.includes('green') || val.includes('أخضر')) return '#1C2A22';
+  return '#14110F';
+}
+
+export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, caseRingColor = '#E8A33D', selectedCaseType = null) {
   try {
+    const bgColor = caseBgColor || getCaseFinishColor(selectedCaseType?.caseFinish || selectedCaseType?.nameEn || selectedCaseType?.nameAr || selectedCaseType?.id);
     const canvas = document.createElement('canvas');
     const width = 360;
     const height = 640;
@@ -63,7 +77,7 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor = 
     const ctx = canvas.getContext('2d');
 
     // 1. Phone Case Base Fill
-    ctx.fillStyle = caseBgColor || '#14110F';
+    ctx.fillStyle = bgColor;
     ctx.beginPath();
     if (ctx.roundRect) {
       ctx.roundRect(15, 15, width - 30, height - 30, 42);
