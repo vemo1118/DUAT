@@ -282,30 +282,47 @@ export const PHONE_MODELS = [
 ];
 
 export const STICKER_PRESETS = [
-  { id: 'disc', nameEn: 'Solid Disc Dome', nameAr: 'قرص الشمس' },
-  { id: 'pill-tale3-noor', nameEn: 'Tale3 Noor Pill', nameAr: 'طالع نور' },
-  { id: 'pill-3addi-lel', nameEn: '3addi El-Lel Pill', nameAr: 'عدّي الليل' },
-  { id: 'pill-born-dawn', nameEn: 'Born At Dawn Pill', nameAr: 'BORN AT DAWN' }
+  { id: 'st-born-dawn', nameEn: 'Born at Dawn', nameAr: 'طالع نور', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
+  { id: 'st-through-night', nameEn: 'Through the Night', nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
+  { id: 'st-crescent', nameEn: 'Crescent Moon', nameAr: 'الهلال', tagEn: '3D EPOXY MOTIF', tagAr: 'رمز إيبوكسي مجسم' },
+  { id: 'st-starry', nameEn: 'Starry Night', nameAr: 'سماء الليل', tagEn: '3D EPOXY DOME', tagAr: 'قبة إيبوكسي نجوم' },
+  { id: 'st-sun', nameEn: 'DUAT Sun', nameAr: 'شمس دوات', tagEn: '3D SUN DISC DOME', tagAr: 'قرص الشمس المجسم' },
+  { id: 'st-duat', nameEn: 'DUAT', nameAr: 'دوات', tagEn: '3D BRAND PILL', tagAr: 'شعار دوات الإيبوكسي' }
 ];
 
 export const PRESET_TEMPLATES = [
   {
-    id: 'preset-dawn',
-    nameEn: 'Dawn Passage',
-    nameAr: 'عبور الفجر',
+    id: 'preset-passage-full',
+    nameEn: 'The Passage Collection (All 6 Domes)',
+    nameAr: 'مجموعة العبور الكاملة (٦ استيكرات)',
     caseTypeId: 'clear',
     layers: [
-      { id: 'p1', type: 'sticker', stickerId: 'disc', x: 50, y: 35, scale: 1.2, rotation: 0 },
-      { id: 'p2', type: 'sticker', stickerId: 'pill-tale3-noor', x: 50, y: 65, scale: 1.1, rotation: 0 }
+      { id: 'p1', type: 'sticker', stickerId: 'st-born-dawn', x: 50, y: 22, scale: 1.0, rotation: 0 },
+      { id: 'p2', type: 'sticker', stickerId: 'st-through-night', x: 50, y: 38, scale: 1.0, rotation: 0 },
+      { id: 'p3', type: 'sticker', stickerId: 'st-crescent', x: 72, y: 54, scale: 1.0, rotation: 0 },
+      { id: 'p4', type: 'sticker', stickerId: 'st-starry', x: 28, y: 54, scale: 1.0, rotation: 0 },
+      { id: 'p5', type: 'sticker', stickerId: 'st-sun', x: 50, y: 70, scale: 1.0, rotation: 0 },
+      { id: 'p6', type: 'sticker', stickerId: 'st-duat', x: 50, y: 84, scale: 0.9, rotation: 0 }
     ]
   },
   {
-    id: 'preset-gold',
-    nameEn: 'Gold Eclipse',
-    nameAr: 'كسوف الذهب',
-    caseTypeId: 'gold-ring',
+    id: 'preset-dawn-duo',
+    nameEn: 'Born at Dawn & Crescent Duo',
+    nameAr: 'طالع نور + الهلال',
+    caseTypeId: 'bone',
     layers: [
-      { id: 'p3', type: 'sticker', stickerId: 'pill-born-dawn', x: 50, y: 55, scale: 1.1, rotation: 0 }
+      { id: 'p1', type: 'sticker', stickerId: 'st-born-dawn', x: 50, y: 40, scale: 1.1, rotation: 0 },
+      { id: 'p2', type: 'sticker', stickerId: 'st-crescent', x: 50, y: 62, scale: 1.1, rotation: 0 }
+    ]
+  },
+  {
+    id: 'preset-night-duo',
+    nameEn: 'Through the Night & Starry Duo',
+    nameAr: 'عدّي الليل + سماء الليل',
+    caseTypeId: 'midnight',
+    layers: [
+      { id: 'p1', type: 'sticker', stickerId: 'st-through-night', x: 50, y: 40, scale: 1.1, rotation: 0 },
+      { id: 'p2', type: 'sticker', stickerId: 'st-starry', x: 50, y: 62, scale: 1.1, rotation: 0 }
     ]
   }
 ];

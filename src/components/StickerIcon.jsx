@@ -251,6 +251,100 @@ export const StickerIcon = ({ stickerId, size = 40, color, bgColor }) => {
         </div>
       );
 
+    case 'st-born-dawn':
+      return (
+        <div
+          style={{
+            color: '#FDFBF7',
+            backgroundColor: bgColor === 'transparent' ? '#B26214' : (bgColor || '#B26214'),
+            borderColor: color || '#E5A44B'
+          }}
+          className="font-space font-bold px-3.5 py-1.5 rounded-full border-2 shadow-[0_4px_12px_rgba(178,98,20,0.4)] text-xs whitespace-nowrap select-none relative overflow-hidden"
+        >
+          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/25 rounded-full blur-[1px] pointer-events-none" />
+          born at dawn
+        </div>
+      );
+
+    case 'st-through-night':
+      return (
+        <div
+          style={{
+            color: '#EDE4D3',
+            backgroundColor: bgColor === 'transparent' ? '#0B192C' : (bgColor || '#0B192C'),
+            borderColor: color || '#243B55'
+          }}
+          className="font-space font-bold px-3.5 py-1.5 rounded-full border-2 shadow-[0_4px_12px_rgba(11,25,44,0.6)] text-xs whitespace-nowrap select-none relative overflow-hidden"
+        >
+          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          through the night
+        </div>
+      );
+
+    case 'st-crescent':
+      return (
+        <div
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: '#0A0B10'
+          }}
+          className="rounded-2xl border-2 border-stone-700 shadow-xl flex items-center justify-center relative overflow-hidden select-none"
+        >
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 24 24" fill="none" stroke="#EDE4D3" strokeWidth="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#EDE4D3" />
+          </svg>
+        </div>
+      );
+
+    case 'st-starry':
+      return (
+        <div
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: '#0E131F'
+          }}
+          className="rounded-2xl border-2 border-stone-700 shadow-xl flex items-center justify-center relative overflow-hidden select-none"
+        >
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:6px_6px] opacity-40" />
+          <span className="font-mono text-xs text-gold font-bold z-10">✨</span>
+        </div>
+      );
+
+    case 'st-sun':
+      return (
+        <div
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: '#F7F3EB'
+          }}
+          className="rounded-2xl border-2 border-stone-300 shadow-xl flex flex-col items-center justify-center relative overflow-hidden select-none p-1"
+        >
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/40 rounded-full blur-[1px] pointer-events-none" />
+          <div className="w-5 h-5 rounded-full bg-[#D97706] mb-0.5" />
+          <div className="w-7 h-0.5 bg-[#0A0C16]" />
+        </div>
+      );
+
+    case 'st-duat':
+      return (
+        <div
+          style={{
+            color: '#E8A33D',
+            backgroundColor: bgColor === 'transparent' ? '#1C1613' : (bgColor || '#1C1613'),
+            borderColor: color || '#E8A33D'
+          }}
+          className="font-space font-bold px-3 py-1 rounded-full border border-gold/70 shadow-md text-[10px] tracking-widest uppercase whitespace-nowrap select-none relative overflow-hidden"
+        >
+          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/15 rounded-full blur-[1px] pointer-events-none" />
+          DUAT
+        </div>
+      );
+
     default:
       return (
         <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
