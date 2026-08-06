@@ -10,7 +10,10 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
     nameAr: '',
     subtitleEn: '',
     subtitleAr: '',
-    imageUrl: ''
+    imageUrl: '',
+    badge: '01',
+    categoryLink: '/shop',
+    is_active: true
   });
 
   const [uploading, setUploading] = useState(false);
@@ -23,12 +26,17 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
         nameAr: banner.nameAr || '',
         subtitleEn: banner.subtitleEn || '',
         subtitleAr: banner.subtitleAr || '',
-        imageUrl: banner.imageUrl || banner.image || ''
+        imageUrl: banner.imageUrl || banner.image || '',
+        badge: banner.badge || '01',
+        categoryLink: banner.categoryLink || '/shop',
+        is_active: banner.is_active !== undefined ? banner.is_active : true
       });
     }
   }, [banner]);
 
   if (!isOpen || !banner) return null;
+
+  const isEditing = Boolean(banner && banner.id);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -56,8 +64,12 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
       showToast('يرجى اختيار صورة للقسم', 'error');
       return;
     }
+    if (!formData.nameAr && !formData.nameEn) {
+      showToast('يرجى كتابة اسم للقسم', 'error');
+      return;
+    }
     onSave(banner.id, formData);
-    showToast('تم تحديث كارت القسم بنجاح ✨', 'success');
+    showToast(isEditing ? 'تم تحديث كارت القسم بنجاح ✨' : 'تم إضافة كارت القسم الجديد بنجاح ✨', 'success');
     onClose();
   };
 
@@ -69,7 +81,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
           <div className="flex items-center gap-2 text-gold">
             <ImageIcon size={20} />
             <h3 className="font-clash text-lg uppercase font-bold text-bone">
-              تعديل صورة وكارت القسم ({formData.nameEn || formData.id})
+              {isEditing ? `تعديل صورة وكارت القسم (${formData.nameEn || formData.id})` : 'إضافة كارت قسم جديد 🎨'}
             </h3>
           </div>
           <button
@@ -85,7 +97,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
           {/* Image Preview & Upload Box */}
           <div className="space-y-2">
             <label className="font-mono text-xs text-gold uppercase tracking-wider block font-bold">
-              صورة القسم الحالية (Category Banner Image)
+              صورة القسم (Category Banner Image)
             </label>
             <div className="relative h-48 bg-coal border-2 border-dashed border-grave hover:border-gold rounded-lg flex flex-col items-center justify-center overflow-hidden group transition-colors">
               {formData.imageUrl ? (
@@ -150,6 +162,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.nameEn}
                 onChange={(e) => setFormData((prev) => ({ ...prev, nameEn: e.target.value }))}
+                placeholder="LUXURY CASES"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -159,6 +172,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.nameAr}
                 onChange={(e) => setFormData((prev) => ({ ...prev, nameAr: e.target.value }))}
+                placeholder="الجرابات الفاخرة"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -172,6 +186,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.subtitleEn}
                 onChange={(e) => setFormData((prev) => ({ ...prev, subtitleEn: e.target.value }))}
+                placeholder="Case + 6 DUAT stickers, made to order"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -181,9 +196,48 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.subtitleAr}
                 onChange={(e) => setFormData((prev) => ({ ...prev, subtitleAr: e.target.value }))}
+                placeholder="جراب + ٦ استيكرات دوات، حسب الطلب"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
+          </div>
+
+          {/* Badge & Link Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="font-mono text-xs text-ash block">رقم الشارة (Badge e.g. 01, 02):</label>
+              <input
+                type="text"
+                value={formData.badge}
+                onChange={(e) => setFormData((prev) => ({ ...prev, badge: e.target.value }))}
+                placeholder="01"
+                className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="font-mono text-xs text-ash block">رابط القسم (Category Link e.g. /shop):</label>
+              <input
+                type="text"
+                value={formData.categoryLink}
+                onChange={(e) => setFormData((prev) => ({ ...prev, categoryLink: e.target.value }))}
+                placeholder="/shop"
+                className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
+              />
+            </div>
+          </div>
+
+          {/* Active Toggle */}
+          <div className="flex items-center gap-3 p-3 bg-coal border border-grave rounded">
+            <input
+              type="checkbox"
+              id="category_is_active"
+              checked={formData.is_active}
+              onChange={(e) => setFormData((prev) => ({ ...prev, is_active: e.target.checked }))}
+              className="w-4 h-4 accent-gold cursor-pointer"
+            />
+            <label htmlFor="category_is_active" className="font-mono text-xs text-bone font-bold cursor-pointer">
+              إظهار كارت القسم في الصفحة الرئيسية (Active)
+            </label>
           </div>
 
           {/* Footer Actions */}

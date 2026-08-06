@@ -60,7 +60,14 @@ export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
-  const { categoryBanners, updateCategoryBanner, resetCategoryBanners } = useCategoryBanners();
+  const {
+    categoryBanners,
+    addCategoryBanner,
+    updateCategoryBanner,
+    toggleCategoryBannerVisibility,
+    deleteCategoryBanner,
+    resetCategoryBanners
+  } = useCategoryBanners();
   const {
     builderPrice,
     caseTypes,
@@ -1161,59 +1168,138 @@ export function AdminView() {
                   DUAT / CATEGORY SHOWCASE BANNERS
                 </span>
                 <h3 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
-                  إدارة كروت وصور الأقسام الرئيسية (THE FOUR HOURS)
+                  إدارة كروت وصور الأقسام الرئيسية (CATEGORIES)
                 </h3>
                 <p className="font-mono text-xs text-ash mt-1">
-                  التحكم الكامل في الصور والعناوين والوصف للـ 4 أقسام الرئيسية في الصفحة الرئيسية.
+                  التحكم الكامل في إضافة، تعديل، إخفاء/إظهار، وحذف كروت الأقسام في الصفحة الرئيسية.
                 </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => {
+                    setEditingCategoryBanner({
+                      id: '',
+                      nameEn: '',
+                      nameAr: '',
+                      subtitleEn: '',
+                      subtitleAr: '',
+                      imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
+                      badge: `0${categoryBanners.length + 1}`,
+                      categoryLink: '/shop',
+                      is_active: true
+                    });
+                    setIsCategoryModalOpen(true);
+                  }}
+                  className="btn-primary py-2.5 px-4 text-xs font-mono font-bold flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  <span>إضافة كارت قسم جديد +</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (window.confirm('هل أنت تأكد من إعادة ضبط كروت الأقسام للوضع الافتراضي؟')) {
+                      resetCategoryBanners();
+                      showToast('تمت إعادة ضبط كروت الأقسام الافتراضية 🔄', 'success');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
+                >
+                  <RotateCcw size={14} />
+                  <span>إعادة ضبط كروت الأقسام 🔄</span>
+                </button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {categoryBanners.map((cat, catIdx) => (
-                <div
-                  key={cat.id}
-                  className="bg-stone border border-grave overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between"
-                >
-                  {/* Category Image Preview Box */}
-                  <div className="h-44 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-2">
-                    <img
-                      src={cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'}
-                      alt={cat.nameEn}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-3 right-3 bg-void/90 border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
-                      قسم #{cat.badge || `0${catIdx + 1}`}
+              {categoryBanners.map((cat, catIdx) => {
+                const isActive = cat.is_active !== false && cat.isActive !== false;
+                return (
+                  <div
+                    key={cat.id}
+                    className={`bg-stone border overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between transition-all ${
+                      isActive ? 'border-grave' : 'border-red-900/40 opacity-60'
+                    }`}
+                  >
+                    {/* Category Image Preview Box */}
+                    <div className="h-44 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-2">
+                      <img
+                        src={cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'}
+                        alt={cat.nameEn}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-3 right-3 bg-void/90 border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
+                        قسم #{cat.badge || `0${catIdx + 1}`}
+                      </div>
+                      <div className="absolute top-3 left-3">
+                        <span
+                          className={`font-mono text-[10px] uppercase font-bold px-2 py-0.5 border ${
+                            isActive
+                              ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+                              : 'bg-red-950/80 text-red-400 border-red-500/40'
+                          }`}
+                        >
+                          {isActive ? 'نشط (ظاهر)' : 'مخفي'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Category Card Details */}
+                    <div className="p-5 space-y-2 flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-clash text-xl font-bold text-bone">
+                          {cat.nameAr} <span className="text-gold font-mono text-sm">({cat.nameEn})</span>
+                        </h4>
+                      </div>
+                      <p className="font-space text-xs text-ash">
+                        {cat.subtitleAr} / {cat.subtitleEn}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => toggleCategoryBannerVisibility(cat.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 border font-mono text-xs font-bold transition-all rounded ${
+                          isActive
+                            ? 'border-ash/40 bg-coal text-ash hover:text-gold'
+                            : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-900/40'
+                        }`}
+                      >
+                        {isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+                        <span>{isActive ? 'إخفاء' : 'إظهار'}</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingCategoryBanner(cat);
+                            setIsCategoryModalOpen(true);
+                          }}
+                          className="flex items-center gap-1.5 px-3.5 py-1.5 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all shadow-md rounded"
+                        >
+                          <Edit2 size={14} />
+                          <span>تعديل 🖼️</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`هل أنت تأكد من حذف كارت القسم "${cat.nameAr || cat.nameEn}"؟`)) {
+                              deleteCategoryBanner(cat.id);
+                              showToast('تم حذف كارت القسم بنجاح 🗑️', 'success');
+                            }
+                          }}
+                          className="flex items-center gap-1 p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white font-mono text-xs transition-all rounded"
+                          title="حذف كارت القسم"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Category Card Details */}
-                  <div className="p-5 space-y-2 flex-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-clash text-xl font-bold text-bone">
-                        {cat.nameAr} <span className="text-gold font-mono text-sm">({cat.nameEn})</span>
-                      </h4>
-                    </div>
-                    <p className="font-space text-xs text-ash">
-                      {cat.subtitleAr} / {cat.subtitleEn}
-                    </p>
-                  </div>
-
-                  {/* Edit Action Button */}
-                  <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-end">
-                    <button
-                      onClick={() => {
-                        setEditingCategoryBanner(cat);
-                        setIsCategoryModalOpen(true);
-                      }}
-                      className="flex items-center gap-1.5 px-4 py-2 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all shadow-md rounded"
-                    >
-                      <Edit2 size={14} />
-                      <span>تعديل صورة وكارت القسم 🖼️</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -1651,7 +1737,13 @@ export function AdminView() {
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}
         banner={editingCategoryBanner}
-        onSave={(bannerId, updatedFields) => updateCategoryBanner(bannerId, updatedFields)}
+        onSave={(bannerId, updatedFields) => {
+          if (bannerId) {
+            updateCategoryBanner(bannerId, updatedFields);
+          } else {
+            addCategoryBanner(updatedFields);
+          }
+        }}
       />
 
       {/* ORDER DETAILS MODAL */}

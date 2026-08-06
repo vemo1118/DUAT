@@ -16,7 +16,11 @@ export const CategoryGrid = ({ onSelectCategory }) => {
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
 
-  const categories = categoryBanners.map((cat) => ({
+  const activeCategories = categoryBanners.filter(
+    (cat) => cat && cat.is_active !== false && cat.isActive !== false
+  );
+
+  const categories = activeCategories.map((cat) => ({
     ...cat,
     image: cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'
   }));

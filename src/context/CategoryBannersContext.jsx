@@ -87,6 +87,32 @@ export const CategoryBannersProvider = ({ children }) => {
     return () => { isMounted = false; };
   }, []);
 
+  const addCategoryBanner = async (newBanner) => {
+    const id = newBanner.id || `cat-${Date.now()}`;
+    const formatted = {
+      ...newBanner,
+      id,
+      is_active: newBanner.is_active !== undefined ? newBanner.is_active : true,
+      badge: newBanner.badge || `0${categoryBanners.length + 1}`
+    };
+    setCategoryBanners((prev) => [...prev, formatted]);
+
+    try {
+      await supabase.from('category_banners').upsert({
+        id,
+        name_en: formatted.nameEn,
+        name_ar: formatted.nameAr,
+        subtitle_en: formatted.subtitleEn,
+        subtitle_ar: formatted.subtitleAr,
+        image_url: formatted.imageUrl,
+        is_active: formatted.is_active,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Supabase add category banner error:', err);
+    }
+  };
+
   const updateCategoryBanner = async (bannerId, updatedFields) => {
     setCategoryBanners((prev) =>
       prev.map((b) => (b.id === bannerId ? { ...b, ...updatedFields } : b))
@@ -100,10 +126,44 @@ export const CategoryBannersProvider = ({ children }) => {
         subtitle_en: updatedFields.subtitleEn,
         subtitle_ar: updatedFields.subtitleAr,
         image_url: updatedFields.imageUrl,
+        is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
         updated_at: new Date().toISOString()
       });
     } catch (err) {
       console.warn('Supabase category banner upsert error:', err);
+    }
+  };
+
+  const toggleCategoryBannerVisibility = async (bannerId) => {
+    let newStatus = true;
+    setCategoryBanners((prev) =>
+      prev.map((b) => {
+        if (b.id === bannerId) {
+          const current = b.is_active !== false && b.isActive !== false;
+          newStatus = !current;
+          return { ...b, is_active: newStatus, isActive: newStatus };
+        }
+        return b;
+      })
+    );
+
+    try {
+      await supabase
+        .from('category_banners')
+        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', bannerId);
+    } catch (err) {
+      console.warn('Supabase toggle category banner visibility error:', err);
+    }
+  };
+
+  const deleteCategoryBanner = async (bannerId) => {
+    setCategoryBanners((prev) => prev.filter((b) => b.id !== bannerId));
+
+    try {
+      await supabase.from('category_banners').delete().eq('id', bannerId);
+    } catch (err) {
+      console.warn('Supabase delete category banner error:', err);
     }
   };
 
@@ -116,7 +176,10 @@ export const CategoryBannersProvider = ({ children }) => {
     <CategoryBannersContext.Provider
       value={{
         categoryBanners,
+        addCategoryBanner,
         updateCategoryBanner,
+        toggleCategoryBannerVisibility,
+        deleteCategoryBanner,
         resetCategoryBanners,
         loading
       }}
