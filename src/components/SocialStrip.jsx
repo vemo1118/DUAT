@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { ArrowUpRight, Share2 } from 'lucide-react';
+import { useSocialGrid } from '../context/SocialGridContext';
+import { ArrowUpRight } from 'lucide-react';
 
 const InstagramIcon = ({ size = 20, className = "" }) => (
   <svg
@@ -22,55 +23,58 @@ const InstagramIcon = ({ size = 20, className = "" }) => (
 
 export const SocialStrip = () => {
   const { lang } = useLanguage();
+  const { settings, tiles } = useSocialGrid();
   const isAr = lang === 'ar';
 
-  const tiles = [
-    { id: 1, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_Whit_rkck3n.jpg', title: 'BONE BUNDLE' },
-    { id: 2, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg', title: 'MIDNIGHT BUNDLE' },
-    { id: 3, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg', title: 'CLEAR BUNDLE' },
-    { id: 4, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg', title: 'DUAT HERO' },
-    { id: 5, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png', title: 'STICKER SHEET' },
-    { id: 6, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg', title: 'PASSAGE CASE' }
-  ];
+  const activeTiles = Array.isArray(tiles)
+    ? tiles.filter((t) => t && t.is_active !== false && t.isActive !== false)
+    : [];
+
+  const eyebrow = settings?.eyebrow || 'DUAT / SOCIALS';
+  const title = isAr ? settings?.titleAr || 'تابع الرحلة على إنستجرام' : settings?.titleEn || 'FOLLOW THE PASSAGE';
+  const handleLabel = settings?.handleLabel || '@WEARDUAT';
+  const handleUrl = settings?.handleUrl || 'https://instagram.com/wearduat';
+
+  if (activeTiles.length === 0) return null;
 
   return (
     <section className="w-full space-y-8 reveal-fade-up">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-grave pb-6">
         <div>
           <span className="font-mono text-xs text-gold uppercase tracking-[0.25em] block">
-            DUAT / SOCIALS
+            {eyebrow}
           </span>
           <h2 className="font-clash text-2xl sm:text-4xl text-bone uppercase mt-1">
-            {isAr ? 'تابع الرحلة على إنستجرام' : 'FOLLOW THE PASSAGE'}
+            {title}
           </h2>
         </div>
 
         <a
-          href="https://instagram.com"
+          href={handleUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-ghost flex items-center gap-2 text-xs py-3 px-6"
+          className="btn-ghost flex items-center gap-2 text-xs py-3 px-6 min-h-[44px]"
         >
           <InstagramIcon size={16} className="text-gold" />
-          <span>@WEARDUAT</span>
+          <span>{handleLabel}</span>
           <ArrowUpRight size={14} />
         </a>
       </div>
 
-      {/* 6 Grid Visual Tiles */}
+      {/* Grid Visual Tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto">
-        {tiles.map((tile) => (
+        {activeTiles.map((tile) => (
           <a
             key={tile.id}
-            href="https://instagram.com"
+            href={tile.linkUrl || handleUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative aspect-square bg-stone border border-grave overflow-hidden card-depth-highlight flex items-center justify-center p-4"
+            className="group relative aspect-square bg-stone border border-grave overflow-hidden card-depth-highlight flex items-center justify-center p-4 rounded-lg"
           >
             <img
-              src={tile.image}
+              src={tile.image || tile.imageUrl}
               alt={tile.title}
-              className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 opacity-60 group-hover:opacity-90"
+              className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100"
             />
             <div className="absolute inset-0 bg-void/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-2 text-center">
               <InstagramIcon size={24} className="text-gold mb-2" />

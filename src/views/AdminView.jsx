@@ -4,11 +4,13 @@ import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
 import { useCustomizerConfig } from '../context/CustomizerContext';
+import { useSocialGrid } from '../context/SocialGridContext';
 import { useToast } from '../context/ToastContext';
 import { supabase } from '../lib/supabase';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
+import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { StickerIcon } from '../components/StickerIcon';
@@ -68,6 +70,19 @@ export function AdminView() {
     deleteCategoryBanner,
     resetCategoryBanners
   } = useCategoryBanners();
+  const {
+    settings: socialSettings,
+    tiles: socialTiles,
+    updateSettings: updateSocialSettings,
+    addTile: addSocialTile,
+    updateTile: updateSocialTile,
+    toggleTileVisibility: toggleSocialTileVisibility,
+    deleteTile: deleteSocialTile,
+    resetSocialGrid
+  } = useSocialGrid();
+
+  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
+  const [editingSocialTile, setEditingSocialTile] = useState(null);
   const {
     builderPrice,
     caseTypes,
@@ -1303,6 +1318,192 @@ export function AdminView() {
             </div>
           </div>
 
+          {/* ============================================================ */}
+          {/* SOCIAL GRID (FOLLOW THE PASSAGE) MANAGEMENT */}
+          {/* ============================================================ */}
+          <div className="pt-10 border-t border-gold/40 space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <span className="font-mono text-xs text-gold font-bold uppercase tracking-widest block">
+                  DUAT / SOCIAL GRID & INSTAGRAM
+                </span>
+                <h3 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
+                  إدارة معرض الصور والشبكة الاجتماعية (FOLLOW THE PASSAGE)
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  التحكم الكامل في عناوين ورابط وحساب إنستجرام، بالإضافة لإضافة، تعديل، وإخفاء صور المعرض السفلي.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => {
+                    setEditingSocialTile({
+                      id: '',
+                      title: '',
+                      image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
+                      linkUrl: socialSettings?.handleUrl || 'https://instagram.com/wearduat',
+                      is_active: true
+                    });
+                    setIsSocialModalOpen(true);
+                  }}
+                  className="btn-primary py-2.5 px-4 text-xs font-mono font-bold flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  <span>إضافة صورة جديدة للمعرض +</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (window.confirm('هل أنت تأكد من إعادة ضبط معرض الصور للوضع الافتراضي؟')) {
+                      resetSocialGrid();
+                      showToast('تمت إعادة ضبط معرض إنستجرام الافتراضي 🔄', 'success');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
+                >
+                  <RotateCcw size={14} />
+                  <span>إعادة ضبط المعرض 🔄</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Social Grid Header Settings Form */}
+            <div className="bg-stone border border-grave p-6 rounded-lg space-y-4 shadow-lg">
+              <h4 className="font-clash text-lg font-bold text-gold uppercase border-b border-grave pb-2">
+                تعديل عناوين وحساب إنستجرام (Header Settings)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+                <div>
+                  <label className="block text-ash mb-1">النص العلوي (Eyebrow):</label>
+                  <input
+                    type="text"
+                    value={socialSettings?.eyebrow || ''}
+                    onChange={(e) => updateSocialSettings({ eyebrow: e.target.value })}
+                    className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gold font-bold mb-1">العنوان بالعربي (Title AR):</label>
+                  <input
+                    type="text"
+                    value={socialSettings?.titleAr || ''}
+                    onChange={(e) => updateSocialSettings({ titleAr: e.target.value })}
+                    className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gold font-bold mb-1">العنوان بالإنجليزي (Title EN):</label>
+                  <input
+                    type="text"
+                    value={socialSettings?.titleEn || ''}
+                    onChange={(e) => updateSocialSettings({ titleEn: e.target.value })}
+                    className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-ash mb-1">اسم حساب إنستجرام (Handle Label):</label>
+                  <input
+                    type="text"
+                    value={socialSettings?.handleLabel || ''}
+                    onChange={(e) => updateSocialSettings({ handleLabel: e.target.value })}
+                    className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-ash mb-1">رابط صفحة إنستجرام (Instagram URL):</label>
+                  <input
+                    type="text"
+                    value={socialSettings?.handleUrl || ''}
+                    onChange={(e) => updateSocialSettings({ handleUrl: e.target.value })}
+                    className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Social Photo Tiles Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {socialTiles.map((tile) => {
+                const isActive = tile.is_active !== false && tile.isActive !== false;
+                return (
+                  <div
+                    key={tile.id}
+                    className={`bg-stone border overflow-hidden shadow-lg flex flex-col justify-between rounded-lg transition-all ${
+                      isActive ? 'border-grave' : 'border-red-900/40 opacity-60'
+                    }`}
+                  >
+                    {/* Preview Box */}
+                    <div className="aspect-square bg-void relative border-b border-grave overflow-hidden flex items-center justify-center">
+                      <img
+                        src={tile.image || tile.imageUrl}
+                        alt={tile.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`font-mono text-[9px] uppercase font-bold px-1.5 py-0.5 border ${
+                            isActive
+                              ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+                              : 'bg-red-950/80 text-red-400 border-red-500/40'
+                          }`}
+                        >
+                          {isActive ? 'ظاهر' : 'مخفي'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-3 space-y-1 flex-1">
+                      <h5 className="font-mono text-xs font-bold text-bone truncate">{tile.title}</h5>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="p-2 bg-stone/40 border-t border-grave flex items-center justify-between gap-1">
+                      <button
+                        onClick={() => toggleSocialTileVisibility(tile.id)}
+                        className={`p-1.5 border font-mono text-xs transition-all rounded ${
+                          isActive
+                            ? 'border-ash/40 bg-coal text-ash hover:text-gold'
+                            : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-400'
+                        }`}
+                        title={isActive ? 'إخفاء الصورة' : 'إظهار الصورة'}
+                      >
+                        {isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            setEditingSocialTile(tile);
+                            setIsSocialModalOpen(true);
+                          }}
+                          className="p-1.5 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all rounded"
+                          title="تعديل الصورة"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`حذف هذه الصورة "${tile.title}" من المعرض؟`)) {
+                              deleteSocialTile(tile.id);
+                              showToast('تم حذف الصورة من المعرض 🗑️', 'success');
+                            }
+                          }}
+                          className="p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-all rounded"
+                          title="حذف الصورة"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -1742,6 +1943,20 @@ export function AdminView() {
             updateCategoryBanner(bannerId, updatedFields);
           } else {
             addCategoryBanner(updatedFields);
+          }
+        }}
+      />
+
+      {/* ADMIN SOCIAL TILE MODAL */}
+      <AdminSocialTileModal
+        isOpen={isSocialModalOpen}
+        onClose={() => setIsSocialModalOpen(false)}
+        tile={editingSocialTile}
+        onSave={(tileId, updatedFields) => {
+          if (tileId) {
+            updateSocialTile(tileId, updatedFields);
+          } else {
+            addSocialTile(updatedFields);
           }
         }}
       />
