@@ -1,6 +1,22 @@
 import React from 'react';
 
-export const StickerIcon = ({ stickerId, size = 40, color, bgColor }) => {
+export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgColor }) => {
+  const customImg = image || imageUrl;
+  if (customImg) {
+    return (
+      <div
+        style={{ width: `${size}px`, height: `${size}px` }}
+        className="flex items-center justify-center relative overflow-hidden select-none"
+      >
+        <img
+          src={customImg}
+          alt="Sticker"
+          className="w-full h-full object-contain drop-shadow-md"
+        />
+      </div>
+    );
+  }
+
   const strokeColor = color || '#E0A93B';
   const fillColor = color || '#E0A93B';
 

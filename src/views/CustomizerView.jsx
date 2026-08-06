@@ -333,10 +333,14 @@ export const CustomizerContent = () => {
 
   // Layer Operations
   const handleAddSticker = (stickerId) => {
+    const st = STICKER_ITEMS.find((s) => s.id === stickerId);
+    const img = st?.image || st?.imageUrl || null;
+
     const newLayer = {
-      id: `sticker-${Date.now()}`,
-      type: 'sticker',
+      id: img ? `image-${Date.now()}` : `sticker-${Date.now()}`,
+      type: img ? 'image' : 'sticker',
       stickerId,
+      src: img,
       color: textColor || '#E8A33D',
       bgColor: textBgColor || '#14110F',
       x: 50,
@@ -512,14 +516,18 @@ export const CustomizerContent = () => {
     const stickerId = e.dataTransfer.getData('text/plain');
     if (!stickerId || !canvasRef.current) return;
     
+    const st = STICKER_ITEMS.find((s) => s.id === stickerId);
+    const img = st?.image || st?.imageUrl || null;
+
     const rect = canvasRef.current.getBoundingClientRect();
     const x = Math.max(15, Math.min(85, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
     const y = Math.max(15, Math.min(85, Math.round(((e.clientY - rect.top) / rect.height) * 100)));
 
     const newLayer = {
-      id: `sticker-${Date.now()}`,
-      type: 'sticker',
+      id: img ? `image-${Date.now()}` : `sticker-${Date.now()}`,
+      type: img ? 'image' : 'sticker',
       stickerId,
+      src: img,
       x,
       y,
       scale: 1.0,
@@ -1020,7 +1028,7 @@ export const CustomizerContent = () => {
                       className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-all min-h-[84px] cursor-grab active:cursor-grabbing hover:scale-105 rounded"
                       title="Click or Drag onto phone"
                     >
-                      <StickerIcon stickerId={st.id} size={36} color={textColor} bgColor={textBgColor} />
+                      <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={36} color={textColor} bgColor={textBgColor} />
                       <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
                       </span>
