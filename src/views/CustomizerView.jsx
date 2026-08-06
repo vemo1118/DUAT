@@ -277,11 +277,12 @@ export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { activeCaseTypes, activePhoneModels, builderPrice } = useCustomizerConfig();
+  const { activeCaseTypes, activePhoneModels, activeBuilderStickers, builderPrice } = useCustomizerConfig();
   const location = useLocation();
 
   const CASE_TYPES = activeCaseTypes.length > 0 ? activeCaseTypes : [];
   const PHONE_MODELS = activePhoneModels.length > 0 ? activePhoneModels : [];
+  const STICKER_ITEMS = activeBuilderStickers && activeBuilderStickers.length > 0 ? activeBuilderStickers : STICKER_PRESETS;
 
   const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : PHONE_MODELS[0] || 'iPhone 16 Pro Max';
   const defaultCaseType = CASE_TYPES.find((c) => c.id === 'matte-black') || CASE_TYPES[0];
@@ -1010,18 +1011,18 @@ export const CustomizerContent = () => {
                   💡 Tip: Click or drag & drop any 3D dome onto the phone canvas
                 </p>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {STICKER_PRESETS.map((st) => (
+                  {STICKER_ITEMS.map((st) => (
                     <button
                       key={st.id}
                       draggable={true}
                       onDragStart={(e) => handleStickerDragStart(st.id, e)}
                       onClick={() => handleAddSticker(st.id)}
-                      className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-all min-h-[84px] cursor-grab active:cursor-grabbing hover:scale-105"
+                      className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-all min-h-[84px] cursor-grab active:cursor-grabbing hover:scale-105 rounded"
                       title="Click or Drag onto phone"
                     >
                       <StickerIcon stickerId={st.id} size={36} color={textColor} bgColor={textBgColor} />
                       <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full">
-                        {lang === 'ar' ? st.nameAr : st.nameEn}
+                        {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
                       </span>
                     </button>
                   ))}

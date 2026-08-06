@@ -11,6 +11,7 @@ import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
 import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
+import { AdminBuilderStickerModal } from '../components/AdminBuilderStickerModal';
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { StickerIcon } from '../components/StickerIcon';
@@ -87,6 +88,7 @@ export function AdminView() {
     builderPrice,
     caseTypes,
     phoneModels,
+    builderStickers,
     addCaseType,
     updateCaseType,
     toggleCaseTypeVisibility,
@@ -94,9 +96,17 @@ export function AdminView() {
     addPhoneModel,
     updatePhoneModel,
     deletePhoneModel,
+    addBuilderSticker,
+    updateBuilderSticker,
+    toggleBuilderStickerVisibility,
+    deleteBuilderSticker,
+    resetBuilderStickers,
     updatePrice,
     resetCustomizerConfig
   } = useCustomizerConfig();
+
+  const [isBuilderStickerModalOpen, setIsBuilderStickerModalOpen] = useState(false);
+  const [editingBuilderSticker, setEditingBuilderSticker] = useState(null);
   const { showToast } = useToast();
 
   // Builder Engine Tab Form States
@@ -1914,6 +1924,142 @@ export function AdminView() {
             </div>
           </div>
 
+          {/* 4. BUILDER STICKERS CONTROL SECTION */}
+          <div className="bg-stone border border-grave p-6 space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+                  <Sparkles size={16} />
+                  <span>إدارة ملصقات واستيكرات البلدر (Builder Stickers — {builderStickers.length})</span>
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  التحكم الكامل في الاستيكرات التفاعلية داخل مصمم الجرابات: تعديل الأسماء، الصور، الرموز، وإخفاء أو إظهار أي استيكر.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingBuilderSticker({
+                      id: '',
+                      nameEn: '',
+                      nameAr: '',
+                      tagEn: '3D EPOXY DOME SLOGAN',
+                      tagAr: 'شعار إيبوكسي بارز',
+                      image: '',
+                      is_active: true
+                    });
+                    setIsBuilderStickerModalOpen(true);
+                  }}
+                  className="btn-primary py-2 px-4 text-xs font-mono font-bold flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  <span>إضافة استيكر جديد للبلدر +</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('إعادة ضبط جميع استيكرات البلدر للوضع الافتراضي؟')) {
+                      resetBuilderStickers();
+                      showToast('تمت إعادة ضبط استيكرات البلدر للوضع الافتراضي 🔄', 'success');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
+                >
+                  <RotateCcw size={14} />
+                  <span>إعادة ضبط الاستيكرات 🔄</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Builder Stickers */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+              {builderStickers.map((st) => {
+                const isActive = st.is_active !== false && st.isActive !== false;
+                return (
+                  <div
+                    key={st.id}
+                    className={`bg-stone border overflow-hidden shadow-lg flex flex-col justify-between rounded transition-all ${
+                      isActive ? 'border-grave' : 'border-red-900/40 opacity-60'
+                    }`}
+                  >
+                    {/* Preview Box */}
+                    <div className="aspect-square bg-coal relative border-b border-grave overflow-hidden flex flex-col items-center justify-center p-2">
+                      <StickerIcon stickerId={st.id} size={36} color="#E8A33D" bgColor="#14110F" />
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`font-mono text-[9px] uppercase font-bold px-1.5 py-0.5 border ${
+                            isActive
+                              ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+                              : 'bg-red-950/80 text-red-400 border-red-500/40'
+                          }`}
+                        >
+                          {isActive ? 'ظاهر' : 'مخفي'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-3 space-y-1 flex-1">
+                      <h5 className="font-mono text-xs font-bold text-bone truncate">
+                        {st.nameAr || st.nameEn || st.id}
+                      </h5>
+                      <p className="font-mono text-[9px] text-gold truncate">
+                        {st.tagAr || st.tagEn || '3D EPOXY'}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="p-2 bg-stone/40 border-t border-grave flex items-center justify-between gap-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleBuilderStickerVisibility(st.id)}
+                        className={`p-1.5 border font-mono text-xs transition-all rounded ${
+                          isActive
+                            ? 'border-ash/40 bg-coal text-ash hover:text-gold'
+                            : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-400'
+                        }`}
+                        title={isActive ? 'إخفاء الاستيكر' : 'إظهار الاستيكر'}
+                      >
+                        {isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingBuilderSticker(st);
+                            setIsBuilderStickerModalOpen(true);
+                          }}
+                          className="p-1.5 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all rounded"
+                          title="تعديل الاستيكر"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`حذف هذا الاستيكر "${st.nameAr || st.nameEn}" من البلدر؟`)) {
+                              deleteBuilderSticker(st.id);
+                              showToast('تم حذف الاستيكر من البلدر 🗑️', 'success');
+                            }
+                          }}
+                          className="p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-all rounded"
+                          title="حذف الاستيكر"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -1957,6 +2103,20 @@ export function AdminView() {
             updateSocialTile(tileId, updatedFields);
           } else {
             addSocialTile(updatedFields);
+          }
+        }}
+      />
+
+      {/* ADMIN BUILDER STICKER MODAL */}
+      <AdminBuilderStickerModal
+        isOpen={isBuilderStickerModalOpen}
+        onClose={() => setIsBuilderStickerModalOpen(false)}
+        stickerToEdit={editingBuilderSticker}
+        onSave={(stickerId, updatedFields) => {
+          if (stickerId) {
+            updateBuilderSticker(stickerId, updatedFields);
+          } else {
+            addBuilderSticker(updatedFields);
           }
         }}
       />
