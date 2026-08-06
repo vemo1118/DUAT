@@ -1025,11 +1025,13 @@ export const CustomizerContent = () => {
                       draggable={true}
                       onDragStart={(e) => handleStickerDragStart(st.id, e)}
                       onClick={() => handleAddSticker(st.id)}
-                      className="p-3 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-center space-y-2 transition-all min-h-[84px] cursor-grab active:cursor-grabbing hover:scale-105 rounded"
+                      className="p-2.5 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-1.5 transition-all min-h-[96px] cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden"
                       title="Click or Drag onto phone"
                     >
-                      <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={36} color={textColor} bgColor={textBgColor} />
-                      <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full">
+                      <div className="w-full h-14 flex items-center justify-center overflow-hidden p-1">
+                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={44} color={textColor} bgColor={textBgColor} />
+                      </div>
+                      <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full font-bold">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
                       </span>
                     </button>

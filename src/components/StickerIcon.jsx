@@ -5,13 +5,12 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
   if (customImg) {
     return (
       <div
-        style={{ width: `${size}px`, height: `${size}px` }}
-        className="flex items-center justify-center relative overflow-hidden select-none"
+        className="w-full h-full flex items-center justify-center relative overflow-hidden select-none p-0.5"
       >
         <img
           src={customImg}
           alt="Sticker"
-          className="w-full h-full object-contain drop-shadow-md"
+          className="max-w-full max-h-full object-contain drop-shadow-md transition-transform hover:scale-105"
         />
       </div>
     );
