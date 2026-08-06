@@ -1987,7 +1987,7 @@ export function AdminView() {
                   >
                     {/* Preview Box */}
                     <div className="aspect-square bg-coal relative border-b border-grave overflow-hidden flex flex-col items-center justify-center p-2">
-                      <StickerIcon stickerId={st.id} size={36} color="#E8A33D" bgColor="#14110F" />
+                      <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={48} color="#E8A33D" bgColor="#14110F" />
                       <div className="absolute top-2 left-2">
                         <span
                           className={`font-mono text-[9px] uppercase font-bold px-1.5 py-0.5 border ${
