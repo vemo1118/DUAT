@@ -81,9 +81,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
             <div className="lg:col-span-5 relative z-10 flex items-center justify-center">
               <img
-                src="/images/stickers.png"
-                alt="Custom Builder Domes"
-                className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                src="https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg"
+                alt="DUAT Clear Case Bundle"
+                className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 rounded-xl"
               />
             </div>
 

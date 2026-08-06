@@ -60,6 +60,7 @@ export function AdminView() {
   const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
+  const { categoryBanners, updateCategoryBanner, resetCategoryBanners } = useCategoryBanners();
   const {
     builderPrice,
     caseTypes,
@@ -1177,7 +1178,7 @@ export function AdminView() {
                   {/* Category Image Preview Box */}
                   <div className="h-44 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-2">
                     <img
-                      src={cat.imageUrl || cat.image || '/images/transparent_hero_case.png'}
+                      src={cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'}
                       alt={cat.nameEn}
                       className="w-full h-full object-cover"
                     />

@@ -47,7 +47,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'جرابات مصنوعة يدوياً في مصر بخامات فاخرة تشطيب إطار ذهبي وضمان استبدال كامل سنة.',
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
-    imageUrl: '/images/stickers.png',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
     ctaPrimaryTextEn: 'SHOP COLLECTION',
     ctaPrimaryTextAr: 'تسوق العروض الآن',
     ctaPrimaryLink: '/shop',

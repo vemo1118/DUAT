@@ -69,7 +69,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     if (product.category === 'stickers') {
       return (
         <img
-          src="/images/stickers.png"
+          src="https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png"
           alt={name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
         />
@@ -78,7 +78,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
     return (
       <img
-        src="/images/charms.png"
+        src="https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg"
         alt={name}
         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
       />

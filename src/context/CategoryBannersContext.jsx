@@ -6,42 +6,22 @@ const CategoryBannersContext = createContext();
 export const INITIAL_CATEGORY_BANNERS = [
   {
     id: 'cases',
-    nameEn: 'Phone Cases',
-    nameAr: 'جرابات الهواتف',
-    subtitleEn: 'Optical acrylic & custom luxury cases',
-    subtitleAr: 'جرابات فاخرة بتشطيب يدوي أنيق',
-    imageUrl: '/images/transparent_hero_case.png',
+    nameEn: 'LUXURY CASES',
+    nameAr: 'الجرابات الفاخرة',
+    subtitleEn: 'Case + 6 DUAT stickers, made to order',
+    subtitleAr: 'جراب + ٦ استيكرات دوات، حسب الطلب',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
     badge: '01',
     categoryLink: '/shop'
   },
   {
     id: 'stickers',
-    nameEn: '3D Epoxy Domes',
-    nameAr: 'ملصقات إيبوكسي مجسمة',
-    subtitleEn: 'Raised slogan pills & motifs',
-    subtitleAr: 'ملصقات بيضاوية وبارزة ثلاثية الأبعاد',
-    imageUrl: '/images/stickers.png',
+    nameEn: 'STICKERS',
+    nameAr: 'الاستيكرات',
+    subtitleEn: '3D epoxy dome stickers, sold on their own',
+    subtitleAr: 'استيكرات إيبوكسي، تتباع لوحدها',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
     badge: '02',
-    categoryLink: '/shop'
-  },
-  {
-    id: 'charms',
-    nameEn: 'Passage Charms',
-    nameAr: 'تعليقات الهواتف',
-    subtitleEn: '18k gold plate & ember glass',
-    subtitleAr: 'نحاس مطل بالذهب وزجاج مصري',
-    imageUrl: '/images/charms.png',
-    badge: '03',
-    categoryLink: '/shop'
-  },
-  {
-    id: 'accessories',
-    nameEn: 'Tech Accessories',
-    nameAr: 'إكسسوارات تكتيكية',
-    subtitleEn: 'MagSafe rings & protective gear',
-    subtitleAr: 'حلقات ماج سيف ومعدات الحماية',
-    imageUrl: '/images/transparent_hero_case.png',
-    badge: '04',
     categoryLink: '/shop'
   }
 ];
@@ -50,7 +30,15 @@ export const CategoryBannersProvider = ({ children }) => {
   const [categoryBanners, setCategoryBanners] = useState(() => {
     try {
       const saved = localStorage.getItem('duat_category_banners');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 2 && parsed.every((c) => c.id === 'cases' || c.id === 'stickers')) {
+          return INITIAL_CATEGORY_BANNERS.map((def) => {
+            const match = parsed.find((p) => p.id === def.id);
+            return match ? { ...def, ...match, nameEn: def.nameEn, nameAr: def.nameAr, subtitleEn: def.subtitleEn, subtitleAr: def.subtitleAr, imageUrl: match.imageUrl || def.imageUrl } : def;
+          });
+        }
+      }
     } catch (e) {
       console.warn('Failed parsing duat_category_banners from localStorage:', e);
     }

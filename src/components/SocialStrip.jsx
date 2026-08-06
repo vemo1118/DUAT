@@ -25,12 +25,12 @@ export const SocialStrip = () => {
   const isAr = lang === 'ar';
 
   const tiles = [
-    { id: 1, image: '/images/transparent_hero_case.png', title: 'PASSAGE CASE' },
-    { id: 2, image: '/images/stickers.png', title: '3D DOME PILLS' },
-    { id: 3, image: '/images/charms.png', title: 'GOLD RING CHARM' },
-    { id: 4, image: '/images/transparent_hero_case.png', title: 'DAWN EDITION' },
-    { id: 5, image: '/images/stickers.png', title: 'TALE3 NOOR' },
-    { id: 6, image: '/images/charms.png', title: 'EMBER BEAD' }
+    { id: 1, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_Whit_rkck3n.jpg', title: 'BONE BUNDLE' },
+    { id: 2, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg', title: 'MIDNIGHT BUNDLE' },
+    { id: 3, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg', title: 'CLEAR BUNDLE' },
+    { id: 4, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg', title: 'DUAT HERO' },
+    { id: 5, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png', title: 'STICKER SHEET' },
+    { id: 6, image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg', title: 'PASSAGE CASE' }
   ];
 
   return (

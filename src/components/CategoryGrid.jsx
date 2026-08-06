@@ -18,7 +18,7 @@ export const CategoryGrid = ({ onSelectCategory }) => {
 
   const categories = categoryBanners.map((cat) => ({
     ...cat,
-    image: cat.imageUrl || cat.image || '/images/transparent_hero_case.png'
+    image: cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'
   }));
 
   const handleClick = (catId) => {
