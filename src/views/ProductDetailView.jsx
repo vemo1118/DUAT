@@ -38,10 +38,11 @@ export function ProductDetailView() {
   const product = getProductById(id) || products[0];
 
   // Images Gallery
-  const images = Array.isArray(product?.images) && product.images.length > 0
+  const primaryImg = product?.imageUrl || product?.image;
+  const images = primaryImg
+    ? [primaryImg]
+    : Array.isArray(product?.images) && product.images.length > 0
     ? product.images
-    : product?.imageUrl || product?.image
-    ? [product.imageUrl || product.image]
     : [];
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);

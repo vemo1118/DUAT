@@ -93,8 +93,12 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
       .map((o) => o.trim())
       .filter(Boolean);
 
+    const img = formData.imageUrl || '';
     const payload = {
       ...formData,
+      imageUrl: img,
+      image: img,
+      images: img ? [img] : [],
       price: Number(formData.price),
       originalPrice: Number(formData.originalPrice) || Number(formData.price),
       options,

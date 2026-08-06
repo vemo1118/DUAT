@@ -8,6 +8,7 @@ function mapFromDb(row) {
   if (!row) return null;
   const data = row.data && typeof row.data === 'object' ? row.data : {};
   const isActiveVal = row.is_active !== undefined ? Boolean(row.is_active) : (data.is_active !== undefined ? Boolean(data.is_active) : (data.isActive !== undefined ? Boolean(data.isActive) : true));
+  const img = data.imageUrl || data.image || row.image_url || '';
   return {
     ...data,
     id: row.id || data.id,
@@ -15,6 +16,9 @@ function mapFromDb(row) {
     price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || 0),
     is_active: isActiveVal,
     isActive: isActiveVal,
+    imageUrl: img,
+    image: img,
+    images: img ? [img] : (Array.isArray(data.images) ? data.images : []),
     nameEn: data.nameEn || row.name_en || '',
     nameAr: data.nameAr || row.name_ar || '',
     tagEn: data.tagEn || row.tag_en || '',
@@ -34,6 +38,7 @@ function mapFromDb(row) {
 
 function mapToDb(p) {
   const isActiveVal = p.is_active !== undefined ? Boolean(p.is_active) : (p.isActive !== undefined ? Boolean(p.isActive) : true);
+  const img = p.imageUrl || p.image || '';
   return {
     id: p.id,
     category: p.category || 'cases',
@@ -41,8 +46,12 @@ function mapToDb(p) {
     name_ar: p.nameAr || p.name_ar || '',
     price: Number(p.price) || 0,
     is_active: isActiveVal,
+    image_url: img,
     data: {
       ...p,
+      imageUrl: img,
+      image: img,
+      images: img ? [img] : (Array.isArray(p.images) ? p.images : []),
       is_active: isActiveVal,
       isActive: isActiveVal
     }
@@ -101,25 +110,31 @@ export function ProductsProvider({ children }) {
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      const local = loadLocalProducts();
       const { data, error } = await supabase.from('products').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        const validIds = new Set(INITIAL_PRODUCTS.map((p) => p.id));
-        const validFetched = fetched.filter((p) => validIds.has(p.id));
-        if (validFetched.length === INITIAL_PRODUCTS.length) {
-          setProducts(validFetched);
-          saveLocalProducts(validFetched);
-        } else {
-          setProducts(INITIAL_PRODUCTS);
-          saveLocalProducts(INITIAL_PRODUCTS);
-        }
+        const localMap = new Map((local || INITIAL_PRODUCTS).map((p) => [p.id, p]));
+        const merged = fetched.map((f) => {
+          const loc = localMap.get(f.id);
+          return loc ? { ...f, ...loc } : f;
+        });
+        setProducts(merged);
+        saveLocalProducts(merged);
+      } else if (local && local.length > 0) {
+        setProducts(local);
       } else {
         setProducts(INITIAL_PRODUCTS);
         saveLocalProducts(INITIAL_PRODUCTS);
       }
     } catch (err) {
       console.error('Unexpected error loading products:', err);
-      setProducts(INITIAL_PRODUCTS);
+      const local = loadLocalProducts();
+      if (local && local.length > 0) {
+        setProducts(local);
+      } else {
+        setProducts(INITIAL_PRODUCTS);
+      }
     } finally {
       setLoading(false);
     }
@@ -130,9 +145,13 @@ export function ProductsProvider({ children }) {
   }, []);
 
   const addProduct = async (prodData) => {
+    const img = prodData.imageUrl || prodData.image || '';
     const newProduct = {
       ...prodData,
-      id: prodData.id || `prod-${Date.now()}`
+      id: prodData.id || `prod-${Date.now()}`,
+      imageUrl: img,
+      image: img,
+      images: img ? [img] : (Array.isArray(prodData.images) ? prodData.images : [])
     };
     setProducts((prev) => {
       const updated = [newProduct, ...prev];
@@ -148,7 +167,14 @@ export function ProductsProvider({ children }) {
     setProducts((prev) => {
       const updatedList = prev.map((prod) => {
         if (prod.id === id) {
-          const updated = { ...prod, ...updatedFields };
+          const img = updatedFields.imageUrl !== undefined ? updatedFields.imageUrl : (updatedFields.image !== undefined ? updatedFields.image : (prod.imageUrl || prod.image || ''));
+          const updated = {
+            ...prod,
+            ...updatedFields,
+            imageUrl: img,
+            image: img,
+            images: img ? [img] : (Array.isArray(prod.images) ? prod.images : [])
+          };
           targetProduct = updated;
           return updated;
         }
