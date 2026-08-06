@@ -2128,8 +2128,8 @@ export function AdminView() {
                                   style={{ backgroundColor: caseBgColor }}
                                   className="w-[170px] h-[280px] rounded-[28px] border-2 border-grave relative overflow-hidden shadow-2xl p-2 select-none flex-shrink-0"
                                 >
-                                  {/* Camera Island */}
-                                  <div className="absolute top-2 right-2 w-10 h-10 rounded-lg border border-[#E8A33D] bg-black flex items-center justify-center gap-1 z-20">
+                                  {/* Camera Island (Top Left) */}
+                                  <div className="absolute top-2 left-2 w-10 h-10 rounded-lg border border-[#E8A33D] bg-black flex items-center justify-center gap-1 z-20">
                                     <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
                                     <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
                                   </div>

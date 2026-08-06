@@ -90,21 +90,21 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
     ctx.lineWidth = 3.5;
     ctx.stroke();
 
-    // Side buttons accents
+    // Side buttons accents (Volume keys on right, Power key on left when facing case back)
     ctx.fillStyle = '#2A2A2E';
-    ctx.fillRect(8, 120, 6, 45); // Vol up
-    ctx.fillRect(8, 185, 6, 45); // Vol down
-    ctx.fillRect(width - 14, 150, 6, 60); // Power button
+    ctx.fillRect(width - 14, 120, 6, 45); // Vol up
+    ctx.fillRect(width - 14, 185, 6, 45); // Vol down
+    ctx.fillRect(8, 150, 6, 60); // Power button
 
-    // 2. Camera Island Top Right (Pro Triple Camera Module)
+    // 2. Camera Island Top Left (Pro Triple Camera Module)
     ctx.fillStyle = '#090A0E';
     ctx.strokeStyle = caseRingColor || '#E8A33D';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     if (ctx.roundRect) {
-      ctx.roundRect(width - 115, 28, 86, 86, 22);
+      ctx.roundRect(28, 28, 86, 86, 22);
     } else {
-      ctx.rect(width - 115, 28, 86, 86);
+      ctx.rect(28, 28, 86, 86);
     }
     ctx.fill();
     ctx.stroke();
@@ -125,19 +125,19 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
       ctx.fill();
     };
 
-    drawLens(width - 98, 48); // Top Left
-    drawLens(width - 48, 48); // Top Right
-    drawLens(width - 98, 92); // Bottom Left
+    drawLens(48, 48); // Top Left
+    drawLens(94, 48); // Top Right
+    drawLens(48, 92); // Bottom Left
 
     // Flash Dot & LiDAR sensor
     ctx.fillStyle = '#FDE68A';
     ctx.beginPath();
-    ctx.arc(width - 50, 84, 5, 0, Math.PI * 2);
+    ctx.arc(94, 84, 5, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.arc(width - 50, 98, 3.5, 0, Math.PI * 2);
+    ctx.arc(94, 98, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
     // 3. MagSafe Ring
@@ -643,9 +643,9 @@ export const CustomizerContent = () => {
                 {/* Acrylic Glass Sheen & Depth Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent pointer-events-none z-10" />
 
-                {/* Camera Island (Pro Triple Camera Module) */}
+                {/* Camera Island (Pro Triple Camera Module - Top Left) */}
                 <div
-                  className="self-end w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden backdrop-blur-md"
+                  className="self-start w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden backdrop-blur-md"
                   style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
                 >
                   <div className="flex justify-between items-center z-10">
