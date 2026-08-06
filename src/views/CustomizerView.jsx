@@ -293,9 +293,14 @@ export const CustomizerContent = () => {
   };
 
   const currentModelName = getModelName(selectedModel);
-  const isCustomModelOption = selectedModel.includes('جهاز آخر') || selectedModel === 'other-custom';
+  const isCustomModelOption =
+    Boolean(selectedModel) &&
+    (selectedModel.includes('جهاز آخر') ||
+     selectedModel.includes('other-custom') ||
+     selectedModel.toLowerCase().includes('other') ||
+     selectedModel.includes('Type model'));
   const effectiveModelName = isCustomModelOption
-    ? (customModelInput.trim() || 'جهاز مخصص حسب الطلب')
+    ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز مخصص حسب الطلب' : 'Custom Device'))
     : currentModelName;
 
   // Layer Operations
