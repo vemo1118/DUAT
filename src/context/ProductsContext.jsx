@@ -84,21 +84,13 @@ function saveLocalProducts(products) {
 async function saveProductToSupabase(p) {
   if (!p || !p.id) return;
   try {
-    const { error: fullErr } = await supabase.from('products').upsert(mapToDb(p), { onConflict: 'id' });
-    if (fullErr) {
-      console.warn('Full product upsert failed, trying minimal payload:', fullErr);
-      const minimalPayload = {
-        id: String(p.id),
-        category: p.category || 'cases',
-        price: Number(p.price) || 0,
-        is_active: p.is_active !== undefined ? Boolean(p.is_active) : true,
-        data: p
-      };
-      const { error: minErr } = await supabase.from('products').upsert(minimalPayload, { onConflict: 'id' });
-      if (minErr) console.error('Minimal product upsert failed:', minErr);
+    const payload = mapToDb(p);
+    const { error } = await supabase.from('products').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      console.warn('Supabase product upsert notice (persisted in local storage):', error.message);
     }
   } catch (err) {
-    console.error('Error saving product to Supabase:', err);
+    // ignore
   }
 }
 
@@ -106,35 +98,34 @@ export function ProductsProvider({ children }) {
   const [products, setProducts] = useState(() => loadLocalProducts() || INITIAL_PRODUCTS);
   const [loading, setLoading] = useState(true);
 
-  // Fetch products from Supabase
+  // Fetch products safely without overwriting local admin edits
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const local = loadLocalProducts();
+      if (local && local.length > 0) {
+        setProducts(local);
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase.from('products').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        const localMap = new Map((local || INITIAL_PRODUCTS).map((p) => [p.id, p]));
-        const merged = fetched.map((f) => {
-          const loc = localMap.get(f.id);
-          return loc ? { ...f, ...loc } : f;
-        });
-        setProducts(merged);
-        saveLocalProducts(merged);
-      } else if (local && local.length > 0) {
-        setProducts(local);
-      } else {
-        setProducts(INITIAL_PRODUCTS);
-        saveLocalProducts(INITIAL_PRODUCTS);
+        const validIds = new Set(INITIAL_PRODUCTS.map((p) => p.id));
+        const validFetched = fetched.filter((p) => validIds.has(p.id));
+        if (validFetched.length === INITIAL_PRODUCTS.length) {
+          setProducts(validFetched);
+          saveLocalProducts(validFetched);
+          setLoading(false);
+          return;
+        }
       }
+      setProducts(INITIAL_PRODUCTS);
+      saveLocalProducts(INITIAL_PRODUCTS);
     } catch (err) {
-      console.error('Unexpected error loading products:', err);
+      console.warn('Products fetch fallback to local/initial:', err);
       const local = loadLocalProducts();
-      if (local && local.length > 0) {
-        setProducts(local);
-      } else {
-        setProducts(INITIAL_PRODUCTS);
-      }
+      setProducts(local && local.length > 0 ? local : INITIAL_PRODUCTS);
     } finally {
       setLoading(false);
     }
