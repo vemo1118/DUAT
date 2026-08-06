@@ -227,7 +227,14 @@ export const CASE_TYPES = [
 ];
 
 export const PHONE_MODELS = [
-  // Apple iPhones
+  // 1. Custom User Input Option (DEFAULT FIRST OPTION)
+  { id: 'other-custom', name: 'Other Device (Type model below 📱)', nameEn: 'Other Device (Type model below 📱)', nameAr: 'جهاز آخر (اكتب اسم موديلك بالأسفل 📱)', category: 'Other' },
+
+  // Apple iPhones (Latest models up to iPhone 17 Pro Max)
+  { id: 'ip17pro-max', name: 'iPhone 17 Pro Max', category: 'Apple' },
+  { id: 'ip17pro', name: 'iPhone 17 Pro', category: 'Apple' },
+  { id: 'ip17plus', name: 'iPhone 17 Plus', category: 'Apple' },
+  { id: 'ip17', name: 'iPhone 17', category: 'Apple' },
   { id: 'ip16pro-max', name: 'iPhone 16 Pro Max', category: 'Apple' },
   { id: 'ip16pro', name: 'iPhone 16 Pro', category: 'Apple' },
   { id: 'ip16plus', name: 'iPhone 16 Plus', category: 'Apple' },
@@ -266,15 +273,12 @@ export const PHONE_MODELS = [
   { id: 'xiaomi14', name: 'Xiaomi 14', category: 'Xiaomi' },
   { id: 'redminote13pro', name: 'Redmi Note 13 Pro+ 5G', category: 'Xiaomi' },
 
-  // Honor, Huawei, Realme, Oppo, Vivo, OnePlus
+  // Honor, Huawei, Realme, OnePlus, Pixel
   { id: 'honormagic6', name: 'Honor Magic 6 Pro', category: 'Honor' },
   { id: 'realmegt6', name: 'Realme GT 6', category: 'Realme' },
   { id: 'oneplus12', name: 'OnePlus 12', category: 'OnePlus' },
   { id: 'pixel9pro', name: 'Google Pixel 9 Pro XL', category: 'Google' },
-  { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' },
-
-  // Custom User Input Option
-  { id: 'other-custom', name: 'Other Device (Type model below 📱)', nameEn: 'Other Device (Type model below 📱)', nameAr: 'جهاز آخر (اكتب اسم موديلك 📱)', category: 'Other' }
+  { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' }
 ];
 
 export const STICKER_PRESETS = [

@@ -86,36 +86,63 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
       ctx.rect(15, 15, width - 30, height - 30);
     }
     ctx.fill();
-    ctx.strokeStyle = '#383838';
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 3.5;
     ctx.stroke();
 
-    // 2. Camera Island Top Right
-    ctx.fillStyle = '#050505';
+    // Side buttons accents
+    ctx.fillStyle = '#2A2A2E';
+    ctx.fillRect(8, 120, 6, 45); // Vol up
+    ctx.fillRect(8, 185, 6, 45); // Vol down
+    ctx.fillRect(width - 14, 150, 6, 60); // Power button
+
+    // 2. Camera Island Top Right (Pro Triple Camera Module)
+    ctx.fillStyle = '#090A0E';
     ctx.strokeStyle = caseRingColor || '#E8A33D';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     if (ctx.roundRect) {
-      ctx.roundRect(width - 105, 30, 75, 75, 20);
+      ctx.roundRect(width - 115, 28, 86, 86, 22);
     } else {
-      ctx.rect(width - 105, 30, 75, 75);
+      ctx.rect(width - 115, 28, 86, 86);
     }
     ctx.fill();
     ctx.stroke();
 
-    // Lenses Inside Camera Island
-    ctx.fillStyle = '#111';
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 1;
+    // 3 Lenses Inside Camera Island
+    const drawLens = (cx, cy) => {
+      ctx.fillStyle = '#161822';
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#0D1B2A';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    drawLens(width - 98, 48); // Top Left
+    drawLens(width - 48, 48); // Top Right
+    drawLens(width - 98, 92); // Bottom Left
+
+    // Flash Dot & LiDAR sensor
+    ctx.fillStyle = '#FDE68A';
     ctx.beginPath();
-    ctx.arc(width - 82, 52, 11, 0, Math.PI * 2);
-    ctx.arc(width - 50, 52, 11, 0, Math.PI * 2);
+    ctx.arc(width - 50, 84, 5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
+
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(width - 50, 98, 3.5, 0, Math.PI * 2);
+    ctx.fill();
 
     // 3. MagSafe Ring
     if (selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') {
-      ctx.strokeStyle = 'rgba(232, 163, 61, 0.55)';
+      ctx.strokeStyle = 'rgba(232, 163, 61, 0.6)';
       ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.arc(width / 2, height / 2, 75, 0, Math.PI * 2);
@@ -600,31 +627,50 @@ export const CustomizerContent = () => {
           <div className="w-full max-w-sm aspect-[3/5] bg-stone border border-grave p-4 shadow-2xl relative flex flex-col items-center justify-center select-none overflow-hidden card-depth-highlight">
             
             {/* Phone Base Outline Container (Interactive Drop Target & Drag Area) */}
-            <div
-              ref={canvasRef}
-              onDragOver={handleCanvasDragOver}
-              onDrop={handleCanvasDrop}
-              className="w-full h-full rounded-[38px] border-2 border-grave relative flex flex-col justify-between p-4 overflow-hidden shadow-xl transition-colors duration-500 cursor-crosshair"
-              style={{ backgroundColor: caseBgColor }}
-            >
-              
-              {/* Camera Island */}
-              <div
-                className="self-end w-20 h-20 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 z-20"
-                style={{ borderColor: caseRingColor, backgroundColor: '#050505' }}
-              >
-                <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center mb-1">
-                  <div className="w-2 h-2 rounded-full bg-ash/30" />
-                </div>
-                <div className="w-5 h-5 rounded-full bg-void border border-ash/40 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-ash/30" />
-                </div>
-              </div>
+            <div className="relative w-full h-full p-2">
+              {/* Outer Phone Hardware Buttons */}
+              <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-700/80 rounded-l-md" />
+              <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-700/80 rounded-l-md" />
+              <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-700/80 rounded-r-md" />
 
-              {/* MagSafe Ring Detail */}
-              {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 rounded-full border-2 border-gold/50 pointer-events-none" />
-              )}
+              <div
+                ref={canvasRef}
+                onDragOver={handleCanvasDragOver}
+                onDrop={handleCanvasDrop}
+                className="w-full h-full rounded-[42px] border-[3px] border-grave/90 relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.85),inset_0_1px_3px_rgba(255,255,255,0.2)] transition-colors duration-500 cursor-crosshair"
+                style={{ backgroundColor: caseBgColor }}
+              >
+                {/* Acrylic Glass Sheen & Depth Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent pointer-events-none z-10" />
+
+                {/* Camera Island (Pro Triple Camera Module) */}
+                <div
+                  className="self-end w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden backdrop-blur-md"
+                  style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
+                >
+                  <div className="flex justify-between items-center z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
+                    </div>
+                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
+                    </div>
+                    <div className="flex flex-col items-center gap-1 mr-0.5">
+                      <div className="w-3 h-3 rounded-full bg-amber-100/90 border border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                      <div className="w-2 h-2 rounded-full bg-black border border-stone-700" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* MagSafe Ring Detail */}
+                {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border-[3px] border-gold/60 shadow-[0_0_20px_rgba(232,163,61,0.25)] pointer-events-none" />
+                )}
 
               {/* CANVAS LAYERS STACK */}
               <div className="absolute inset-0 pointer-events-auto">
@@ -735,11 +781,9 @@ export const CustomizerContent = () => {
               </div>
 
               {/* Phone Speaker Bottom Bar */}
-              <div className="w-24 h-1.5 bg-grave/80 rounded-full self-center z-20" />
-
             </div>
-
           </div>
+        </div>
 
           <div className="font-mono text-xs text-ash text-center uppercase tracking-widest font-medium">
             {currentModelName} · {selectedCaseType?.nameEn}
