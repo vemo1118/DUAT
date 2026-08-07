@@ -294,9 +294,15 @@ export const CustomizerContent = () => {
   const [customModelInput, setCustomModelInput] = useState('');
   const [designNotes, setDesignNotes] = useState('');
 
+  const isBundle = Boolean(
+    location.state?.loadBundlePreset ||
+    location.state?.preselectedProductId?.includes('bundle') ||
+    location.state?.preselectedProductId?.startsWith('bundle-')
+  );
+
   const defaultLayers = location.state?.presetLayers
     ? location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` }))
-    : (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear')
+    : isBundle
     ? (PRESET_TEMPLATES[0]?.layers.map((l) => ({ ...l, id: `init-${l.id}-${Date.now()}` })) || [])
     : [];
 
@@ -305,13 +311,19 @@ export const CustomizerContent = () => {
 
   // Pre-select case finish and layers if navigated from Product Card or Modal
   useEffect(() => {
-    if (location.state?.preselectedCaseTypeId) {
-      const match = CASE_TYPES.find((c) => c.id === location.state.preselectedCaseTypeId);
+    const targetCaseId = location.state?.preselectedCaseTypeId || (
+      location.state?.preselectedProductId?.includes('bone') ? 'bone' :
+      location.state?.preselectedProductId?.includes('midnight') ? 'midnight' :
+      null
+    );
+
+    if (targetCaseId) {
+      const match = CASE_TYPES.find((c) => c.id === targetCaseId || c.id?.toLowerCase() === targetCaseId);
       if (match) setSelectedCaseType(match);
     }
     if (location.state?.presetLayers) {
       setLayers(location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
-    } else if (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear') {
+    } else if (isBundle) {
       setLayers(PRESET_TEMPLATES[0].layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
     }
   }, [location.state]);

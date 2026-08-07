@@ -23,11 +23,21 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   const handleCustomize = (e) => {
     e?.stopPropagation();
-    navigate('/customizer', {
+    const caseTypeId = product.caseTypeId || (
+      product.id?.includes('bone') ? 'bone' :
+      product.id?.includes('midnight') ? 'midnight' :
+      'clear'
+    );
+    const isBundle = Boolean(
+      product.id?.includes('bundle') ||
+      product.id?.includes('pack') ||
+      product.category === 'cases'
+    );
+    navigate('/customize', {
       state: {
-        preselectedCaseTypeId: product.caseTypeId || 'clear',
+        preselectedCaseTypeId: caseTypeId,
         preselectedProductId: product.id,
-        loadBundlePreset: product.id?.includes('bundle') || product.id === 'bundle-clear'
+        loadBundlePreset: isBundle
       }
     });
   };
