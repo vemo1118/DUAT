@@ -180,6 +180,20 @@ export function AdminView() {
       if (currentSession && fetchOrders) fetchOrders();
     });
 
+    const syncNotifSettingsFromDb = async () => {
+      try {
+        const { data } = await supabase.from('builder_settings').select('telegram_token, telegram_chat_id, admin_whatsapp').eq('id', 'global-builder-config').maybeSingle();
+        if (data) {
+          if (data.telegram_token) setTelegramToken(data.telegram_token);
+          if (data.telegram_chat_id) setTelegramChatId(data.telegram_chat_id);
+          if (data.admin_whatsapp) setAdminWhatsApp(data.admin_whatsapp);
+        }
+      } catch (e) {
+        console.warn('Error loading telegram settings in AdminView:', e);
+      }
+    };
+    syncNotifSettingsFromDb();
+
     return () => subscription.unsubscribe();
   }, []);
 

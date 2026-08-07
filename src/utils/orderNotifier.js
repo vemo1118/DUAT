@@ -18,7 +18,7 @@ export function getTelegramCredentials() {
   return { token: token ? token.trim() : '', chatId: chatId ? chatId.trim() : '' };
 }
 
-export function saveNotificationSettingsToSupabase(token, chatId, whatsapp) {
+export async function saveNotificationSettingsToSupabase(token, chatId, whatsapp) {
   const cleanToken = (token || '').trim();
   const cleanChatId = (chatId || '').trim();
   const cleanWa = (whatsapp || '').trim();
@@ -31,6 +31,18 @@ export function saveNotificationSettingsToSupabase(token, chatId, whatsapp) {
     token: cleanToken || cachedCredentials.token,
     chatId: cleanChatId || cachedCredentials.chatId
   };
+
+  try {
+    await supabase.from('builder_settings').upsert({
+      id: 'global-builder-config',
+      telegram_token: cleanToken,
+      telegram_chat_id: cleanChatId,
+      admin_whatsapp: cleanWa,
+      updated_at: new Date().toISOString()
+    });
+  } catch (err) {
+    console.warn('Failed saving telegram credentials to Supabase:', err);
+  }
 }
 
 /**
@@ -38,10 +50,32 @@ export function saveNotificationSettingsToSupabase(token, chatId, whatsapp) {
  */
 export async function sendTelegramOrderNotification(order) {
   try {
-    const { token, chatId } = getTelegramCredentials();
+    let { token, chatId } = getTelegramCredentials();
 
     if (!token || !chatId) {
-      console.warn('Telegram Bot Token or Chat ID not configured in Admin Settings.');
+      try {
+        const { data } = await supabase.from('builder_settings').select('telegram_token, telegram_chat_id, admin_whatsapp').eq('id', 'global-builder-config').maybeSingle();
+        if (data) {
+          if (data.telegram_token) {
+            token = data.telegram_token.trim();
+            localStorage.setItem(TELEGRAM_TOKEN_KEY, token);
+          }
+          if (data.telegram_chat_id) {
+            chatId = data.telegram_chat_id.trim();
+            localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId);
+          }
+          if (data.admin_whatsapp) {
+            localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, data.admin_whatsapp.trim());
+          }
+          cachedCredentials = { token, chatId };
+        }
+      } catch (dbErr) {
+        console.warn('Could not fetch Telegram settings from Supabase:', dbErr);
+      }
+    }
+
+    if (!token || !chatId) {
+      console.warn('Telegram Bot Token or Chat ID not configured in Admin Settings or Supabase DB.');
       return false;
     }
 
