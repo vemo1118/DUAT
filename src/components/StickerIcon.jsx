@@ -2,7 +2,20 @@ import React from 'react';
 
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgColor }) => {
   const customImg = image || imageUrl;
-  if (customImg && !customImg.includes('born_at_dawn_lrnbz6') && !customImg.includes('through_the_night_tuaiqp') && !customImg.includes('MOON_nogd7g') && !customImg.includes('STARS_dky4yc') && !customImg.includes('DUAT_SUN_mj2hid') && !customImg.includes('DUAT_TEXT_net8dw')) {
+  if (customImg) {
+    const isCapsuleSlogan = stickerId === 'st-born-dawn' || stickerId === 'st-through-night';
+    const isBrandPill = stickerId === 'st-duat' || stickerId?.startsWith('quote-') || stickerId?.startsWith('pill-');
+    const isSquareDome = stickerId === 'st-crescent' || stickerId === 'st-starry' || stickerId === 'st-sun';
+
+    let imgStyle = { maxWidth: `${size}px`, maxHeight: `${size}px` };
+    if (isCapsuleSlogan) {
+      imgStyle = { width: '115px', height: '36px', maxWidth: '115px', maxHeight: '36px' };
+    } else if (isBrandPill) {
+      imgStyle = { width: '82px', height: '32px', maxWidth: '82px', maxHeight: '32px' };
+    } else if (isSquareDome) {
+      imgStyle = { width: '42px', height: '42px', maxWidth: '42px', maxHeight: '42px' };
+    }
+
     return (
       <div
         className="w-full h-full flex items-center justify-center relative overflow-hidden select-none p-0.5"
@@ -10,7 +23,8 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
         <img
           src={customImg}
           alt="Sticker"
-          className="max-w-full max-h-full object-contain drop-shadow-md transition-transform hover:scale-105 rounded-lg"
+          style={imgStyle}
+          className="object-contain filter drop-shadow-[0_6px_12px_rgba(0,0,0,0.5)] rounded-lg"
         />
       </div>
     );
