@@ -7,13 +7,34 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
     const isBrandPill = stickerId === 'st-duat' || stickerId?.startsWith('quote-') || stickerId?.startsWith('pill-');
     const isSquareDome = stickerId === 'st-crescent' || stickerId === 'st-starry' || stickerId === 'st-sun';
 
-    let imgStyle = { maxWidth: `${size}px`, maxHeight: `${size}px` };
+    let imgStyle = { maxWidth: `${size}px`, maxHeight: `${size}px`, mixBlendMode: 'multiply' };
     if (isCapsuleSlogan) {
-      imgStyle = { width: '115px', height: '36px', maxWidth: '115px', maxHeight: '36px' };
+      imgStyle = {
+        width: '115px',
+        height: '36px',
+        maxWidth: '115px',
+        maxHeight: '36px',
+        borderRadius: '9999px',
+        mixBlendMode: 'multiply'
+      };
     } else if (isBrandPill) {
-      imgStyle = { width: '82px', height: '32px', maxWidth: '82px', maxHeight: '32px' };
+      imgStyle = {
+        width: '82px',
+        height: '32px',
+        maxWidth: '82px',
+        maxHeight: '32px',
+        borderRadius: '9999px',
+        mixBlendMode: 'multiply'
+      };
     } else if (isSquareDome) {
-      imgStyle = { width: '42px', height: '42px', maxWidth: '42px', maxHeight: '42px' };
+      imgStyle = {
+        width: '42px',
+        height: '42px',
+        maxWidth: '42px',
+        maxHeight: '42px',
+        borderRadius: '10px',
+        mixBlendMode: 'multiply'
+      };
     }
 
     return (
@@ -24,7 +45,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
           src={customImg}
           alt="Sticker"
           style={imgStyle}
-          className="object-contain filter drop-shadow-[0_6px_12px_rgba(0,0,0,0.5)] rounded-lg"
+          className="object-cover filter drop-shadow-[0_6px_12px_rgba(0,0,0,0.5)] pointer-events-none select-none"
         />
       </div>
     );
