@@ -813,16 +813,7 @@ export const CustomizerContent = () => {
                 </div>
               )}
 
-              {/* FIXED BRANDING MARK AT BOTTOM CENTER OF PHONE CASE */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none z-20 select-none bg-[#12162B] px-3.5 py-1.5 rounded-full border border-[#E8A33D]/60 shadow-[0_4px_20px_rgba(0,0,0,0.85)]">
-                <SunDisc size={16} strokeColor="#EDE4D3" />
-                <span
-                  style={{ color: '#E8A33D' }}
-                  className="font-space text-xs font-bold tracking-[0.25em] uppercase leading-none drop-shadow-md"
-                >
-                  DUAT
-                </span>
-              </div>
+
 
               {/* Phone Speaker Bottom Bar */}
             </div>
