@@ -285,23 +285,28 @@ export const CustomizerContent = () => {
   const STICKER_ITEMS = activeBuilderStickers && activeBuilderStickers.length > 0 ? activeBuilderStickers : STICKER_PRESETS;
 
   const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : PHONE_MODELS[0] || 'iPhone 16 Pro Max';
-  const defaultCaseType = CASE_TYPES.find((c) => c.id === 'matte-black') || CASE_TYPES[0];
+  const defaultCaseType = CASE_TYPES.find((c) => c.id === 'clear') || CASE_TYPES[0];
   const [selectedModel, setSelectedModel] = useState(defaultModelName);
   const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
   const [customModelInput, setCustomModelInput] = useState('');
   const [designNotes, setDesignNotes] = useState('');
 
-  // Pre-select case finish if navigated from Product Card or Modal
+  const defaultLayers = PRESET_TEMPLATES[0]?.layers.map((l) => ({ ...l, id: `init-${l.id}-${Date.now()}` })) || [];
+  const [layers, setLayers] = useState(defaultLayers);
+  const [selectedLayerId, setSelectedLayerId] = useState(null);
+
+  // Pre-select case finish and layers if navigated from Product Card or Modal
   useEffect(() => {
     if (location.state?.preselectedCaseTypeId) {
       const match = CASE_TYPES.find((c) => c.id === location.state.preselectedCaseTypeId);
       if (match) setSelectedCaseType(match);
     }
+    if (location.state?.presetLayers) {
+      setLayers(location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+    } else if (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear' || location.state?.preselectedCaseTypeId === 'clear') {
+      setLayers(PRESET_TEMPLATES[0].layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+    }
   }, [location.state]);
-
-  const [activeTab, setActiveTab] = useState('stickers'); // 'presets', 'stickers', 'text', 'image'
-  const [layers, setLayers] = useState([]);
-  const [selectedLayerId, setSelectedLayerId] = useState(null);
 
   const [customText, setCustomText] = useState('');
   const [textColor, setTextColor] = useState('#E8A33D');

@@ -27,8 +27,11 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
     ? products.filter((p) => p && p.is_active !== false && p.isActive !== false)
     : [];
   const activeProducts = filteredProducts.length > 0 ? filteredProducts : (Array.isArray(products) ? products : []);
-  const latestDrops = activeProducts.slice(0, 6);
-  const bestSellers = activeProducts.filter((p) => p.category === 'cases').concat(activeProducts.filter((p) => p.category === 'stickers')).slice(2, 8);
+  const stickersOnly = activeProducts.filter((p) => p?.category === 'stickers');
+  const casesOnly = activeProducts.filter((p) => p?.category === 'cases');
+
+  const latestDrops = stickersOnly.length > 0 ? stickersOnly.slice(0, 6) : activeProducts.slice(0, 6);
+  const bestSellers = casesOnly.concat(stickersOnly).slice(0, 8);
 
   return (
     <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">

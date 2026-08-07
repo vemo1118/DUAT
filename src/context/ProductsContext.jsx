@@ -58,19 +58,49 @@ function mapToDb(p) {
   };
 }
 
-const PRODUCTS_STORAGE_KEY = 'duat_products_v2';
+const PRODUCTS_STORAGE_KEY = 'duat_products_v7';
+
+const PREFERRED_BUNDLE_ORDER = [
+  'bundle-clear',
+  'bundle-bone',
+  'bundle-midnight',
+  'pack-passage',
+  'st-born-dawn',
+  'st-through-night',
+  'st-crescent',
+  'st-starry',
+  'st-sun',
+  'st-duat'
+];
+
+export function sortProductsByDefaultOrder(prods) {
+  if (!Array.isArray(prods)) return [];
+  return [...prods].sort((a, b) => {
+    const idxA = PREFERRED_BUNDLE_ORDER.indexOf(a?.id);
+    const idxB = PREFERRED_BUNDLE_ORDER.indexOf(b?.id);
+    const posA = idxA !== -1 ? idxA : (a?.category === 'cases' ? 10 : 99);
+    const posB = idxB !== -1 ? idxB : (b?.category === 'cases' ? 10 : 99);
+    return posA - posB;
+  });
+}
 
 function loadLocalProducts() {
   try {
+    const isCustomOrder = localStorage.getItem('duat_custom_product_order') === 'true';
     const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        if (!isCustomOrder) {
+          return sortProductsByDefaultOrder(parsed);
+        }
+        return parsed;
+      }
     }
   } catch (e) {
     // ignore
   }
-  return null;
+  return sortProductsByDefaultOrder(INITIAL_PRODUCTS);
 }
 
 function saveLocalProducts(products) {
@@ -95,37 +125,26 @@ async function saveProductToSupabase(p) {
 }
 
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useState(() => loadLocalProducts() || INITIAL_PRODUCTS);
+  const [products, setProducts] = useState(() => loadLocalProducts());
   const [loading, setLoading] = useState(true);
 
   // Fetch products safely without overwriting local admin edits
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      const isCustomOrder = localStorage.getItem('duat_custom_product_order') === 'true';
       const local = loadLocalProducts();
       if (local && local.length > 0) {
-        setProducts(local);
+        setProducts(isCustomOrder ? local : sortProductsByDefaultOrder(local));
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase.from('products').select('*');
-      if (!error && Array.isArray(data) && data.length > 0) {
-        const fetched = data.map(mapFromDb).filter(Boolean);
-        const validIds = new Set(INITIAL_PRODUCTS.map((p) => p.id));
-        const validFetched = fetched.filter((p) => validIds.has(p.id));
-        if (validFetched.length === INITIAL_PRODUCTS.length) {
-          setProducts(validFetched);
-          saveLocalProducts(validFetched);
-          setLoading(false);
-          return;
-        }
-      }
-      setProducts(INITIAL_PRODUCTS);
-      saveLocalProducts(INITIAL_PRODUCTS);
+      const initialSorted = sortProductsByDefaultOrder(INITIAL_PRODUCTS);
+      setProducts(initialSorted);
+      saveLocalProducts(initialSorted);
     } catch (err) {
       console.warn('Products fetch fallback to local/initial:', err);
-      const local = loadLocalProducts();
-      setProducts(local && local.length > 0 ? local : INITIAL_PRODUCTS);
+      setProducts(sortProductsByDefaultOrder(INITIAL_PRODUCTS));
     } finally {
       setLoading(false);
     }
@@ -134,6 +153,49 @@ export function ProductsProvider({ children }) {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const moveProductUp = (id) => {
+    localStorage.setItem('duat_custom_product_order', 'true');
+    setProducts((prev) => {
+      const idx = prev.findIndex((p) => p.id === id);
+      if (idx <= 0) return prev;
+      const updated = [...prev];
+      const temp = updated[idx];
+      updated[idx] = updated[idx - 1];
+      updated[idx - 1] = temp;
+      saveLocalProducts(updated);
+      return updated;
+    });
+  };
+
+  const moveProductDown = (id) => {
+    localStorage.setItem('duat_custom_product_order', 'true');
+    setProducts((prev) => {
+      const idx = prev.findIndex((p) => p.id === id);
+      if (idx === -1 || idx >= prev.length - 1) return prev;
+      const updated = [...prev];
+      const temp = updated[idx];
+      updated[idx] = updated[idx + 1];
+      updated[idx + 1] = temp;
+      saveLocalProducts(updated);
+      return updated;
+    });
+  };
+
+  const setCasesFirstOrder = () => {
+    localStorage.removeItem('duat_custom_product_order');
+    setProducts((prev) => {
+      const updated = sortProductsByDefaultOrder(prev);
+      saveLocalProducts(updated);
+      return updated;
+    });
+  };
+
+  const reorderProducts = (newList) => {
+    localStorage.setItem('duat_custom_product_order', 'true');
+    setProducts(newList);
+    saveLocalProducts(newList);
+  };
 
   const addProduct = async (prodData) => {
     const img = prodData.imageUrl || prodData.image || '';
@@ -249,7 +311,8 @@ export function ProductsProvider({ children }) {
 
   // Reset products
   const resetProducts = async () => {
-    fetchProducts();
+    setProducts(INITIAL_PRODUCTS);
+    saveLocalProducts(INITIAL_PRODUCTS);
   };
 
   return (
@@ -263,7 +326,11 @@ export function ProductsProvider({ children }) {
         toggleProductVisibility,
         deleteProduct,
         getProductById,
-        resetProducts
+        resetProducts,
+        moveProductUp,
+        moveProductDown,
+        setCasesFirstOrder,
+        reorderProducts
       }}
     >
       {children}

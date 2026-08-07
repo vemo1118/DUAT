@@ -98,7 +98,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       onMouseLeave={() => setIsPaused(false)}
       className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans"
     >
-      {/* Background Graphic or Uploaded Image Layer */}
+      {/* Full-Bleed Background Image Layer */}
       {bgImage ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
@@ -107,49 +107,30 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
           {/* Dynamic Background Overlay Vignette */}
-          {overlayStrength !== 'none' && (
-            <>
-              <div
-                className={`absolute inset-0 ${
-                  overlayStrength === 'heavy'
-                    ? 'bg-gradient-to-r from-void/98 via-void/90 to-void/40 sm:w-3/4'
-                    : overlayStrength === 'subtle'
-                    ? 'bg-gradient-to-r from-void/80 via-void/40 to-transparent sm:w-1/2'
-                    : 'bg-gradient-to-r from-void/95 via-void/70 to-transparent sm:w-2/3'
-                }`}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
-            </>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/80 to-transparent sm:w-2/3" />
+          <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#E0A93B_1px,transparent_1px)] [background-size:24px_24px]" />
       )}
 
-      {/* Main Content Container with Free 2D Position & Scaling across full screen */}
-      <div className="w-full px-4 sm:px-12 lg:px-16 py-16 sm:py-24 relative z-10">
+      {/* Full Bleed Content Container */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 lg:px-16 py-16 sm:py-24 relative z-10">
         <div
-          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-sm:!max-w-full max-sm:!left-0 max-sm:!top-0 ${alignClass}`}
+          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-2xl ${alignClass}`}
           key={current.id}
-          style={{
-            position: 'relative',
-            left: `${posX}%`,
-            top: `${posY - 30}%`,
-            maxWidth: `${maxWidth}%`,
-            fontSize: `${fontSizeScale}rem`
-          }}
         >
           
           {/* Eyebrow & Offer Badge */}
           <div className={`flex flex-wrap items-center gap-3 ${flexJustifyClass}`}>
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/10 px-3 py-1 border border-gold/30">
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/10 px-3 py-1 border border-gold/30 backdrop-blur-sm">
               <SunDisc size={14} variant="gold" />
               <span>{eyebrow}</span>
             </div>
 
             {badge && (
-              <span className="font-mono text-xs uppercase tracking-widest text-red-400 bg-red-600/20 border border-red-500/40 px-3 py-1 font-bold animate-pulse">
+              <span className="font-mono text-xs uppercase tracking-widest text-red-400 bg-red-600/20 border border-red-500/40 px-3 py-1 font-bold animate-pulse backdrop-blur-sm">
                 {badge}
               </span>
             )}
@@ -158,15 +139,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           {/* Headlines */}
           <div className="space-y-1 w-full">
             <h1
-              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none"
-              style={{ color: current?.headline1Color || '#EDE4D3' }}
+              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone drop-shadow-md"
+              style={{ color: current?.headline1Color || undefined }}
             >
               {headline1}
             </h1>
             {headline2 && (
               <h2
-                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none"
-                style={{ color: current?.headline2Color || '#E8A33D' }}
+                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold drop-shadow-md"
+                style={{ color: current?.headline2Color || undefined }}
               >
                 {headline2}
               </h2>
@@ -175,8 +156,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
           {/* Subtitle / Description */}
           <p
-            className="font-space text-sm sm:text-base font-light max-w-2xl leading-relaxed"
-            style={{ color: current?.subColor || '#8E98BF' }}
+            className="font-space text-sm sm:text-base font-light max-w-xl leading-relaxed text-bone/90 drop-shadow"
+            style={{ color: current?.subColor || undefined }}
           >
             {sub}
           </p>
@@ -186,8 +167,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             {/* Primary Action Button */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              style={{ backgroundColor: '#E8A33D', color: '#0A0C16' }}
-              className="py-4 px-8 font-bold hover:brightness-110 transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm border border-gold"
+              className="py-4 px-8 bg-gold text-[#050505] font-bold hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm border border-gold"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
@@ -197,8 +177,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             {/* Secondary Action Button */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              style={{ backgroundColor: 'rgba(24, 30, 59, 0.8)', color: '#EDE4D3', borderColor: '#28305F' }}
-              className="py-4 px-8 border hover:border-gold hover:text-gold transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+              className="py-4 px-8 bg-void/80 border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 flex items-center justify-center gap-2 text-sm backdrop-blur-sm"
             >
               <Sparkles size={16} />
               <span>{secondaryBtnText}</span>

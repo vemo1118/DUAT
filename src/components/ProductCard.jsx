@@ -23,7 +23,13 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   const handleCustomize = (e) => {
     e?.stopPropagation();
-    navigate('/customizer', { state: { preselectedCaseTypeId: product.caseTypeId || 'clear' } });
+    navigate('/customizer', {
+      state: {
+        preselectedCaseTypeId: product.caseTypeId || 'clear',
+        preselectedProductId: product.id,
+        loadBundlePreset: product.id?.includes('bundle') || product.id === 'bundle-clear'
+      }
+    });
   };
 
   const handleCardClick = () => {
@@ -36,6 +42,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   if (!product) return null;
 
+  const isCaseCategory = product.category === 'cases';
   const name = (lang === 'ar' ? product.nameAr : product.nameEn) || product.nameEn || product.nameAr || 'Product';
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
@@ -142,11 +149,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
           )}
         </div>
 
-        {/* Dual Action Buttons: Add to Cart & Customize */}
-        <div className="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+        {/* Action Buttons: Add to Cart & Customize (Customize ONLY for cases) */}
+        <div className={`pt-1 ${isCaseCategory ? 'grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2' : 'flex'}`}>
           <button
             onClick={handleAdd}
-            className={`min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border transition-all duration-300 flex items-center justify-center gap-1 ${
+            className={`w-full min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border transition-all duration-300 flex items-center justify-center gap-1 ${
               added
                 ? 'bg-gold text-void border-gold'
                 : 'bg-coal text-bone border-grave hover:bg-gold hover:text-void hover:border-gold'
@@ -165,14 +172,16 @@ export const ProductCard = ({ product, onSelectProduct }) => {
             )}
           </button>
 
-          {/* Customize Navigation Button */}
-          <button
-            onClick={handleCustomize}
-            className="min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all duration-300 flex items-center justify-center gap-1"
-          >
-            <Sparkles size={13} />
-            <span>CUSTOMIZE</span>
-          </button>
+          {/* Customize Navigation Button (ONLY for cases/bundles) */}
+          {isCaseCategory && (
+            <button
+              onClick={handleCustomize}
+              className="min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all duration-300 flex items-center justify-center gap-1"
+            >
+              <Sparkles size={13} />
+              <span>CUSTOMIZE</span>
+            </button>
+          )}
         </div>
 
       </div>

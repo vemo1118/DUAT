@@ -16,6 +16,8 @@ import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { StickerIcon } from '../components/StickerIcon';
 import {
+  ArrowUp,
+  ArrowDown,
   Plus,
   Edit2,
   Trash2,
@@ -60,7 +62,18 @@ import {
 } from '../utils/orderNotifier';
 
 export function AdminView() {
-  const { products, addProduct, updateProduct, adjustPrice, toggleProductVisibility, deleteProduct, resetProducts } = useProducts();
+  const {
+    products,
+    addProduct,
+    updateProduct,
+    adjustPrice,
+    toggleProductVisibility,
+    deleteProduct,
+    resetProducts,
+    moveProductUp,
+    moveProductDown,
+    setCasesFirstOrder
+  } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
   const {
@@ -560,9 +573,24 @@ export function AdminView() {
       {activeTab === 'products' && (
         <div className="space-y-8 animate-fade-in">
           {/* QUICK ACTIONS */}
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="font-clash text-xl font-bold text-bone">كتالوج المنتجات</h2>
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-clash text-xl font-bold text-bone">كتالوج المنتجات وترتيب العرض</h2>
+              <p className="font-mono text-xs text-ash mt-0.5">يمكنك تقديم أو تأخير أي منتج باستخدام أزرار الترتيب (▲/▼)</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => {
+                  setCasesFirstOrder();
+                  showToast('تم ترتيب القائمة: الجرابات أولاً!', 'success');
+                }}
+                className="flex items-center gap-2 px-4 py-2 border border-gold/40 bg-gold/10 hover:bg-gold hover:text-[#050505] text-gold font-bold transition-all font-mono text-xs uppercase"
+                title="جعل كافة الجرابات والباندلات تظهر في البداية قبل الاستيكرات"
+              >
+                <Layers size={15} />
+                <span>ترتيب: الجرابات أولاً 📱</span>
+              </button>
+
               <button
                 onClick={handleResetCatalog}
                 className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
@@ -667,6 +695,7 @@ export function AdminView() {
                 <table className="w-full text-right border-collapse">
                   <thead>
                     <tr className="border-b border-grave bg-stone/40 font-mono text-xs uppercase text-ash tracking-wider">
+                      <th className="py-3.5 px-4 text-center">الترتيب</th>
                       <th className="py-3.5 px-4">المنتج والصورة</th>
                       <th className="py-3.5 px-4">التصنيف</th>
                       <th className="py-3.5 px-4 text-center">السعر والتعديل السريع</th>
@@ -677,8 +706,40 @@ export function AdminView() {
                   <tbody className="divide-y divide-grave font-sans text-sm">
                     {filteredProducts.map((product) => {
                       const img = product.imageUrl || product.image;
+                      const globalIndex = products.findIndex((p) => p.id === product.id);
                       return (
                         <tr key={product.id} className="hover:bg-stone/30 transition-colors">
+                          {/* ORDER CONTROL BUTTONS (UP / DOWN) */}
+                          <td className="py-4 px-3 text-center">
+                            <div className="flex items-center justify-center gap-1 font-mono text-xs">
+                              <button
+                                onClick={() => {
+                                  moveProductUp(product.id);
+                                  showToast('تم تمييز المنتج ورفعه للأعلى!', 'info');
+                                }}
+                                disabled={globalIndex <= 0}
+                                className="p-1.5 border border-grave bg-stone/60 hover:border-gold hover:text-gold text-ash disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                title="تحريك للأعلى (ترتيب أسبق)"
+                              >
+                                <ArrowUp size={15} />
+                              </button>
+                              <span className="font-bold text-gold px-2 py-1 border border-grave bg-coal/80 text-[11px] min-w-[32px] text-center shadow-inner">
+                                #{globalIndex + 1}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  moveProductDown(product.id);
+                                  showToast('تم تحريك المنتج للأسفل!', 'info');
+                                }}
+                                disabled={globalIndex === -1 || globalIndex >= products.length - 1}
+                                className="p-1.5 border border-grave bg-stone/60 hover:border-gold hover:text-gold text-ash disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                title="تحريك للأسفل (ترتيب متأخر)"
+                              >
+                                <ArrowDown size={15} />
+                              </button>
+                            </div>
+                          </td>
+
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
                               {img ? (

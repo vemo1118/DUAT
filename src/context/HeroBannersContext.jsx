@@ -24,9 +24,9 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextAr: 'معرض الكتالوج',
     ctaSecondaryLink: '/shop',
     textAlign: 'left',
-    headline1Color: '#EDE4D3',
-    headline2Color: '#E8A33D',
-    subColor: '#8E98BF',
+    headline1Color: '',
+    headline2Color: '',
+    subColor: '',
     overlayStrength: 'medium',
     posX: 0,
     posY: 30,
@@ -55,9 +55,9 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextAr: 'تتبع طلبك الحقيقي',
     ctaSecondaryLink: '/track-order',
     textAlign: 'left',
-    headline1Color: '#EDE4D3',
-    headline2Color: '#E8A33D',
-    subColor: '#8E98BF',
+    headline1Color: '',
+    headline2Color: '',
+    subColor: '',
     overlayStrength: 'medium',
     posX: 0,
     posY: 30,
@@ -147,7 +147,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v5';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v7';
 
 function loadLocalSlides() {
   try {

@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
+const THEME_STORAGE_KEY = 'duat_theme_v2';
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('duat_theme') || 'night';
+    return localStorage.getItem(THEME_STORAGE_KEY) || 'dawn';
   });
 
   useEffect(() => {
-    localStorage.setItem('duat_theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
     if (theme === 'dawn') {
       document.documentElement.setAttribute('data-theme', 'dawn');
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', 'night');
     }
   }, [theme]);
 
