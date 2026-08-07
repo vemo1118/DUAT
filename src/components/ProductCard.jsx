@@ -100,7 +100,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
     return (
       <img
-        src="https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg"
+        src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg"
         alt={name}
         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
       />

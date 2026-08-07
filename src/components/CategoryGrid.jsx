@@ -22,7 +22,7 @@ export const CategoryGrid = ({ onSelectCategory }) => {
 
   const categories = activeCategories.map((cat) => ({
     ...cat,
-    image: cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'
+    image: cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg'
   }));
 
   const handleClick = (catId) => {

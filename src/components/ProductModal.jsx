@@ -60,13 +60,13 @@ export const ProductModal = ({ product, onClose }) => {
             />
           ) : product.category === 'stickers' ? (
             <img
-              src="https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png"
+              src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png"
               alt={name}
               className="w-full aspect-[3/4] object-cover object-center"
             />
           ) : (
             <img
-              src="https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg"
+              src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg"
               alt={name}
               className="w-full aspect-[3/4] object-cover object-center"
             />

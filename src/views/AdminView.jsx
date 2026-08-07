@@ -1293,7 +1293,7 @@ export function AdminView() {
                       nameAr: '',
                       subtitleEn: '',
                       subtitleAr: '',
-                      imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
+                      imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
                       badge: `0${categoryBanners.length + 1}`,
                       categoryLink: '/shop',
                       is_active: true
@@ -1334,7 +1334,7 @@ export function AdminView() {
                     {/* Category Image Preview Box */}
                     <div className="h-44 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-2">
                       <img
-                        src={cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'}
+                        src={cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg'}
                         alt={cat.nameEn}
                         className="w-full h-full object-cover"
                       />
@@ -1435,7 +1435,7 @@ export function AdminView() {
                     setEditingSocialTile({
                       id: '',
                       title: '',
-                      image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
+                      image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
                       linkUrl: socialSettings?.handleUrl || 'https://instagram.com/duat.wear',
                       is_active: true
                     });

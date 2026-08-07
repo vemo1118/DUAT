@@ -66,7 +66,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const secondaryBtnText = (isAr ? current?.ctaSecondaryTextAr : current?.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
   const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';
 
-  const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg';
+  const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
 
   const alignClass = current?.textAlign === 'center'
     ? 'text-center items-center mx-auto'

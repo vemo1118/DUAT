@@ -22,8 +22,8 @@ export const PRODUCTS = [
     descriptionAr: 'جراب أكريليك شفاف نقي مجهز ومزين مسبقاً بجميع ملصقات دوات الـ ٦ البارزة المجسمة.',
     specsEn: ['Base: Crystal Clear Optical Acrylic Case', 'Includes: All 6 3D Epoxy Domes Applied', 'Hand-finished in Egypt'],
     specsAr: ['الأساس: جراب أكريليك شفاف نقي مقاوم للاصفرار', 'يتضمن: جميع ملصقات دوات الـ ٦ مثبة يدوياً', 'تشطيب مصري يدوي فاخر'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg'],
     caseTypeId: 'clear',
     is_active: true,
     reviewCount: 0,
@@ -43,8 +43,8 @@ export const PRODUCTS = [
     descriptionAr: 'جراب عاجي دافئ مجهز ومزين مسبقاً بجميع ملصقات دوات الـ ٦ البارزة المجسمة.',
     specsEn: ['Base: Soft-touch Alabaster Bone Case', 'Includes: All 6 3D Epoxy Domes Applied', 'Hand-finished in Egypt'],
     specsAr: ['الأساس: جراب عاجي دافئ بملمس حريري', 'يتضمن: جميع ملصقات دوات الـ ٦ مثبة يدوياً', 'تشطيب مصري يدوي فاخر'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_Whit_rkck3n.jpg',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_Whit_rkck3n.jpg'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_Whit_rkck3n.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_Whit_rkck3n.jpg'],
     caseTypeId: 'bone',
     is_active: true,
     reviewCount: 0,
@@ -64,8 +64,8 @@ export const PRODUCTS = [
     descriptionAr: 'جراب كحلي ملكي عميق مجهز ومزين مسبقاً بجميع ملصقات دوات الـ ٦ البارزة المجسمة.',
     specsEn: ['Base: Deep Royal Navy Midnight Case', 'Includes: All 6 3D Epoxy Domes Applied', 'Hand-finished in Egypt'],
     specsAr: ['الأساس: جراب كحلي ملكي عميق', 'يتضمن: جميع ملصقات دوات الـ ٦ مثبة يدوياً', 'تشطيب مصري يدوي فاخر'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg'],
     caseTypeId: 'tide',
     is_active: true,
     reviewCount: 0,
@@ -87,8 +87,8 @@ export const PRODUCTS = [
     descriptionAr: 'المجموعة الكاملة المكونة من ٦ ملصقات إيبوكسي مجسمة من دوات في علبة فاخرة.',
     specsEn: ['Includes: All 6 DUAT 3D Epoxy Stickers', 'Save 100 EGP vs Individual Purchase', 'Collector Gift Packaging Included'],
     specsAr: ['تتضمن: جميع ملصقات دوات الـ ٦ المجسمة', 'توفير ١٠٠ ج.م عن الشراء المنفرد', 'تأتي داخل علبة هدايا فاخرة'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -107,8 +107,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز عبارة "طالع نور" بتشطيب عنبري فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Glossy Amber Resin', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: صمغ عنبري لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786036786/born_at_dawn_k5gb1v.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786036786/born_at_dawn_k5gb1v.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -127,8 +127,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز باللون الكحلي العميق عبارة "عدّي الليل".',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Royal Navy Gloss', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: كحلي ملكي لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103661/through_the_night_squ9bn.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103661/through_the_night_squ9bn.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -147,8 +147,8 @@ export const PRODUCTS = [
     descriptionAr: 'رمز الهلال الإيبوكسي المجسم بتشطيب أسود فحمي فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Obsidian Crescent', 'Adhesive: High-tack 3M', 'Waterproof'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: هلال فحمي', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/MOON_qqyojj.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/MOON_qqyojj.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -167,8 +167,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة إيبوكسي مجسمة بلون سماء الليل الكحلي المرصعة بالنجوم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Starry Night Glitter', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: بريق سماء الليل', 'اللاصق: 3M عالي الالتصاق'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/STARS_imo15w.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/STARS_imo15w.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -187,8 +187,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة مربعة عاجية مزينة بشعار قرص الشمس الذهبي المجسم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Alabaster & Dawn Gold', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: عاجي وذهب الفجر', 'اللاصق: 3M عالي الالتصاق'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103675/DUAT_SUN_rqu7s4.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103675/DUAT_SUN_rqu7s4.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -207,8 +207,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق بيضاوي رمادي شفاف مزين بشعار دوات الذهبي المحفور.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Smoked Glass & Gold', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: دخاني وذهب محفور', 'اللاصق: 3M عالي الالتصاق'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103674/DUAT_TEXT_zixxvh.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103674/DUAT_TEXT_zixxvh.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -287,12 +287,12 @@ export const PHONE_MODELS = [
 ];
 
 export const STICKER_PRESETS = [
-  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786036786/born_at_dawn_k5gb1v.png' },
-  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103661/through_the_night_squ9bn.png' },
-  { id: 'st-crescent',     nameEn: 'Crescent Moon',   nameAr: 'الهلال',      tagEn: '3D EPOXY MOTIF',      tagAr: 'رمز إيبوكسي مجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/MOON_qqyojj.png' },
-  { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/STARS_imo15w.png' },
-  { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103675/DUAT_SUN_rqu7s4.png' },
-  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103674/DUAT_TEXT_zixxvh.png' }
+  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
+  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
+  { id: 'st-crescent',     nameEn: 'Crescent Moon',   nameAr: 'الهلال',      tagEn: '3D EPOXY MOTIF',      tagAr: 'رمز إيبوكسي مجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png' },
+  { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png' },
+  { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png' },
+  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' }
 ];
 
 export const PRESET_TEMPLATES = [

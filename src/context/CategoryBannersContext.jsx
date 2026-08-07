@@ -10,7 +10,7 @@ export const INITIAL_CATEGORY_BANNERS = [
     nameAr: 'الجرابات الفاخرة',
     subtitleEn: 'Case + 6 DUAT stickers, made to order',
     subtitleAr: 'جراب + ٦ استيكرات دوات، حسب الطلب',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
     badge: '01',
     categoryLink: '/shop'
   },
@@ -20,7 +20,7 @@ export const INITIAL_CATEGORY_BANNERS = [
     nameAr: 'الاستيكرات',
     subtitleEn: '3D epoxy dome stickers, sold on their own',
     subtitleAr: 'استيكرات إيبوكسي، تتباع لوحدها',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     badge: '02',
     categoryLink: '/shop'
   }

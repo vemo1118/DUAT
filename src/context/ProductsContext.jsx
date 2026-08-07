@@ -58,7 +58,7 @@ function mapToDb(p) {
   };
 }
 
-const PRODUCTS_STORAGE_KEY = 'duat_products_v8';
+const PRODUCTS_STORAGE_KEY = 'duat_products_v9';
 
 const PREFERRED_BUNDLE_ORDER = [
   'bundle-clear',
