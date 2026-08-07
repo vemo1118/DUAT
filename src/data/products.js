@@ -287,12 +287,12 @@ export const PHONE_MODELS = [
 ];
 
 export const STICKER_PRESETS = [
-  { id: 'st-born-dawn', nameEn: 'Born at Dawn', nameAr: 'طالع نور', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg' },
-  { id: 'st-through-night', nameEn: 'Through the Night', nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg' },
-  { id: 'st-crescent', nameEn: 'Crescent Moon', nameAr: 'الهلال', tagEn: '3D EPOXY MOTIF', tagAr: 'رمز إيبوكسي مجسم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg' },
-  { id: 'st-starry', nameEn: 'Starry Night', nameAr: 'سماء الليل', tagEn: '3D EPOXY DOME', tagAr: 'قبة إيبوكسي نجوم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg' },
-  { id: 'st-sun', nameEn: 'DUAT Sun', nameAr: 'شمس دوات', tagEn: '3D SUN DISC DOME', tagAr: 'قرص الشمس المجسم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg' },
-  { id: 'st-duat', nameEn: 'DUAT', nameAr: 'دوات', tagEn: '3D BRAND PILL', tagAr: 'شعار دوات الإيبوكسي', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_TEXT_net8dw.jpg' }
+  { id: 'st-born-dawn', nameEn: 'Born at Dawn', nameAr: 'طالع نور', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
+  { id: 'st-through-night', nameEn: 'Through the Night', nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
+  { id: 'st-crescent', nameEn: 'Crescent Moon', nameAr: 'الهلال', tagEn: '3D EPOXY MOTIF', tagAr: 'رمز إيبوكسي مجسم' },
+  { id: 'st-starry', nameEn: 'Starry Night', nameAr: 'سماء الليل', tagEn: '3D EPOXY DOME', tagAr: 'قبة إيبوكسي نجوم' },
+  { id: 'st-sun', nameEn: 'DUAT Sun', nameAr: 'شمس دوات', tagEn: '3D SUN DISC DOME', tagAr: 'قرص الشمس المجسم' },
+  { id: 'st-duat', nameEn: 'DUAT', nameAr: 'دوات', tagEn: '3D BRAND PILL', tagAr: 'شعار دوات الإيبوكسي' }
 ];
 
 export const PRESET_TEMPLATES = [
