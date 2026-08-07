@@ -98,7 +98,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       <div className="py-4">
         <ProductRow
           eyebrow="DUAT / 02"
-          title={isAr ? 'الأكثر مبيعاً هذا الأسبوع' : 'BEST SELLERS — TOP THIS WEEK'}
+          title={isAr ? 'قطع مختارة' : 'FEATURED PIECES'}
           products={bestSellers}
           viewAllPath="/shop"
         />

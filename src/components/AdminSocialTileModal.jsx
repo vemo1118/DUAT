@@ -8,7 +8,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
     id: '',
     title: '',
     image: '',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   });
 
@@ -20,7 +20,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
         id: tile.id || '',
         title: tile.title || '',
         image: tile.image || tile.imageUrl || '',
-        linkUrl: tile.linkUrl || 'https://instagram.com/wearduat',
+        linkUrl: tile.linkUrl || 'https://instagram.com/duat.wear',
         is_active: tile.is_active !== undefined ? tile.is_active : true
       });
     }
@@ -165,7 +165,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
               type="text"
               value={formData.linkUrl}
               onChange={(e) => setFormData((prev) => ({ ...prev, linkUrl: e.target.value }))}
-              placeholder="https://instagram.com/wearduat"
+              placeholder="https://instagram.com/duat.wear"
               className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
             />
           </div>

@@ -6,8 +6,8 @@ export const INITIAL_SOCIAL_GRID_SETTINGS = {
   eyebrow: 'DUAT / SOCIALS',
   titleEn: 'FOLLOW THE PASSAGE',
   titleAr: 'تابع الرحلة على إنستجرام',
-  handleLabel: '@WEARDUAT',
-  handleUrl: 'https://instagram.com/wearduat'
+  handleLabel: '@DUAT.WEAR',
+  handleUrl: 'https://instagram.com/duat.wear'
 };
 
 export const INITIAL_SOCIAL_TILES = [
@@ -15,42 +15,42 @@ export const INITIAL_SOCIAL_TILES = [
     id: 'tile-1',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_Whit_rkck3n.jpg',
     title: 'BONE BUNDLE',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   },
   {
     id: 'tile-2',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
     title: 'MIDNIGHT BUNDLE',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   },
   {
     id: 'tile-3',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785768478/B1_TB_w1zemr.jpg',
     title: 'CLEAR BUNDLE',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   },
   {
     id: 'tile-4',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg',
     title: 'DUAT HERO',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   },
   {
     id: 'tile-5',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
     title: 'STICKER SHEET',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   },
   {
     id: 'tile-6',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
     title: 'PASSAGE CASE',
-    linkUrl: 'https://instagram.com/wearduat',
+    linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   }
 ];

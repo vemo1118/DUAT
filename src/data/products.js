@@ -107,6 +107,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز عبارة "طالع نور" بتشطيب عنبري فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Glossy Amber Resin', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: صمغ عنبري لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786036786/born_at_dawn_k5gb1v.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786036786/born_at_dawn_k5gb1v.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -125,6 +127,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز باللون الكحلي العميق عبارة "عدّي الليل".',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Royal Navy Gloss', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: كحلي ملكي لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103661/through_the_night_squ9bn.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103661/through_the_night_squ9bn.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -143,6 +147,8 @@ export const PRODUCTS = [
     descriptionAr: 'رمز الهلال الإيبوكسي المجسم بتشطيب أسود فحمي فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Obsidian Crescent', 'Adhesive: High-tack 3M', 'Waterproof'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: هلال فحمي', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/MOON_qqyojj.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/MOON_qqyojj.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -161,6 +167,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة إيبوكسي مجسمة بلون سماء الليل الكحلي المرصعة بالنجوم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Starry Night Glitter', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: بريق سماء الليل', 'اللاصق: 3M عالي الالتصاق'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/STARS_imo15w.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103660/STARS_imo15w.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -179,6 +187,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة مربعة عاجية مزينة بشعار قرص الشمس الذهبي المجسم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Alabaster & Dawn Gold', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: عاجي وذهب الفجر', 'اللاصق: 3M عالي الالتصاق'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103675/DUAT_SUN_rqu7s4.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103675/DUAT_SUN_rqu7s4.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -197,6 +207,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق بيضاوي رمادي شفاف مزين بشعار دوات الذهبي المحفور.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Smoked Glass & Gold', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: دخاني وذهب محفور', 'اللاصق: 3M عالي الالتصاق'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786103674/DUAT_TEXT_zixxvh.png',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786103674/DUAT_TEXT_zixxvh.png'],
     is_active: true,
     reviewCount: 0,
     reviews: []

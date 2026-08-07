@@ -136,7 +136,7 @@ export const TRANSLATIONS = {
     payCard: 'Credit / Debit Card',
     payCardDesc: 'Pay securely via Visa / Mastercard.',
     payInstaPay: 'InstaPay Transfer',
-    payInstaPayDesc: 'Instant transfer to handle: wearduat@instapay',
+    payInstaPayDesc: 'Instant transfer to handle: moataz_m25@instapay',
     copyInstaPay: 'COPY INSTAPAY HANDLE',
     instaCopiedToast: 'InstaPay handle copied to clipboard',
     orderSummary: 'Order Summary',
@@ -216,7 +216,7 @@ export const TRANSLATIONS = {
     footerBrand: 'DUAT',
     footerTagline: 'Objects for the night crossing.',
     footerLocation: 'Egypt',
-    footerSocial: '@wearduat on IG / TikTok / Threads',
+    footerSocial: '@duat.wear on IG / TikTok / Threads',
     footerRights: '© DUAT. All rights reserved.'
   },
 
@@ -357,7 +357,7 @@ export const TRANSLATIONS = {
     payCard: 'بطاقة ائتمان / خصم',
     payCardDesc: 'ادفع بأمان عبر فيزا / ماستركارد.',
     payInstaPay: 'تحويل إنستا باي (InstaPay)',
-    payInstaPayDesc: 'تحويل فوري للحساب: wearduat@instapay',
+    payInstaPayDesc: 'تحويل فوري للحساب: moataz_m25@instapay',
     copyInstaPay: 'نسخ عنوان إنستا باي',
     instaCopiedToast: 'تم نسخ حساب إنستا باي إلى الحافظة',
     orderSummary: 'ملخص الطلب',
@@ -437,7 +437,7 @@ export const TRANSLATIONS = {
     footerBrand: 'دوات',
     footerTagline: 'أشياء مخصصة لرحلة الليل.',
     footerLocation: 'مصر',
-    footerSocial: 'wearduat@ على إنستجرام / تيك توك / ثريدز',
+    footerSocial: '@duat.wear على إنستجرام / تيك توك / ثريدز',
     footerRights: '© دوات. جميع الحقوق محفوظة.'
   }
 };

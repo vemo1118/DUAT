@@ -1422,7 +1422,7 @@ export function AdminView() {
                       id: '',
                       title: '',
                       image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
-                      linkUrl: socialSettings?.handleUrl || 'https://instagram.com/wearduat',
+                      linkUrl: socialSettings?.handleUrl || 'https://instagram.com/duat.wear',
                       is_active: true
                     });
                     setIsSocialModalOpen(true);

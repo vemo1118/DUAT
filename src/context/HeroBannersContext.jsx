@@ -6,23 +6,23 @@ const HeroBannersContext = createContext();
 export const INITIAL_HERO_SLIDES = [
   {
     id: 'hero-slide-1',
-    eyebrowEn: 'DUAT / THE FORGE',
-    eyebrowAr: 'دوات / كور الفن والتشطيب',
-    headline1En: 'CRAFT YOUR OWN',
-    headline1Ar: 'صمم جرابك الخاص',
-    headline2En: 'CUSTOM LUXURY CASE.',
-    headline2Ar: 'بلمسة مصرية فاخرة.',
-    subEn: 'Interactive 3D dome builder. Select phone model, case finish, raised slogan pills, Arabic motifs, and custom engravings.',
-    subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
-    badgeEn: '3D BUILDER',
-    badgeAr: 'أداة 3D الحصرية',
+    eyebrowEn: 'DUAT / EGYPT',
+    eyebrowAr: 'دوات / مصر',
+    headline1En: 'THROUGH THE NIGHT,',
+    headline1Ar: 'نعدّي الليل،',
+    headline2En: 'BORN AT DAWN.',
+    headline2Ar: 'ونطلع نور.',
+    subEn: '3D epoxy dome stickers, made to order in Egypt. The case is just the canvas — you tell the story.',
+    subAr: 'استيكرات إيبوكسي مجسّمة، تصنيع حسب الطلب في مصر. الجراب مجرد كانفس — وإنت اللي بتحكي.',
+    badgeEn: 'MADE TO ORDER',
+    badgeAr: 'تصنيع حسب الطلب',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785712166/B1_u3veqk.jpg',
-    ctaPrimaryTextEn: 'START BUILDING',
-    ctaPrimaryTextAr: 'ابدأ التصميم الآن',
-    ctaPrimaryLink: '/customize',
-    ctaSecondaryTextEn: 'VIEW GALLERY',
-    ctaSecondaryTextAr: 'معرض الكتالوج',
-    ctaSecondaryLink: '/shop',
+    ctaPrimaryTextEn: 'SHOP STICKERS',
+    ctaPrimaryTextAr: 'تسوق الاستيكرات',
+    ctaPrimaryLink: '/shop',
+    ctaSecondaryTextEn: 'BUILD A CASE',
+    ctaSecondaryTextAr: 'صمم جرابك',
+    ctaSecondaryLink: '/customize',
     textAlign: 'left',
     headline1Color: '',
     headline2Color: '',
@@ -34,37 +34,6 @@ export const INITIAL_HERO_SLIDES = [
     fontSizeScale: 92,
     is_active: true,
     sort_order: 1
-  },
-  {
-    id: 'hero-slide-2',
-    eyebrowEn: 'SPECIAL SUMMER DROP',
-    eyebrowAr: 'عرض خاص لفترة محدودة',
-    headline1En: 'EXCLUSIVE 30% OFF',
-    headline1Ar: 'خصم ٣٠٪ حصري',
-    headline2En: 'ON ALL CASES.',
-    headline2Ar: 'على جميع الجرابات.',
-    subEn: 'Hand-crafted luxury phone cases with raised epoxy motifs. Premium 18k anodized finish meets Egyptian heritage.',
-    subAr: 'جرابات مصنوعة يدوياً في مصر بخامات فاخرة تشطيب إطار ذهبي وضمان استبدال كامل سنة.',
-    badgeEn: 'OFFER 30% OFF',
-    badgeAr: 'عرض خاص 30%',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
-    ctaPrimaryTextEn: 'SHOP COLLECTION',
-    ctaPrimaryTextAr: 'تسوق العروض الآن',
-    ctaPrimaryLink: '/shop',
-    ctaSecondaryTextEn: 'TRACK YOUR ORDER',
-    ctaSecondaryTextAr: 'تتبع طلبك الحقيقي',
-    ctaSecondaryLink: '/track-order',
-    textAlign: 'left',
-    headline1Color: '',
-    headline2Color: '',
-    subColor: '',
-    overlayStrength: 'medium',
-    posX: 0,
-    posY: 30,
-    maxWidth: 50,
-    fontSizeScale: 100,
-    is_active: true,
-    sort_order: 2
   }
 ];
 
@@ -147,7 +116,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v8';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v9';
 
 function loadLocalSlides() {
   try {
@@ -240,8 +209,16 @@ export function HeroBannersProvider({ children }) {
       const { data, error } = await query;
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        if (fetched.length > 0) {
-          const merged = mergeWithLocalSlides(fetched);
+        // Exclude deleted slide 2 if it's the old promo slide
+        const filtered = fetched.filter((s) => s.id !== 'hero-slide-2');
+        if (filtered.length > 0) {
+          // If hero-slide-1 in DB has old copy, update it with new defaults
+          const merged = filtered.map((s) => {
+            if (s.id === 'hero-slide-1' && (s.headline1En === 'CRAFT YOUR OWN' || s.eyebrowEn === 'DUAT / THE FORGE')) {
+              return { ...s, ...INITIAL_HERO_SLIDES[0] };
+            }
+            return s;
+          });
           setSlides(merged);
           saveLocalSlides(merged);
           setLoading(false);

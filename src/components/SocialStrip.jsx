@@ -32,8 +32,8 @@ export const SocialStrip = () => {
 
   const eyebrow = settings?.eyebrow || 'DUAT / SOCIALS';
   const title = isAr ? settings?.titleAr || 'تابع الرحلة على إنستجرام' : settings?.titleEn || 'FOLLOW THE PASSAGE';
-  const handleLabel = settings?.handleLabel || '@WEARDUAT';
-  const handleUrl = settings?.handleUrl || 'https://instagram.com/wearduat';
+  const handleLabel = settings?.handleLabel || '@DUAT.WEAR';
+  const handleUrl = settings?.handleUrl || 'https://instagram.com/duat.wear';
 
   if (activeTiles.length === 0) return null;
 
