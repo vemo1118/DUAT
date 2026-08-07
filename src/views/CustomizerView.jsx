@@ -37,8 +37,11 @@ class CustomizerErrorBoundary extends Component {
           <div className="bg-stone border border-grave p-10 space-y-4 card-depth-highlight">
             <h2 className="font-clash text-2xl uppercase text-gold">Customizer Glitch</h2>
             <p className="font-space text-sm text-bone/80">
-              The custom case builder encountered a minor rendering issue.
+              The custom case builder encountered a minor rendering issue:
             </p>
+            <div className="text-xs text-red-400 font-mono bg-void/90 p-4 border border-red-900/50 text-left overflow-auto max-h-48 rounded">
+              {String(this.state.error?.stack || this.state.error?.message || this.state.error)}
+            </div>
             <button
               onClick={this.handleReset}
               className="btn-primary py-3 px-6 text-xs font-mono font-bold tracking-widest inline-flex items-center gap-2"
