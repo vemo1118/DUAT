@@ -4,7 +4,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useCustomizerConfig } from '../context/CustomizerContext';
-import { useProducts } from '../context/ProductsContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import { toPng } from 'html-to-image';
@@ -265,19 +264,16 @@ export const CustomizerContent = () => {
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const { activeCaseTypes, activePhoneModels, activeBuilderStickers, builderPrice } = useCustomizerConfig();
-  const { products: supabaseProducts } = useProducts();
   const location = useLocation();
 
   const CASE_TYPES = Array.isArray(activeCaseTypes) && activeCaseTypes.length > 0 ? activeCaseTypes : DEFAULT_CASE_TYPES;
   const PHONE_MODELS = Array.isArray(activePhoneModels) && activePhoneModels.length > 0 ? activePhoneModels : DEFAULT_PHONE_MODELS;
 
-  // Merge activeBuilderStickers with real Supabase product images
-  const baseStickers = Array.isArray(activeBuilderStickers) && activeBuilderStickers.length > 0 ? activeBuilderStickers : STICKER_PRESETS;
-  const STICKER_ITEMS = baseStickers.map((st) => {
-    const dbProd = Array.isArray(supabaseProducts) ? supabaseProducts.find((p) => p.id === st.id) : null;
-    const img = dbProd?.image || dbProd?.imageUrl || st.image || st.imageUrl || null;
-    return img ? { ...st, image: img } : st;
-  });
+  // STICKER_ITEMS: use activeBuilderStickers from context (already has PNG images from STICKER_PRESETS)
+  // NEVER override st.image with product images — sticker PNG and product photo are separate
+  const STICKER_ITEMS = Array.isArray(activeBuilderStickers) && activeBuilderStickers.length > 0
+    ? activeBuilderStickers
+    : STICKER_PRESETS;
 
   const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : (PHONE_MODELS[0] || 'iPhone 16 Pro Max');
   const defaultCaseType = (Array.isArray(CASE_TYPES) && CASE_TYPES.find((c) => c?.id === 'clear')) || CASE_TYPES[0] || DEFAULT_CASE_TYPES[0];
