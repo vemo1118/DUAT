@@ -1063,7 +1063,7 @@ export const CustomizerContent = () => {
                       title="Click or Drag onto phone"
                     >
                       <div className="w-full h-14 flex items-center justify-center overflow-hidden p-1">
-                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={44} color={textColor} bgColor={textBgColor} />
+                        <StickerIcon stickerId={st.id} size={44} color={textColor} bgColor={textBgColor} />
                       </div>
                       <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full font-bold">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
