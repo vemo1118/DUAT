@@ -764,20 +764,15 @@ export const CustomizerContent = () => {
                         </>
                       )}
 
-                      {/* Render Real Uploaded Sticker Image */}
-                      {layer.type === 'sticker' && (() => {
-                        const stItem = STICKER_ITEMS.find((s) => s.id === layer.stickerId) || STICKER_PRESETS.find((s) => s.id === layer.stickerId);
-                        const imgUrl = layer.src || stItem?.image || stItem?.imageUrl;
-                        return (
-                          <StickerIcon
-                            stickerId={layer.stickerId}
-                            image={imgUrl}
-                            size={56}
-                            color={layer.color}
-                            bgColor={layer.bgColor}
-                          />
-                        );
-                      })()}
+                      {/* Render 100% Isolated 3D Epoxy Dome */}
+                      {layer.type === 'sticker' && (
+                        <StickerIcon
+                          stickerId={layer.stickerId}
+                          size={46}
+                          color={layer.color}
+                          bgColor={layer.bgColor}
+                        />
+                      )}
 
                       {/* Render Custom Text Sticker Pill */}
                       {layer.type === 'text' && (
