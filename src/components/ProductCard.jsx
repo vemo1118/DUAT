@@ -120,17 +120,20 @@ export const ProductCard = ({ product, onSelectProduct }) => {
         {/* Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-stone/90 via-transparent to-transparent pointer-events-none" />
 
-        {/* Small Tag Badge */}
-        <div className="absolute top-3 left-3 bg-void/85 backdrop-blur-sm border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest">
-          {tag}
-        </div>
+        {/* Top Badges Bar */}
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10 pointer-events-none">
+          {tag ? (
+            <div className="bg-void/85 backdrop-blur-sm border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest truncate">
+              {tag}
+            </div>
+          ) : <div />}
 
-        {/* Subtle Scarcity / Craft Badge (Top Right) */}
-        {craftTag && (
-          <div className="absolute top-3 right-3 bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider">
-            CRAFT
-          </div>
-        )}
+          {craftTag && (
+            <div className="bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider flex-shrink-0 ml-auto">
+              CRAFT
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Product Details */}
