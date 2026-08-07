@@ -12,7 +12,7 @@ function mapFromDb(row) {
   return {
     ...data,
     id: row.id || data.id,
-    category: row.category || data.category || 'cases',
+    category: row.category || data.category || (String(row.id || data.id || '').startsWith('st-') || String(row.id || data.id || '').startsWith('pack-') || String(row.id || data.id || '').startsWith('sticker') ? 'stickers' : 'cases'),
     price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || 0),
     is_active: isActiveVal,
     isActive: isActiveVal,

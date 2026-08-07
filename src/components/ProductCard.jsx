@@ -42,7 +42,8 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   if (!product) return null;
 
-  const isCaseCategory = product.category === 'cases';
+  const isSticker = product.category === 'stickers' || String(product.id || '').startsWith('st-') || String(product.id || '').startsWith('pack-') || String(product.id || '').startsWith('sticker');
+  const isCaseCategory = (product.category === 'cases' || String(product.id || '').startsWith('bundle-') || String(product.id || '').startsWith('case-')) && !isSticker;
   const name = (lang === 'ar' ? product.nameAr : product.nameEn) || product.nameEn || product.nameAr || 'Product';
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
