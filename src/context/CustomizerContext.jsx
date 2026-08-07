@@ -11,6 +11,13 @@ export const INITIAL_BUILDER_CONFIG = {
   stickers: DEFAULT_STICKER_PRESETS.map((s) => ({ ...s, is_active: true }))
 };
 
+function ensureOtherCustomFirst(models) {
+  if (!Array.isArray(models) || models.length === 0) return models;
+  const otherItem = { id: 'other-custom', name: 'Other Device (Type model below 📱)', nameEn: 'Other Device (Type model below 📱)', nameAr: 'جهاز آخر (اكتب اسم موديلك بالأسفل 📱)', category: 'Other', is_active: true };
+  const filtered = models.filter((m) => m && m.id !== 'other-custom');
+  return [otherItem, ...filtered];
+}
+
 export const CustomizerProvider = ({ children }) => {
   const [builderPrice, setBuilderPrice] = useState(() => {
     try {
@@ -35,11 +42,14 @@ export const CustomizerProvider = ({ children }) => {
   const [phoneModels, setPhoneModels] = useState(() => {
     try {
       const saved = localStorage.getItem('duat_phone_models');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return ensureOtherCustomFirst(parsed);
+      }
     } catch (e) {
       console.warn('Error reading duat_phone_models:', e);
     }
-    return INITIAL_BUILDER_CONFIG.phoneModels;
+    return ensureOtherCustomFirst(INITIAL_BUILDER_CONFIG.phoneModels);
   });
 
   const [builderStickers, setBuilderStickers] = useState(() => {
@@ -53,7 +63,7 @@ export const CustomizerProvider = ({ children }) => {
     try {
       localStorage.setItem('duat_builder_price', String(builderPrice));
       localStorage.setItem('duat_case_types', JSON.stringify(caseTypes));
-      localStorage.setItem('duat_phone_models', JSON.stringify(phoneModels));
+      localStorage.setItem('duat_phone_models', JSON.stringify(ensureOtherCustomFirst(phoneModels)));
       localStorage.setItem('duat_builder_stickers_v1', JSON.stringify(builderStickers));
     } catch (e) {
       console.warn('Error persisting customizer config:', e);
@@ -69,7 +79,7 @@ export const CustomizerProvider = ({ children }) => {
         if (!error && data && isMounted) {
           if (data.price) setBuilderPrice(data.price);
           if (data.case_types) setCaseTypes(data.case_types);
-          if (data.phone_models) setPhoneModels(data.phone_models);
+          if (data.phone_models) setPhoneModels(ensureOtherCustomFirst(data.phone_models));
           if (data.builder_stickers) setBuilderStickers(data.builder_stickers);
         }
       } catch (err) {
@@ -86,7 +96,7 @@ export const CustomizerProvider = ({ children }) => {
         id: 'global-builder-config',
         price: newPrice,
         case_types: newCaseTypes,
-        phone_models: newPhoneModels,
+        phone_models: ensureOtherCustomFirst(newPhoneModels),
         builder_stickers: newStickers,
         updated_at: new Date().toISOString()
       });
@@ -148,24 +158,24 @@ export const CustomizerProvider = ({ children }) => {
       is_active: true
     };
     setPhoneModels((prev) => {
-      const updated = [item, ...prev];
-      saveToSupabase(builderPrice, updated, caseTypes, builderStickers);
+      const updated = ensureOtherCustomFirst([item, ...prev]);
+      saveToSupabase(builderPrice, caseTypes, updated, builderStickers);
       return updated;
     });
   };
 
   const updatePhoneModel = (id, updatedFields) => {
     setPhoneModels((prev) => {
-      const updated = prev.map((m) => (m.id === id ? { ...m, ...updatedFields } : m));
-      saveToSupabase(builderPrice, updated, caseTypes, builderStickers);
+      const updated = ensureOtherCustomFirst(prev.map((m) => (m.id === id ? { ...m, ...updatedFields } : m)));
+      saveToSupabase(builderPrice, caseTypes, updated, builderStickers);
       return updated;
     });
   };
 
   const deletePhoneModel = (id) => {
     setPhoneModels((prev) => {
-      const updated = prev.filter((m) => m.id !== id);
-      saveToSupabase(builderPrice, updated, caseTypes, builderStickers);
+      const updated = ensureOtherCustomFirst(prev.filter((m) => m.id !== id));
+      saveToSupabase(builderPrice, caseTypes, updated, builderStickers);
       return updated;
     });
   };
@@ -229,7 +239,7 @@ export const CustomizerProvider = ({ children }) => {
   const resetCustomizerConfig = () => {
     setBuilderPrice(850);
     setCaseTypes(INITIAL_BUILDER_CONFIG.caseTypes);
-    setPhoneModels(INITIAL_BUILDER_CONFIG.phoneModels);
+    setPhoneModels(ensureOtherCustomFirst(INITIAL_BUILDER_CONFIG.phoneModels));
     setBuilderStickers(INITIAL_BUILDER_CONFIG.stickers);
     localStorage.removeItem('duat_builder_price');
     localStorage.removeItem('duat_case_types');
@@ -238,7 +248,7 @@ export const CustomizerProvider = ({ children }) => {
   };
 
   const activeCaseTypes = caseTypes.filter((c) => c.is_active !== false);
-  const activePhoneModels = phoneModels.filter((m) => m.is_active !== false);
+  const activePhoneModels = ensureOtherCustomFirst(phoneModels.filter((m) => m.is_active !== false));
   const activeBuilderStickers = builderStickers.filter((s) => s.is_active !== false && s.isActive !== false);
 
   return (
