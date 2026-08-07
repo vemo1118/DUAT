@@ -73,7 +73,7 @@ const PREFERRED_BUNDLE_ORDER = [
   'st-duat'
 ];
 
-export function sortProductsByDefaultOrder(prods) {
+function sortProductsByDefaultOrder(prods) {
   if (!Array.isArray(prods)) return [];
   return [...prods].sort((a, b) => {
     const idxA = PREFERRED_BUNDLE_ORDER.indexOf(a?.id);
