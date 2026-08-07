@@ -719,7 +719,7 @@ export const CustomizerContent = () => {
 
                 {/* Camera Island (Pro Triple Camera Module - Top Left) */}
                 <div
-                  className="self-start w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden backdrop-blur-md"
+                  className="self-start w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden bg-[#090A0E]"
                   style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
                 >
                   <div className="flex justify-between items-center z-10">

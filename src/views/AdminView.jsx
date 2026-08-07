@@ -2253,6 +2253,24 @@ export function AdminView() {
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
                   const isCustomCase = item.category === 'cases' || !!cfg || !!item.designSnapshot || layers.length > 0;
 
+                  const STICKER_NAME_MAP = {
+                    'st-born-dawn': 'طالع نور (Born at Dawn)',
+                    'st-through-night': 'عدّي الليل (Through the Night)',
+                    'st-crescent': 'الهلال (Crescent Moon)',
+                    'st-starry': 'سماء الليل (Starry Night)',
+                    'st-sun': 'شمس دوات (DUAT Sun)',
+                    'st-duat': 'دوات (DUAT)'
+                  };
+
+                  const getStickerDisplayName = (stickerId) => {
+                    if (!stickerId) return 'قرص مجسم';
+                    if (STICKER_NAME_MAP[stickerId]) return STICKER_NAME_MAP[stickerId];
+                    if (stickerId.startsWith('ar-letter-')) return `حرف عربي: ${stickerId.replace('ar-letter-', '')}`;
+                    if (stickerId.startsWith('en-letter-')) return `حرف إنجليزي: ${stickerId.replace('en-letter-', '').toUpperCase()}`;
+                    if (stickerId.startsWith('num-')) return `رقم: ${stickerId.replace('num-', '')}`;
+                    return stickerId;
+                  };
+
                   return (
                     <div key={idx} className="p-4 space-y-3 font-sans text-xs bg-coal/40 rounded border border-grave/60">
                       {/* Top Product Header Row with Thumbnail Image */}
@@ -2297,7 +2315,7 @@ export function AdminView() {
                           </div>
 
                           {cfg.designNotes && (
-                            <div className="text-amber-300 bg-stone/60 p-2 rounded border border-amber-500/30">
+                            <div className="text-stone-950 bg-amber-400 p-2.5 rounded font-bold border border-amber-500 shadow-sm text-xs">
                               <strong>📝 ملاحظات التصميم والورشة:</strong> "{cfg.designNotes}"
                             </div>
                           )}
@@ -2307,8 +2325,8 @@ export function AdminView() {
                               <span className="text-bone font-bold block">الموتيفات والطبقات المصممة ({layers.length}):</span>
                               {layers.map((l, lIdx) => (
                                 <div key={lIdx} className="flex items-center justify-between gap-2">
-                                  <span>
-                                    • {l.type === 'text' ? `نص محفور: "${l.text}"` : l.type === 'image' ? 'صورة استيكر مرفوعة من العميل' : `موتيف: ${l.stickerId || 'قرص مجسم'}`}
+                                  <span className="text-bone font-bold">
+                                    • {l.type === 'text' ? `نص محفور: "${l.text}"` : l.type === 'image' ? 'صورة استيكر مرفوعة من العميل' : `موتيف: ${getStickerDisplayName(l.stickerId)}`}
                                   </span>
                                   {l.src && (
                                     <a
