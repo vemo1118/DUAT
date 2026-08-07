@@ -329,12 +329,12 @@ export const CustomizerContent = () => {
   };
 
   const currentModelName = getModelName(selectedModel);
+  const modelStr = String(currentModelName || '').toLowerCase();
   const isCustomModelOption =
-    Boolean(selectedModel) &&
-    (selectedModel.includes('جهاز آخر') ||
-     selectedModel.includes('other-custom') ||
-     selectedModel.toLowerCase().includes('other') ||
-     selectedModel.includes('Type model'));
+    modelStr.includes('جهاز آخر') ||
+    modelStr.includes('other') ||
+    modelStr.includes('مخصص') ||
+    modelStr.includes('type model');
   const effectiveModelName = isCustomModelOption
     ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز مخصص حسب الطلب' : 'Custom Device'))
     : currentModelName;
