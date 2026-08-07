@@ -18,23 +18,28 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
     const isSquareDome = stickerId === 'st-crescent' || stickerId === 'st-starry' || stickerId === 'st-sun';
 
     let containerStyle = { width: `${size}px`, height: `${size}px`, borderRadius: '12px' };
+    let imgScaleClass = 'scale-[2.2]';
+
     if (isCapsuleSlogan) {
-      containerStyle = { width: '118px', height: '37px', borderRadius: '9999px' };
+      containerStyle = { width: '120px', height: '38px', borderRadius: '9999px' };
+      imgScaleClass = 'scale-[2.3]';
     } else if (isBrandPill) {
-      containerStyle = { width: '84px', height: '33px', borderRadius: '9999px' };
+      containerStyle = { width: '84px', height: '34px', borderRadius: '9999px' };
+      imgScaleClass = 'scale-[2.3]';
     } else if (isSquareDome) {
-      containerStyle = { width: '43px', height: '43px', borderRadius: '12px' };
+      containerStyle = { width: '44px', height: '44px', borderRadius: '12px' };
+      imgScaleClass = 'scale-[2.3]';
     }
 
     return (
       <div
         style={containerStyle}
-        className="relative overflow-hidden flex items-center justify-center select-none shadow-[0_6px_14px_rgba(0,0,0,0.5)] shrink-0 pointer-events-none"
+        className="relative overflow-hidden flex items-center justify-center select-none shadow-[0_6px_16px_rgba(0,0,0,0.55)] shrink-0 pointer-events-none"
       >
         <img
           src={customImg}
           alt="Sticker"
-          className="w-full h-full object-cover scale-[1.28] pointer-events-none select-none"
+          className={`w-full h-full object-cover ${imgScaleClass} object-center pointer-events-none select-none`}
         />
       </div>
     );
