@@ -1,7 +1,22 @@
 import React from 'react';
 
-export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor }) => {
-  // Pure Crisp 3D Glass Epoxy Domes matching STICKERS tab panel
+export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgColor }) => {
+  const customImg = image || imageUrl;
+
+  // Render Dashboard / Supabase Uploaded Image if available
+  if (customImg) {
+    return (
+      <div className="w-full h-full flex items-center justify-center relative select-none p-0.5 pointer-events-none shrink-0">
+        <img
+          src={customImg}
+          alt="Sticker"
+          className="max-w-full max-h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] rounded-lg pointer-events-none select-none"
+        />
+      </div>
+    );
+  }
+
+  // Fallback Isolated 3D Domes
   switch (stickerId) {
     case 'st-born-dawn':
       return (
@@ -106,17 +121,6 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
       );
 
     default:
-      if (image || imageUrl) {
-        return (
-          <div className="flex items-center justify-center relative select-none p-0.5 pointer-events-none">
-            <img
-              src={image || imageUrl}
-              alt="Sticker"
-              className="max-w-full max-h-full object-contain filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] rounded-lg pointer-events-none select-none"
-            />
-          </div>
-        );
-      }
       return (
         <div
           style={{
