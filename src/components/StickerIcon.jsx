@@ -1,9 +1,12 @@
 import React from 'react';
+import { PRODUCTS } from '../data/products';
 
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgColor }) => {
-  const customImg = image || imageUrl;
+  // Resolve image from props or fallback to products catalog item
+  const matchedProd = PRODUCTS.find((p) => p.id === stickerId);
+  const customImg = image || imageUrl || matchedProd?.image || matchedProd?.imageUrl;
 
-  // Render Dashboard / Supabase Uploaded Image if available
+  // Render exact identical image on both phone canvas and selection list
   if (customImg) {
     return (
       <div className="w-full h-full flex items-center justify-center relative select-none p-0.5 pointer-events-none shrink-0">
@@ -16,7 +19,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
     );
   }
 
-  // Fallback Isolated 3D Domes
+  // Fallback 3D Domes
   switch (stickerId) {
     case 'st-born-dawn':
       return (
