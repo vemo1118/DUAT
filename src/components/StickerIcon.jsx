@@ -1,7 +1,14 @@
-import React from 'react';
+const DEFAULT_STICKER_IMAGES = {
+  'st-born-dawn': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg',
+  'st-through-night': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg',
+  'st-crescent': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg',
+  'st-starry': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg',
+  'st-sun': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg',
+  'st-duat': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_TEXT_net8dw.jpg'
+};
 
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgColor }) => {
-  const customImg = image || imageUrl;
+  const customImg = image || imageUrl || DEFAULT_STICKER_IMAGES[stickerId];
   if (customImg) {
     return (
       <div
@@ -10,7 +17,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
         <img
           src={customImg}
           alt="Sticker"
-          className="max-w-full max-h-full object-contain drop-shadow-md transition-transform hover:scale-105"
+          className="max-w-full max-h-full object-contain drop-shadow-md transition-transform hover:scale-105 rounded-lg"
         />
       </div>
     );
