@@ -47,7 +47,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'جرابات مصنوعة يدوياً في مصر بخامات فاخرة تشطيب إطار ذهبي وضمان استبدال كامل سنة.',
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785764123/B1_DarkNight_dzbmmn.jpg',
     ctaPrimaryTextEn: 'SHOP COLLECTION',
     ctaPrimaryTextAr: 'تسوق العروض الآن',
     ctaPrimaryLink: '/shop',
@@ -147,7 +147,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v7';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v8';
 
 function loadLocalSlides() {
   try {

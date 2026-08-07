@@ -107,7 +107,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
           {/* Dynamic Background Overlay Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/80 to-transparent sm:w-2/3" />
+          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/90 to-void/20 sm:w-3/4" />
           <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
         </div>
       ) : (
