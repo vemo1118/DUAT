@@ -437,7 +437,7 @@ export const CustomizerContent = () => {
     );
   };
 
-  // Instant Global Pointer Event Listeners (Window Level for Smooth 60fps Dragging)
+  // Instant Global Pointer Event Listeners (Window Level for Smooth 60fps Dragging on Touch & Mouse)
   useEffect(() => {
     if (!activeDragState) return;
 
@@ -446,19 +446,22 @@ export const CustomizerContent = () => {
       const rect = canvasRef.current.getBoundingClientRect();
       const { type, layerId, startX, startY, initialX, initialY, initialScale, initialRotation } = activeDragState;
 
+      const clientX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : startX);
+      const clientY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : startY);
+
       if (type === 'move') {
-        const deltaXPercent = ((e.clientX - startX) / rect.width) * 100;
-        const deltaYPercent = ((e.clientY - startY) / rect.height) * 100;
-        const newX = Math.max(8, Math.min(92, Math.round(initialX + deltaXPercent)));
-        const newY = Math.max(8, Math.min(92, Math.round(initialY + deltaYPercent)));
+        const deltaXPercent = ((clientX - startX) / rect.width) * 100;
+        const deltaYPercent = ((clientY - startY) / rect.height) * 100;
+        const newX = Math.max(5, Math.min(95, Math.round((initialX + deltaXPercent) * 10) / 10));
+        const newY = Math.max(5, Math.min(95, Math.round((initialY + deltaYPercent) * 10) / 10));
         setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, x: newX, y: newY } : l)));
       } else if (type === 'scale') {
-        const delta = (e.clientX - startX) + (e.clientY - startY);
-        const newScale = Math.max(0.5, Math.min(2.8, parseFloat((initialScale + delta * 0.012).toFixed(2))));
+        const delta = (clientX - startX) + (clientY - startY);
+        const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale + delta * 0.012).toFixed(2))));
         setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
       } else if (type === 'rotate') {
-        const deltaX = e.clientX - startX;
-        const newRot = (initialRotation + Math.round(deltaX * 0.9)) % 360;
+        const deltaX = clientX - startX;
+        const newRot = (initialRotation + Math.round(deltaX * 1.2)) % 360;
         setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
       }
     };
@@ -469,9 +472,14 @@ export const CustomizerContent = () => {
 
     window.addEventListener('pointermove', handleWindowPointerMove);
     window.addEventListener('pointerup', handleWindowPointerUp);
+    window.addEventListener('touchmove', handleWindowPointerMove, { passive: false });
+    window.addEventListener('touchend', handleWindowPointerUp);
+
     return () => {
       window.removeEventListener('pointermove', handleWindowPointerMove);
       window.removeEventListener('pointerup', handleWindowPointerUp);
+      window.removeEventListener('touchmove', handleWindowPointerMove);
+      window.removeEventListener('touchend', handleWindowPointerUp);
     };
   }, [activeDragState]);
 
@@ -720,7 +728,7 @@ export const CustomizerContent = () => {
                         top: `${layer.y}%`,
                         transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
                       }}
-                      className={`absolute cursor-grab active:cursor-grabbing p-2 transition-transform select-none touch-none ${
+                      className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
                         isSelected ? 'ring-2 ring-[#E8A33D] ring-offset-2 ring-offset-transparent z-30' : 'z-10'
                       }`}
                     >
