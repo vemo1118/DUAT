@@ -764,12 +764,11 @@ export const CustomizerContent = () => {
                         </>
                       )}
 
-                      {/* Render Real 3D Epoxy Sticker Photo */}
+                      {/* Render Crisp 3D Glass Dome */}
                       {layer.type === 'sticker' && (
                         <StickerIcon
                           stickerId={layer.stickerId}
-                          image={layer.src}
-                          size={46}
+                          size={48}
                           color={layer.color}
                           bgColor={layer.bgColor}
                         />
