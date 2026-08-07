@@ -107,8 +107,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز عبارة "طالع نور" بتشطيب عنبري فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Glossy Amber Resin', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: صمغ عنبري لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -127,8 +127,8 @@ export const PRODUCTS = [
     descriptionAr: 'ملصق إيبوكسي مجسم بارز باللون الكحلي العميق عبارة "عدّي الليل".',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Royal Navy Gloss', 'Adhesive: High-tack 3M', 'Waterproof & Scratch-resistant'],
     specsAr: ['المادة: إيبوكسي مجسم ثلاثي الأبعاد', 'التشطيب: كحلي ملكي لامع', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء والخدش'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -147,8 +147,8 @@ export const PRODUCTS = [
     descriptionAr: 'رمز الهلال الإيبوكسي المجسم بتشطيب أسود فحمي فاخر.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Obsidian Crescent', 'Adhesive: High-tack 3M', 'Waterproof'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: هلال فحمي', 'اللاصق: 3M عالي الالتصاق', 'مقاوم للماء'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -167,8 +167,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة إيبوكسي مجسمة بلون سماء الليل الكحلي المرصعة بالنجوم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Starry Night Glitter', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: بريق سماء الليل', 'اللاصق: 3M عالي الالتصاق'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -187,8 +187,8 @@ export const PRODUCTS = [
     descriptionAr: 'قبة مربعة عاجية مزينة بشعار قرص الشمس الذهبي المجسم.',
     specsEn: ['Material: 3D Polyurethane Epoxy', 'Finish: Alabaster & Dawn Gold', 'Adhesive: High-tack 3M'],
     specsAr: ['المادة: إيبوكسي مجسم', 'التشطيب: عاجي وذهب الفجر', 'اللاصق: 3M عالي الالتصاق'],
-    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png',
-    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png'],
+    image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg',
+    images: ['https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg'],
     is_active: true,
     reviewCount: 0,
     reviews: []
@@ -287,12 +287,12 @@ export const PHONE_MODELS = [
 ];
 
 export const STICKER_PRESETS = [
-  { id: 'st-born-dawn', nameEn: 'Born at Dawn', nameAr: 'طالع نور', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
-  { id: 'st-through-night', nameEn: 'Through the Night', nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز' },
-  { id: 'st-crescent', nameEn: 'Crescent Moon', nameAr: 'الهلال', tagEn: '3D EPOXY MOTIF', tagAr: 'رمز إيبوكسي مجسم' },
-  { id: 'st-starry', nameEn: 'Starry Night', nameAr: 'سماء الليل', tagEn: '3D EPOXY DOME', tagAr: 'قبة إيبوكسي نجوم' },
-  { id: 'st-sun', nameEn: 'DUAT Sun', nameAr: 'شمس دوات', tagEn: '3D SUN DISC DOME', tagAr: 'قرص الشمس المجسم' },
-  { id: 'st-duat', nameEn: 'DUAT', nameAr: 'دوات', tagEn: '3D BRAND PILL', tagAr: 'شعار دوات الإيبوكسي' }
+  { id: 'st-born-dawn', nameEn: 'Born at Dawn', nameAr: 'طالع نور', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg' },
+  { id: 'st-through-night', nameEn: 'Through the Night', nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg' },
+  { id: 'st-crescent', nameEn: 'Crescent Moon', nameAr: 'الهلال', tagEn: '3D EPOXY MOTIF', tagAr: 'رمز إيبوكسي مجسم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg' },
+  { id: 'st-starry', nameEn: 'Starry Night', nameAr: 'سماء الليل', tagEn: '3D EPOXY DOME', tagAr: 'قبة إيبوكسي نجوم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg' },
+  { id: 'st-sun', nameEn: 'DUAT Sun', nameAr: 'شمس دوات', tagEn: '3D SUN DISC DOME', tagAr: 'قرص الشمس المجسم', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg' },
+  { id: 'st-duat', nameEn: 'DUAT', nameAr: 'دوات', tagEn: '3D BRAND PILL', tagAr: 'شعار دوات الإيبوكسي', image: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_TEXT_net8dw.jpg' }
 ];
 
 export const PRESET_TEMPLATES = [

@@ -294,7 +294,12 @@ export const CustomizerContent = () => {
   const [customModelInput, setCustomModelInput] = useState('');
   const [designNotes, setDesignNotes] = useState('');
 
-  const defaultLayers = PRESET_TEMPLATES[0]?.layers.map((l) => ({ ...l, id: `init-${l.id}-${Date.now()}` })) || [];
+  const defaultLayers = location.state?.presetLayers
+    ? location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` }))
+    : (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear')
+    ? (PRESET_TEMPLATES[0]?.layers.map((l) => ({ ...l, id: `init-${l.id}-${Date.now()}` })) || [])
+    : [];
+
   const [layers, setLayers] = useState(defaultLayers);
   const [selectedLayerId, setSelectedLayerId] = useState(null);
 
@@ -306,7 +311,7 @@ export const CustomizerContent = () => {
     }
     if (location.state?.presetLayers) {
       setLayers(location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
-    } else if (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear' || location.state?.preselectedCaseTypeId === 'clear') {
+    } else if (location.state?.loadBundlePreset || location.state?.preselectedProductId === 'bundle-clear') {
       setLayers(PRESET_TEMPLATES[0].layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
     }
   }, [location.state]);
