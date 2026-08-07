@@ -3,8 +3,8 @@ import React from 'react';
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor }) => {
   const customImg = image || imageUrl;
 
-  // Render custom uploaded image ONLY for non-preset stickers
-  if (customImg && !stickerId?.startsWith('st-')) {
+  // If a real image URL is passed (from Dashboard/Supabase), always render it
+  if (customImg) {
     return (
       <div className="w-full h-full flex items-center justify-center relative select-none p-0.5 pointer-events-none shrink-0">
         <img
