@@ -7,7 +7,7 @@ import { useCustomizerConfig } from '../context/CustomizerContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import { toPng } from 'html-to-image';
-import { PHONE_MODELS, CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
+import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
 import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2 } from 'lucide-react';
 
 // Error Boundary Fallback for Customizer View
@@ -280,12 +280,12 @@ export const CustomizerContent = () => {
   const { activeCaseTypes, activePhoneModels, activeBuilderStickers, builderPrice } = useCustomizerConfig();
   const location = useLocation();
 
-  const CASE_TYPES = activeCaseTypes.length > 0 ? activeCaseTypes : [];
-  const PHONE_MODELS = activePhoneModels.length > 0 ? activePhoneModels : [];
-  const STICKER_ITEMS = activeBuilderStickers && activeBuilderStickers.length > 0 ? activeBuilderStickers : STICKER_PRESETS;
+  const CASE_TYPES = Array.isArray(activeCaseTypes) && activeCaseTypes.length > 0 ? activeCaseTypes : DEFAULT_CASE_TYPES;
+  const PHONE_MODELS = Array.isArray(activePhoneModels) && activePhoneModels.length > 0 ? activePhoneModels : DEFAULT_PHONE_MODELS;
+  const STICKER_ITEMS = Array.isArray(activeBuilderStickers) && activeBuilderStickers.length > 0 ? activeBuilderStickers : STICKER_PRESETS;
 
-  const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : PHONE_MODELS[0] || 'iPhone 16 Pro Max';
-  const defaultCaseType = CASE_TYPES.find((c) => c.id === 'clear') || CASE_TYPES[0];
+  const defaultModelName = typeof PHONE_MODELS[0] === 'object' ? PHONE_MODELS[0]?.name : (PHONE_MODELS[0] || 'iPhone 16 Pro Max');
+  const defaultCaseType = (Array.isArray(CASE_TYPES) && CASE_TYPES.find((c) => c?.id === 'clear')) || CASE_TYPES[0] || DEFAULT_CASE_TYPES[0];
   const [selectedModel, setSelectedModel] = useState(defaultModelName);
   const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
   const [customModelInput, setCustomModelInput] = useState('');
