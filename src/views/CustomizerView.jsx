@@ -764,6 +764,7 @@ export const CustomizerContent = () => {
                           size={48}
                           color={layer.color}
                           bgColor={layer.bgColor}
+                          forCanvas={true}
                         />
                       )}
 

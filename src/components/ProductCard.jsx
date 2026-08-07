@@ -62,11 +62,16 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
+      const blendStyle = isSticker ? { mixBlendMode: 'multiply' } : {};
+      const fitClass = isSticker
+        ? 'w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out p-4'
+        : 'w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out';
       return (
         <img
           src={customImage}
           alt={name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+          className={fitClass}
+          style={blendStyle}
           onError={(e) => {
             console.warn('Failed to load image:', customImage);
           }}
@@ -85,12 +90,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     }
 
     if (product.category === 'stickers') {
+      // Show placeholder silhouette if no image uploaded
       return (
-        <img
-          src="https://res.cloudinary.com/ikim5u08/image/upload/v1785825222/SH1_ST_j1z2h3.png"
-          alt={name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-        />
+        <div className="w-full h-full flex items-center justify-center bg-void/40">
+          <span className="font-mono text-xs text-ash opacity-50 uppercase tracking-widest">3D Epoxy Dome</span>
+        </div>
       );
     }
 
