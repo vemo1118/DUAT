@@ -760,7 +760,7 @@ export const CustomizerContent = () => {
                       {layer.type === 'sticker' && (
                         <StickerIcon
                           stickerId={layer.stickerId}
-                          image={layer.src}
+                          image={layer.src || STICKER_ITEMS.find(s => s.id === layer.stickerId)?.image || STICKER_PRESETS.find(s => s.id === layer.stickerId)?.image}
                           size={48}
                           color={layer.color}
                           bgColor={layer.bgColor}
