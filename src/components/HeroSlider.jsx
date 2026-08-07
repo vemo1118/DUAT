@@ -157,24 +157,24 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             {sub}
           </p>
 
-          {/* Action Buttons */}
+          {/* Action Buttons: Glassmorphism Navbar Style */}
           <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
-            {/* Primary Action Button */}
+            {/* Primary Action Button - Gold Glass */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              className="py-4 px-8 bg-gold text-[#050505] font-bold hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/20 flex items-center justify-center gap-2 text-sm border border-gold"
+              className="py-4 px-8 bg-void/50 hover:bg-gold text-gold hover:text-void border border-gold/70 hover:border-gold transition-all duration-300 backdrop-blur-md shadow-xl shadow-gold/10 hover:shadow-gold/30 flex items-center justify-center gap-2.5 text-sm font-bold tracking-wider"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
               {isRtl ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
             </button>
 
-            {/* Secondary Action Button */}
+            {/* Secondary Action Button - Frosted Glass */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              className="py-4 px-8 bg-void/80 border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 flex items-center justify-center gap-2 text-sm backdrop-blur-sm"
+              className="py-4 px-8 bg-void/50 hover:bg-stone/80 border border-grave/80 text-bone hover:border-gold hover:text-gold transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm font-bold tracking-wider"
             >
-              <Sparkles size={16} />
+              <Sparkles size={16} className="text-gold" />
               <span>{secondaryBtnText}</span>
             </button>
           </div>
