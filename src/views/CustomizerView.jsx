@@ -359,12 +359,12 @@ export const CustomizerContent = () => {
 
   // Layer Operations
   const handleAddSticker = (stickerId) => {
-    const st = STICKER_ITEMS.find((s) => s.id === stickerId);
+    const st = STICKER_ITEMS.find((s) => s.id === stickerId) || STICKER_PRESETS.find((s) => s.id === stickerId);
     const img = st?.image || st?.imageUrl || null;
 
     const newLayer = {
-      id: img ? `image-${Date.now()}` : `sticker-${Date.now()}`,
-      type: img ? 'image' : 'sticker',
+      id: `sticker-${Date.now()}`,
+      type: 'sticker',
       stickerId,
       src: img,
       color: textColor || '#E8A33D',
@@ -764,15 +764,20 @@ export const CustomizerContent = () => {
                         </>
                       )}
 
-                      {/* Render Sticker SVG Artwork */}
-                      {layer.type === 'sticker' && (
-                        <StickerIcon
-                          stickerId={layer.stickerId}
-                          size={46}
-                          color={layer.color}
-                          bgColor={layer.bgColor}
-                        />
-                      )}
+                      {/* Render Real Uploaded Sticker Image */}
+                      {layer.type === 'sticker' && (() => {
+                        const stItem = STICKER_ITEMS.find((s) => s.id === layer.stickerId) || STICKER_PRESETS.find((s) => s.id === layer.stickerId);
+                        const imgUrl = layer.src || stItem?.image || stItem?.imageUrl;
+                        return (
+                          <StickerIcon
+                            stickerId={layer.stickerId}
+                            image={imgUrl}
+                            size={56}
+                            color={layer.color}
+                            bgColor={layer.bgColor}
+                          />
+                        );
+                      })()}
 
                       {/* Render Custom Text Sticker Pill */}
                       {layer.type === 'text' && (
