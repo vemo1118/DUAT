@@ -1,13 +1,10 @@
 import React from 'react';
-import { PRODUCTS } from '../data/products';
 
-export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgColor }) => {
-  // Resolve image from props or fallback to products catalog item
-  const matchedProd = PRODUCTS.find((p) => p.id === stickerId);
-  const customImg = image || imageUrl || matchedProd?.image || matchedProd?.imageUrl;
+export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor }) => {
+  const customImg = image || imageUrl;
 
-  // Render exact identical image on both phone canvas and selection list
-  if (customImg) {
+  // Render custom uploaded image ONLY for non-preset stickers
+  if (customImg && !stickerId?.startsWith('st-')) {
     return (
       <div className="w-full h-full flex items-center justify-center relative select-none p-0.5 pointer-events-none shrink-0">
         <img
@@ -19,7 +16,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgCo
     );
   }
 
-  // Fallback 3D Domes
+  // 100% Identical Clean 3D Epoxy Domes for Canvas and Selection Panel
   switch (stickerId) {
     case 'st-born-dawn':
       return (
