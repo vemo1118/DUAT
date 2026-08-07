@@ -1,10 +1,35 @@
 import React from 'react';
 
+// Natural canvas dimensions for each sticker type (pixels on the phone canvas)
+// Pills are wide, domes are square
+const CANVAS_DIMS = {
+  'st-born-dawn':     { w: 130, h: 46 },
+  'st-through-night': { w: 140, h: 46 },
+  'st-crescent':      { w: 72,  h: 72 },
+  'st-starry':        { w: 72,  h: 72 },
+  'st-sun':           { w: 72,  h: 72 },
+  'st-duat':          { w: 110, h: 46 },
+};
+
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor, forCanvas = false }) => {
   const customImg = image || imageUrl;
 
-  // Always render the real uploaded image as-is — no tricks, no blend, no crop
   if (customImg) {
+    if (forCanvas) {
+      // Fixed natural size on the phone canvas
+      const dims = CANVAS_DIMS[stickerId] || { w: 90, h: 90 };
+      return (
+        <img
+          src={customImg}
+          alt="Sticker"
+          style={{ width: dims.w, height: dims.h, objectFit: 'contain', display: 'block' }}
+          className="pointer-events-none select-none"
+          draggable={false}
+        />
+      );
+    }
+
+    // Selection panel: fill the square card
     return (
       <img
         src={customImg}
@@ -15,7 +40,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     );
   }
 
-  // Fallback synthetic 3D Domes (no image uploaded)
+  // ── Fallback synthetic domes (no image uploaded) ──────────────────────────
   switch (stickerId) {
     case 'st-born-dawn':
       return (
@@ -23,7 +48,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           style={{
             color: '#FFF8ED',
             background: 'linear-gradient(135deg, #B26214 0%, #6E3808 100%)',
-            borderColor: 'rgba(245, 178, 85, 0.7)',
+            borderColor: 'rgba(245,178,85,0.7)',
             boxShadow: '0 8px 18px rgba(178,98,20,0.45), inset 0 2px 5px rgba(255,255,255,0.45)',
           }}
           className="font-serif italic font-medium px-4 py-1.5 rounded-full border text-xs whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center pointer-events-none min-w-[115px] min-h-[36px]"
@@ -38,7 +63,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           style={{
             color: '#F0ECE1',
             background: 'linear-gradient(135deg, #0D1B2A 0%, #040810 100%)',
-            borderColor: 'rgba(50, 80, 120, 0.7)',
+            borderColor: 'rgba(50,80,120,0.7)',
             boxShadow: '0 8px 18px rgba(13,27,42,0.65), inset 0 2px 5px rgba(255,255,255,0.35)',
           }}
           className="font-serif italic font-medium px-4 py-1.5 rounded-full border text-xs whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center pointer-events-none min-w-[115px] min-h-[36px]"
@@ -80,7 +105,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     case 'st-duat':
       return (
         <div
-          style={{ color: '#D89E46', background: 'linear-gradient(135deg, #2B1F18 0%, #0E0906 100%)', borderColor: 'rgba(232, 163, 61, 0.6)', boxShadow: '0 8px 18px rgba(0,0,0,0.65)' }}
+          style={{ color: '#D89E46', background: 'linear-gradient(135deg, #2B1F18 0%, #0E0906 100%)', borderColor: 'rgba(232,163,61,0.6)', boxShadow: '0 8px 18px rgba(0,0,0,0.65)' }}
           className="font-serif font-bold px-3.5 py-1 rounded-full border text-xs tracking-widest uppercase whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center pointer-events-none min-w-[84px] min-h-[32px]"
         >
           DUAT
