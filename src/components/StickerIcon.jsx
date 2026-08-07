@@ -1,15 +1,8 @@
-const DEFAULT_STICKER_IMAGES = {
-  'st-born-dawn': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/born_at_dawn_lrnbz6.jpg',
-  'st-through-night': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/through_the_night_tuaiqp.jpg',
-  'st-crescent': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/MOON_nogd7g.jpg',
-  'st-starry': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/STARS_dky4yc.jpg',
-  'st-sun': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_SUN_mj2hid.jpg',
-  'st-duat': 'https://res.cloudinary.com/ikim5u08/image/upload/v1786029411/DUAT_TEXT_net8dw.jpg'
-};
+import React from 'react';
 
-export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgColor }) => {
-  const customImg = image || imageUrl || DEFAULT_STICKER_IMAGES[stickerId];
-  if (customImg) {
+export const StickerIcon = ({ stickerId, image, imageUrl, size = 44, color, bgColor }) => {
+  const customImg = image || imageUrl;
+  if (customImg && !customImg.includes('born_at_dawn_lrnbz6') && !customImg.includes('through_the_night_tuaiqp') && !customImg.includes('MOON_nogd7g') && !customImg.includes('STARS_dky4yc') && !customImg.includes('DUAT_SUN_mj2hid') && !customImg.includes('DUAT_TEXT_net8dw')) {
     return (
       <div
         className="w-full h-full flex items-center justify-center relative overflow-hidden select-none p-0.5"
@@ -41,7 +34,6 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
           }}
           className="rounded-full border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none"
         >
-          {/* Epoxy Dome Specular Highlight */}
           <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
           <span style={{ color: color || '#E8A33D' }} className="font-kufi font-bold text-lg leading-none transform translate-y-[-1px]">
             {char}
@@ -63,7 +55,6 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
           }}
           className="rounded-full border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none"
         >
-          {/* Epoxy Dome Specular Highlight */}
           <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
           <span style={{ color: color || '#E8A33D' }} className="font-mono font-bold text-base leading-none">
             {char}
@@ -71,219 +62,21 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
         </div>
       );
     }
-
-    if (stickerId.startsWith('num-')) {
-      const val = stickerId.replace('num-', '');
-      const isYear = val.length > 2;
-      return (
-        <div
-          style={{
-            minWidth: isYear ? `${size * 1.6}px` : `${size}px`,
-            height: `${size}px`,
-            paddingLeft: isYear ? '8px' : '0',
-            paddingRight: isYear ? '8px' : '0',
-            color: color || '#E8A33D',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
-            borderColor: color || '#E8A33D'
-          }}
-          className={`${
-            isYear ? 'rounded-full px-3' : 'rounded-full'
-          } border-2 flex items-center justify-center shadow-lg relative overflow-hidden select-none`}
-        >
-          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <span style={{ color: color || '#E8A33D' }} className="font-mono font-bold text-xs tracking-wider">
-            {val}
-          </span>
-        </div>
-      );
-    }
-
-    if (stickerId.startsWith('quote-')) {
-      const qKey = stickerId.replace('quote-', '');
-      const quotesMap = {
-        'sahr': 'سَهَر',
-        '0x-sun': '0X SUN',
-        '12am': '12 AM',
-        'nocturnal': 'NOCTURNAL',
-        'passage': 'THE PASSAGE',
-        'noor': 'نور'
-      };
-      const text = quotesMap[qKey] || qKey;
-      const isAr = /[\u0600-\u06FF]/.test(text);
-
-      return (
-        <div
-          style={{
-            color: color || '#E8A33D',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
-            borderColor: color || '#E8A33D'
-          }}
-          className={`border-2 px-3.5 py-1.5 rounded-full shadow-md text-xs whitespace-nowrap select-none relative overflow-hidden ${isAr ? 'font-kufi' : 'font-mono uppercase tracking-widest'}`}
-        >
-          <div className="absolute top-0.5 left-2 w-1/4 h-1/2 bg-white/15 rounded-full blur-[1px] pointer-events-none" />
-          {text}
-        </div>
-      );
-    }
   }
 
-  // Pre-existing Shapes and Slogan Pills
   switch (stickerId) {
-    case 'disc':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="40" fill={fillColor} />
-          <circle cx="42" cy="40" r="12" fill="white" opacity="0.25" />
-        </svg>
-      );
-
-    case 'ring':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="40" stroke={strokeColor} strokeWidth="8" />
-        </svg>
-      );
-
-    case 'crescent':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 10 A40 40 0 1 0 90 50 A30 30 0 1 1 50 10 Z" fill={fillColor} />
-        </svg>
-      );
-
-    case 'star-4':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 5 L62 38 L95 50 L62 62 L50 95 L38 62 L5 50 L38 38 Z" fill={fillColor} />
-        </svg>
-      );
-
-    case 'triangle':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <polygon points="50,10 90,85 10,85" stroke={strokeColor} strokeWidth="8" fill="none" />
-        </svg>
-      );
-
-    case 'horizon':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <rect x="15" y="35" width="70" height="10" rx="5" fill={fillColor} />
-          <rect x="15" y="55" width="70" height="10" rx="5" fill={fillColor} />
-        </svg>
-      );
-
-    case 'lightning':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <polygon points="55,5 15,55 45,55 35,95 85,45 55,45" fill={fillColor} />
-        </svg>
-      );
-
-    case 'arrow-up':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 10 L85 45 H62 V90 H38 V45 H15 Z" fill={fillColor} />
-        </svg>
-      );
-
-    case 'spark':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 10 V90 M10 50 H90 M22 22 L78 78 M78 22 L22 78" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
-        </svg>
-      );
-
-    case 'plus':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 15 V85 M15 50 H85" stroke={strokeColor} strokeWidth="12" strokeLinecap="square" />
-        </svg>
-      );
-
-    case 'concentric':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="42" stroke={strokeColor} strokeWidth="6" />
-          <circle cx="50" cy="50" r="26" stroke={strokeColor} strokeWidth="6" />
-          <circle cx="50" cy="50" r="10" fill={fillColor} />
-        </svg>
-      );
-
-    case 'flame':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <path d="M50 10 C65 30 85 55 85 70 A35 35 0 0 1 15 70 C15 55 35 30 50 10 Z" fill={fillColor} />
-        </svg>
-      );
-
-    case 'pill-tale3-noor':
-      return (
-        <div
-          style={{
-            color: color || '#050505',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#E8A33D'),
-            borderColor: color || '#E8A33D'
-          }}
-          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
-        >
-          طالع نور
-        </div>
-      );
-
-    case 'pill-3addi-lel':
-      return (
-        <div
-          style={{
-            color: color || '#EDE4D3',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#14110F'),
-            borderColor: color || '#E8A33D'
-          }}
-          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
-        >
-          عدّي الليل
-        </div>
-      );
-
-    case 'pill-bokra-ahla':
-      return (
-        <div
-          style={{
-            color: color || '#EDE4D3',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#2E2823'),
-            borderColor: color || '#E8A33D'
-          }}
-          className="font-kufi font-bold px-3.5 py-1.5 rounded-full border shadow-md text-xs whitespace-nowrap select-none"
-        >
-          بكرة أحلى
-        </div>
-      );
-
-    case 'pill-born-dawn':
-      return (
-        <div
-          style={{
-            color: color || '#E8A33D',
-            backgroundColor: bgColor === 'transparent' ? 'transparent' : (bgColor || '#050505'),
-            borderColor: color || '#E8A33D'
-          }}
-          className="font-mono font-bold px-3 py-1 rounded-full border shadow-md text-[10px] tracking-widest uppercase whitespace-nowrap select-none"
-        >
-          BORN AT DAWN
-        </div>
-      );
-
     case 'st-born-dawn':
       return (
         <div
           style={{
-            color: '#FDFBF7',
-            backgroundColor: bgColor === 'transparent' ? '#B26214' : (bgColor || '#B26214'),
-            borderColor: color || '#E5A44B'
+            color: '#FFF8ED',
+            background: 'linear-gradient(135deg, #B26214 0%, #7A3F05 100%)',
+            borderColor: '#E5A44B',
+            boxShadow: '0 6px 14px rgba(178,98,20,0.5), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.4)'
           }}
-          className="font-space font-bold px-3.5 py-1.5 rounded-full border-2 shadow-[0_4px_12px_rgba(178,98,20,0.4)] text-xs whitespace-nowrap select-none relative overflow-hidden"
+          className="font-serif italic font-medium px-4 py-1.5 rounded-full border border-amber-300/40 text-xs sm:text-sm whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center shadow-lg cursor-pointer"
         >
-          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/25 rounded-full blur-[1px] pointer-events-none" />
+          <div className="absolute top-0.5 left-2 w-2/5 h-1/2 bg-gradient-to-b from-white/35 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
           born at dawn
         </div>
       );
@@ -292,13 +85,14 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
       return (
         <div
           style={{
-            color: '#EDE4D3',
-            backgroundColor: bgColor === 'transparent' ? '#0B192C' : (bgColor || '#0B192C'),
-            borderColor: color || '#243B55'
+            color: '#F0ECE1',
+            background: 'linear-gradient(135deg, #0B192C 0%, #040A14 100%)',
+            borderColor: '#243B55',
+            boxShadow: '0 6px 14px rgba(11,25,44,0.7), inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.5)'
           }}
-          className="font-space font-bold px-3.5 py-1.5 rounded-full border-2 shadow-[0_4px_12px_rgba(11,25,44,0.6)] text-xs whitespace-nowrap select-none relative overflow-hidden"
+          className="font-serif italic font-medium px-4 py-1.5 rounded-full border border-blue-400/30 text-xs sm:text-sm whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center shadow-lg cursor-pointer"
         >
-          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
+          <div className="absolute top-0.5 left-2 w-2/5 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
           through the night
         </div>
       );
@@ -307,15 +101,16 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
       return (
         <div
           style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            backgroundColor: '#0A0B10'
+            width: `${size || 44}px`,
+            height: `${size || 44}px`,
+            background: 'radial-gradient(circle at 30% 30%, #1A1F2B 0%, #07080D 100%)',
+            boxShadow: '0 6px 14px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.35)'
           }}
-          className="rounded-2xl border-2 border-stone-700 shadow-xl flex items-center justify-center relative overflow-hidden select-none"
+          className="rounded-2xl border border-stone-600 flex items-center justify-center relative overflow-hidden select-none shrink-0 shadow-lg cursor-pointer"
         >
-          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 24 24" fill="none" stroke="#EDE4D3" strokeWidth="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#EDE4D3" />
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-gradient-to-b from-white/35 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
+          <svg width={(size || 44) * 0.58} height={(size || 44) * 0.58} viewBox="0 0 24 24" fill="none">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#E2DAC9" />
           </svg>
         </div>
       );
@@ -324,15 +119,15 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
       return (
         <div
           style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            backgroundColor: '#0E131F'
+            width: `${size || 44}px`,
+            height: `${size || 44}px`,
+            background: 'radial-gradient(circle at 30% 30%, #151D2F 0%, #050810 100%)',
+            boxShadow: '0 6px 14px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.35)'
           }}
-          className="rounded-2xl border-2 border-stone-700 shadow-xl flex items-center justify-center relative overflow-hidden select-none"
+          className="rounded-2xl border border-stone-600 flex items-center justify-center relative overflow-hidden select-none shrink-0 shadow-lg cursor-pointer"
         >
-          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/20 rounded-full blur-[1px] pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:6px_6px] opacity-40" />
-          <span className="font-mono text-xs text-gold font-bold z-10">✨</span>
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-gradient-to-b from-white/35 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:5px_5px] opacity-40" />
         </div>
       );
 
@@ -340,15 +135,16 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
       return (
         <div
           style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            backgroundColor: '#F7F3EB'
+            width: `${size || 44}px`,
+            height: `${size || 44}px`,
+            background: 'radial-gradient(circle at 30% 30%, #FAF6EE 0%, #E4DDD0 100%)',
+            boxShadow: '0 6px 14px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.8)'
           }}
-          className="rounded-2xl border-2 border-stone-300 shadow-xl flex flex-col items-center justify-center relative overflow-hidden select-none p-1"
+          className="rounded-2xl border border-stone-300 flex flex-col items-center justify-center relative overflow-hidden select-none shrink-0 p-1 shadow-lg cursor-pointer"
         >
-          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-white/40 rounded-full blur-[1px] pointer-events-none" />
-          <div className="w-5 h-5 rounded-full bg-[#D97706] mb-0.5" />
-          <div className="w-7 h-0.5 bg-[#0A0C16]" />
+          <div className="absolute top-1 left-1.5 w-1/3 h-1/3 bg-gradient-to-b from-white/60 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
+          <div className="w-4 h-4 rounded-full bg-[#D97706] mb-0.5 shadow-sm" />
+          <div className="w-5 h-0.5 bg-[#0A0C16]" />
         </div>
       );
 
@@ -357,21 +153,29 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 40, color, bgCo
         <div
           style={{
             color: '#E8A33D',
-            backgroundColor: bgColor === 'transparent' ? '#1C1613' : (bgColor || '#1C1613'),
-            borderColor: color || '#E8A33D'
+            background: 'linear-gradient(135deg, #2A1F18 0%, #100C09 100%)',
+            borderColor: '#E8A33D',
+            boxShadow: '0 6px 14px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.25)'
           }}
-          className="font-space font-bold px-3 py-1 rounded-full border border-gold/70 shadow-md text-[10px] tracking-widest uppercase whitespace-nowrap select-none relative overflow-hidden"
+          className="font-serif font-bold px-3.5 py-1 rounded-full border border-gold/70 text-xs sm:text-sm tracking-widest uppercase whitespace-nowrap select-none relative overflow-hidden flex items-center justify-center shadow-lg cursor-pointer"
         >
-          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-white/15 rounded-full blur-[1px] pointer-events-none" />
+          <div className="absolute top-0.5 left-2 w-1/3 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-full blur-[0.5px] pointer-events-none" />
           DUAT
         </div>
       );
 
     default:
       return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="40" fill={fillColor} />
-        </svg>
+        <div
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: bgColor || '#E8A33D'
+          }}
+          className="rounded-full shadow flex items-center justify-center"
+        >
+          <span className="font-mono text-xs font-bold text-void">DU</span>
+        </div>
       );
   }
 };
