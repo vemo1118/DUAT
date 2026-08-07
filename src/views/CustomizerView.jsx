@@ -1037,18 +1037,18 @@ export const CustomizerContent = () => {
                 <p className="font-mono text-[11px] text-ash uppercase tracking-wider">
                   💡 Tip: Click or drag & drop any 3D dome onto the phone canvas
                 </p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {STICKER_ITEMS.map((st) => (
                     <button
                       key={st.id}
                       draggable={true}
                       onDragStart={(e) => handleStickerDragStart(st.id, e)}
                       onClick={() => handleAddSticker(st.id)}
-                      className="p-2.5 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-1.5 transition-all min-h-[96px] cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden"
+                      className="p-2 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-2 transition-all cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden"
                       title="Click or Drag onto phone"
                     >
-                      <div className="w-full h-14 flex items-center justify-center overflow-hidden p-1">
-                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={44} color={textColor} bgColor={textBgColor} />
+                      <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
+                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={72} color={textColor} bgColor={textBgColor} />
                       </div>
                       <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full font-bold">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
