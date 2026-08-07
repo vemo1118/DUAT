@@ -311,6 +311,7 @@ export const CustomizerContent = () => {
     }
   }, [location.state]);
 
+  const [activeTab, setActiveTab] = useState('stickers');
   const [customText, setCustomText] = useState('');
   const [textColor, setTextColor] = useState('#E8A33D');
   const [textBgColor, setTextBgColor] = useState('#14110F');
