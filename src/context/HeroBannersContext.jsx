@@ -201,15 +201,21 @@ function mergeWithLocalSlides(fetchedFromDb) {
   if (!Array.isArray(local) || local.length === 0) return fetchedFromDb;
   const localMap = new Map(local.map((s) => [String(s.id), s]));
 
-  return fetchedFromDb.map((dbSlide) => {
+  const dbIds = new Set(fetchedFromDb.map((s) => String(s.id)));
+  const mergedDb = fetchedFromDb.map((dbSlide) => {
     const loc = localMap.get(String(dbSlide.id));
     if (!loc) return dbSlide;
+    const activeVal = loc.is_active !== undefined ? Boolean(loc.is_active) : (loc.isActive !== undefined ? Boolean(loc.isActive) : Boolean(dbSlide.is_active));
     return {
       ...dbSlide,
       ...loc,
-      is_active: loc.is_active !== undefined ? Boolean(loc.is_active) : Boolean(dbSlide.is_active)
+      is_active: activeVal,
+      isActive: activeVal
     };
   });
+
+  const localOnly = local.filter((s) => !dbIds.has(String(s.id)));
+  return [...mergedDb, ...localOnly];
 }
 
 export function HeroBannersProvider({ children }) {
@@ -219,6 +225,12 @@ export function HeroBannersProvider({ children }) {
   const fetchSlides = async () => {
     setLoading(true);
     try {
+      const local = loadLocalSlides();
+      if (local && local.length > 0) {
+        setSlides(local);
+        setLoading(false);
+        return;
+      }
       let query = supabase.from('hero_slides').select('*');
       try {
         query = query.order('sort_order', { ascending: true });
@@ -232,20 +244,16 @@ export function HeroBannersProvider({ children }) {
           const merged = mergeWithLocalSlides(fetched);
           setSlides(merged);
           saveLocalSlides(merged);
-        }
-      } else {
-        const local = loadLocalSlides();
-        if (local && local.length > 0) {
-          setSlides(local);
-        } else {
-          setSlides(INITIAL_HERO_SLIDES);
-          saveLocalSlides(INITIAL_HERO_SLIDES);
+          setLoading(false);
+          return;
         }
       }
+      setSlides(INITIAL_HERO_SLIDES);
+      saveLocalSlides(INITIAL_HERO_SLIDES);
     } catch (err) {
       console.error('Unexpected error loading hero slides:', err);
       const local = loadLocalSlides();
-      if (local && local.length > 0) setSlides(local);
+      setSlides(local && local.length > 0 ? local : INITIAL_HERO_SLIDES);
     } finally {
       setLoading(false);
     }

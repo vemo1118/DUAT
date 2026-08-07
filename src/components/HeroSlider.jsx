@@ -18,14 +18,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const filteredSlides = Array.isArray(slides)
-    ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false)
+  const activeSlides = Array.isArray(slides)
+    ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false && String(s.is_active) !== 'false')
     : [];
-
-  // Guaranteed non-empty slides array fallback so HeroSlider never collapses or returns null
-  const activeSlides = filteredSlides.length > 0
-    ? filteredSlides
-    : (Array.isArray(slides) && slides.length > 0 ? slides : INITIAL_HERO_SLIDES);
 
   const isAr = lang === 'ar';
   const isRtl = isAr;

@@ -1138,110 +1138,119 @@ export function AdminView() {
 
           {/* SLIDES GRID DISPLAY */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {slides.map((slide, index) => (
-              <div
-                key={slide.id}
-                className="bg-stone border border-grave overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between"
-              >
-                {/* Slide Image / Visual Preview Box */}
-                <div className="h-48 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-4">
-                  {slide.imageUrl ? (
-                    <img src={slide.imageUrl} alt="Banner" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-center space-y-2 text-ash">
-                      <ImageIcon size={36} className="mx-auto text-gold/40" />
-                      <span className="font-mono text-xs block">خلفية دوات النقوش المصرية الافتراضية</span>
-                    </div>
-                  )}
+            {slides.map((slide, index) => {
+              const isSlideActive = slide.is_active !== false && slide.isActive !== false && String(slide.is_active) !== 'false';
+              return (
+                <div
+                  key={slide.id}
+                  className={`bg-stone border overflow-hidden shadow-lg card-depth-highlight flex flex-col justify-between transition-all ${
+                    isSlideActive ? 'border-grave' : 'border-red-900/60 opacity-65 bg-stone/70'
+                  }`}
+                >
+                  {/* Hero Background Preview Box */}
+                  <div className="h-48 bg-void relative border-b border-grave overflow-hidden flex items-center justify-center p-4">
+                    {slide.imageUrl || slide.image ? (
+                      <img
+                        src={slide.imageUrl || slide.image}
+                        alt={slide.headline1Ar || slide.headline1En}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-center space-y-2 text-ash">
+                        <ImageIcon size={36} className="mx-auto text-gold/40" />
+                        <span className="font-mono text-xs block">خلفية دوات النقوش المصرية الافتراضية</span>
+                      </div>
+                    )}
 
-                  <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-                    <div className="bg-void/90 backdrop-blur border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
-                      بنر #{index + 1}
+                    <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                      <div className="bg-void/90 backdrop-blur border border-gold/40 px-2.5 py-1 font-mono text-xs text-gold font-bold">
+                        بنر #{index + 1}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSlideVisibility(slide.id);
+                          showToast(isSlideActive ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                        }}
+                        className={`px-3 py-1 border font-mono text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+                          isSlideActive
+                            ? 'border-emerald-500 bg-emerald-600/90 text-white hover:bg-emerald-700'
+                            : 'border-amber-500 bg-amber-600/90 text-white hover:bg-amber-700'
+                        }`}
+                        title={isSlideActive ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
+                      >
+                        {isSlideActive ? <Eye size={13} /> : <EyeOff size={13} />}
+                        <span>{isSlideActive ? 'ظاهر (إخفاء)' : 'مخفي (إظهار)'}</span>
+                      </button>
                     </div>
 
+                    {slide.badgeAr && (
+                      <div className="absolute top-3 left-3 bg-red-600/90 text-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider">
+                        {slide.badgeAr}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Slide Details Content */}
+                  <div className="p-6 space-y-4 flex-1">
+                    <span className="font-mono text-xs text-gold uppercase tracking-widest block font-bold">
+                      {slide.eyebrowAr || slide.eyebrowEn}
+                    </span>
+
+                    <h3 className="font-clash text-2xl font-bold text-bone leading-snug">
+                      {slide.headline1Ar} <span className="text-gold">{slide.headline2Ar}</span>
+                    </h3>
+
+                    <p className="font-space text-xs text-ash leading-relaxed line-clamp-2">
+                      {slide.subAr || slide.subEn}
+                    </p>
+
+                    <div className="pt-2 border-t border-grave/60 flex items-center justify-between font-mono text-xs text-ash">
+                      <span>الزر الأول: <strong className="text-bone">{slide.ctaPrimaryTextAr}</strong> ({slide.ctaPrimaryLink})</span>
+                    </div>
+                  </div>
+
+                  {/* Card Action Buttons */}
+                  <div className="p-4 bg-stone/40 border-t border-grave flex flex-wrap items-center justify-between gap-2">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         toggleSlideVisibility(slide.id);
-                        showToast(slide.is_active !== false ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                        showToast(isSlideActive ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
                       }}
-                      className={`px-3 py-1 border font-mono text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
-                        slide.is_active !== false
-                          ? 'border-emerald-500 bg-emerald-600/90 text-white hover:bg-emerald-700'
-                          : 'border-amber-500 bg-amber-600/90 text-white hover:bg-amber-700'
+                      className={`flex items-center gap-1.5 px-3 py-2 border font-mono text-xs font-bold transition-colors ${
+                        isSlideActive
+                          ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                          : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
                       }`}
-                      title={slide.is_active !== false ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
+                      title={isSlideActive ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
                     >
-                      {slide.is_active !== false ? <Eye size={13} /> : <EyeOff size={13} />}
-                      <span>{slide.is_active !== false ? 'ظاهر (إخفاء)' : 'مخفي (إظهار)'}</span>
+                      {isSlideActive ? <Eye size={14} /> : <EyeOff size={14} />}
+                      <span>{isSlideActive ? 'ظاهر' : 'مخفي'}</span>
                     </button>
-                  </div>
 
-                  {slide.badgeAr && (
-                    <div className="absolute top-3 left-3 bg-red-600/90 text-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider">
-                      {slide.badgeAr}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenEditHeroModal(slide)}
+                        className="flex items-center gap-1.5 px-4 py-2 border border-grave bg-stone/80 hover:border-gold hover:text-gold text-bone font-mono text-xs font-bold transition-colors"
+                      >
+                        <Edit2 size={14} />
+                        <span>تعديل البنر</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteHeroSlide(slide.id)}
+                        className="flex items-center gap-1.5 px-3 py-2 border border-red-500/40 text-red-500 hover:bg-red-500/10 font-mono text-xs font-bold transition-colors"
+                        title="حذف البنر"
+                      >
+                        <Trash2 size={14} />
+                        <span>حذف</span>
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                {/* Slide Details Content */}
-                <div className="p-6 space-y-4 flex-1">
-                  <span className="font-mono text-xs text-gold uppercase tracking-widest block font-bold">
-                    {slide.eyebrowAr || slide.eyebrowEn}
-                  </span>
-
-                  <h3 className="font-clash text-2xl font-bold text-bone leading-snug">
-                    {slide.headline1Ar} <span className="text-gold">{slide.headline2Ar}</span>
-                  </h3>
-
-                  <p className="font-space text-xs text-ash leading-relaxed line-clamp-2">
-                    {slide.subAr || slide.subEn}
-                  </p>
-
-                  <div className="pt-2 border-t border-grave/60 flex items-center justify-between font-mono text-xs text-ash">
-                    <span>الزر الأول: <strong className="text-bone">{slide.ctaPrimaryTextAr}</strong> ({slide.ctaPrimaryLink})</span>
                   </div>
                 </div>
-
-                {/* Card Action Buttons */}
-                <div className="p-4 bg-stone/40 border-t border-grave flex flex-wrap items-center justify-between gap-2">
-                  <button
-                    onClick={() => {
-                      toggleSlideVisibility(slide.id);
-                      showToast(slide.is_active !== false ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-2 border font-mono text-xs font-bold transition-colors ${
-                      slide.is_active !== false
-                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
-                        : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
-                    }`}
-                    title={slide.is_active !== false ? 'إخفاء البنر من الصفحة الرئيسية' : 'إظهار البنر في الصفحة الرئيسية'}
-                  >
-                    {slide.is_active !== false ? <Eye size={14} /> : <EyeOff size={14} />}
-                    <span>{slide.is_active !== false ? 'ظاهر' : 'مخفي'}</span>
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleOpenEditHeroModal(slide)}
-                      className="flex items-center gap-1.5 px-4 py-2 border border-grave bg-stone/80 hover:border-gold hover:text-gold text-bone font-mono text-xs font-bold transition-colors"
-                    >
-                      <Edit2 size={14} />
-                      <span>تعديل البنر</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteHeroSlide(slide.id)}
-                      className="flex items-center gap-1.5 px-3 py-2 border border-red-500/40 text-red-500 hover:bg-red-500/10 font-mono text-xs font-bold transition-colors"
-                      title="حذف البنر"
-                    >
-                      <Trash2 size={14} />
-                      <span>حذف</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* ============================================================ */}
