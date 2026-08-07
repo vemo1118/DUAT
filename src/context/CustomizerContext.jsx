@@ -43,15 +43,8 @@ export const CustomizerProvider = ({ children }) => {
   });
 
   const [builderStickers, setBuilderStickers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('duat_builder_stickers_v1');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.warn('Error reading duat_builder_stickers:', e);
-    }
+    // Always start from INITIAL_BUILDER_CONFIG to ensure fresh PNG image URLs
+    // User sticker order/visibility is managed via Supabase, not localStorage
     return INITIAL_BUILDER_CONFIG.stickers;
   });
 
