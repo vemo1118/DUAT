@@ -425,6 +425,14 @@ export const CustomizerContent = () => {
     );
   };
 
+  const getLayerCenterScreenCoords = (layer) => {
+    if (!canvasRef.current || !layer) return null;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const centerX = rect.left + (layer.x / 100) * rect.width;
+    const centerY = rect.top + (layer.y / 100) * rect.height;
+    return { centerX, centerY };
+  };
+
   // Instant Global Pointer Event Listeners (Window Level for Smooth 60fps Dragging on Touch & Mouse)
   useEffect(() => {
     if (!activeDragState) return;
@@ -444,13 +452,27 @@ export const CustomizerContent = () => {
         const newY = Math.max(5, Math.min(95, Math.round((initialY + deltaYPercent) * 10) / 10));
         setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, x: newX, y: newY } : l)));
       } else if (type === 'scale') {
-        const delta = (clientX - startX) + (clientY - startY);
-        const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale + delta * 0.012).toFixed(2))));
-        setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
+        if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialDistance) {
+          const currentDistance = Math.hypot(clientX - activeDragState.centerX, clientY - activeDragState.centerY);
+          const scaleFactor = currentDistance / activeDragState.initialDistance;
+          const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale * scaleFactor).toFixed(2))));
+          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
+        } else {
+          const delta = (clientX - startX) + (clientY - startY);
+          const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale + delta * 0.012).toFixed(2))));
+          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
+        }
       } else if (type === 'rotate') {
-        const deltaX = clientX - startX;
-        const newRot = (initialRotation + Math.round(deltaX * 1.2)) % 360;
-        setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
+        if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialAngleRad !== undefined) {
+          const currentAngleRad = Math.atan2(clientY - activeDragState.centerY, clientX - activeDragState.centerX);
+          const angleDeltaDeg = Math.round(((currentAngleRad - activeDragState.initialAngleRad) * 180) / Math.PI);
+          const newRot = (initialRotation + angleDeltaDeg + 3600) % 360;
+          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
+        } else {
+          const deltaX = clientX - startX;
+          const newRot = (initialRotation + Math.round(deltaX * 1.2)) % 360;
+          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
+        }
       }
     };
 
@@ -480,11 +502,14 @@ export const CustomizerContent = () => {
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
+    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
     setActiveDragState({
       type: 'move',
       layerId: id,
-      startX: e.clientX,
-      startY: e.clientY,
+      startX,
+      startY,
       initialX: layer.x,
       initialY: layer.y
     });
@@ -497,12 +522,21 @@ export const CustomizerContent = () => {
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
+    const center = getLayerCenterScreenCoords(layer);
+    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+    const initialAngleRad = center ? Math.atan2(startY - center.centerY, startX - center.centerX) : 0;
+
     setActiveDragState({
       type: 'rotate',
       layerId: id,
-      startX: e.clientX,
-      startY: e.clientY,
-      initialRotation: layer.rotation
+      startX,
+      startY,
+      centerX: center?.centerX,
+      centerY: center?.centerY,
+      initialAngleRad,
+      initialRotation: layer.rotation || 0
     });
   };
 
@@ -513,12 +547,21 @@ export const CustomizerContent = () => {
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
+    const center = getLayerCenterScreenCoords(layer);
+    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+    const initialDistance = center ? Math.hypot(startX - center.centerX, startY - center.centerY) : 1;
+
     setActiveDragState({
       type: 'scale',
       layerId: id,
-      startX: e.clientX,
-      startY: e.clientY,
-      initialScale: layer.scale
+      startX,
+      startY,
+      centerX: center?.centerX,
+      centerY: center?.centerY,
+      initialDistance: initialDistance || 1,
+      initialScale: layer.scale || 1.0
     });
   };
 
