@@ -152,23 +152,6 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
       ctx.stroke();
     }
 
-    // 4. DUAT Branding Pill at Bottom Center
-    ctx.fillStyle = '#12162B';
-    ctx.strokeStyle = 'rgba(232, 163, 61, 0.7)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(width / 2 - 55, height - 55, 110, 26, 13);
-    } else {
-      ctx.rect(width / 2 - 55, height - 55, 110, 26);
-    }
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = '#E8A33D';
-    ctx.font = 'bold 10px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('DUAT HORIZON', width / 2, height - 42);
 
     // 5. Draw Layers
     for (const layer of (layers || [])) {
