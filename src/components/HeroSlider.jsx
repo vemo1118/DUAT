@@ -117,9 +117,11 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       )}
 
       {/* Full Bleed Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 lg:px-16 py-16 sm:py-24 relative z-10">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-16 sm:py-24 relative z-10">
         <div
-          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-2xl ${alignClass}`}
+          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${
+            isRtl ? '-mr-2 lg:-mr-6' : '-ml-2 lg:-ml-6'
+          } ${alignClass}`}
           key={current.id}
         >
           
