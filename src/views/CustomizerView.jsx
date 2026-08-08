@@ -310,6 +310,8 @@ export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const { theme } = useTheme();
+  const isNight = theme === 'night';
   const { activeCaseTypes, activePhoneModels, activeBuilderStickers, activeBuilderCategories, builderPrice } = useCustomizerConfig();
   const location = useLocation();
 
