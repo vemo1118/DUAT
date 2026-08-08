@@ -46,11 +46,8 @@ export const CategoryBannersProvider = ({ children }) => {
       const saved = localStorage.getItem('duat_category_banners');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 2 && parsed.every((c) => c.id === 'cases' || c.id === 'stickers')) {
-          return INITIAL_CATEGORY_BANNERS.map((def) => {
-            const match = parsed.find((p) => p.id === def.id);
-            return match ? { ...def, ...match, nameEn: def.nameEn, nameAr: def.nameAr, subtitleEn: def.subtitleEn, subtitleAr: def.subtitleAr, imageUrl: match.imageUrl || def.imageUrl } : def;
-          });
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
       }
     } catch (e) {
@@ -71,6 +68,15 @@ export const CategoryBannersProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // Sync categoryBanners to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('duat_category_banners', JSON.stringify(categoryBanners));
+    } catch (e) {
+      console.warn('Failed saving duat_category_banners to localStorage:', e);
+    }
+  }, [categoryBanners]);
+
   // Sync forgeBanner to localStorage
   useEffect(() => {
     try {
@@ -79,6 +85,86 @@ export const CategoryBannersProvider = ({ children }) => {
       console.warn('Failed saving duat_forge_banner to localStorage:', e);
     }
   }, [forgeBanner]);
+
+  const addCategoryBanner = async (newBanner) => {
+    const id = newBanner.id || `cat-${Date.now()}`;
+    const formatted = {
+      ...newBanner,
+      id,
+      is_active: newBanner.is_active !== undefined ? newBanner.is_active : true,
+      badge: newBanner.badge || `0${categoryBanners.length + 1}`
+    };
+    setCategoryBanners((prev) => [...prev, formatted]);
+
+    try {
+      await supabase.from('category_banners').upsert({
+        id,
+        name_en: formatted.nameEn,
+        name_ar: formatted.nameAr,
+        subtitle_en: formatted.subtitleEn,
+        subtitle_ar: formatted.subtitleAr,
+        image_url: formatted.imageUrl,
+        is_active: formatted.is_active,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Supabase add category banner error:', err);
+    }
+  };
+
+  const updateCategoryBanner = async (bannerId, updatedFields) => {
+    setCategoryBanners((prev) =>
+      prev.map((b) => (b.id === bannerId ? { ...b, ...updatedFields } : b))
+    );
+
+    try {
+      await supabase.from('category_banners').upsert({
+        id: bannerId,
+        name_en: updatedFields.nameEn,
+        name_ar: updatedFields.nameAr,
+        subtitle_en: updatedFields.subtitleEn,
+        subtitle_ar: updatedFields.subtitleAr,
+        image_url: updatedFields.imageUrl,
+        is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Supabase category banner upsert error:', err);
+    }
+  };
+
+  const toggleCategoryBannerVisibility = async (bannerId) => {
+    let newStatus = true;
+    setCategoryBanners((prev) =>
+      prev.map((b) => {
+        if (b.id === bannerId) {
+          const current = b.is_active !== false && b.isActive !== false;
+          newStatus = !current;
+          return { ...b, is_active: newStatus, isActive: newStatus };
+        }
+        return b;
+      })
+    );
+
+    try {
+      await supabase
+        .from('category_banners')
+        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', bannerId);
+    } catch (err) {
+      console.warn('Supabase toggle category banner visibility error:', err);
+    }
+  };
+
+  const deleteCategoryBanner = async (bannerId) => {
+    setCategoryBanners((prev) => prev.filter((b) => b.id !== bannerId));
+
+    try {
+      await supabase.from('category_banners').delete().eq('id', bannerId);
+    } catch (err) {
+      console.warn('Supabase delete category banner error:', err);
+    }
+  };
 
   const updateForgeBanner = async (updatedFields) => {
     const updated = { ...forgeBanner, ...updatedFields };
