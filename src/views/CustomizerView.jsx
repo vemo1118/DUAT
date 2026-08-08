@@ -7,7 +7,7 @@ import { useCustomizerConfig } from '../context/CustomizerContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { useTheme } from '../context/ThemeContext';
 import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
-import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft, Info, Check, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft, Info, Check, Plus, Minus, ChevronDown, ChevronUp, Smartphone, Palette } from 'lucide-react';
 
 // Error Boundary Fallback for Customizer View
 class CustomizerErrorBoundary extends Component {
