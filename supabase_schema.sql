@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 -- Migrations for Products table
 ALTER TABLE public.products ALTER COLUMN id TYPE TEXT USING id::text;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS case_type_id TEXT;
 
 -- RLS & Grants for Products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
