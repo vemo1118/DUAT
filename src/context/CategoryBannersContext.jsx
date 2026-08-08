@@ -10,7 +10,7 @@ export const INITIAL_CATEGORY_BANNERS = [
     nameAr: 'الجرابات الفاخرة',
     subtitleEn: 'Case + 6 DUAT stickers, made to order',
     subtitleAr: 'جراب + ٦ استيكرات دوات، حسب الطلب',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
     badge: '01',
     categoryLink: '/shop'
   },
@@ -43,7 +43,7 @@ export const DEFAULT_FORGE_BANNER = {
 export const CategoryBannersProvider = ({ children }) => {
   const [categoryBanners, setCategoryBanners] = useState(() => {
     try {
-      const saved = localStorage.getItem('duat_category_banners');
+      const saved = localStorage.getItem('duat_category_banners_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -90,16 +90,20 @@ export const CategoryBannersProvider = ({ children }) => {
           setCategoryBanners((prev) =>
             prev.map((b) => {
               const match = catData.find((dbRow) => dbRow.id === b.id);
-              if (match) {
-                return {
-                  ...b,
-                  imageUrl: match.image_url || b.imageUrl,
-                  nameEn: match.name_en || b.nameEn,
-                  nameAr: match.name_ar || b.nameAr,
-                  subtitleEn: match.subtitle_en || b.subtitleEn,
-                  subtitleAr: match.subtitle_ar || b.subtitleAr,
-                  is_active: match.is_active !== undefined ? match.is_active : (b.is_active !== undefined ? b.is_active : true)
-                };
+              if (match && match.image_url) {
+                // Keep local image URL if user customized it
+                const localSaved = localStorage.getItem('duat_category_banners_v3');
+                if (!localSaved) {
+                  return {
+                    ...b,
+                    imageUrl: match.image_url || b.imageUrl,
+                    nameEn: match.name_en || b.nameEn,
+                    nameAr: match.name_ar || b.nameAr,
+                    subtitleEn: match.subtitle_en || b.subtitleEn,
+                    subtitleAr: match.subtitle_ar || b.subtitleAr,
+                    is_active: match.is_active !== undefined ? match.is_active : (b.is_active !== undefined ? b.is_active : true)
+                  };
+                }
               }
               return b;
             })
@@ -116,7 +120,7 @@ export const CategoryBannersProvider = ({ children }) => {
   // Sync categoryBanners to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_category_banners', JSON.stringify(categoryBanners));
+      localStorage.setItem('duat_category_banners_v3', JSON.stringify(categoryBanners));
     } catch (e) {
       console.warn('Failed saving duat_category_banners to localStorage:', e);
     }
