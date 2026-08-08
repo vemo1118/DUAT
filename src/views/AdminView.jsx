@@ -108,6 +108,7 @@ export function AdminView() {
     caseTypes,
     phoneModels,
     builderStickers,
+    builderCategories,
     addCaseType,
     updateCaseType,
     toggleCaseTypeVisibility,
@@ -120,6 +121,12 @@ export function AdminView() {
     toggleBuilderStickerVisibility,
     deleteBuilderSticker,
     resetBuilderStickers,
+    addBuilderCategory,
+    updateBuilderCategory,
+    moveBuilderCategory,
+    toggleBuilderCategoryVisibility,
+    deleteBuilderCategory,
+    resetBuilderCategories,
     setCategoryStickersVisibility,
     updatePrice,
     resetCustomizerConfig
@@ -129,6 +136,10 @@ export function AdminView() {
 
   const [isBuilderStickerModalOpen, setIsBuilderStickerModalOpen] = useState(false);
   const [editingBuilderSticker, setEditingBuilderSticker] = useState(null);
+
+  const [isCategoryEditModalOpen, setIsCategoryEditModalOpen] = useState(false);
+  const [editingCatData, setEditingCatData] = useState({ id: '', labelAr: '', labelEn: '', icon: '🏷️' });
+
   const { showToast } = useToast();
 
   // Builder Engine Tab Form States
@@ -2513,6 +2524,169 @@ export function AdminView() {
             </div>
           </div>
 
+          {/* 3.5. STICKER CATEGORIES MANAGEMENT (REORDER & RENAME) */}
+          <div className="bg-stone border border-gold/40 p-6 space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+                  <Layers size={16} />
+                  <span>إدارة أقسام وتصنيفات الاستيكرات وترتيبها (Sticker Categories & Sort Order — {builderCategories.length})</span>
+                </h3>
+                <p className="font-mono text-xs text-ash mt-1">
+                  تغيير ترتيب ظهور الأقسام (للأعلى وللأسفل)، تعديل أسمائها بالعربي والإنجليزي والأيقونة، وإضافة أقسام جديدة.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingCatData({ id: '', labelAr: '', labelEn: '', icon: '🏷️' });
+                    setIsCategoryEditModalOpen(true);
+                  }}
+                  className="btn-primary py-2 px-4 text-xs font-mono font-bold flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  <span>إضافة قسم/تصنيف جديد +</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('إعادة ضبط أقسام الاستيكرات للوضع الافتراضي وترتيبها الأولي؟')) {
+                      resetBuilderCategories();
+                      showToast('تمت إعادة ضبط الأقسام للترتيب الافتراضي 🔄', 'success');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
+                >
+                  <RotateCcw size={14} />
+                  <span>إعادة ضبط الأقسام 🔄</span>
+                </button>
+              </div>
+            </div>
+
+            {/* List / Table of Categories */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {builderCategories.map((cat, catIdx) => {
+                const isActive = cat.is_active !== false;
+                const stickerCount = builderStickers.filter((s) => {
+                  if (cat.id === 'letters') return s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters';
+                  if (cat.id === 'letters-en') return s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en';
+                  if (cat.id === 'years') return s.id?.startsWith('year-') || s.category === 'years';
+                  if (cat.id === 'months') return s.id?.startsWith('month-') || s.category === 'months';
+                  if (cat.id === 'quotes-ar') return s.category === 'quotes-ar' || s.id === 'st-born-dawn' || s.id === 'st-through-night';
+                  if (cat.id === 'quotes-en') return s.category === 'quotes-en' || s.id === 'st-duat';
+                  if (cat.id === 'motifs') return s.category === 'motifs' || s.id === 'st-crescent' || s.id === 'st-starry' || s.id === 'st-sun';
+                  return s.category === cat.id;
+                }).length;
+
+                return (
+                  <div
+                    key={cat.id}
+                    className={`p-4 bg-coal border rounded flex flex-col justify-between space-y-3 transition-colors ${
+                      isActive ? 'border-grave hover:border-gold/60' : 'border-red-900/50 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xl p-2 bg-stone rounded border border-grave flex items-center justify-center">
+                          {cat.icon || '🏷️'}
+                        </span>
+                        <div>
+                          <p className="font-space text-sm font-bold text-bone flex items-center gap-1.5">
+                            <span>{cat.labelAr}</span>
+                            <span className="text-[10px] font-mono text-gold bg-gold/10 px-1.5 py-0.5 rounded border border-gold/30">
+                              #{catIdx + 1}
+                            </span>
+                          </p>
+                          <p className="font-mono text-xs text-ash">{cat.labelEn}</p>
+                          <p className="font-mono text-[10px] text-ash/80 mt-0.5">
+                            {stickerCount} استيكر مرتبط
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Move Up / Move Down Buttons */}
+                      <div className="flex flex-col items-center gap-1 font-mono text-xs">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            moveBuilderCategory(cat.id, 'up');
+                            showToast(`تم تقديم القسم "${cat.labelAr}" للأمام ⬆️`, 'info');
+                          }}
+                          disabled={catIdx === 0}
+                          className="p-1 border border-grave bg-stone hover:border-gold text-ash hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded"
+                          title="تحريك للأعلى (تقديم الترتيب)"
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            moveBuilderCategory(cat.id, 'down');
+                            showToast(`تم تأخير القسم "${cat.labelAr}" للخلف ⬇️`, 'info');
+                          }}
+                          disabled={catIdx === builderCategories.length - 1}
+                          className="p-1 border border-grave bg-stone hover:border-gold text-ash hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded"
+                          title="تحريك لأسفل (تأخير الترتيب)"
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2 font-mono text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toggleBuilderCategoryVisibility(cat.id);
+                          showToast(isActive ? `تم إخفاء القسم "${cat.labelAr}"` : `تم إظهار القسم "${cat.labelAr}"`, 'info');
+                        }}
+                        className={`flex items-center gap-1 px-2.5 py-1 font-bold border transition-colors ${
+                          isActive
+                            ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                            : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
+                        }`}
+                      >
+                        {isActive ? <Eye size={12} /> : <EyeOff size={12} />}
+                        <span>{isActive ? 'ظاهر' : 'مخفي'}</span>
+                      </button>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCatData(cat);
+                            setIsCategoryEditModalOpen(true);
+                          }}
+                          className="flex items-center gap-1 px-2.5 py-1 border border-gold/60 text-gold hover:bg-gold hover:text-void font-bold transition-all rounded"
+                        >
+                          <Edit2 size={12} />
+                          <span>تعديل</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`هل أنت تأكد من حذف القسم "${cat.labelAr}"؟`)) {
+                              deleteBuilderCategory(cat.id);
+                              showToast('تم حذف القسم بنجاح', 'warning');
+                            }
+                          }}
+                          className="p-1 text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 rounded transition-colors"
+                          title="حذف القسم"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* 4. BUILDER STICKERS CONTROL SECTION */}
           <div className="bg-stone border border-grave p-6 space-y-6">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
@@ -2563,7 +2737,7 @@ export function AdminView() {
               </div>
             </div>
 
-            {/* Category Filter & Batch Visibility Controls Bar */}
+            {/* Dynamic Category Filter & Batch Visibility Controls Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-coal p-4 border border-grave rounded">
               <div className="flex flex-wrap gap-2">
                 <button
@@ -2575,33 +2749,32 @@ export function AdminView() {
                 >
                   الكل ({builderStickers.length})
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setAdminStickerFilter('letters-ar')}
-                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
-                    adminStickerFilter === 'letters-ar' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
-                  }`}
-                >
-                  حروف رقعة 🔤 ({builderStickers.filter(s => s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAdminStickerFilter('letters-en')}
-                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
-                    adminStickerFilter === 'letters-en' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
-                  }`}
-                >
-                  حروف إنجليزي 🅰️ ({builderStickers.filter(s => s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAdminStickerFilter('motifs')}
-                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
-                    adminStickerFilter === 'motifs' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
-                  }`}
-                >
-                  شعارات ومجسمات ✨ ({builderStickers.filter(s => !s.id?.startsWith('ar-letter-') && !s.id?.startsWith('en-letter-') && s.category !== 'letters' && s.category !== 'letters-en').length})
-                </button>
+
+                {builderCategories.map((cat) => {
+                  const stickerCount = builderStickers.filter((s) => {
+                    if (cat.id === 'letters') return s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters';
+                    if (cat.id === 'letters-en') return s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en';
+                    if (cat.id === 'years') return s.id?.startsWith('year-') || s.category === 'years';
+                    if (cat.id === 'months') return s.id?.startsWith('month-') || s.category === 'months';
+                    if (cat.id === 'quotes-ar') return s.category === 'quotes-ar' || s.id === 'st-born-dawn' || s.id === 'st-through-night';
+                    if (cat.id === 'quotes-en') return s.category === 'quotes-en' || s.id === 'st-duat';
+                    if (cat.id === 'motifs') return s.category === 'motifs' || s.id === 'st-crescent' || s.id === 'st-starry' || s.id === 'st-sun';
+                    return s.category === cat.id;
+                  }).length;
+
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setAdminStickerFilter(cat.id)}
+                      className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 ${
+                        adminStickerFilter === cat.id ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
+                      }`}
+                    >
+                      <span>{cat.icon || '🏷️'} {cat.labelAr} ({stickerCount})</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Batch Action Buttons */}
@@ -2637,14 +2810,15 @@ export function AdminView() {
             {/* Grid of Builder Stickers */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
               {builderStickers.filter((st) => {
-                const isAr = st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
-                const isEn = st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
-                const isMotif = !isAr && !isEn;
-
-                if (adminStickerFilter === 'letters-ar') return isAr;
-                if (adminStickerFilter === 'letters-en') return isEn;
-                if (adminStickerFilter === 'motifs') return isMotif;
-                return true;
+                if (adminStickerFilter === 'all') return true;
+                if (adminStickerFilter === 'letters-ar' || adminStickerFilter === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
+                if (adminStickerFilter === 'letters-en') return st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
+                if (adminStickerFilter === 'years') return st.id?.startsWith('year-') || st.category === 'years';
+                if (adminStickerFilter === 'months') return st.id?.startsWith('month-') || st.category === 'months';
+                if (adminStickerFilter === 'quotes-ar') return st.category === 'quotes-ar' || st.id === 'st-born-dawn' || st.id === 'st-through-night';
+                if (adminStickerFilter === 'quotes-en') return st.category === 'quotes-en' || st.id === 'st-duat';
+                if (adminStickerFilter === 'motifs') return st.category === 'motifs' || st.id === 'st-crescent' || st.id === 'st-starry' || st.id === 'st-sun';
+                return st.category === adminStickerFilter;
               }).map((st) => {
                 const isActive = st.is_active !== false && st.isActive !== false;
                 return (
@@ -3158,6 +3332,115 @@ export function AdminView() {
                 </select>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL: ADD / EDIT STICKER CATEGORY */}
+      {/* ============================================================ */}
+      {isCategoryEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-stone border border-gold p-6 sm:p-8 rounded-lg max-w-lg w-full space-y-6 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-grave pb-4">
+              <h3 className="font-clash text-xl font-bold text-bone flex items-center gap-2">
+                <Layers className="text-gold" size={22} />
+                <span>{editingCatData.id ? 'تعديل قسم الاستيكرات' : 'إضافة قسم استيكرات جديد'}</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCategoryEditModalOpen(false)}
+                className="text-ash hover:text-bone font-mono font-bold text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!editingCatData.labelAr.trim() || !editingCatData.labelEn.trim()) {
+                  showToast('يرجى إدخال اسم القسم بالعربية والإنجليزي', 'error');
+                  return;
+                }
+                if (editingCatData.id) {
+                  updateBuilderCategory(editingCatData.id, editingCatData);
+                  showToast(`تم تعديل القسم "${editingCatData.labelAr}" بنجاح! 🎨`, 'success');
+                } else {
+                  addBuilderCategory(editingCatData);
+                  showToast(`تمت إضافة القسم الجديد "${editingCatData.labelAr}" بنجاح! 🎉`, 'success');
+                }
+                setIsCategoryEditModalOpen(false);
+              }}
+              className="space-y-4 font-mono text-xs"
+            >
+              <div>
+                <label className="block text-gold font-bold mb-1">اسم القسم بالعربية (AR Label):</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="مثال: عبارات وتوقيعات"
+                  value={editingCatData.labelAr}
+                  onChange={(e) => setEditingCatData({ ...editingCatData, labelAr: e.target.value })}
+                  className="w-full bg-coal border border-grave p-3 text-bone focus:border-gold outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gold font-bold mb-1">اسم القسم بالإنجليزي (EN Label):</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Slogans & Quotes"
+                  value={editingCatData.labelEn}
+                  onChange={(e) => setEditingCatData({ ...editingCatData, labelEn: e.target.value })}
+                  className="w-full bg-coal border border-grave p-3 text-bone focus:border-gold outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-ash mb-1">رمز / أيقونة القسم (Emoji):</label>
+                  <input
+                    type="text"
+                    placeholder="✨"
+                    value={editingCatData.icon}
+                    onChange={(e) => setEditingCatData({ ...editingCatData, icon: e.target.value })}
+                    className="w-full bg-coal border border-grave p-3 text-bone text-center text-lg focus:border-gold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ash mb-1">معرّف القسم (ID Unique):</label>
+                  <input
+                    type="text"
+                    disabled={Boolean(editingCatData.id)}
+                    placeholder="custom-category"
+                    value={editingCatData.id || ''}
+                    onChange={(e) => setEditingCatData({ ...editingCatData, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                    className="w-full bg-coal border border-grave p-3 text-bone font-mono focus:border-gold outline-none disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-grave flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryEditModalOpen(false)}
+                  className="px-4 py-2.5 border border-grave text-ash hover:text-bone"
+                >
+                  إلغاء
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn-primary py-2.5 px-6 font-bold uppercase tracking-wider flex items-center gap-2"
+                >
+                  <Save size={16} />
+                  <span>حفظ القسم</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

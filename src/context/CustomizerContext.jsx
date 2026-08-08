@@ -4,11 +4,22 @@ import { CASE_TYPES as DEFAULT_CASE_TYPES, PHONE_MODELS as DEFAULT_PHONE_MODELS,
 
 const CustomizerContext = createContext();
 
+export const DEFAULT_BUILDER_CATEGORIES = [
+  { id: 'letters', labelAr: 'حروف رقعة', labelEn: 'Arabic Letters', icon: '🔤', is_active: true },
+  { id: 'letters-en', labelAr: 'حروف إنجليزي', labelEn: 'English Letters', icon: '🅰️', is_active: true },
+  { id: 'motifs', labelAr: 'شعارات ومجسمات', labelEn: 'Shapes & Motifs', icon: '✨', is_active: true },
+  { id: 'quotes-ar', labelAr: 'عبارات عربية', labelEn: 'Arabic Quotes', icon: '📜', is_active: true },
+  { id: 'quotes-en', labelAr: 'عبارات إنجليزي', labelEn: 'English Quotes', icon: '💬', is_active: true },
+  { id: 'years', labelAr: 'سنوات ميلادية', labelEn: 'Gregorian Years', icon: '📅', is_active: true },
+  { id: 'months', labelAr: 'أشهر السنة', labelEn: 'Months of the Year', icon: '🗓️', is_active: true }
+];
+
 export const INITIAL_BUILDER_CONFIG = {
   price: 850,
   caseTypes: DEFAULT_CASE_TYPES.map((c) => ({ ...c, is_active: true })),
   phoneModels: DEFAULT_PHONE_MODELS.map((m) => ({ ...m, is_active: true })),
-  stickers: DEFAULT_STICKER_PRESETS.map((s) => ({ ...s, is_active: true }))
+  stickers: DEFAULT_STICKER_PRESETS.map((s) => ({ ...s, is_active: true })),
+  categories: DEFAULT_BUILDER_CATEGORIES
 };
 
 function ensureOtherCustomFirst(models) {
@@ -58,6 +69,19 @@ export const CustomizerProvider = ({ children }) => {
     return INITIAL_BUILDER_CONFIG.stickers;
   });
 
+  const [builderCategories, setBuilderCategories] = useState(() => {
+    try {
+      const saved = localStorage.getItem('duat_builder_categories');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error reading duat_builder_categories:', e);
+    }
+    return DEFAULT_BUILDER_CATEGORIES;
+  });
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -65,10 +89,11 @@ export const CustomizerProvider = ({ children }) => {
       localStorage.setItem('duat_case_types', JSON.stringify(caseTypes));
       localStorage.setItem('duat_phone_models', JSON.stringify(ensureOtherCustomFirst(phoneModels)));
       localStorage.setItem('duat_builder_stickers_v1', JSON.stringify(builderStickers));
+      localStorage.setItem('duat_builder_categories', JSON.stringify(builderCategories));
     } catch (e) {
       console.warn('Error persisting customizer config:', e);
     }
-  }, [builderPrice, caseTypes, phoneModels, builderStickers]);
+  }, [builderPrice, caseTypes, phoneModels, builderStickers, builderCategories]);
 
   // Sync with Supabase builder_settings if available
   useEffect(() => {
@@ -80,6 +105,9 @@ export const CustomizerProvider = ({ children }) => {
           if (data.price) setBuilderPrice(data.price);
           if (data.case_types) setCaseTypes(data.case_types);
           if (data.phone_models) setPhoneModels(ensureOtherCustomFirst(data.phone_models));
+          if (data.builder_categories && Array.isArray(data.builder_categories) && data.builder_categories.length > 0) {
+            setBuilderCategories(data.builder_categories);
+          }
           if (data.builder_stickers) {
             const dbStickers = Array.isArray(data.builder_stickers) ? data.builder_stickers : [];
             const dbIds = new Set(dbStickers.map((s) => s?.id));
@@ -95,7 +123,7 @@ export const CustomizerProvider = ({ children }) => {
     return () => { isMounted = false; };
   }, []);
 
-  const saveToSupabase = async (newPrice, newCaseTypes, newPhoneModels, newStickers) => {
+  const saveToSupabase = async (newPrice, newCaseTypes, newPhoneModels, newStickers, newCategories) => {
     try {
       await supabase.from('builder_settings').upsert({
         id: 'global-builder-config',
@@ -103,6 +131,7 @@ export const CustomizerProvider = ({ children }) => {
         case_types: newCaseTypes,
         phone_models: ensureOtherCustomFirst(newPhoneModels),
         builder_stickers: newStickers,
+        builder_categories: newCategories || builderCategories,
         updated_at: new Date().toISOString()
       });
     } catch (err) {
@@ -269,15 +298,82 @@ export const CustomizerProvider = ({ children }) => {
     setCaseTypes(INITIAL_BUILDER_CONFIG.caseTypes);
     setPhoneModels(ensureOtherCustomFirst(INITIAL_BUILDER_CONFIG.phoneModels));
     setBuilderStickers(INITIAL_BUILDER_CONFIG.stickers);
+    setBuilderCategories(DEFAULT_BUILDER_CATEGORIES);
     localStorage.removeItem('duat_builder_price');
     localStorage.removeItem('duat_case_types');
     localStorage.removeItem('duat_phone_models');
     localStorage.removeItem('duat_builder_stickers_v1');
+    localStorage.removeItem('duat_builder_categories');
+  };
+
+  // Builder Category Operations (FULL CRUD & REORDER)
+  const addBuilderCategory = (catData) => {
+    const newCat = {
+      id: catData.id || `cat-${Date.now()}`,
+      labelAr: catData.labelAr || 'قسم جديد',
+      labelEn: catData.labelEn || 'New Category',
+      icon: catData.icon || '🏷️',
+      is_active: true
+    };
+    setBuilderCategories((prev) => {
+      const updated = [...prev, newCat];
+      saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, updated);
+      return updated;
+    });
+    return newCat;
+  };
+
+  const updateBuilderCategory = (id, updatedFields) => {
+    setBuilderCategories((prev) => {
+      const updated = prev.map((c) => (c.id === id ? { ...c, ...updatedFields } : c));
+      saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, updated);
+      return updated;
+    });
+  };
+
+  const moveBuilderCategory = (id, direction) => {
+    setBuilderCategories((prev) => {
+      const index = prev.findIndex((c) => c.id === id);
+      if (index < 0) return prev;
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+
+      const updated = [...prev];
+      const temp = updated[index];
+      updated[index] = updated[targetIndex];
+      updated[targetIndex] = temp;
+
+      saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, updated);
+      return updated;
+    });
+  };
+
+  const toggleBuilderCategoryVisibility = (id) => {
+    setBuilderCategories((prev) => {
+      const updated = prev.map((c) => (c.id === id ? { ...c, is_active: c.is_active === false ? true : false } : c));
+      saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, updated);
+      return updated;
+    });
+  };
+
+  const deleteBuilderCategory = (id) => {
+    setBuilderCategories((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, updated);
+      return updated;
+    });
+  };
+
+  const resetBuilderCategories = () => {
+    setBuilderCategories(DEFAULT_BUILDER_CATEGORIES);
+    localStorage.removeItem('duat_builder_categories');
+    saveToSupabase(builderPrice, caseTypes, phoneModels, builderStickers, DEFAULT_BUILDER_CATEGORIES);
   };
 
   const activeCaseTypes = caseTypes.filter((c) => c.is_active !== false);
   const activePhoneModels = ensureOtherCustomFirst(phoneModels.filter((m) => m.is_active !== false));
   const activeBuilderStickers = builderStickers.filter((s) => s.is_active !== false && s.isActive !== false);
+  const activeBuilderCategories = builderCategories.filter((c) => c.is_active !== false);
 
   return (
     <CustomizerContext.Provider
@@ -286,9 +382,11 @@ export const CustomizerProvider = ({ children }) => {
         caseTypes,
         phoneModels,
         builderStickers,
+        builderCategories,
         activeCaseTypes,
         activePhoneModels,
         activeBuilderStickers,
+        activeBuilderCategories,
         addCaseType,
         updateCaseType,
         toggleCaseTypeVisibility,
@@ -301,6 +399,12 @@ export const CustomizerProvider = ({ children }) => {
         toggleBuilderStickerVisibility,
         deleteBuilderSticker,
         resetBuilderStickers,
+        addBuilderCategory,
+        updateBuilderCategory,
+        moveBuilderCategory,
+        toggleBuilderCategoryVisibility,
+        deleteBuilderCategory,
+        resetBuilderCategories,
         setCategoryStickersVisibility,
         updatePrice,
         resetCustomizerConfig

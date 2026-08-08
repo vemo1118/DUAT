@@ -311,7 +311,7 @@ export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { activeCaseTypes, activePhoneModels, activeBuilderStickers, builderPrice } = useCustomizerConfig();
+  const { activeCaseTypes, activePhoneModels, activeBuilderStickers, activeBuilderCategories, builderPrice } = useCustomizerConfig();
   const location = useLocation();
 
   const CASE_TYPES = Array.isArray(activeCaseTypes) && activeCaseTypes.length > 0 ? activeCaseTypes : DEFAULT_CASE_TYPES;
@@ -793,20 +793,27 @@ export const CustomizerContent = () => {
   const logoTextColor = isLightCase ? 'text-[#0A0C16] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]' : 'text-[#E8A33D] drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]';
 
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState('motifs');
+
+  const dynamicStickerCategories = (Array.isArray(activeBuilderCategories) && activeBuilderCategories.length > 0)
+    ? activeBuilderCategories
+    : [
+        { id: 'motifs', labelAr: 'أشكال ومجسمات', labelEn: 'Shapes & Motifs', icon: '✨' },
+        { id: 'quotes-ar', labelAr: 'عبارات عربية', labelEn: 'Arabic Quotes', icon: '📜' },
+        { id: 'quotes-en', labelAr: 'عبارات إنجليزي', labelEn: 'English Quotes', icon: '💬' },
+        { id: 'letters', labelAr: 'حروف رقعة', labelEn: 'Arabic Letters', icon: '🔤' },
+        { id: 'years', labelAr: 'سنوات ميلادية', labelEn: 'Gregorian Years', icon: '📅' },
+        { id: 'months', labelAr: 'أشهر السنة', labelEn: 'Months of the Year', icon: '🗓️' },
+        { id: 'letters-en', labelAr: 'حروف إنجليزي', labelEn: 'English Letters', icon: '🅰️' },
+      ];
 
   const CATEGORY_PILLS = [
-    { id: 'motifs', labelAr: 'أشكال ومجسمات', labelEn: 'Shapes & Motifs' },
-    { id: 'quotes-ar', labelAr: 'عبارات عربية', labelEn: 'Arabic Quotes' },
-    { id: 'quotes-en', labelAr: 'عبارات إنجليزي', labelEn: 'English Quotes' },
-    { id: 'letters', labelAr: 'حروف عربية', labelEn: 'Arabic Letters' },
-    { id: 'years', labelAr: 'سنوات ميلادية', labelEn: 'Gregorian Years' },
-    { id: 'months', labelAr: 'أشهر السنة', labelEn: 'Months of the Year' },
-    { id: 'letters-en', labelAr: 'حروف إنجليزي', labelEn: 'English Letters' },
-    { id: 'model', labelAr: 'نوع ورسم الجراب', labelEn: 'Case & Model' },
-    { id: 'text-photo', labelAr: 'كتابة وصور', labelEn: 'Text & Upload' },
-    { id: 'presets', labelAr: 'قوالب جاهزة', labelEn: 'Presets' },
+    ...dynamicStickerCategories,
+    { id: 'model', labelAr: 'نوع ورسم الجراب', labelEn: 'Case & Model', icon: '📱' },
+    { id: 'text-photo', labelAr: 'كتابة وصور', labelEn: 'Text & Upload', icon: '🖼️' },
+    { id: 'presets', labelAr: 'قوالب جاهزة', labelEn: 'Presets', icon: '🎨' },
   ];
+
+  const [activeCategory, setActiveCategory] = useState(() => CATEGORY_PILLS[0]?.id || 'motifs');
 
   const getStickerSubLabel = (st) => {
     if (!st) return '';
