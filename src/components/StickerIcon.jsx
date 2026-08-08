@@ -12,36 +12,10 @@ const CANVAS_DIMS = {
 };
 
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor, forCanvas = false }) => {
+  const isArabicLetter = stickerId && (stickerId.startsWith('ar-letter-') || stickerId.startsWith('st-letter-'));
   const customImg = image || imageUrl;
 
-  if (customImg) {
-    if (forCanvas) {
-      // Fixed natural size on the phone canvas
-      const dims = CANVAS_DIMS[stickerId] || { w: 90, h: 90 };
-      return (
-        <img
-          src={customImg}
-          alt="Sticker"
-          style={{ width: dims.w, height: dims.h, objectFit: 'contain', display: 'block' }}
-          className="pointer-events-none select-none"
-          draggable={false}
-        />
-      );
-    }
-
-    // Selection panel: fill the square card
-    return (
-      <img
-        src={customImg}
-        alt="Sticker"
-        className="w-full h-full object-contain pointer-events-none select-none"
-        style={{ display: 'block' }}
-      />
-    );
-  }
-
   // ── Synthetic 3D Epoxy Arabic Ruq'ah Square Letter Domes ──────────────────
-  const isArabicLetter = stickerId && (stickerId.startsWith('ar-letter-') || stickerId.startsWith('st-letter-'));
   if (isArabicLetter) {
     const char = stickerId.replace(/^(ar-letter-|st-letter-)/, '');
     const boxSize = forCanvas ? 64 : size;
@@ -91,6 +65,33 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
       </div>
     );
   }
+
+  if (customImg) {
+    if (forCanvas) {
+      // Fixed natural size on the phone canvas
+      const dims = CANVAS_DIMS[stickerId] || { w: 90, h: 90 };
+      return (
+        <img
+          src={customImg}
+          alt="Sticker"
+          style={{ width: dims.w, height: dims.h, objectFit: 'contain', display: 'block' }}
+          className="pointer-events-none select-none"
+          draggable={false}
+        />
+      );
+    }
+
+    // Selection panel: fill the square card
+    return (
+      <img
+        src={customImg}
+        alt="Sticker"
+        className="w-full h-full object-contain pointer-events-none select-none"
+        style={{ display: 'block' }}
+      />
+    );
+  }
+
 
   // ── Fallback synthetic domes (no image uploaded) ──────────────────────────
   switch (stickerId) {

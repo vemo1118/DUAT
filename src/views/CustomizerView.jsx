@@ -1267,7 +1267,9 @@ export const CustomizerContent = () => {
                         />
                       </div>
                       <span className="font-space text-xs text-bone group-hover:text-gold tracking-wide truncate max-w-full font-bold">
-                        {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
+                        {st.id?.startsWith('ar-letter-')
+                          ? (lang === 'ar' ? `حرف ${st.id.replace('ar-letter-', '')}` : `Letter ${st.id.replace('ar-letter-', '')}`)
+                          : (lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr))}
                       </span>
                     </button>
                   ))}
