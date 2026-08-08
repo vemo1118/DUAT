@@ -48,11 +48,11 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
-          className="select-none leading-none transform translate-y-[-1px] font-sans"
+          className="select-none leading-none transform translate-y-[-1px] font-arsenica"
           style={{
-            fontSize: `${Math.round(boxSize * 0.58)}px`,
-            fontFamily: "'IBM Plex Sans Arabic', 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif",
-            fontWeight: 800,
+            fontSize: `${Math.round(boxSize * 0.60)}px`,
+            fontFamily: "'Arsenica Arabic', 'Arsenica-Arabic-Demibold-TRIAL', 'IBM Plex Sans Arabic', 'Cairo', serif",
+            fontWeight: 600,
             color: '#000000',
             textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.15)'
           }}

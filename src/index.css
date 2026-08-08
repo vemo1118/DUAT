@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Arsenica Arabic';
+  src: url('/fonts/Arsenica-Arabic-Demibold-TRIAL.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-arsenica {
+  font-family: 'Arsenica Arabic', 'Arsenica-Arabic-Demibold-TRIAL', 'IBM Plex Sans Arabic', 'Cairo', serif;
+}
+
 .font-ruqaa {
   font-family: 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', 'Rakkas', serif;
 }
