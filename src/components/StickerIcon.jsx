@@ -21,10 +21,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const isDefaultColor = !color || color === '#E8A33D';
-    const finalTextColor = isTransparentBg
-      ? (isDefaultColor ? '#FFFFFF' : color)
-      : (isDefaultColor ? '#141414' : color);
+    const finalTextColor = isTransparentBg ? (color || '#000000') : '#000000';
 
     const finalBg = isTransparentBg
       ? 'transparent'
@@ -72,10 +69,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const isDefaultColor = !color || color === '#E8A33D';
-    const finalTextColor = isTransparentBg
-      ? (isDefaultColor ? '#FFFFFF' : color)
-      : (isDefaultColor ? '#FFFFFF' : color);
+    const finalTextColor = isTransparentBg ? (color || '#FFFFFF') : '#FFFFFF';
 
     const finalBg = isTransparentBg
       ? 'transparent'
