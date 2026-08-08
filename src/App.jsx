@@ -15,6 +15,8 @@ import { ProductsProvider } from './context/ProductsContext';
 import { OrdersProvider } from './context/OrdersContext';
 import { HeroBannersProvider } from './context/HeroBannersContext';
 import { CategoryBannersProvider } from './context/CategoryBannersContext';
+import { CustomizerProvider } from './context/CustomizerContext';
+import { SocialGridProvider } from './context/SocialGridContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { AnnouncementMarquee } from './components/AnnouncementMarquee';
