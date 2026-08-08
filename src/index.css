@@ -85,13 +85,13 @@ html[data-theme="dawn"] body {
   min-height: 100vh;
 }
 
-/* Dawn Mode Class Overrides for High Contrast (excluding hero section and header) */
-html[data-theme="dawn"] :not(.hero-section):not(header) .text-bone,
-html[data-theme="dawn"] body:not(.hero-section):not(header) h1,
-html[data-theme="dawn"] body:not(.hero-section):not(header) h2,
-html[data-theme="dawn"] body:not(.hero-section):not(header) h3,
-html[data-theme="dawn"] body:not(.hero-section):not(header) h4,
-html[data-theme="dawn"] body:not(.hero-section):not(header) p {
+/* Dawn Mode Class Overrides for High Contrast (excluding hero section) */
+html[data-theme="dawn"] :not(.hero-section) .text-bone,
+html[data-theme="dawn"] body:not(.hero-section) h1,
+html[data-theme="dawn"] body:not(.hero-section) h2,
+html[data-theme="dawn"] body:not(.hero-section) h3,
+html[data-theme="dawn"] body:not(.hero-section) h4,
+html[data-theme="dawn"] body:not(.hero-section) p {
   color: #1A1714;
 }
 
