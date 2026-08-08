@@ -91,7 +91,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-bone transition-colors"
+      className="hero-section relative w-full bg-[#0A0C16] border-b border-[#28305F] overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-[#EDE4D3] shadow-2xl"
     >
       {/* Full-Bleed Background Image Layer */}
       {bgImage ? (
@@ -101,15 +101,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             alt="Hero Background"
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
-          {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
+          {/* Filmic High-Contrast Dark Gradient Vignette Overlays (RTL & LTR Aware) */}
           <div
             className={`absolute inset-0 ${
               isRtl
-                ? 'bg-gradient-to-l from-void via-void/95 via-80% to-transparent'
-                : 'bg-gradient-to-r from-void via-void/95 via-80% to-transparent'
+                ? 'bg-gradient-to-l from-[#0A0C16] via-[#0A0C16]/85 to-transparent sm:w-3/4'
+                : 'bg-gradient-to-r from-[#0A0C16] via-[#0A0C16]/85 to-transparent sm:w-3/4'
             }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-void via-transparent to-void/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C16]/95 via-transparent to-[#0A0C16]/40" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
@@ -125,13 +125,13 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           
           {/* Eyebrow & Offer Badge */}
           <div className={`flex flex-wrap items-center gap-3 ${flexJustifyClass}`}>
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/15 px-3.5 py-1.5 border border-gold/40 backdrop-blur-md rounded-sm shadow-md">
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-[#E8A33D] font-bold bg-[#E8A33D]/15 px-3.5 py-1.5 border border-[#E8A33D]/40 backdrop-blur-md rounded-sm shadow-md">
               <SunDisc size={14} variant="gold" />
               <span>{eyebrow}</span>
             </div>
 
             {badge && (
-              <span className="font-mono text-xs uppercase tracking-widest text-red-400 bg-red-950/70 border border-red-500/50 px-3.5 py-1.5 font-bold animate-pulse backdrop-blur-md rounded-sm shadow-md">
+              <span className="font-mono text-xs uppercase tracking-widest text-red-300 bg-red-950/70 border border-red-500/50 px-3.5 py-1.5 font-bold animate-pulse backdrop-blur-md rounded-sm shadow-md">
                 {badge}
               </span>
             )}
@@ -140,15 +140,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           {/* Headlines */}
           <div className="space-y-1 w-full">
             <h1
-              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone drop-shadow-md"
-              style={{ color: current?.headline1Color || undefined }}
+              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-[#EDE4D3] drop-shadow-xl"
+              style={{ color: current?.headline1Color || '#EDE4D3' }}
             >
               {headline1}
             </h1>
             {headline2 && (
               <h2
-                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold drop-shadow-md"
-                style={{ color: current?.headline2Color || undefined }}
+                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-[#E8A33D] drop-shadow-xl"
+                style={{ color: current?.headline2Color || '#E8A33D' }}
               >
                 {headline2}
               </h2>
@@ -157,30 +157,30 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
           {/* Subtitle / Description */}
           <p
-            className="font-space text-sm sm:text-base font-normal max-w-xl leading-relaxed text-bone/90 drop-shadow-sm"
-            style={{ color: current?.subColor || undefined }}
+            className="font-space text-sm sm:text-base font-normal max-w-xl leading-relaxed text-[#EDE4D3]/90 drop-shadow-md"
+            style={{ color: current?.subColor || '#EDE4D3' }}
           >
             {sub}
           </p>
 
-          {/* Action Buttons: Glassmorphism Navbar Style */}
+          {/* Action Buttons: Solid Gold & Frosted Glass */}
           <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
-            {/* Primary Action Button - Dynamic Gold */}
+            {/* Primary Action Button - Vibrant Gold */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              className="py-4 px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-4 px-8 bg-[#E8A33D] hover:bg-[#C97B22] text-[#0A0C16] font-bold border border-[#E8A33D] transition-all duration-300 shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
               {isRtl ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
             </button>
 
-            {/* Secondary Action Button - Dynamic Frosted Glass */}
+            {/* Secondary Action Button - Frosted Glass */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              className="py-4 px-8 bg-stone hover:bg-coal border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-4 px-8 bg-[#12162B]/80 hover:bg-[#181E3B] border border-[#28305F] text-[#EDE4D3] hover:border-[#E8A33D] hover:text-[#E8A33D] transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
             >
-              <Sparkles size={16} className="text-gold" />
+              <Sparkles size={16} className="text-[#E8A33D]" />
               <span>{secondaryBtnText}</span>
             </button>
           </div>
@@ -189,15 +189,16 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       </div>
 
       {/* Manual Slide Controls & Dots Bar (Bottom) */}
-      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-4 bg-stone/90 border border-grave px-4 py-2 backdrop-blur">
+      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-4 bg-[#12162B]/90 border border-[#28305F] px-4 py-2 backdrop-blur">
         {/* Slide Counter / Indicators */}
-        <div className="flex items-center gap-1.5 font-mono text-xs text-ash">
+        <div className="flex items-center gap-1.5 font-mono text-xs text-[#8E98BF]">
           {activeSlides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
+              style={currentSlide === idx ? { backgroundColor: '#E8A33D' } : { backgroundColor: '#28305F' }}
               className={`h-2 transition-all rounded-full shrink-0 ${
-                currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-ash hover:bg-gold'
+                currentSlide === idx ? 'w-6' : 'w-2 hover:bg-[#8E98BF]'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -206,17 +207,17 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
         {/* Corrected Prev / Next Arrow Directions */}
         {activeSlides.length > 1 && (
-          <div className="flex items-center gap-1 border-l border-grave pl-3 pr-1">
+          <div className="flex items-center gap-1 border-l border-[#28305F] pl-3 pr-1">
             <button
               onClick={handlePrev}
-              className="p-1.5 text-ash hover:text-gold transition-colors"
+              className="p-1.5 text-[#8E98BF] hover:text-[#E8A33D] transition-colors"
               title={isAr ? 'السابق' : 'Previous'}
             >
               {isRtl ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
             <button
               onClick={handleNext}
-              className="p-1.5 text-ash hover:text-gold transition-colors"
+              className="p-1.5 text-[#8E98BF] hover:text-[#E8A33D] transition-colors"
               title={isAr ? 'التالي' : 'Next'}
             >
               {isRtl ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
@@ -226,17 +227,17 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       </div>
 
       {/* Micro Trust Bar Overlay with Strict Language Switching */}
-      <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/80 border-t border-r border-grave font-mono text-[11px] text-ash">
+      <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-[#12162B]/80 border-t border-r border-[#28305F] font-mono text-[11px] text-[#8E98BF]">
         <span className="flex items-center gap-1.5">
-          <ShieldCheck size={14} className="text-gold" />
+          <ShieldCheck size={14} className="text-[#E8A33D]" />
           <span>{isAr ? 'ضمان سنة استبدال' : '1-YEAR WARRANTY'}</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <Truck size={14} className="text-gold" />
+          <Truck size={14} className="text-[#E8A33D]" />
           <span>{isAr ? 'شحن لكافة المحافظات' : 'FAST EGYPT SHIPPING'}</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <Clock size={14} className="text-gold" />
+          <Clock size={14} className="text-[#E8A33D]" />
           <span>{isAr ? 'تقفيل مصري فاخر' : 'HAND-FINISHED IN EGYPT'}</span>
         </span>
       </div>
