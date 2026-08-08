@@ -28,14 +28,14 @@ export const Navbar = ({ onOpenTracker }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-void/90 backdrop-blur-md border-b border-grave text-bone transition-colors shadow-md">
+    <header className="sticky top-0 z-40 bg-[#0A0C16]/95 backdrop-blur-md border-b border-[#28305F] text-[#EDE4D3] transition-colors shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
           {/* LOGO LOCKUP: SunDisc + DUAT Typography (Left in LTR, Right in RTL) */}
           <Link to="/" className="flex items-center gap-3 group focus:outline-none min-h-[44px]">
             <SunDisc size={28} variant="gold" />
-            <span className="font-clash text-2xl font-bold tracking-tight text-bone group-hover:text-gold transition-colors leading-none">
+            <span className="font-clash text-2xl font-bold tracking-tight text-[#EDE4D3] group-hover:text-[#E8A33D] transition-colors leading-none">
               DUAT
             </span>
           </Link>
@@ -49,14 +49,14 @@ export const Navbar = ({ onOpenTracker }) => {
                 end={link.end}
                 className={({ isActive }) =>
                   `font-mono text-xs uppercase tracking-[0.2em] transition-all duration-200 py-2 min-h-[44px] flex items-center relative group ${
-                    isActive ? 'text-gold font-bold' : 'text-bone/80 hover:text-gold'
+                    isActive ? 'text-[#E8A33D] font-bold' : 'text-[#EDE4D3]/90 hover:text-[#E8A33D]'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <span>{link.label}</span>
-                    <span className={`absolute bottom-3 left-0 w-full h-[1.5px] bg-gold transition-transform duration-300 origin-left ${
+                    <span className={`absolute bottom-3 left-0 w-full h-[1.5px] bg-[#E8A33D] transition-transform duration-300 origin-left ${
                       isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`} />
                   </>
@@ -71,26 +71,26 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Shipment Order Tracker Button */}
             <button
               onClick={handleTrackerClick}
-              className="hidden sm:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ash hover:text-gold transition-colors border border-grave bg-stone/50 px-3 py-2 min-h-[44px]"
+              className="hidden sm:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[#8E98BF] hover:text-[#E8A33D] transition-colors border border-[#28305F] bg-[#12162B] px-3 py-2 min-h-[44px] rounded-sm"
               title={t('trackOrderNav')}
             >
-              <Truck size={14} className="text-gold" />
+              <Truck size={14} className="text-[#E8A33D]" />
               <span>{t('trackOrderNav')}</span>
             </button>
 
             {/* Theme Toggle (Night / Dawn) */}
             <button
               onClick={toggleTheme}
-              className="flex items-center gap-1.5 font-mono text-xs text-ash hover:text-gold border border-grave bg-stone px-2.5 sm:px-3 py-2 transition-colors uppercase min-h-[44px] min-w-[44px] justify-center"
+              className="flex items-center gap-1.5 font-mono text-xs text-[#EDE4D3] hover:text-[#E8A33D] border border-[#28305F] bg-[#12162B] px-2.5 sm:px-3 py-2 transition-colors uppercase min-h-[44px] min-w-[44px] justify-center rounded-sm"
               aria-label="Toggle Theme"
               title={theme === 'night' ? 'Dawn Mode (Sunrise)' : 'Night Mode (Dusk)'}
             >
               {theme === 'night' ? (
-                <Sun size={15} className="text-gold" />
+                <Sun size={15} className="text-[#E8A33D]" />
               ) : (
-                <Moon size={15} className="text-gold" />
+                <Moon size={15} className="text-[#E8A33D]" />
               )}
-              <span className="hidden lg:inline text-[11px]">
+              <span className="hidden lg:inline text-[11px] font-bold">
                 {theme === 'night' ? 'Dawn' : 'Night'}
               </span>
             </button>
@@ -98,10 +98,10 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Bilingual Toggle EN / AR */}
             <button
               onClick={toggleLanguage}
-              className="hidden md:flex items-center gap-1.5 font-mono text-xs tracking-widest text-ash hover:text-gold border border-grave bg-stone px-3 py-2 transition-colors uppercase min-h-[44px]"
+              className="hidden md:flex items-center gap-1.5 font-mono text-xs tracking-widest text-[#EDE4D3] hover:text-[#E8A33D] border border-[#28305F] bg-[#12162B] px-3 py-2 transition-colors uppercase min-h-[44px] rounded-sm"
               aria-label="Toggle Language"
             >
-              <Globe size={14} className="text-gold" />
+              <Globe size={14} className="text-[#E8A33D]" />
               <span className={lang === 'en' ? 'font-arabic font-bold text-xs tracking-normal' : 'font-mono text-xs'}>
                 {lang === 'en' ? 'عربي' : 'EN'}
               </span>
@@ -110,13 +110,13 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Wishlist Icon Trigger */}
             <button
               onClick={toggleWishlist}
-              className="relative p-2.5 text-bone hover:text-gold transition-colors border border-grave bg-stone hover:border-gold flex items-center justify-center min-h-[44px] min-w-[44px]"
+              className="relative p-2.5 text-[#EDE4D3] hover:text-[#E8A33D] transition-colors border border-[#28305F] bg-[#12162B] hover:border-[#E8A33D] flex items-center justify-center min-h-[44px] min-w-[44px] rounded-sm"
               aria-label="Open Wishlist"
               title={lang === 'ar' ? 'المفضلة' : 'Wishlist'}
             >
-              <Heart size={18} className={wishlistCount > 0 ? 'text-gold fill-gold/20' : ''} />
+              <Heart size={18} className={wishlistCount > 0 ? 'text-[#E8A33D] fill-[#E8A33D]/20' : ''} />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-gold text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-stone shadow-sm">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#E8A33D] text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-[#12162B] shadow-sm">
                   {wishlistCount}
                 </span>
               )}
@@ -125,12 +125,12 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Cart Icon Trigger */}
             <button
               onClick={toggleCart}
-              className="relative p-2.5 text-bone hover:text-gold transition-colors border border-grave bg-stone hover:border-gold flex items-center justify-center min-h-[44px] min-w-[44px]"
+              className="relative p-2.5 text-[#EDE4D3] hover:text-[#E8A33D] transition-colors border border-[#28305F] bg-[#12162B] hover:border-[#E8A33D] flex items-center justify-center min-h-[44px] min-w-[44px] rounded-sm"
               aria-label="Open Shopping Cart"
             >
               <ShoppingBag size={20} />
               {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-gold text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-stone shadow-sm">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#E8A33D] text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-[#12162B] shadow-sm">
                   {totalItems}
                 </span>
               )}
@@ -139,7 +139,7 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Mobile Hamburger Trigger (<768px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 text-bone hover:text-gold border border-grave bg-stone flex items-center justify-center min-h-[44px] min-w-[44px]"
+              className="md:hidden p-2.5 text-[#EDE4D3] hover:text-[#E8A33D] border border-[#28305F] bg-[#12162B] flex items-center justify-center min-h-[44px] min-w-[44px] rounded-sm"
               aria-label="Toggle Mobile Menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

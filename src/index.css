@@ -31,21 +31,21 @@ html:not([data-theme]) {
   --rose: #E0917A;
 
   --void: #0A0C16;
-  --void-rgb: 10, 12, 22;
+  --void-rgb: 10 12 22;
   --stone: #12162B;
-  --stone-rgb: 18, 22, 43;
+  --stone-rgb: 18 22 43;
   --coal: #181E3B;
-  --coal-rgb: 24, 30, 59;
+  --coal-rgb: 24 30 59;
   --grave: #28305F;
-  --grave-rgb: 40, 48, 95;
+  --grave-rgb: 40 48 95;
   --gold: #E8A33D;
-  --gold-rgb: 232, 163, 61;
+  --gold-rgb: 232 163 61;
   --bone: #EDE4D3;
-  --bone-rgb: 237, 228, 211;
+  --bone-rgb: 237 228 211;
   --ash: #8E98BF;
-  --ash-rgb: 142, 152, 191;
+  --ash-rgb: 142 152 191;
   --ember: #D9432E;
-  --ember-rgb: 217, 67, 46;
+  --ember-rgb: 217 67 46;
 }
 
 html[data-theme="night"] body,
@@ -60,28 +60,22 @@ html:not([data-theme]) body {
 html[data-theme="dawn"] {
   color-scheme: light;
   --void: #FAF6F0;
-  --void-rgb: 250, 246, 240;
+  --void-rgb: 250 246 240;
   --stone: #EFEAE0;
-  --stone-rgb: 239, 234, 224;
+  --stone-rgb: 239 234 224;
   --coal: #E5DFC5;
-  --coal-rgb: 229, 223, 197;
+  --coal-rgb: 229 223 197;
   --grave: #DCD4C7;
-  --grave-rgb: 220, 212, 199;
+  --grave-rgb: 220 212 199;
   --bone: #0A0C16;
-  --bone-rgb: 10, 12, 22;
+  --bone-rgb: 10 12 22;
   --ash: #524C44;
-  --ash-rgb: 82, 76, 68;
+  --ash-rgb: 82 76 68;
   --gold: #C97B22;
-  --gold-rgb: 201, 123, 34;
+  --gold-rgb: 201 123 34;
   --amber: #C97B22;
   --ember: #D9432E;
-  --ember-rgb: 217, 67, 46;
-}
-
-html[data-theme="dawn"] body {
-  background: linear-gradient(180deg, #FAF6F0 0%, #F4EFE6 46%, #E8DFCE 100%);
-  background-attachment: fixed;
-  color: #0A0C16;
+  --ember-rgb: 217 67 46;
 }
 
 html[data-theme="dawn"] body {
@@ -91,13 +85,13 @@ html[data-theme="dawn"] body {
   min-height: 100vh;
 }
 
-/* Dawn Mode Class Overrides for High Contrast (excluding hero section) */
-html[data-theme="dawn"] :not(.hero-section) .text-bone,
-html[data-theme="dawn"] body:not(.hero-section) h1,
-html[data-theme="dawn"] body:not(.hero-section) h2,
-html[data-theme="dawn"] body:not(.hero-section) h3,
-html[data-theme="dawn"] body:not(.hero-section) h4,
-html[data-theme="dawn"] body:not(.hero-section) p {
+/* Dawn Mode Class Overrides for High Contrast (excluding hero section and header) */
+html[data-theme="dawn"] :not(.hero-section):not(header) .text-bone,
+html[data-theme="dawn"] body:not(.hero-section):not(header) h1,
+html[data-theme="dawn"] body:not(.hero-section):not(header) h2,
+html[data-theme="dawn"] body:not(.hero-section):not(header) h3,
+html[data-theme="dawn"] body:not(.hero-section):not(header) h4,
+html[data-theme="dawn"] body:not(.hero-section):not(header) p {
   color: #1A1714;
 }
 
