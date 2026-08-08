@@ -98,7 +98,7 @@ export const CategoryBannersProvider = ({ children }) => {
                   nameAr: match.name_ar || b.nameAr,
                   subtitleEn: match.subtitle_en || b.subtitleEn,
                   subtitleAr: match.subtitle_ar || b.subtitleAr,
-                  is_active: match.is_active !== undefined ? match.is_active : b.is_active
+                  is_active: match.is_active !== undefined ? match.is_active : (b.is_active !== undefined ? b.is_active : true)
                 };
               }
               return b;
@@ -109,6 +109,7 @@ export const CategoryBannersProvider = ({ children }) => {
         console.warn('Error loading banners from Supabase:', err);
       }
     }
+
     loadFromSupabase();
   }, []);
 
@@ -143,11 +144,11 @@ export const CategoryBannersProvider = ({ children }) => {
     try {
       await supabase.from('category_banners').upsert({
         id,
-        name_en: formatted.nameEn,
-        name_ar: formatted.nameAr,
-        subtitle_en: formatted.subtitleEn,
-        subtitle_ar: formatted.subtitleAr,
-        image_url: formatted.imageUrl,
+        name_en: formatted.nameEn || '',
+        name_ar: formatted.nameAr || '',
+        subtitle_en: formatted.subtitleEn || '',
+        subtitle_ar: formatted.subtitleAr || '',
+        image_url: formatted.imageUrl || '',
         is_active: formatted.is_active,
         updated_at: new Date().toISOString()
       });
@@ -157,23 +158,32 @@ export const CategoryBannersProvider = ({ children }) => {
   };
 
   const updateCategoryBanner = async (bannerId, updatedFields) => {
+    let fullTarget = null;
     setCategoryBanners((prev) =>
-      prev.map((b) => (b.id === bannerId ? { ...b, ...updatedFields } : b))
+      prev.map((b) => {
+        if (b.id === bannerId) {
+          fullTarget = { ...b, ...updatedFields };
+          return fullTarget;
+        }
+        return b;
+      })
     );
 
-    try {
-      await supabase.from('category_banners').upsert({
-        id: bannerId,
-        name_en: updatedFields.nameEn,
-        name_ar: updatedFields.nameAr,
-        subtitle_en: updatedFields.subtitleEn,
-        subtitle_ar: updatedFields.subtitleAr,
-        image_url: updatedFields.imageUrl,
-        is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
-        updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Supabase category banner upsert error:', err);
+    if (fullTarget) {
+      try {
+        await supabase.from('category_banners').upsert({
+          id: bannerId,
+          name_en: fullTarget.nameEn || '',
+          name_ar: fullTarget.nameAr || '',
+          subtitle_en: fullTarget.subtitleEn || '',
+          subtitle_ar: fullTarget.subtitleAr || '',
+          image_url: fullTarget.imageUrl || '',
+          is_active: fullTarget.is_active !== undefined ? fullTarget.is_active : true,
+          updated_at: new Date().toISOString()
+        });
+      } catch (err) {
+        console.warn('Supabase category banner upsert error:', err);
+      }
     }
   };
 
