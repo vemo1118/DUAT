@@ -559,106 +559,130 @@ export const CustomizerContent = () => {
     return { centerX, centerY };
   };
 
-  // Instant Global Pointer Event Listeners (Window Level for Smooth 60fps Dragging on Touch & Mouse)
+  // Helper to extract exact client coordinates across Pointer, Mouse, and Touch events
+  const getEventClientCoords = (e) => {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    return { x: e.clientX !== undefined ? e.clientX : 0, y: e.clientY !== undefined ? e.clientY : 0 };
+  };
+
+  // Instant Global Pointer & Touch Event Listeners (Window Level for Smooth 60fps Dragging)
   useEffect(() => {
     if (!activeDragState) return;
 
+    let rafId = null;
+
     const handleWindowPointerMove = (e) => {
-      if (!canvasRef.current) return;
+      if (!canvasRef.current || !activeDragState) return;
+
+      // Prevent native browser touch scrolling while dragging stickers on mobile
+      if (e.cancelable && e.preventDefault) {
+        e.preventDefault();
+      }
+
       const rect = canvasRef.current.getBoundingClientRect();
       const { type, layerId, startX, startY, initialX, initialY, initialScale, initialRotation } = activeDragState;
+      const coords = getEventClientCoords(e);
 
-      const clientX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : startX);
-      const clientY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : startY);
-
-      if (type === 'move') {
-        const deltaXPercent = ((clientX - startX) / rect.width) * 100;
-        const deltaYPercent = ((clientY - startY) / rect.height) * 100;
-        const newX = Math.max(5, Math.min(95, Math.round((initialX + deltaXPercent) * 10) / 10));
-        const newY = Math.max(5, Math.min(95, Math.round((initialY + deltaYPercent) * 10) / 10));
-        setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, x: newX, y: newY } : l)));
-      } else if (type === 'scale') {
-        if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialDistance) {
-          const currentDistance = Math.hypot(clientX - activeDragState.centerX, clientY - activeDragState.centerY);
-          const scaleFactor = currentDistance / activeDragState.initialDistance;
-          const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale * scaleFactor).toFixed(2))));
-          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
-        } else {
-          const delta = (clientX - startX) + (clientY - startY);
-          const newScale = Math.max(0.4, Math.min(3.0, parseFloat((initialScale + delta * 0.012).toFixed(2))));
-          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
-        }
-      } else if (type === 'rotate') {
-        if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialAngleRad !== undefined) {
-          const currentAngleRad = Math.atan2(clientY - activeDragState.centerY, clientX - activeDragState.centerX);
-          const angleDeltaDeg = Math.round(((currentAngleRad - activeDragState.initialAngleRad) * 180) / Math.PI);
-          const newRot = (initialRotation + angleDeltaDeg + 3600) % 360;
-          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
-        } else {
-          const deltaX = clientX - startX;
-          const newRot = (initialRotation + Math.round(deltaX * 1.2)) % 360;
-          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
-        }
+      if (rafId) {
+        cancelAnimationFrame(rafId);
       }
+
+      rafId = requestAnimationFrame(() => {
+        if (type === 'move') {
+          const deltaXPercent = ((coords.x - startX) / rect.width) * 100;
+          const deltaYPercent = ((coords.y - startY) / rect.height) * 100;
+          const newX = Math.max(0, Math.min(100, parseFloat((initialX + deltaXPercent).toFixed(1))));
+          const newY = Math.max(0, Math.min(100, parseFloat((initialY + deltaYPercent).toFixed(1))));
+          setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, x: newX, y: newY } : l)));
+        } else if (type === 'scale') {
+          if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialDistance) {
+            const currentDistance = Math.hypot(coords.x - activeDragState.centerX, coords.y - activeDragState.centerY);
+            const scaleFactor = currentDistance / activeDragState.initialDistance;
+            const newScale = Math.max(0.3, Math.min(3.5, parseFloat((initialScale * scaleFactor).toFixed(2))));
+            setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
+          } else {
+            const delta = (coords.x - startX) + (coords.y - startY);
+            const newScale = Math.max(0.3, Math.min(3.5, parseFloat((initialScale + delta * 0.01).toFixed(2))));
+            setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, scale: newScale } : l)));
+          }
+        } else if (type === 'rotate') {
+          if (activeDragState.centerX !== undefined && activeDragState.centerY !== undefined && activeDragState.initialAngleRad !== undefined) {
+            const currentAngleRad = Math.atan2(coords.y - activeDragState.centerY, coords.x - activeDragState.centerX);
+            const angleDeltaDeg = Math.round(((currentAngleRad - activeDragState.initialAngleRad) * 180) / Math.PI);
+            const newRot = (initialRotation + angleDeltaDeg + 3600) % 360;
+            setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
+          } else {
+            const deltaX = coords.x - startX;
+            const newRot = (initialRotation + Math.round(deltaX * 1.2) + 3600) % 360;
+            setLayers((prev) => prev.map((l) => (l.id === layerId ? { ...l, rotation: newRot } : l)));
+          }
+        }
+      });
     };
 
     const handleWindowPointerUp = () => {
+      if (rafId) cancelAnimationFrame(rafId);
       setActiveDragState(null);
     };
 
-    window.addEventListener('pointermove', handleWindowPointerMove);
+    window.addEventListener('pointermove', handleWindowPointerMove, { passive: false });
     window.addEventListener('pointerup', handleWindowPointerUp);
+    window.addEventListener('pointercancel', handleWindowPointerUp);
     window.addEventListener('touchmove', handleWindowPointerMove, { passive: false });
     window.addEventListener('touchend', handleWindowPointerUp);
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('pointermove', handleWindowPointerMove);
       window.removeEventListener('pointerup', handleWindowPointerUp);
+      window.removeEventListener('pointercancel', handleWindowPointerUp);
       window.removeEventListener('touchmove', handleWindowPointerMove);
       window.removeEventListener('touchend', handleWindowPointerUp);
     };
   }, [activeDragState]);
 
-  // Pointer Down Handlers
+  // Pointer & Touch Down Handlers
   const handlePointerDownLayer = (id, e) => {
-    e.preventDefault();
+    if (e.cancelable && e.preventDefault) e.preventDefault();
     e.stopPropagation();
     setSelectedLayerId(id);
 
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
-    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    const coords = getEventClientCoords(e);
 
     setActiveDragState({
       type: 'move',
       layerId: id,
-      startX,
-      startY,
+      startX: coords.x,
+      startY: coords.y,
       initialX: layer.x,
       initialY: layer.y
     });
   };
 
   const handlePointerDownRotate = (id, e) => {
-    e.preventDefault();
+    if (e.cancelable && e.preventDefault) e.preventDefault();
     e.stopPropagation();
 
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
     const center = getLayerCenterScreenCoords(layer);
-    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-
-    const initialAngleRad = center ? Math.atan2(startY - center.centerY, startX - center.centerX) : 0;
+    const coords = getEventClientCoords(e);
+    const initialAngleRad = center ? Math.atan2(coords.y - center.centerY, coords.x - center.centerX) : 0;
 
     setActiveDragState({
       type: 'rotate',
       layerId: id,
-      startX,
-      startY,
+      startX: coords.x,
+      startY: coords.y,
       centerX: center?.centerX,
       centerY: center?.centerY,
       initialAngleRad,
@@ -667,23 +691,21 @@ export const CustomizerContent = () => {
   };
 
   const handlePointerDownScale = (id, e) => {
-    e.preventDefault();
+    if (e.cancelable && e.preventDefault) e.preventDefault();
     e.stopPropagation();
 
     const layer = layers.find((l) => l.id === id);
     if (!layer) return;
 
     const center = getLayerCenterScreenCoords(layer);
-    const startX = e.clientX !== undefined && e.clientX !== 0 ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-    const startY = e.clientY !== undefined && e.clientY !== 0 ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-
-    const initialDistance = center ? Math.hypot(startX - center.centerX, startY - center.centerY) : 1;
+    const coords = getEventClientCoords(e);
+    const initialDistance = center ? Math.hypot(coords.x - center.centerX, coords.y - center.centerY) : 1;
 
     setActiveDragState({
       type: 'scale',
       layerId: id,
-      startX,
-      startY,
+      startX: coords.x,
+      startY: coords.y,
       centerX: center?.centerX,
       centerY: center?.centerY,
       initialDistance: initialDistance || 1,
@@ -1009,6 +1031,7 @@ export const CustomizerContent = () => {
               <div
                 key={layer.id}
                 onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
+                onTouchStart={(e) => handlePointerDownLayer(layer.id, e)}
                 style={{
                   left: `${layer.x}%`,
                   top: `${layer.y}%`,
@@ -1022,6 +1045,7 @@ export const CustomizerContent = () => {
                   <>
                     <div
                       onPointerDown={(e) => handlePointerDownRotate(layer.id, e)}
+                      onTouchStart={(e) => handlePointerDownRotate(layer.id, e)}
                       className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-ew-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
                       title="Drag to rotate"
                     >
@@ -1030,6 +1054,7 @@ export const CustomizerContent = () => {
 
                     <div
                       onPointerDown={(e) => handleRemoveLayer(layer.id, e)}
+                      onTouchStart={(e) => handleRemoveLayer(layer.id, e)}
                       className="absolute -top-3.5 -right-3.5 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
                       title="Remove layer"
                     >
@@ -1038,6 +1063,7 @@ export const CustomizerContent = () => {
 
                     <div
                       onPointerDown={(e) => handlePointerDownScale(layer.id, e)}
+                      onTouchStart={(e) => handlePointerDownScale(layer.id, e)}
                       className="absolute -bottom-3.5 -right-3.5 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-nwse-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
                       title="Drag to scale"
                     >
