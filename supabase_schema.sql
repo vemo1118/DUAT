@@ -258,7 +258,109 @@ ON CONFLICT (id) DO NOTHING;
 
 
 -- ---------------------------------------------------------------------
--- 7. STORAGE BUCKET FOR INSTAPAY PAYMENT PROOFS
+-- 7. PERFORMANCE INDEXES (SUPABASE POSTGRES BEST PRACTICES)
+-- ---------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_products_category_active ON public.products (category, is_active, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_products_case_type ON public.products (case_type_id) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_orders_ref ON public.orders (ref);
+CREATE INDEX IF NOT EXISTS idx_orders_status_created ON public.orders (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_hero_slides_active_sort ON public.hero_slides (sort_order ASC) WHERE is_active = true;
+
+
+-- ---------------------------------------------------------------------
+-- 8. COUPONS TABLE (DYNAMIC DISCOUNT ENGINE)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.coupons (
+  code TEXT PRIMARY KEY,
+  type TEXT NOT NULL DEFAULT 'percentage', -- 'percentage' or 'fixed'
+  value NUMERIC NOT NULL DEFAULT 10,
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read active coupons" ON public.coupons;
+CREATE POLICY "Allow public read active coupons"
+  ON public.coupons FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated modify coupons" ON public.coupons;
+CREATE POLICY "Allow authenticated modify coupons"
+  ON public.coupons FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+GRANT SELECT ON public.coupons TO anon;
+GRANT ALL ON public.coupons TO authenticated;
+
+-- Seed Initial Coupons
+INSERT INTO public.coupons (code, type, value, description) VALUES
+  ('DUAT10', 'percentage', 10, 'خصم ١٠٪ على جميع الجرابات والمنتجات'),
+  ('DAWN100', 'fixed', 100, 'خصم ١٠٠ ج.م ثابت'),
+  ('SUMMER20', 'percentage', 20, 'خصم الصيف ٢٠٪')
+ON CONFLICT (code) DO NOTHING;
+
+
+-- ---------------------------------------------------------------------
+-- 9. STORE SETTINGS TABLE (TELEGRAM, WHATSAPP & GLOBAL CONFIG)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.store_settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read settings" ON public.store_settings;
+CREATE POLICY "Allow public read settings"
+  ON public.store_settings FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated modify settings" ON public.store_settings;
+CREATE POLICY "Allow authenticated modify settings"
+  ON public.store_settings FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+GRANT SELECT ON public.store_settings TO anon;
+GRANT ALL ON public.store_settings TO authenticated;
+
+
+-- ---------------------------------------------------------------------
+-- 10. AUTOMATIC UPDATED_AT TRIGGER FUNCTION
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_updated_at_products ON public.products;
+CREATE TRIGGER set_updated_at_products
+  BEFORE UPDATE ON public.products
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+DROP TRIGGER IF EXISTS set_updated_at_orders ON public.orders;
+CREATE TRIGGER set_updated_at_orders
+  BEFORE UPDATE ON public.orders
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+
+-- ---------------------------------------------------------------------
+-- 11. STORAGE BUCKET FOR INSTAPAY PAYMENT PROOFS & SECURE RLS
 -- ---------------------------------------------------------------------
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('payment-proofs', 'payment-proofs', true)
@@ -276,15 +378,16 @@ ON storage.objects FOR SELECT
 TO anon, authenticated
 USING (bucket_id = 'payment-proofs');
 
-DROP POLICY IF EXISTS "Allow public update on payment-proofs" ON storage.objects;
-CREATE POLICY "Allow public update on payment-proofs"
+DROP POLICY IF EXISTS "Allow authenticated update payment-proofs" ON storage.objects;
+CREATE POLICY "Allow authenticated update payment-proofs"
 ON storage.objects FOR UPDATE
-TO anon, authenticated
+TO authenticated
 USING (bucket_id = 'payment-proofs');
 
-DROP POLICY IF EXISTS "Allow public delete on payment-proofs" ON storage.objects;
-CREATE POLICY "Allow public delete on payment-proofs"
+DROP POLICY IF EXISTS "Allow authenticated delete payment-proofs" ON storage.objects;
+CREATE POLICY "Allow authenticated delete payment-proofs"
 ON storage.objects FOR DELETE
-TO anon, authenticated
+TO authenticated
 USING (bucket_id = 'payment-proofs');
+
 
