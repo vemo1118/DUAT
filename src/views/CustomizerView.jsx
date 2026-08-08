@@ -443,6 +443,20 @@ export const CustomizerContent = () => {
   const [textBgColor, setTextBgColor] = useState('#14110F');
   const [textFont, setTextFont] = useState('kufi'); // 'ruqaa', 'kufi', 'space', 'mono'
 
+  const handleColorSelect = (newColor) => {
+    setTextColor(newColor);
+    if (selectedLayerId) {
+      setLayers((prev) => prev.map((l) => (l.id === selectedLayerId ? { ...l, color: newColor } : l)));
+    }
+  };
+
+  const handleBgColorSelect = (newBgColor) => {
+    setTextBgColor(newBgColor);
+    if (selectedLayerId) {
+      setLayers((prev) => prev.map((l) => (l.id === selectedLayerId ? { ...l, bgColor: newBgColor } : l)));
+    }
+  };
+
   // Global Pointer Drag State
   const [activeDragState, setActiveDragState] = useState(null);
   const canvasRef = useRef(null);
@@ -773,6 +787,7 @@ export const CustomizerContent = () => {
       ];
 
   const CATEGORY_PILLS = [
+    { id: 'model', labelAr: '📱 الجهاز والجراب', labelEn: '📱 Model & Case', icon: '📱' },
     ...dynamicStickerCategories,
     { id: 'text-photo', labelAr: 'كتابة وصور', labelEn: 'Text & Upload', icon: '🖼️' },
     { id: 'presets', labelAr: 'قوالب جاهزة', labelEn: 'Presets', icon: '🎨' },
@@ -1163,7 +1178,7 @@ export const CustomizerContent = () => {
 
   return (
     <>
-      <div className={`lg:hidden min-h-screen font-sans flex flex-col justify-between select-none pb-6 ${isNight ? 'bg-[#0B0908] text-bone' : 'bg-[#F8F7F4] text-stone-900'}`}>
+      <div className={`lg:hidden min-h-screen font-sans flex flex-col justify-between select-none pb-6 ${isNight ? 'bg-[#0A0C16] text-bone' : 'bg-[#F8F7F4] text-stone-900'}`}>
         <header className="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between relative select-none z-20">
           <button
             type="button"
@@ -1181,8 +1196,8 @@ export const CustomizerContent = () => {
             <div className="flex items-center gap-1.5 mt-1">
               <button
                 type="button"
-                onClick={() => setActiveCategory('model')}
-                className={`transition-all duration-300 ${activeCategory === 'model' ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
+                onClick={() => { setIsModelSelectorOpen(true); setActiveCategory('model'); }}
+                className={`transition-all duration-300 ${activeCategory === 'model' || isModelSelectorOpen ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
               />
               <button
                 type="button"
@@ -1204,7 +1219,53 @@ export const CustomizerContent = () => {
           <div className="w-10" />
         </header>
 
-        <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-2 sm:my-4">
+        <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-1 sm:my-3">
+          {/* Prominent Mobile Model & Case Finish Selector Bar */}
+          <div className="w-full max-w-sm mx-auto mb-2 flex items-center justify-between gap-2 z-20">
+            <button
+              type="button"
+              onClick={() => setIsModelSelectorOpen((prev) => !prev)}
+              className={`flex-1 flex items-center justify-between gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer ${
+                isNight
+                  ? 'bg-[#182744] border-gold/50 text-gold hover:border-gold hover:bg-[#203258]'
+                  : 'bg-white border-stone-300 text-stone-900 hover:border-black'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 truncate">
+                <Smartphone size={15} className="text-gold shrink-0" />
+                <span className="truncate">{currentModelName}</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/20 text-gold font-bold shrink-0">
+                {lang === 'ar' ? 'تغيير' : 'Edit'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsModelSelectorOpen((prev) => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer ${
+                isNight
+                  ? 'bg-[#182744] border-gold/50 text-bone hover:border-gold hover:bg-[#203258]'
+                  : 'bg-white border-stone-300 text-stone-900 hover:border-black'
+              }`}
+              title={lang === 'ar' ? 'لون ونوع الجراب' : 'Case Finish & Color'}
+            >
+              <div
+                className="w-3.5 h-3.5 rounded-full border border-stone-400/50 shadow-inner shrink-0"
+                style={{ backgroundColor: selectedCaseType?.color || '#000000' }}
+              />
+              <span className="text-xs font-medium truncate max-w-[70px]">{lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}</span>
+              <Palette size={14} className="text-gold shrink-0" />
+            </button>
+          </div>
+
+          {/* Inline Model Selector Drawer for Mobile when active */}
+          {isModelSelectorOpen && (
+            <div className="w-full max-w-sm mx-auto mb-3 z-30">
+              {renderTopCaseModelBar()}
+            </div>
+          )}
+
           {renderPhoneCanvas(false)}
           {renderQuickToolbar(isNight)}
         </main>
@@ -1236,7 +1297,12 @@ export const CustomizerContent = () => {
                 <button
                   key={pill.id}
                   type="button"
-                  onClick={() => setActiveCategory(pill.id)}
+                  onClick={() => {
+                    if (pill.id === 'model') {
+                      setIsModelSelectorOpen((prev) => !prev);
+                    }
+                    setActiveCategory(pill.id);
+                  }}
                   className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border ${
                     isActive
                       ? (isNight ? 'bg-gold text-[#0A0C16] border-gold font-bold shadow-md' : 'bg-[#18181B] text-white border-[#18181B] font-semibold shadow-sm')
@@ -1291,6 +1357,41 @@ export const CustomizerContent = () => {
             </div>
           )}
 
+          {['letters', 'letters-en', 'text-photo'].includes(activeCategory) && (
+            <div className={`p-2.5 sm:p-3 border rounded-2xl space-y-2 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold font-sans flex items-center gap-1.5">
+                  <span>🎨</span>
+                  <span>{lang === 'ar' ? 'اختر لون الحرف والخط:' : 'Choose Letter / Text Color:'}</span>
+                </span>
+                {selectedLayerId && (
+                  <span className="text-[10px] text-gold font-bold">{lang === 'ar' ? 'يعدّل الاستيكر المحدد' : 'Editing Selected'}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                {[
+                  { name: 'أسود', color: '#000000' },
+                  { name: 'أبيض', color: '#FFFFFF' },
+                  { name: 'ذهبي', color: '#E0A93B' },
+                  { name: 'أحمر', color: '#C93A43' },
+                  { name: 'كحلي', color: '#182744' },
+                  { name: 'زمردي', color: '#054A29' }
+                ].map((c) => (
+                  <button
+                    key={c.color}
+                    type="button"
+                    onClick={() => handleColorSelect(c.color)}
+                    className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
+                      textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: c.color }}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
             <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 custom-scrollbar max-w-full">
               {filteredStickers.map((st) => {
@@ -1308,8 +1409,8 @@ export const CustomizerContent = () => {
                         stickerId={st.id}
                         image={st.image || st.imageUrl}
                         size={54}
-                        color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
-                        bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
+                        color={textColor}
+                        bgColor={textBgColor}
                       />
                     </div>
                     <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${
@@ -1646,6 +1747,41 @@ export const CustomizerContent = () => {
                 </div>
               )}
 
+              {['letters', 'letters-en', 'text-photo'].includes(activeCategory) && (
+                <div className={`p-3 border rounded-2xl space-y-2 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold font-sans flex items-center gap-1.5">
+                      <span>🎨</span>
+                      <span>{lang === 'ar' ? 'اختر لون الحرف والخط:' : 'Choose Letter / Text Color:'}</span>
+                    </span>
+                    {selectedLayerId && (
+                      <span className="text-[10px] text-gold font-bold">{lang === 'ar' ? 'يعدّل الاستيكر المحدد' : 'Editing Selected'}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                    {[
+                      { name: 'أسود', color: '#000000' },
+                      { name: 'أبيض', color: '#FFFFFF' },
+                      { name: 'ذهبي', color: '#E0A93B' },
+                      { name: 'أحمر', color: '#C93A43' },
+                      { name: 'كحلي', color: '#182744' },
+                      { name: 'زمردي', color: '#054A29' }
+                    ].map((c) => (
+                      <button
+                        key={c.color}
+                        type="button"
+                        onClick={() => handleColorSelect(c.color)}
+                        className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
+                          textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
+                        }`}
+                        style={{ backgroundColor: c.color }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
                 <div className="space-y-3">
                   <div className={`flex items-center justify-between font-sans text-xs font-medium ${isNight ? 'text-stone-300' : 'text-stone-600'}`}>
@@ -1670,8 +1806,8 @@ export const CustomizerContent = () => {
                               stickerId={st.id}
                               image={st.image || st.imageUrl}
                               size={56}
-                              color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
-                              bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
+                              color={textColor}
+                              bgColor={textBgColor}
                             />
                           </div>
                           <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${

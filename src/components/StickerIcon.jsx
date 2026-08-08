@@ -21,7 +21,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = '#000000';
+    const finalTextColor = color || '#000000';
 
     const finalBg = isTransparentBg
       ? 'transparent'
@@ -53,7 +53,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
             fontSize: `${Math.round(boxSize * 0.60)}px`,
             fontFamily: "'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'Arsenica Arabic', 'IBM Plex Sans Arabic', serif",
             fontWeight: 800,
-            color: '#000000',
+            color: finalTextColor,
             textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.15)'
           }}
         >
@@ -70,7 +70,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = isTransparentBg ? (color || '#FFFFFF') : '#FFFFFF';
+    const finalTextColor = color || '#FFFFFF';
 
     const finalBg = isTransparentBg
       ? 'transparent'
