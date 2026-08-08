@@ -466,6 +466,10 @@ export const CustomizerContent = () => {
     ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز مخصص حسب الطلب' : 'Custom Device'))
     : currentModelName;
 
+  const displayModelBadgeText = isCustomModelOption
+    ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز آخر (حدد بالأسفل)' : 'Other Device'))
+    : currentModelName;
+
   // Layer Operations
   const handleAddSticker = (stickerId) => {
     const st = STICKER_ITEMS.find((s) => s.id === stickerId) || STICKER_PRESETS.find((s) => s.id === stickerId);
@@ -840,47 +844,53 @@ export const CustomizerContent = () => {
   };
 
   const renderCollapsibleModelSelector = () => (
-    <div className={`rounded-2xl border transition-all overflow-hidden mb-3 ${isNight ? 'bg-[#1F1B18] border-stone-800' : 'bg-[#F8F7F4] border-stone-200'}`}>
+    <div className={`rounded-2xl border transition-all overflow-hidden mb-4 shadow-sm ${
+      isNight ? 'bg-[#1F1B18] border-stone-800' : 'bg-stone-50 border-stone-200/90'
+    }`}>
       <button
         type="button"
         onClick={() => setIsModelSelectorOpen((prev) => !prev)}
         className={`w-full px-4 py-3 flex items-center justify-between transition-colors cursor-pointer text-left ${
-          isNight ? 'hover:bg-stone-800/40 text-bone' : 'hover:bg-stone-200/50 text-stone-900'
+          isNight ? 'hover:bg-stone-800/40 text-bone' : 'hover:bg-stone-200/60 text-stone-900'
         }`}
       >
-        <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+        <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm font-sans">
           <span className="font-bold flex items-center gap-1">
             📱 {lang === 'ar' ? 'نوع ولون الجراب:' : 'Case & Color:'}
           </span>
-          <span className={`px-2.5 py-0.5 rounded-full font-semibold border text-xs ${
+          <span className={`px-3 py-1 rounded-full font-bold border text-xs shadow-sm ${
             isNight ? 'bg-gold/20 text-gold border-gold/40' : 'bg-stone-900 text-white border-stone-900'
           }`}>
-            {currentModelName}
+            {displayModelBadgeText}
           </span>
-          <span className={`px-2.5 py-0.5 rounded-full font-semibold border text-xs ${
-            isNight ? 'bg-stone-800 text-bone border-stone-700' : 'bg-white text-stone-800 border-stone-300'
+          <span className={`px-3 py-1 rounded-full font-semibold border text-xs shadow-sm ${
+            isNight ? 'bg-[#28221D] text-bone border-stone-700' : 'bg-white text-stone-900 border-stone-300'
           }`}>
             {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
           </span>
         </div>
 
-        <div className={`flex items-center gap-1.5 font-sans text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all ${
-          isNight ? 'bg-stone-800 text-gold border-stone-700 hover:border-gold' : 'bg-white text-stone-700 border-stone-300 hover:border-black'
+        <div className={`flex items-center gap-1.5 font-sans text-xs font-bold px-3 py-1.5 rounded-xl border transition-all shadow-sm ${
+          isNight
+            ? 'bg-gold text-[#0A0C16] border-gold hover:bg-amber-400'
+            : 'bg-[#18181B] text-white border-[#18181B] hover:bg-black'
         }`}>
           <span>{lang === 'ar' ? (isModelSelectorOpen ? 'إغلاق القائمة' : 'تعديل النوع واللون ✏️') : (isModelSelectorOpen ? 'Close Menu' : 'Edit Model & Color ✏️')}</span>
-          {isModelSelectorOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {isModelSelectorOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         </div>
       </button>
 
       {isModelSelectorOpen && (
-        <div className={`p-4 border-t space-y-4 animate-fade-in ${isNight ? 'border-stone-800 bg-[#161311]' : 'border-stone-200 bg-white'}`}>
+        <div className={`p-4 border-t space-y-4 animate-fade-in ${
+          isNight ? 'border-stone-800 bg-[#14110F]' : 'border-stone-200 bg-white'
+        }`}>
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold block">{t('selectModel')}</label>
+            <label className={`text-xs font-bold block ${isNight ? 'text-gold' : 'text-stone-900'}`}>📱 {t('selectModel')}</label>
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className={`w-full p-2.5 rounded-xl font-sans text-sm outline-none border min-h-[44px] ${
-                isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-200 text-stone-900 focus:border-stone-900'
+              className={`w-full p-2.5 rounded-xl font-sans text-sm font-medium outline-none border min-h-[44px] ${
+                isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'
               }`}
             >
               {PHONE_MODELS.map((m) => {
@@ -902,7 +912,7 @@ export const CustomizerContent = () => {
                   value={customModelInput}
                   onChange={(e) => setCustomModelInput(e.target.value)}
                   placeholder={t('customModelPlaceholder')}
-                  className={`w-full p-2.5 rounded-xl text-xs outline-none border ${
+                  className={`w-full p-2.5 rounded-xl text-xs font-medium outline-none border ${
                     isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'
                   }`}
                 />
@@ -911,7 +921,7 @@ export const CustomizerContent = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold block">{t('caseType')}</label>
+            <label className={`text-xs font-bold block ${isNight ? 'text-gold' : 'text-stone-900'}`}>🎨 {t('caseType')}</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CASE_TYPES.map((ct) => {
                 const active = selectedCaseType?.id === ct.id;
@@ -922,8 +932,8 @@ export const CustomizerContent = () => {
                     onClick={() => setSelectedCaseType(ct)}
                     className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
                       active
-                        ? (isNight ? 'border-gold bg-gold/20 text-gold font-bold shadow-sm' : 'border-black bg-stone-900 text-white font-semibold shadow-sm')
-                        : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600' : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400')
+                        ? (isNight ? 'border-gold bg-gold/20 text-gold font-bold shadow-sm' : 'border-black bg-stone-900 text-white font-bold shadow-md')
+                        : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600' : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400 font-medium')
                     }`}
                   >
                     <div
@@ -943,7 +953,7 @@ export const CustomizerContent = () => {
             <button
               type="button"
               onClick={() => setIsModelSelectorOpen(false)}
-              className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
+              className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer ${
                 isNight ? 'bg-gold text-[#0A0C16] hover:bg-amber-400' : 'bg-[#18181B] text-white hover:bg-black'
               }`}
             >
@@ -1413,11 +1423,13 @@ export const CustomizerContent = () => {
           </div>
 
           <div className="flex items-center gap-3 font-sans text-xs">
-            <div className={`px-4 py-1.5 rounded-full border font-medium ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone' : 'bg-[#F4F3F0] border-stone-200 text-stone-800'}`}>
-              📱 <strong className={isNight ? 'text-gold' : 'text-stone-900'}>{currentModelName}</strong>
+            <div className={`px-3.5 py-1.5 rounded-full border font-semibold flex items-center gap-1.5 ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone' : 'bg-stone-100 border-stone-300 text-stone-900 shadow-sm'}`}>
+              <span>📱</span>
+              <strong className={isNight ? 'text-gold' : 'text-stone-900'}>{displayModelBadgeText}</strong>
             </div>
-            <div className={`px-4 py-1.5 rounded-full border font-medium ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone' : 'bg-[#F4F3F0] border-stone-200 text-stone-800'}`}>
-              🎨 {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
+            <div className={`px-3.5 py-1.5 rounded-full border font-semibold flex items-center gap-1.5 ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone' : 'bg-stone-100 border-stone-300 text-stone-900 shadow-sm'}`}>
+              <span>🎨</span>
+              <span className={isNight ? 'text-bone' : 'text-stone-800'}>{lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}</span>
             </div>
             <div className={`font-bold px-4 py-1.5 rounded-full shadow-sm ${isNight ? 'bg-gold text-[#0A0C16] shadow-gold/20' : 'bg-[#18181B] text-white'}`}>
               {builderPrice || 850} EGP
