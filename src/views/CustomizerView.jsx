@@ -214,39 +214,64 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
         ctx.fillText('🖼️ صورة مرفوعة', 0, 0);
       } else {
         let displayText = layer.stickerId || 'STICKER';
-        if (displayText.startsWith('ar-letter-')) displayText = displayText.replace('ar-letter-', '');
-        else if (displayText.startsWith('en-letter-')) displayText = displayText.replace('en-letter-', '');
-        else if (displayText.startsWith('num-')) displayText = displayText.replace('num-', '');
-        else if (displayText.startsWith('quote-')) displayText = displayText.replace('quote-', '');
-        else if (displayText === 'slogan-1') displayText = 'طالع نور';
-        else if (displayText === 'slogan-2') displayText = 'عدّي الليل';
-        else if (displayText === 'slogan-3') displayText = 'بكرة أحلى';
-        else if (displayText === 'slogan-4') displayText = 'BORN AT DAWN';
-        else if (displayText.startsWith('dome-')) displayText = displayText.replace('dome-', '✨ ').toUpperCase();
-
-        ctx.font = 'bold 13px sans-serif';
-        const txtWidth = ctx.measureText(displayText).width;
-        const pw = Math.max(70, txtWidth + 24);
-        const ph = 34;
-
-        if (bgColor !== 'transparent') {
-          ctx.fillStyle = bgColor;
-          ctx.strokeStyle = fgColor;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
-          } else {
-            ctx.rect(-pw / 2, -ph / 2, pw, ph);
+        const isLetterLayer = displayText.startsWith('ar-letter-') || displayText.startsWith('st-letter-');
+        if (isLetterLayer) {
+          const char = displayText.replace(/^(ar-letter-|st-letter-)/, '');
+          const pw = 48;
+          const ph = 48;
+          if (bgColor !== 'transparent') {
+            ctx.fillStyle = bgColor || '#F5F3EC';
+            ctx.strokeStyle = 'rgba(215,205,190,0.8)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+              ctx.roundRect(-pw / 2, -ph / 2, pw, ph, 10);
+            } else {
+              ctx.rect(-pw / 2, -ph / 2, pw, ph);
+            }
+            ctx.fill();
+            ctx.stroke();
           }
-          ctx.fill();
-          ctx.stroke();
-        }
+          ctx.fillStyle = fgColor && fgColor !== '#E8A33D' ? fgColor : '#141414';
+          ctx.font = 'bold 26px "Aref Ruqaa", serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(char, 0, 2);
+        } else {
+          if (displayText.startsWith('ar-letter-')) displayText = displayText.replace('ar-letter-', '');
+          else if (displayText.startsWith('en-letter-')) displayText = displayText.replace('en-letter-', '');
+          else if (displayText.startsWith('num-')) displayText = displayText.replace('num-', '');
+          else if (displayText.startsWith('quote-')) displayText = displayText.replace('quote-', '');
+          else if (displayText === 'slogan-1') displayText = 'طالع نور';
+          else if (displayText === 'slogan-2') displayText = 'عدّي الليل';
+          else if (displayText === 'slogan-3') displayText = 'بكرة أحلى';
+          else if (displayText === 'slogan-4') displayText = 'BORN AT DAWN';
+          else if (displayText.startsWith('dome-')) displayText = displayText.replace('dome-', '✨ ').toUpperCase();
 
-        ctx.fillStyle = fgColor;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(displayText, 0, 0);
+          ctx.font = 'bold 13px sans-serif';
+          const txtWidth = ctx.measureText(displayText).width;
+          const pw = Math.max(70, txtWidth + 24);
+          const ph = 34;
+
+          if (bgColor !== 'transparent') {
+            ctx.fillStyle = bgColor;
+            ctx.strokeStyle = fgColor;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+              ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
+            } else {
+              ctx.rect(-pw / 2, -ph / 2, pw, ph);
+            }
+            ctx.fill();
+            ctx.stroke();
+          }
+
+          ctx.fillStyle = fgColor;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(displayText, 0, 0);
+        }
       }
 
       ctx.restore();
@@ -380,10 +405,11 @@ export const CustomizerContent = () => {
   }, [location.state]);
 
   const [activeTab, setActiveTab] = useState('stickers');
+  const [stickerCategoryFilter, setStickerCategoryFilter] = useState('letters');
   const [customText, setCustomText] = useState('');
   const [textColor, setTextColor] = useState('#E8A33D');
   const [textBgColor, setTextBgColor] = useState('#14110F');
-  const [textFont, setTextFont] = useState('kufi'); // 'clash', 'kufi', 'mono'
+  const [textFont, setTextFont] = useState('kufi'); // 'ruqaa', 'kufi', 'space', 'mono'
 
   // Global Pointer Drag State
   const [activeDragState, setActiveDragState] = useState(null);
@@ -879,7 +905,7 @@ export const CustomizerContent = () => {
                             backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F')
                           }}
                           className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-gold/50 shadow-xl backdrop-blur-sm ${
-                            layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
+                            layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
                           }`}
                         >
                           {layer.text}
@@ -1183,23 +1209,58 @@ export const CustomizerContent = () => {
                   </div>
                 </div>
 
+                {/* Sticker Sub-category Filters (Ruq'ah Letters vs Motifs vs All) */}
+                <div className="flex flex-wrap gap-2 pb-1 border-b border-grave/40">
+                  <button
+                    type="button"
+                    onClick={() => setStickerCategoryFilter('letters')}
+                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      stickerCategoryFilter === 'letters' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
+                    }`}
+                  >
+                    <span>حروف رقعة 🔤</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStickerCategoryFilter('motifs')}
+                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      stickerCategoryFilter === 'motifs' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
+                    }`}
+                  >
+                    <span>شعارات ومجسمات ✨</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStickerCategoryFilter('all')}
+                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      stickerCategoryFilter === 'all' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
+                    }`}
+                  >
+                    <span>الكل ({STICKER_ITEMS.length})</span>
+                  </button>
+                </div>
+
                 <p className="font-mono text-[11px] text-ash uppercase tracking-wider">
                   💡 Tip: Click or drag & drop any 3D dome onto the phone canvas
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {STICKER_ITEMS.map((st) => (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[380px] overflow-y-auto p-1 custom-scrollbar">
+                  {STICKER_ITEMS.filter((st) => {
+                    if (stickerCategoryFilter === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
+                    if (stickerCategoryFilter === 'motifs') return !st.id?.startsWith('ar-letter-') && !st.id?.startsWith('st-letter-') && st.category !== 'letters';
+                    return true;
+                  }).map((st) => (
                     <button
                       key={st.id}
                       draggable={true}
                       onDragStart={(e) => handleStickerDragStart(st.id, e)}
                       onClick={() => handleAddSticker(st.id)}
-                      className="p-2 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-2 transition-all cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden"
+                      className="p-2 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-1.5 transition-all cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden group"
                       title="Click or Drag onto phone"
                     >
                       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={72} color={textColor} bgColor={textBgColor} />
+                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={58} color={textColor} bgColor={textBgColor} />
                       </div>
-                      <span className="font-mono text-[10px] text-ash tracking-widest uppercase truncate max-w-full font-bold">
+                      <span className="font-mono text-[10px] text-ash group-hover:text-gold tracking-wider truncate max-w-full font-bold">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
                       </span>
                     </button>
@@ -1242,14 +1303,14 @@ export const CustomizerContent = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 font-mono text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
                   <button
-                    onClick={() => setTextFont('space')}
-                    className={`p-2 border ${
-                      textFont === 'space' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
+                    onClick={() => setTextFont('ruqaa')}
+                    className={`p-2 border font-ruqaa text-sm ${
+                      textFont === 'ruqaa' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
                     }`}
                   >
-                    Space Grotesk
+                    خط رقعة
                   </button>
                   <button
                     onClick={() => setTextFont('kufi')}
@@ -1258,6 +1319,14 @@ export const CustomizerContent = () => {
                     }`}
                   >
                     IBM Plex Arabic
+                  </button>
+                  <button
+                    onClick={() => setTextFont('space')}
+                    className={`p-2 border ${
+                      textFont === 'space' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
+                    }`}
+                  >
+                    Space Grotesk
                   </button>
                   <button
                     onClick={() => setTextFont('mono')}

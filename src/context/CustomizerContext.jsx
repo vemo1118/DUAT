@@ -80,7 +80,12 @@ export const CustomizerProvider = ({ children }) => {
           if (data.price) setBuilderPrice(data.price);
           if (data.case_types) setCaseTypes(data.case_types);
           if (data.phone_models) setPhoneModels(ensureOtherCustomFirst(data.phone_models));
-          if (data.builder_stickers) setBuilderStickers(data.builder_stickers);
+          if (data.builder_stickers) {
+            const dbStickers = Array.isArray(data.builder_stickers) ? data.builder_stickers : [];
+            const dbIds = new Set(dbStickers.map((s) => s?.id));
+            const missingDefaults = INITIAL_BUILDER_CONFIG.stickers.filter((s) => !dbIds.has(s?.id));
+            setBuilderStickers([...dbStickers, ...missingDefaults]);
+          }
         }
       } catch (err) {
         console.warn('Supabase builder_settings fallback:', err);

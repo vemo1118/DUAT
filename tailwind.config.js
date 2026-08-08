@@ -20,6 +20,7 @@ export default {
         clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
         kufi: ['"IBM Plex Sans Arabic"', 'sans-serif'],
+        ruqaa: ['"Aref Ruqaa"', 'serif'],
         mono: ['"Space Grotesk"', 'sans-serif'],
         display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
       },

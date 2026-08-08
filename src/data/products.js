@@ -286,13 +286,27 @@ export const PHONE_MODELS = [
   { id: 'pixel8pro', name: 'Google Pixel 8 Pro', category: 'Google' }
 ];
 
+const ARABIC_LETTERS = [
+  'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'
+];
+
+export const ARABIC_LETTER_STICKERS = ARABIC_LETTERS.map((char) => ({
+  id: `ar-letter-${char}`,
+  nameEn: `Letter ${char} (Ruqaa)`,
+  nameAr: `حرف ${char} (رقعة)`,
+  tagEn: '3D EPOXY SQUARE LETTER',
+  tagAr: 'حرف رقعة مجسم',
+  category: 'letters'
+}));
+
 export const STICKER_PRESETS = [
-  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
-  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
-  { id: 'st-crescent',     nameEn: 'Crescent Moon',   nameAr: 'الهلال',      tagEn: '3D EPOXY MOTIF',      tagAr: 'رمز إيبوكسي مجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png' },
-  { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png' },
-  { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png' },
-  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' }
+  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
+  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
+  { id: 'st-crescent',     nameEn: 'Crescent Moon',   nameAr: 'الهلال',      tagEn: '3D EPOXY MOTIF',      tagAr: 'رمز إيبوكسي مجسم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png' },
+  { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png' },
+  { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png' },
+  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' },
+  ...ARABIC_LETTER_STICKERS
 ];
 
 export const PRESET_TEMPLATES = [

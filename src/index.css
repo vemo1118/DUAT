@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.font-ruqaa {
+  font-family: 'Aref Ruqaa', serif;
+}
+
 /* High contrast text selection fix */
 ::selection {
   background-color: #E8A33D !important;
