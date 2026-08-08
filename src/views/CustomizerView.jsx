@@ -1372,7 +1372,7 @@ export const CustomizerContent = () => {
               {/* Text Color */}
               <div>
                 <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الحرف / النص' : 'Text Color'}</p>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                <div className="flex items-center gap-2">
                   {[
                     { name: 'كحلي', color: '#182744' },
                     { name: 'أسود', color: '#000000' },
@@ -1385,11 +1385,13 @@ export const CustomizerContent = () => {
                       key={c.color}
                       type="button"
                       onClick={() => handleColorSelect(c.color)}
-                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
-                        textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
+                      title={c.name}
+                      className={`w-7 h-7 flex-shrink-0 rounded-full cursor-pointer transition-all ${
+                        textColor === c.color
+                          ? 'ring-2 ring-offset-2 ring-gold ring-offset-[#182744] scale-110 shadow-md'
+                          : 'ring-1 ring-white/20 hover:scale-105'
                       }`}
                       style={{ background: c.color }}
-                      title={c.name}
                     />
                   ))}
                 </div>
@@ -1397,7 +1399,7 @@ export const CustomizerContent = () => {
               {/* Background Color */}
               <div>
                 <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الخلفية' : 'Background'}</p>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                <div className="flex items-center gap-2">
                   {[
                     { name: 'أبيض', color: '#FFFFFF' },
                     { name: 'كحلي', color: '#182744' },
@@ -1410,11 +1412,19 @@ export const CustomizerContent = () => {
                       key={c.color}
                       type="button"
                       onClick={() => handleBgColorSelect(c.color)}
-                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
-                        textBgColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : (c.color === '#FFFFFF' ? 'border-stone-300' : 'border-stone-400/60 opacity-80 hover:opacity-100')
-                      }`}
-                      style={{ background: c.color === 'transparent' ? 'repeating-conic-gradient(#ccc 0% 25%, white 0% 50%) 0 0 / 8px 8px' : c.color }}
                       title={c.name}
+                      className={`w-7 h-7 flex-shrink-0 rounded-full cursor-pointer transition-all ${
+                        textBgColor === c.color
+                          ? 'ring-2 ring-offset-2 ring-gold ring-offset-[#182744] scale-110 shadow-md'
+                          : 'ring-1 ring-white/20 hover:scale-105'
+                      }`}
+                      style={{
+                        background: c.color === 'transparent'
+                          ? 'repeating-conic-gradient(#aaa 0% 25%, #fff 0% 50%) 0 0 / 10px 10px'
+                          : c.color,
+                        outline: c.color === '#182744' ? '2px solid rgba(255,255,255,0.25)' : 'none',
+                        outlineOffset: '-2px'
+                      }}
                     />
                   ))}
                 </div>
@@ -1791,7 +1801,7 @@ export const CustomizerContent = () => {
                   {/* Text Color */}
                   <div>
                     <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الحرف / النص' : 'Letter / Text Color'}</p>
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                    <div className="flex items-center gap-2">
                       {[
                         { name: 'كحلي', color: '#182744' },
                         { name: 'أسود', color: '#000000' },
@@ -1804,11 +1814,13 @@ export const CustomizerContent = () => {
                           key={c.color}
                           type="button"
                           onClick={() => handleColorSelect(c.color)}
-                          className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
-                            textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
-                          }`}
-                          style={{ backgroundColor: c.color }}
                           title={c.name}
+                          className={`w-7 h-7 flex-shrink-0 rounded-full cursor-pointer transition-all ${
+                            textColor === c.color
+                              ? 'ring-2 ring-offset-2 ring-gold ring-offset-[#182744] scale-110 shadow-md'
+                              : 'ring-1 ring-white/20 hover:scale-105'
+                          }`}
+                          style={{ background: c.color }}
                         />
                       ))}
                     </div>
@@ -1816,7 +1828,7 @@ export const CustomizerContent = () => {
                   {/* Background Color */}
                   <div>
                     <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الخلفية' : 'Background Color'}</p>
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                    <div className="flex items-center gap-2">
                       {[
                         { name: 'أبيض', color: '#FFFFFF' },
                         { name: 'كحلي', color: '#182744' },
@@ -1829,15 +1841,19 @@ export const CustomizerContent = () => {
                           key={c.color}
                           type="button"
                           onClick={() => handleBgColorSelect(c.color)}
-                          className={`w-8 h-8 rounded-lg transition-all cursor-pointer shrink-0 border-2 ${
-                            textBgColor === c.color ? 'scale-110 ring-2 ring-gold border-gold shadow-md' : (c.color === '#FFFFFF' ? 'border-stone-300' : 'border-transparent opacity-90 hover:opacity-100')
+                          title={c.name}
+                          className={`w-7 h-7 flex-shrink-0 rounded-full cursor-pointer transition-all ${
+                            textBgColor === c.color
+                              ? 'ring-2 ring-offset-2 ring-gold ring-offset-[#182744] scale-110 shadow-md'
+                              : 'ring-1 ring-white/20 hover:scale-105'
                           }`}
                           style={{
                             background: c.color === 'transparent'
                               ? 'repeating-conic-gradient(#aaa 0% 25%, #fff 0% 50%) 0 0 / 10px 10px'
-                              : c.color
+                              : c.color,
+                            outline: c.color === '#182744' ? '2px solid rgba(255,255,255,0.25)' : 'none',
+                            outlineOffset: '-2px'
                           }}
-                          title={c.name}
                         />
                       ))}
                     </div>
