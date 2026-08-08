@@ -20,10 +20,15 @@ class GlobalErrorBoundary extends Component {
 
   handleReset = () => {
     try {
-      localStorage.clear();
+      localStorage.removeItem('duat_category_banners');
+      localStorage.removeItem('duat_forge_banner_v1');
       sessionStorage.clear();
     } catch (e) {}
     window.location.href = window.location.origin + window.location.pathname + '?reset=' + Date.now();
+  };
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: null });
   };
 
   render() {
@@ -45,12 +50,22 @@ class GlobalErrorBoundary extends Component {
                 </div>
               )}
             </div>
-            <button
-              onClick={this.handleReset}
-              className="w-full py-3.5 bg-[#E8A33D] text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-widest hover:bg-[#C97B22] transition-colors shadow-lg"
-            >
-              تحديث وتفريغ الـ CACHE الآن ↻
-            </button>
+
+            <div className="space-y-2 pt-2">
+              <button
+                onClick={this.handleReset}
+                className="w-full py-3.5 bg-[#E8A33D] text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-widest hover:bg-[#C97B22] transition-colors shadow-lg"
+              >
+                تحديث وتفريغ الـ CACHE الآن ↻
+              </button>
+
+              <button
+                onClick={this.handleRetry}
+                className="w-full py-2.5 bg-transparent border border-[#28305F] text-[#EDE4D3] hover:border-[#E8A33D] hover:text-[#E8A33D] font-mono text-xs uppercase transition-colors"
+              >
+                إعادة المحاولة ومتابعة التصفح 🚀
+              </button>
+            </div>
           </div>
         </div>
       );
