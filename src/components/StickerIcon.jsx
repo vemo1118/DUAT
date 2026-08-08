@@ -21,7 +21,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = isTransparentBg ? (color || '#000000') : '#000000';
+    const finalTextColor = '#000000';
 
     const finalBg = isTransparentBg
       ? 'transparent'
@@ -48,13 +48,13 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
-          className="select-none leading-none transform translate-y-[-1px]"
+          className="select-none leading-none transform translate-y-[-1px] font-sans"
           style={{
-            fontSize: `${Math.round(boxSize * 0.62)}px`,
-            fontFamily: "'Aref Ruqaa Ink', 'Aref Ruqaa', cursive",
-            fontWeight: 700,
-            color: finalTextColor,
-            textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.2)'
+            fontSize: `${Math.round(boxSize * 0.58)}px`,
+            fontFamily: "'IBM Plex Sans Arabic', 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif",
+            fontWeight: 800,
+            color: '#000000',
+            textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.15)'
           }}
         >
           {char}
