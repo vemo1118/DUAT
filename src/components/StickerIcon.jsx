@@ -97,10 +97,11 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
-          className="font-cinzel font-bold select-none leading-none tracking-tight transform translate-y-[-0.5px]"
+          className="font-arsenica font-bold select-none leading-none tracking-tight transform translate-y-[-0.5px]"
           style={{
-            fontSize: `${Math.round(boxSize * 0.52)}px`,
-            fontFamily: "'Cinzel', 'Playfair Display', Georgia, serif",
+            fontSize: `${Math.round(boxSize * 0.54)}px`,
+            fontFamily: "'Arsenica Arabic', 'Arsenica-Arabic-Demibold-TRIAL', 'Cinzel', serif",
+            fontWeight: 600,
             color: finalTextColor,
             textShadow: isTransparentBg ? 'none' : '0 2px 4px rgba(0,0,0,0.6)'
           }}

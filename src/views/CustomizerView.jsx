@@ -334,7 +334,7 @@ export const CustomizerContent = () => {
 
   const getSubLabelFontClass = (st) => {
     if (st?.id?.startsWith('ar-letter-')) return 'font-camel text-xs sm:text-sm font-bold tracking-normal';
-    if (st?.id?.startsWith('en-letter-')) return 'font-cinzel text-xs font-bold';
+    if (st?.id?.startsWith('en-letter-')) return 'font-arsenica text-xs font-bold';
     if (st?.category === 'quotes-ar' || st?.id?.startsWith('quote-ar-')) return 'font-ruqaa text-xs font-bold';
     return 'font-sans text-[11px] sm:text-xs font-medium';
   };
