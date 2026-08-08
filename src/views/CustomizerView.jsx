@@ -333,7 +333,7 @@ export const CustomizerContent = () => {
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
 
   const getSubLabelFontClass = (st) => {
-    if (st?.id?.startsWith('ar-letter-')) return 'font-ruqaa text-sm sm:text-base font-bold';
+    if (st?.id?.startsWith('ar-letter-')) return 'font-sans text-xs sm:text-sm font-extrabold tracking-normal';
     if (st?.id?.startsWith('en-letter-')) return 'font-cinzel text-xs font-bold';
     if (st?.category === 'quotes-ar' || st?.id?.startsWith('quote-ar-')) return 'font-ruqaa text-xs font-bold';
     return 'font-sans text-[11px] sm:text-xs font-medium';
@@ -1286,7 +1286,11 @@ export const CustomizerContent = () => {
                         bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                       />
                     </div>
-                    <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
+                    <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${
+                      st?.id?.startsWith('ar-letter-')
+                        ? (isNight ? 'text-gold group-hover:text-amber-300 font-extrabold' : 'text-stone-900 group-hover:text-black font-extrabold')
+                        : (isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900')
+                    }`}>
                       {subLabel}
                     </span>
                   </button>
@@ -1644,7 +1648,11 @@ export const CustomizerContent = () => {
                               bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                             />
                           </div>
-                          <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
+                          <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${
+                            st?.id?.startsWith('ar-letter-')
+                              ? (isNight ? 'text-gold group-hover:text-amber-300 font-extrabold' : 'text-stone-900 group-hover:text-black font-extrabold')
+                              : (isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900')
+                          }`}>
                             {subLabel}
                           </span>
                         </button>

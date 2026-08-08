@@ -15,19 +15,19 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
   const isArabicLetter = stickerId && (stickerId.startsWith('ar-letter-') || stickerId.startsWith('st-letter-'));
   const customImg = image || imageUrl;
 
-  // ── Synthetic 3D Epoxy Arabic Ruq'ah Square Letter Domes ──────────────────
+  // ── Synthetic 3D Epoxy Arabic Square Letter Domes ──────────────────
   if (isArabicLetter) {
     const char = stickerId.replace(/^(ar-letter-|st-letter-)/, '');
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = isTransparentBg ? (color || '#000000') : '#000000';
+    const finalTextColor = isTransparentBg ? (color || '#121212') : '#121212';
 
     const finalBg = isTransparentBg
       ? 'transparent'
       : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
           ? bgColor
-          : 'linear-gradient(145deg, #FFFFFF 0%, #F5F1E6 60%, #EAE4D4 100%)');
+          : 'linear-gradient(145deg, #FFFFFF 0%, #F8F5EC 60%, #EFE8D6 100%)');
 
     return (
       <div
@@ -48,10 +48,10 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
-          className="font-ruqaa font-bold select-none leading-none transform translate-y-[-1px]"
+          className="font-bold select-none leading-none transform translate-y-[-1px]"
           style={{
             fontSize: `${Math.round(boxSize * 0.58)}px`,
-            fontFamily: "'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', serif",
+            fontFamily: "'Amiri', 'Traditional Arabic', 'Cairo', 'Noto Naskh Arabic', serif",
             color: finalTextColor,
             textShadow: isTransparentBg ? 'none' : '0 1px 1px rgba(255,255,255,0.4)'
           }}
