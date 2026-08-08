@@ -29,15 +29,23 @@ html:not([data-theme]) {
   --amber: #E8A33D;
   --amber-deep: #C97B22;
   --rose: #E0917A;
-  --bone: #EDE4D3;
 
   --void: #0A0C16;
+  --void-rgb: 10, 12, 22;
   --stone: #12162B;
+  --stone-rgb: 18, 22, 43;
   --coal: #181E3B;
+  --coal-rgb: 24, 30, 59;
   --grave: #28305F;
+  --grave-rgb: 40, 48, 95;
   --gold: #E8A33D;
+  --gold-rgb: 232, 163, 61;
+  --bone: #EDE4D3;
+  --bone-rgb: 237, 228, 211;
   --ash: #8E98BF;
+  --ash-rgb: 142, 152, 191;
   --ember: #D9432E;
+  --ember-rgb: 217, 67, 46;
 }
 
 html[data-theme="night"] body,
@@ -52,13 +60,22 @@ html:not([data-theme]) body {
 html[data-theme="dawn"] {
   color-scheme: light;
   --void: #FAF6F0;
+  --void-rgb: 250, 246, 240;
   --stone: #EFEAE0;
+  --stone-rgb: 239, 234, 224;
   --coal: #E5DFC5;
+  --coal-rgb: 229, 223, 197;
   --grave: #DCD4C7;
+  --grave-rgb: 220, 212, 199;
   --bone: #0A0C16;
+  --bone-rgb: 10, 12, 22;
   --ash: #524C44;
+  --ash-rgb: 82, 76, 68;
   --gold: #C97B22;
+  --gold-rgb: 201, 123, 34;
   --amber: #C97B22;
+  --ember: #D9432E;
+  --ember-rgb: 217, 67, 46;
 }
 
 html[data-theme="dawn"] body {

@@ -625,7 +625,7 @@ export function AdminView() {
               onClick={() => setActiveTab('products')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'products'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -637,7 +637,7 @@ export function AdminView() {
               onClick={() => setActiveTab('orders')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'orders'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -649,7 +649,7 @@ export function AdminView() {
               onClick={() => setActiveTab('hero')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'hero'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -661,7 +661,7 @@ export function AdminView() {
               onClick={() => setActiveTab('forge_banner')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'forge_banner'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -673,7 +673,7 @@ export function AdminView() {
               onClick={() => setActiveTab('notifications')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'notifications'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -685,7 +685,7 @@ export function AdminView() {
               onClick={() => setActiveTab('coupons')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'coupons'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
@@ -697,7 +697,7 @@ export function AdminView() {
               onClick={() => setActiveTab('builder')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'builder'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
                   : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >

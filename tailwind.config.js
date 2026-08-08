@@ -7,20 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: 'rgb(var(--void-rgb) / <alpha-value>)',
-        stone: 'rgb(var(--stone-rgb) / <alpha-value>)',
-        coal: 'rgb(var(--coal-rgb) / <alpha-value>)',
-        grave: 'rgb(var(--grave-rgb) / <alpha-value>)',
-        gold: 'rgb(var(--gold-rgb) / <alpha-value>)',
-        ember: 'rgb(var(--ember-rgb) / <alpha-value>)',
-        bone: 'rgb(var(--bone-rgb) / <alpha-value>)',
-        ash: 'rgb(var(--ash-rgb) / <alpha-value>)',
+        void: 'var(--void)',
+        stone: 'var(--stone)',
+        coal: 'var(--coal)',
+        grave: 'var(--grave)',
+        gold: 'var(--gold)',
+        ember: 'var(--ember)',
+        bone: 'var(--bone)',
+        ash: 'var(--ash)',
       },
       fontFamily: {
         clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
         kufi: ['"IBM Plex Sans Arabic"', 'sans-serif'],
-        mono: ['"Space Grotesk"', 'sans-serif'], // Replaced JetBrains Mono with Space Grotesk sitewide
+        mono: ['"Space Grotesk"', 'sans-serif'],
         display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
       },
       letterSpacing: {
