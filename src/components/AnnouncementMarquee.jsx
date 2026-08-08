@@ -12,7 +12,7 @@ export const AnnouncementMarquee = () => {
   const content = isAr ? textAr : textEn;
 
   return (
-    <div className="w-full bg-[#070812] border-b border-[#28305F] text-[#E8A33D] overflow-hidden py-2 font-mono text-[11px] uppercase tracking-widest relative z-50 select-none">
+    <div className="w-full bg-coal border-b border-grave text-gold overflow-hidden py-2 font-mono text-[11px] uppercase tracking-widest relative z-50 select-none">
       <div className="flex w-max animate-marquee">
         <span className="px-4">{content}</span>
         <span className="px-4">{content}</span>
