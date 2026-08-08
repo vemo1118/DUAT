@@ -101,9 +101,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             alt="Hero Background"
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
-          {/* Dynamic Theme Background Overlay Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/90 to-transparent sm:w-4/5" />
-          <div className="absolute inset-0 bg-gradient-to-t from-void/95 via-transparent to-void/30" />
+          {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
+          <div
+            className={`absolute inset-0 ${
+              isRtl
+                ? 'bg-gradient-to-l from-void via-void/95 via-80% to-transparent'
+                : 'bg-gradient-to-r from-void via-void/95 via-80% to-transparent'
+            }`}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-void via-transparent to-void/40" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
