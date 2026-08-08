@@ -6,6 +6,10 @@
   font-family: 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', 'Rakkas', serif;
 }
 
+.font-cinzel {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+}
+
 /* High contrast text selection fix */
 ::selection {
   background-color: #E8A33D !important;

@@ -214,8 +214,9 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
         ctx.fillText('🖼️ صورة مرفوعة', 0, 0);
       } else {
         let displayText = layer.stickerId || 'STICKER';
-        const isLetterLayer = displayText.startsWith('ar-letter-') || displayText.startsWith('st-letter-');
-        if (isLetterLayer) {
+        const isArLetter = displayText.startsWith('ar-letter-') || displayText.startsWith('st-letter-');
+        const isEnLetter = displayText.startsWith('en-letter-') || displayText.startsWith('st-en-letter-');
+        if (isArLetter) {
           const char = displayText.replace(/^(ar-letter-|st-letter-)/, '');
           const pw = 48;
           const ph = 48;
@@ -237,6 +238,28 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(char, 0, 2);
+        } else if (isEnLetter) {
+          const char = displayText.replace(/^(en-letter-|st-en-letter-)/, '').toUpperCase();
+          const pw = 48;
+          const ph = 48;
+          if (bgColor !== 'transparent') {
+            ctx.fillStyle = bgColor || '#0D1629';
+            ctx.strokeStyle = 'rgba(55,80,125,0.7)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+              ctx.roundRect(-pw / 2, -ph / 2, pw, ph, 10);
+            } else {
+              ctx.rect(-pw / 2, -ph / 2, pw, ph);
+            }
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.fillStyle = fgColor && fgColor !== '#E8A33D' ? fgColor : '#FFFFFF';
+          ctx.font = 'bold 26px "Cinzel", "Playfair Display", serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(char, 0, 1);
         } else {
           if (displayText.startsWith('ar-letter-')) displayText = displayText.replace('ar-letter-', '');
           else if (displayText.startsWith('en-letter-')) displayText = displayText.replace('en-letter-', '');
@@ -905,7 +928,7 @@ export const CustomizerContent = () => {
                             backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F')
                           }}
                           className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-gold/50 shadow-xl backdrop-blur-sm ${
-                            layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
+                            layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'cinzel' ? 'font-cinzel text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
                           }`}
                         >
                           {layer.text}
@@ -1209,7 +1232,7 @@ export const CustomizerContent = () => {
                   </div>
                 </div>
 
-                {/* Sticker Sub-category Filters (Ruq'ah Letters vs Motifs vs All) */}
+                {/* Sticker Sub-category Filters (Arabic Letters vs English Letters vs Motifs vs All) */}
                 <div className="flex flex-wrap gap-2 pb-1 border-b border-grave/40">
                   <button
                     type="button"
@@ -1219,6 +1242,15 @@ export const CustomizerContent = () => {
                     }`}
                   >
                     <span>حروف رقعة 🔤</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStickerCategoryFilter('letters-en')}
+                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      stickerCategoryFilter === 'letters-en' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
+                    }`}
+                  >
+                    <span>حروف إنجليزي 🅰️</span>
                   </button>
                   <button
                     type="button"
@@ -1246,7 +1278,8 @@ export const CustomizerContent = () => {
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[380px] overflow-y-auto p-1 custom-scrollbar">
                   {STICKER_ITEMS.filter((st) => {
                     if (stickerCategoryFilter === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
-                    if (stickerCategoryFilter === 'motifs') return !st.id?.startsWith('ar-letter-') && !st.id?.startsWith('st-letter-') && st.category !== 'letters';
+                    if (stickerCategoryFilter === 'letters-en') return st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
+                    if (stickerCategoryFilter === 'motifs') return !st.id?.startsWith('ar-letter-') && !st.id?.startsWith('en-letter-') && st.category !== 'letters' && st.category !== 'letters-en';
                     return true;
                   }).map((st) => (
                     <button
@@ -1262,13 +1295,15 @@ export const CustomizerContent = () => {
                           stickerId={st.id}
                           image={st.image || st.imageUrl}
                           size={62}
-                          color={st.id?.startsWith('ar-letter-') ? undefined : textColor}
-                          bgColor={st.id?.startsWith('ar-letter-') ? undefined : textBgColor}
+                          color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
+                          bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                         />
                       </div>
                       <span className="font-space text-xs text-bone group-hover:text-gold tracking-wide truncate max-w-full font-bold">
                         {st.id?.startsWith('ar-letter-')
                           ? (lang === 'ar' ? `حرف ${st.id.replace('ar-letter-', '')}` : `Letter ${st.id.replace('ar-letter-', '')}`)
+                          : st.id?.startsWith('en-letter-')
+                          ? (lang === 'ar' ? `حرف ${st.id.replace('en-letter-', '')}` : `Letter ${st.id.replace('en-letter-', '')}`)
                           : (lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr))}
                       </span>
                     </button>

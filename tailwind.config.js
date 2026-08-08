@@ -21,6 +21,7 @@ export default {
         space: ['"Space Grotesk"', 'sans-serif'],
         kufi: ['"IBM Plex Sans Arabic"', 'sans-serif'],
         ruqaa: ['"Aref Ruqaa Ink"', '"Aref Ruqaa"', '"Katibeh"', '"Rakkas"', 'serif'],
+        cinzel: ['"Cinzel"', '"Playfair Display"', 'Georgia', 'serif'],
         mono: ['"Space Grotesk"', 'sans-serif'],
         display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
       },

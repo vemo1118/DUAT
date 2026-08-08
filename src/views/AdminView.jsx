@@ -120,9 +120,12 @@ export function AdminView() {
     toggleBuilderStickerVisibility,
     deleteBuilderSticker,
     resetBuilderStickers,
+    setCategoryStickersVisibility,
     updatePrice,
     resetCustomizerConfig
   } = useCustomizerConfig();
+
+  const [adminStickerFilter, setAdminStickerFilter] = useState('all');
 
   const [isBuilderStickerModalOpen, setIsBuilderStickerModalOpen] = useState(false);
   const [editingBuilderSticker, setEditingBuilderSticker] = useState(null);
@@ -2560,9 +2563,89 @@ export function AdminView() {
               </div>
             </div>
 
+            {/* Category Filter & Batch Visibility Controls Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-coal p-4 border border-grave rounded">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminStickerFilter('all')}
+                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                    adminStickerFilter === 'all' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
+                  }`}
+                >
+                  الكل ({builderStickers.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminStickerFilter('letters-ar')}
+                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                    adminStickerFilter === 'letters-ar' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
+                  }`}
+                >
+                  حروف رقعة 🔤 ({builderStickers.filter(s => s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminStickerFilter('letters-en')}
+                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                    adminStickerFilter === 'letters-en' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
+                  }`}
+                >
+                  حروف إنجليزي 🅰️ ({builderStickers.filter(s => s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminStickerFilter('motifs')}
+                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                    adminStickerFilter === 'motifs' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
+                  }`}
+                >
+                  شعارات ومجسمات ✨ ({builderStickers.filter(s => !s.id?.startsWith('ar-letter-') && !s.id?.startsWith('en-letter-') && s.category !== 'letters' && s.category !== 'letters-en').length})
+                </button>
+              </div>
+
+              {/* Batch Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryStickersVisibility(adminStickerFilter, true);
+                    showToast('تم تفعيل كافة استيكرات المجموعة بنجاح 👁️', 'success');
+                  }}
+                  className="px-3 py-1.5 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold transition-all rounded flex items-center gap-1.5"
+                  title="إظهار جميع استيكرات هذه المجموعة في البلدر"
+                >
+                  <Eye size={14} />
+                  <span>تفعيل المجموعة 👁️</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryStickersVisibility(adminStickerFilter, false);
+                    showToast('تم إخفاء كافة استيكرات المجموعة بنجاح 🚫', 'info');
+                  }}
+                  className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 border border-red-500/40 text-red-300 font-mono text-xs font-bold transition-all rounded flex items-center gap-1.5"
+                  title="إخفاء جميع استيكرات هذه المجموعة من البلدر"
+                >
+                  <EyeOff size={14} />
+                  <span>تعطيل المجموعة 🚫</span>
+                </button>
+              </div>
+            </div>
+
             {/* Grid of Builder Stickers */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-              {builderStickers.map((st) => {
+              {builderStickers.filter((st) => {
+                const isAr = st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
+                const isEn = st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
+                const isMotif = !isAr && !isEn;
+
+                if (adminStickerFilter === 'letters-ar') return isAr;
+                if (adminStickerFilter === 'letters-en') return isEn;
+                if (adminStickerFilter === 'motifs') return isMotif;
+                return true;
+              }).map((st) => {
                 const isActive = st.is_active !== false && st.isActive !== false;
                 return (
                   <div

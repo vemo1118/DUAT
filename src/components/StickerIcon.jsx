@@ -66,6 +66,58 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     );
   }
 
+  // ── Synthetic 3D Epoxy English Serif Square Letter Domes ──────────────────
+  const isEnglishLetter = stickerId && (stickerId.startsWith('en-letter-') || stickerId.startsWith('st-en-letter-'));
+  if (isEnglishLetter) {
+    const char = stickerId.replace(/^(en-letter-|st-en-letter-)/, '').toUpperCase();
+    const boxSize = forCanvas ? 64 : size;
+    const isTransparentBg = bgColor === 'transparent';
+    const isDefaultNavyBg = !bgColor || bgColor === '#14110F' || bgColor === '#0A0C16' || bgColor === '#181E3B';
+
+    const finalBg = isTransparentBg
+      ? 'transparent'
+      : isDefaultNavyBg
+      ? 'linear-gradient(145deg, #182744 0%, #0D1629 60%, #070C18 100%)'
+      : bgColor;
+
+    const finalTextColor = isTransparentBg
+      ? (color || '#FFFFFF')
+      : isDefaultNavyBg
+      ? (color && color !== '#E8A33D' ? color : '#FFFFFF')
+      : (color || '#FFFFFF');
+
+    return (
+      <div
+        style={{
+          width: boxSize,
+          height: boxSize,
+          background: finalBg,
+          color: finalTextColor,
+          boxShadow: isTransparentBg
+            ? 'none'
+            : '0 8px 18px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.4)',
+          borderColor: isTransparentBg ? 'transparent' : 'rgba(55, 80, 125, 0.7)'
+        }}
+        className="rounded-2xl border flex items-center justify-center relative overflow-hidden select-none shrink-0 pointer-events-none transition-transform"
+      >
+        {/* 3D Epoxy Glass Bevel Gloss */}
+        {!isTransparentBg && (
+          <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
+        )}
+        <span
+          className="font-cinzel font-bold select-none leading-none tracking-tight transform translate-y-[-0.5px]"
+          style={{
+            fontSize: `${Math.round(boxSize * 0.52)}px`,
+            fontFamily: "'Cinzel', 'Playfair Display', Georgia, serif",
+            textShadow: isTransparentBg ? 'none' : '0 2px 4px rgba(0,0,0,0.6)'
+          }}
+        >
+          {char}
+        </span>
+      </div>
+    );
+  }
+
   if (customImg) {
     if (forCanvas) {
       // Fixed natural size on the phone canvas

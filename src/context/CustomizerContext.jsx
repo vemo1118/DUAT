@@ -235,6 +235,29 @@ export const CustomizerProvider = ({ children }) => {
     localStorage.removeItem('duat_builder_stickers_v1');
   };
 
+  const setCategoryStickersVisibility = (filterType, isVisible) => {
+    setBuilderStickers((prev) => {
+      const updated = prev.map((s) => {
+        const isAr = s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters';
+        const isEn = s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en';
+        const isMotif = !isAr && !isEn;
+
+        let shouldTarget = false;
+        if (filterType === 'letters-ar' && isAr) shouldTarget = true;
+        else if (filterType === 'letters-en' && isEn) shouldTarget = true;
+        else if (filterType === 'motifs' && isMotif) shouldTarget = true;
+        else if (filterType === 'all') shouldTarget = true;
+
+        if (shouldTarget) {
+          return { ...s, is_active: isVisible, isActive: isVisible };
+        }
+        return s;
+      });
+      saveToSupabase(builderPrice, caseTypes, phoneModels, updated);
+      return updated;
+    });
+  };
+
   const updatePrice = (priceVal) => {
     const val = Number(priceVal) || 850;
     setBuilderPrice(val);
@@ -278,6 +301,7 @@ export const CustomizerProvider = ({ children }) => {
         toggleBuilderStickerVisibility,
         deleteBuilderSticker,
         resetBuilderStickers,
+        setCategoryStickersVisibility,
         updatePrice,
         resetCustomizerConfig
       }}

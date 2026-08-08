@@ -299,6 +299,19 @@ export const ARABIC_LETTER_STICKERS = ARABIC_LETTERS.map((char) => ({
   category: 'letters'
 }));
 
+const ENGLISH_LETTERS = [
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+];
+
+export const ENGLISH_LETTER_STICKERS = ENGLISH_LETTERS.map((char) => ({
+  id: `en-letter-${char}`,
+  nameEn: `Letter ${char}`,
+  nameAr: `حرف ${char}`,
+  tagEn: '3D EPOXY SERIF LETTER',
+  tagAr: 'حرف إنجليزي بارز',
+  category: 'letters-en'
+}));
+
 export const STICKER_PRESETS = [
   { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
   { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
@@ -306,7 +319,8 @@ export const STICKER_PRESETS = [
   { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png' },
   { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png' },
   { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' },
-  ...ARABIC_LETTER_STICKERS
+  ...ARABIC_LETTER_STICKERS,
+  ...ENGLISH_LETTER_STICKERS
 ];
 
 export const PRESET_TEMPLATES = [
