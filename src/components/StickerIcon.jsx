@@ -46,28 +46,44 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const char = stickerId.replace(/^(ar-letter-|st-letter-)/, '');
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
+    const isDarkDefaultBg = !bgColor || bgColor === '#14110F' || bgColor === '#0A0C16' || bgColor === '#181E3B';
+
+    const finalBg = isTransparentBg
+      ? 'transparent'
+      : isDarkDefaultBg
+      ? 'linear-gradient(145deg, #FFFFFF 0%, #F6F3EB 60%, #EAE4D4 100%)'
+      : bgColor;
+
+    const finalTextColor = isTransparentBg
+      ? (color && color !== '#E8A33D' ? color : '#FFFFFF')
+      : isDarkDefaultBg
+      ? '#141414'
+      : (color || '#141414');
+
     return (
       <div
         style={{
           width: boxSize,
           height: boxSize,
-          background: isTransparentBg ? 'transparent' : (bgColor || 'linear-gradient(145deg, #FBF8F1 0%, #EFE8D8 100%)'),
-          color: color && color !== '#E8A33D' ? color : '#141414',
-          boxShadow: isTransparentBg ? 'none' : '0 6px 16px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.08)',
-          borderColor: isTransparentBg ? 'transparent' : 'rgba(215, 205, 190, 0.8)'
+          background: finalBg,
+          color: finalTextColor,
+          boxShadow: isTransparentBg
+            ? 'none'
+            : '0 8px 18px rgba(0,0,0,0.22), inset 0 2px 4px rgba(255,255,255,1), inset 0 -2px 4px rgba(0,0,0,0.08)',
+          borderColor: isTransparentBg ? 'transparent' : 'rgba(210, 200, 182, 0.85)'
         }}
         className="rounded-2xl border flex items-center justify-center relative overflow-hidden select-none shrink-0 pointer-events-none transition-transform"
       >
-        {/* 3D Epoxy Dome Bevel Highlight */}
+        {/* 3D Epoxy Glass Bevel Gloss */}
         {!isTransparentBg && (
-          <div className="absolute top-1 left-2 w-3/5 h-1/2 bg-gradient-to-b from-white/70 to-transparent rounded-t-xl blur-[0.5px] pointer-events-none" />
+          <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
           className="font-ruqaa font-bold select-none leading-none transform translate-y-[-1px]"
           style={{
-            fontSize: `${Math.round(boxSize * 0.52)}px`,
+            fontSize: `${Math.round(boxSize * 0.54)}px`,
             fontFamily: "'Aref Ruqaa', serif",
-            textShadow: isTransparentBg ? 'none' : '0 1px 2px rgba(0,0,0,0.12)'
+            textShadow: isTransparentBg ? 'none' : '0 1px 1px rgba(255,255,255,0.4)'
           }}
         >
           {char}

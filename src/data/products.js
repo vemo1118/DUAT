@@ -292,8 +292,8 @@ const ARABIC_LETTERS = [
 
 export const ARABIC_LETTER_STICKERS = ARABIC_LETTERS.map((char) => ({
   id: `ar-letter-${char}`,
-  nameEn: `Letter ${char} (Ruqaa)`,
-  nameAr: `حرف ${char} (رقعة)`,
+  nameEn: `Letter ${char}`,
+  nameAr: `حرف ${char}`,
   tagEn: '3D EPOXY SQUARE LETTER',
   tagAr: 'حرف رقعة مجسم',
   category: 'letters'

@@ -1257,10 +1257,16 @@ export const CustomizerContent = () => {
                       className="p-2 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-1.5 transition-all cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden group"
                       title="Click or Drag onto phone"
                     >
-                      <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={58} color={textColor} bgColor={textBgColor} />
+                      <div className="w-full aspect-square flex items-center justify-center overflow-hidden p-1">
+                        <StickerIcon
+                          stickerId={st.id}
+                          image={st.image || st.imageUrl}
+                          size={62}
+                          color={st.id?.startsWith('ar-letter-') ? undefined : textColor}
+                          bgColor={st.id?.startsWith('ar-letter-') ? undefined : textBgColor}
+                        />
                       </div>
-                      <span className="font-mono text-[10px] text-ash group-hover:text-gold tracking-wider truncate max-w-full font-bold">
+                      <span className="font-space text-xs text-bone group-hover:text-gold tracking-wide truncate max-w-full font-bold">
                         {lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr)}
                       </span>
                     </button>
