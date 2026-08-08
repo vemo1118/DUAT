@@ -110,6 +110,75 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     );
   }
 
+  // ── Synthetic 3D Gregorian Year Badges ─────────────────────────────────────
+  const isYearBadge = stickerId && stickerId.startsWith('year-');
+  if (isYearBadge) {
+    const yearKey = stickerId.replace('year-', '');
+    const is199x = yearKey === '199x';
+    const labelText = is199x ? 'Made in 199x' : `${yearKey}'s`;
+    
+    if (forCanvas) {
+      return (
+        <div
+          style={{
+            color: '#FFFFFF',
+            background: is199x
+              ? 'linear-gradient(135deg, #5C1D38 0%, #3B1023 100%)'
+              : 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+            borderColor: is199x ? 'rgba(219,39,119,0.5)' : 'rgba(100,116,139,0.6)',
+            boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+          }}
+          className={`${is199x ? 'rounded-full px-4 py-1.5' : 'rounded-2xl px-5 py-2'} border flex items-center justify-center font-bold font-sans text-xs sm:text-sm select-none pointer-events-none whitespace-nowrap shadow-lg`}
+        >
+          {labelText}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        style={{
+          color: '#FFFFFF',
+          background: is199x
+            ? 'linear-gradient(135deg, #6B2144 0%, #421229 100%)'
+            : 'linear-gradient(135deg, #1E2B45 0%, #0E1626 100%)',
+          borderColor: is199x ? '#9D174D' : '#334155',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+        }}
+        className={`${is199x ? 'rounded-full px-3 py-1' : 'rounded-xl px-3 py-1.5'} border flex items-center justify-center font-bold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap w-full`}
+      >
+        {labelText}
+      </div>
+    );
+  }
+
+  // ── Synthetic 3D Month Badges ──────────────────────────────────────────────
+  const isMonthBadge = stickerId && stickerId.startsWith('month-');
+  if (isMonthBadge) {
+    const monthMap = {
+      jan: 'January', feb: 'February', mar: 'March', apr: 'April',
+      may: 'May', jun: 'June', jul: 'July', aug: 'August',
+      sep: 'September', oct: 'October', nov: 'November', dec: 'December'
+    };
+    const monthCode = stickerId.replace('month-', '');
+    const monthFullName = monthMap[monthCode] || monthCode;
+    const labelText = `Made In ${monthFullName}`;
+
+    return (
+      <div
+        style={{
+          color: '#334155',
+          background: 'linear-gradient(145deg, #F8F5EE 0%, #EAE4D6 100%)',
+          borderColor: 'rgba(203,195,178,0.9)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.9)',
+        }}
+        className="rounded-full px-3 py-1 sm:px-4 sm:py-1.5 border flex items-center justify-center font-serif italic font-semibold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap shadow-sm"
+      >
+        {labelText}
+      </div>
+    );
+  }
+
   if (customImg) {
     if (forCanvas) {
       // Fixed natural size on the phone canvas

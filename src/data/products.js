@@ -312,15 +312,63 @@ export const ENGLISH_LETTER_STICKERS = ENGLISH_LETTERS.map((char) => ({
   category: 'letters-en'
 }));
 
+const GREGORIAN_YEARS = [
+  { id: 'year-199x', nameEn: 'Made In 199x', nameAr: 'صنع في 199x' },
+  { id: 'year-2000', nameEn: "2000's", nameAr: 'عام 2000' },
+  { id: 'year-2001', nameEn: "2001's", nameAr: 'عام 2001' },
+  { id: 'year-2002', nameEn: "2002's", nameAr: 'عام 2002' },
+  { id: 'year-2003', nameEn: "2003's", nameAr: 'عام 2003' },
+  { id: 'year-2004', nameEn: "2004's", nameAr: 'عام 2004' },
+  { id: 'year-2005', nameEn: "2005's", nameAr: 'عام 2005' },
+  { id: 'year-2006', nameEn: "2006's", nameAr: 'عام 2006' },
+  { id: 'year-2007', nameEn: "2007's", nameAr: 'عام 2007' },
+  { id: 'year-2008', nameEn: "2008's", nameAr: 'عام 2008' },
+];
+
+export const YEAR_STICKERS = GREGORIAN_YEARS.map((y) => ({
+  id: y.id,
+  nameEn: y.nameEn,
+  nameAr: y.nameAr,
+  tagEn: '3D YEAR BADGE',
+  tagAr: 'شارة سنة ميلادية',
+  category: 'years'
+}));
+
+const MONTHS_LIST = [
+  { id: 'month-jan', nameEn: 'Made In January', nameAr: 'يناير', label: 'January' },
+  { id: 'month-feb', nameEn: 'Made In February', nameAr: 'فبراير', label: 'February' },
+  { id: 'month-mar', nameEn: 'Made In March', nameAr: 'مارس', label: 'March' },
+  { id: 'month-apr', nameEn: 'Made In April', nameAr: 'أبريل', label: 'April' },
+  { id: 'month-may', nameEn: 'Made In May', nameAr: 'مايو', label: 'May' },
+  { id: 'month-jun', nameEn: 'Made In June', nameAr: 'يونيو', label: 'June' },
+  { id: 'month-jul', nameEn: 'Made In July', nameAr: 'يوليو', label: 'July' },
+  { id: 'month-aug', nameEn: 'Made In August', nameAr: 'أغسطس', label: 'August' },
+  { id: 'month-sep', nameEn: 'Made In September', nameAr: 'سبتمبر', label: 'September' },
+  { id: 'month-oct', nameEn: 'Made In October', nameAr: 'أكتوبر', label: 'October' },
+  { id: 'month-nov', nameEn: 'Made In November', nameAr: 'نوفمبر', label: 'November' },
+  { id: 'month-dec', nameEn: 'Made In December', nameAr: 'ديسمبر', label: 'December' },
+];
+
+export const MONTH_STICKERS = MONTHS_LIST.map((m) => ({
+  id: m.id,
+  nameEn: m.nameEn,
+  nameAr: m.nameAr,
+  tagEn: '3D MONTH BADGE',
+  tagAr: 'شارة شهر الميلاد',
+  category: 'months'
+}));
+
 export const STICKER_PRESETS = [
-  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
-  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
+  { id: 'st-born-dawn',    nameEn: 'Born at Dawn',    nameAr: 'طالع نور',    tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'quotes-ar', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png' },
+  { id: 'st-through-night',nameEn: 'Through the Night',nameAr: 'عدّي الليل', tagEn: '3D EPOXY DOME SLOGAN', tagAr: 'شعار إيبوكسي بارز', category: 'quotes-ar', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png' },
   { id: 'st-crescent',     nameEn: 'Crescent Moon',   nameAr: 'الهلال',      tagEn: '3D EPOXY MOTIF',      tagAr: 'رمز إيبوكسي مجسم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/MOON_qqyojj.png' },
   { id: 'st-starry',       nameEn: 'Starry Night',    nameAr: 'سماء الليل',  tagEn: '3D EPOXY DOME',       tagAr: 'قبة إيبوكسي نجوم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103660/STARS_imo15w.png' },
   { id: 'st-sun',          nameEn: 'DUAT Sun',        nameAr: 'شمس دوات',    tagEn: '3D SUN DISC DOME',    tagAr: 'قرص الشمس المجسم',  category: 'motifs',  image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png' },
-  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',category: 'slogans', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' },
+  { id: 'st-duat',         nameEn: 'DUAT',            nameAr: 'دوات',        tagEn: '3D BRAND PILL',       tagAr: 'شعار دوات الإيبوكسي',category: 'quotes-en', image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103674/DUAT_TEXT_zixxvh.png' },
   ...ARABIC_LETTER_STICKERS,
-  ...ENGLISH_LETTER_STICKERS
+  ...ENGLISH_LETTER_STICKERS,
+  ...YEAR_STICKERS,
+  ...MONTH_STICKERS
 ];
 
 export const PRESET_TEMPLATES = [

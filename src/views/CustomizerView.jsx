@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, Component } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -8,7 +8,7 @@ import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import { toPng } from 'html-to-image';
 import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
-import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2 } from 'lucide-react';
+import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft, Info, Check, Plus, Minus } from 'lucide-react';
 
 // Error Boundary Fallback for Customizer View
 class CustomizerErrorBoundary extends Component {
@@ -792,256 +792,431 @@ export const CustomizerContent = () => {
   const logoHorizonColor = isLightCase ? '#0A0C16' : '#EDE4D3';
   const logoTextColor = isLightCase ? 'text-[#0A0C16] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]' : 'text-[#E8A33D] drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]';
 
+  const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState('motifs');
+
+  const CATEGORY_PILLS = [
+    { id: 'motifs', labelAr: 'أشكال ومجسمات', labelEn: 'Shapes & Motifs' },
+    { id: 'quotes-ar', labelAr: 'عبارات عربية', labelEn: 'Arabic Quotes' },
+    { id: 'quotes-en', labelAr: 'عبارات إنجليزي', labelEn: 'English Quotes' },
+    { id: 'letters', labelAr: 'حروف عربية', labelEn: 'Arabic Letters' },
+    { id: 'years', labelAr: 'سنوات ميلادية', labelEn: 'Gregorian Years' },
+    { id: 'months', labelAr: 'أشهر السنة', labelEn: 'Months of the Year' },
+    { id: 'letters-en', labelAr: 'حروف إنجليزي', labelEn: 'English Letters' },
+    { id: 'model', labelAr: 'نوع ورسم الجراب', labelEn: 'Case & Model' },
+    { id: 'text-photo', labelAr: 'كتابة وصور', labelEn: 'Text & Upload' },
+    { id: 'presets', labelAr: 'قوالب جاهزة', labelEn: 'Presets' },
+  ];
+
+  const getStickerSubLabel = (st) => {
+    if (!st) return '';
+    if (st.id?.startsWith('ar-letter-')) return st.id.replace('ar-letter-', '');
+    if (st.id?.startsWith('en-letter-')) return st.id.replace('en-letter-', '').toUpperCase();
+    if (st.id?.startsWith('year-')) {
+      const yr = st.id.replace('year-', '');
+      return yr === '199x' ? 'Made In 199x' : yr;
+    }
+    if (st.id?.startsWith('month-')) {
+      const mo = st.id.replace('month-', '');
+      const monthNames = { jan: 'Jan', feb: 'Feb', mar: 'Mar', apr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', aug: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dec: 'Dec' };
+      return `Made In ${monthNames[mo] || mo}`;
+    }
+    return lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr);
+  };
+
+  const filteredStickers = STICKER_ITEMS.filter((st) => {
+    if (activeCategory === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
+    if (activeCategory === 'letters-en') return st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
+    if (activeCategory === 'years') return st.id?.startsWith('year-') || st.category === 'years';
+    if (activeCategory === 'months') return st.id?.startsWith('month-') || st.category === 'months';
+    if (activeCategory === 'quotes-ar') return st.category === 'quotes-ar' || st.id === 'st-born-dawn' || st.id === 'st-through-night';
+    if (activeCategory === 'quotes-en') return st.category === 'quotes-en' || st.id === 'st-duat';
+    if (activeCategory === 'motifs') return st.category === 'motifs' || st.id === 'st-crescent' || st.id === 'st-starry' || st.id === 'st-sun';
+    if (activeCategory === 'all') return true;
+    return false;
+  });
+
+  const currentCategoryObj = CATEGORY_PILLS.find((c) => c.id === activeCategory) || CATEGORY_PILLS[0];
+  const sheetTitle = lang === 'ar' ? currentCategoryObj.labelAr : currentCategoryObj.labelEn;
+
+  const handleNextPill = () => {
+    const currIdx = CATEGORY_PILLS.findIndex((c) => c.id === activeCategory);
+    if (currIdx < CATEGORY_PILLS.length - 1) {
+      setActiveCategory(CATEGORY_PILLS[currIdx + 1].id);
+    } else {
+      handleAddToCart();
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="min-h-screen bg-[#F8F7F4] text-stone-900 font-sans flex flex-col justify-between select-none pb-6">
       
-      {/* Header */}
-      <div className="space-y-2 border-l-2 border-gold pl-4">
-        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-          <span>{t('customizerEyebrow')}</span>
-        </div>
-        <h1 className="font-clash text-4xl sm:text-5xl uppercase text-bone">
-          {t('customizerTitle')}
-        </h1>
-      </div>
+      {/* ── TOP EDITOR HEADER ("Live Editor" + Step Dots) ────────────────────── */}
+      <header className="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between relative select-none z-20">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="p-2 text-stone-700 hover:text-black transition-colors rounded-full hover:bg-stone-200/60 flex items-center justify-center min-w-[40px] min-h-[40px]"
+          title={lang === 'ar' ? 'الرجوع' : 'Back'}
+        >
+          {lang === 'ar' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+        </button>
 
-      {/* Main Grid Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="flex flex-col items-center">
+          <h1 className="font-sans font-semibold text-base sm:text-lg text-stone-900 tracking-tight">
+            {lang === 'ar' ? 'محرر مباشر' : 'Live Editor'}
+          </h1>
+          {/* Step Dots Indicator: • • ▬ • */}
+          <div className="flex items-center gap-1.5 mt-1">
+            <button
+              type="button"
+              onClick={() => setActiveCategory('model')}
+              className={`transition-all duration-300 ${activeCategory === 'model' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              title="Step 1: Model & Finish"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveCategory('motifs')}
+              className={`transition-all duration-300 ${['motifs','quotes-ar','quotes-en','letters','years','months','letters-en'].includes(activeCategory) ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              title="Step 2: Stickers"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveCategory('text-photo')}
+              className={`transition-all duration-300 ${activeCategory === 'text-photo' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              title="Step 3: Text & Photos"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveCategory('presets')}
+              className={`transition-all duration-300 ${activeCategory === 'presets' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              title="Step 4: Presets & Review"
+            />
+          </div>
+        </div>
+
+        <div className="w-10" />
+      </header>
+
+
+      {/* ── MAIN STUDIO WORKSPACE (Phone Canvas) ─────────────────────────────── */}
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-2 sm:my-4">
         
-        {/* LEFT COLUMN: INTERACTIVE CANVAS */}
-        <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-center space-y-4">
+        {/* Phone Canvas Shell Container */}
+        <div className="w-[300px] sm:w-[340px] aspect-[3/5] relative flex flex-col items-center justify-center select-none overflow-visible">
           
-          <div className="w-full max-w-sm aspect-[3/5] bg-stone border border-grave p-4 shadow-2xl relative flex flex-col items-center justify-center select-none overflow-hidden card-depth-highlight">
-            
-            {/* Phone Base Outline Container (Interactive Drop Target & Drag Area) */}
-            <div className="relative w-full h-full p-2">
-              {/* Outer Phone Hardware Buttons */}
-              <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-700/80 rounded-l-md" />
-              <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-700/80 rounded-l-md" />
-              <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-700/80 rounded-r-md" />
+          {/* Hardware Side Buttons */}
+          <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
+          <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
+          <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-400/80 rounded-r-md" />
 
-              <div
-                ref={canvasRef}
-                onDragOver={handleCanvasDragOver}
-                onDrop={handleCanvasDrop}
-                className="w-full h-full rounded-[42px] border-[3px] border-grave/90 relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.85),inset_0_1px_3px_rgba(255,255,255,0.2)] transition-colors duration-500 cursor-crosshair"
-                style={{ backgroundColor: caseBgColor }}
-              >
-                {/* Acrylic Glass Sheen & Depth Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent pointer-events-none z-10" />
+          {/* Canvas Box */}
+          <div
+            ref={canvasRef}
+            onDragOver={handleCanvasDragOver}
+            onDrop={handleCanvasDrop}
+            className="w-full h-full rounded-[42px] border-[3px] border-stone-300/80 relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-colors duration-500 cursor-crosshair"
+            style={{ backgroundColor: caseBgColor }}
+          >
+            {/* Acrylic Glass Sheen Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none z-10" />
 
-                {/* Camera Island (Pro Triple Camera Module - Top Left) */}
-                <div
-                  className="self-start w-24 h-24 rounded-[22px] border-2 shadow-2xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden bg-[#090A0E]"
-                  style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
-                >
-                  <div className="flex justify-between items-center z-10">
-                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                    </div>
-                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center z-10">
-                    <div className="w-6 h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                    </div>
-                    <div className="flex flex-col items-center gap-1 mr-0.5">
-                      <div className="w-3 h-3 rounded-full bg-amber-100/90 border border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-                      <div className="w-2 h-2 rounded-full bg-black border border-stone-700" />
-                    </div>
-                  </div>
+            {/* Camera Island Module (Top Left) */}
+            <div
+              className="self-start w-22 h-22 sm:w-24 sm:h-24 rounded-[22px] border-2 shadow-xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden bg-[#090A0E]"
+              style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
+            >
+              <div className="flex justify-between items-center z-10">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
                 </div>
-
-                {/* MagSafe Ring Detail */}
-                {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border-[3px] border-gold/60 shadow-[0_0_20px_rgba(232,163,61,0.25)] pointer-events-none" />
-                )}
-
-              {/* CANVAS LAYERS STACK */}
-              <div className="absolute inset-0 pointer-events-auto">
-                {layers.map((layer) => {
-                  const isSelected = layer.id === selectedLayerId;
-                  return (
-                    <div
-                      key={layer.id}
-                      onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
-                      style={{
-                        left: `${layer.x}%`,
-                        top: `${layer.y}%`,
-                        transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
-                      }}
-                      className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
-                        isSelected ? 'ring-2 ring-[#E8A33D] ring-offset-2 ring-offset-transparent z-30' : 'z-10'
-                      }`}
-                    >
-                      {/* Interactive On-Canvas Handles (Visible when selected) */}
-                      {isSelected && (
-                        <>
-                          {/* Drag-to-Rotate Handle (Top Center) */}
-                          <div
-                            onPointerDown={(e) => handlePointerDownRotate(layer.id, e)}
-                            className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[#E8A33D] text-[#0A0C16] flex items-center justify-center cursor-ew-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                            title="Drag left/right to rotate"
-                          >
-                            <RotateCw size={13} />
-                          </div>
-
-                          {/* Delete Handle (Top Right) */}
-                          <div
-                            onPointerDown={(e) => handleRemoveLayer(layer.id, e)}
-                            className="absolute -top-3.5 -right-3.5 w-7 h-7 rounded-full bg-[#D9432E] text-[#EDE4D3] flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                            title="Remove layer"
-                          >
-                            ✕
-                          </div>
-
-                          {/* Drag-to-Scale Handle (Bottom Right) */}
-                          <div
-                            onPointerDown={(e) => handlePointerDownScale(layer.id, e)}
-                            className="absolute -bottom-3.5 -right-3.5 w-7 h-7 rounded-full bg-[#E8A33D] text-[#0A0C16] flex items-center justify-center cursor-nwse-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                            title="Drag to resize scale"
-                          >
-                            <Maximize2 size={13} />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Render Dashboard Uploaded Sticker Image */}
-                      {layer.type === 'sticker' && (
-                        <StickerIcon
-                          stickerId={layer.stickerId}
-                          image={layer.src || STICKER_ITEMS.find(s => s.id === layer.stickerId)?.image || STICKER_PRESETS.find(s => s.id === layer.stickerId)?.image}
-                          size={48}
-                          color={layer.color}
-                          bgColor={layer.bgColor}
-                          forCanvas={true}
-                        />
-                      )}
-
-                      {/* Render Custom Text Sticker Pill */}
-                      {layer.type === 'text' && (
-                        <div
-                          style={{
-                            color: layer.color || '#E8A33D',
-                            backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#14110F')
-                          }}
-                          className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-gold/50 shadow-xl backdrop-blur-sm ${
-                            layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'cinzel' ? 'font-cinzel text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
-                          }`}
-                        >
-                          {layer.text}
-                        </div>
-                      )}
-
-                      {/* Render Uploaded Image */}
-                      {layer.type === 'image' && (
-                        <img
-                          src={layer.src}
-                          alt="Custom Layer"
-                          draggable={false}
-                          className="max-w-[120px] max-h-[120px] object-contain pointer-events-none select-none touch-none shadow-md rounded"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
+                </div>
               </div>
-
-              {/* Empty Canvas Drop Prompt */}
-              {layers.length === 0 && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-ash/60 pointer-events-none">
-                  <Move size={32} className="text-gold mb-2 animate-bounce" />
-                  <span className="font-mono text-xs uppercase tracking-widest font-bold">DRAG & DROP STICKERS HERE</span>
-                  <span className="font-space text-xs mt-1">Pull a 3D dome from right or click to add</span>
+              <div className="flex justify-between items-center z-10">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
                 </div>
-              )}
-
-
-
-              {/* Phone Speaker Bottom Bar */}
+                <div className="flex flex-col items-center gap-1 mr-0.5">
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-100/90 border border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-black border border-stone-700" />
+                </div>
+              </div>
             </div>
+
+            {/* MagSafe Ring Detail */}
+            {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[3px] border-amber-400/60 shadow-sm pointer-events-none" />
+            )}
+
+            {/* CANVAS LAYERS STACK */}
+            <div className="absolute inset-0 pointer-events-auto">
+              {layers.map((layer) => {
+                const isSelected = layer.id === selectedLayerId;
+                return (
+                  <div
+                    key={layer.id}
+                    onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
+                    style={{
+                      left: `${layer.x}%`,
+                      top: `${layer.y}%`,
+                      transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
+                    }}
+                    className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
+                      isSelected ? 'ring-2 ring-stone-900 ring-offset-2 ring-offset-transparent z-30' : 'z-10'
+                    }`}
+                  >
+                    {/* Interactive Handles (Visible when selected) */}
+                    {isSelected && (
+                      <>
+                        <div
+                          onPointerDown={(e) => handlePointerDownRotate(layer.id, e)}
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-ew-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                          title="Drag to rotate"
+                        >
+                          <RotateCw size={13} />
+                        </div>
+
+                        <div
+                          onPointerDown={(e) => handleRemoveLayer(layer.id, e)}
+                          className="absolute -top-3.5 -right-3.5 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                          title="Remove layer"
+                        >
+                          ✕
+                        </div>
+
+                        <div
+                          onPointerDown={(e) => handlePointerDownScale(layer.id, e)}
+                          className="absolute -bottom-3.5 -right-3.5 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-nwse-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                          title="Drag to scale"
+                        >
+                          <Maximize2 size={13} />
+                        </div>
+                      </>
+                    )}
+
+                    {/* Sticker Image */}
+                    {layer.type === 'sticker' && (
+                      <StickerIcon
+                        stickerId={layer.stickerId}
+                        image={layer.src || STICKER_ITEMS.find(s => s.id === layer.stickerId)?.image || STICKER_PRESETS.find(s => s.id === layer.stickerId)?.image}
+                        size={48}
+                        color={layer.color}
+                        bgColor={layer.bgColor}
+                        forCanvas={true}
+                      />
+                    )}
+
+                    {/* Custom Text Pill */}
+                    {layer.type === 'text' && (
+                      <div
+                        style={{
+                          color: layer.color || '#18181B',
+                          backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#FFFFFF')
+                        }}
+                        className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-stone-300 shadow-md backdrop-blur-sm ${
+                          layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'cinzel' ? 'font-cinzel text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
+                        }`}
+                      >
+                        {layer.text}
+                      </div>
+                    )}
+
+                    {/* Uploaded Image */}
+                    {layer.type === 'image' && (
+                      <img
+                        src={layer.src}
+                        alt="Custom Layer"
+                        draggable={false}
+                        className="max-w-[120px] max-h-[120px] object-contain pointer-events-none select-none touch-none shadow-md rounded"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Empty Canvas Drop Hint */}
+            {layers.length === 0 && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-stone-400 pointer-events-none">
+                <Move size={28} className="text-stone-700 mb-1 animate-bounce" />
+                <span className="font-sans text-xs uppercase tracking-wider font-semibold text-stone-600">
+                  {lang === 'ar' ? 'اختر استيكر لإضافته هنا' : 'ADD STICKERS HERE'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-          <div className="font-mono text-xs text-ash text-center uppercase tracking-widest font-medium">
-            {currentModelName} · {selectedCaseType?.nameEn}
+        {/* Floating Quick Action Toolbar (Undo, Redo, Clear) */}
+        <div className="flex items-center justify-between gap-3 mt-3 w-[300px] sm:w-[340px]">
+          <div className="font-sans text-[11px] sm:text-xs text-stone-600 font-medium truncate">
+            {currentModelName} · {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
           </div>
 
-          {/* Canvas Undo/Redo & History Toolbar */}
-          <div className="flex items-center justify-between w-full max-w-sm gap-2">
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={handleUndo}
-                disabled={!canUndo}
-                className={`p-2.5 rounded border font-mono text-xs flex items-center gap-1.5 transition-all ${
-                  canUndo
-                    ? 'bg-stone border-grave text-bone hover:border-gold hover:text-gold cursor-pointer'
-                    : 'bg-stone/50 border-grave/40 text-ash/30 cursor-not-allowed'
-                }`}
-                title={lang === 'ar' ? 'تراجع (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
-              >
-                <Undo2 size={16} />
-                <span className="text-xs">{lang === 'ar' ? 'تراجع' : 'Undo'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleRedo}
-                disabled={!canRedo}
-                className={`p-2.5 rounded border font-mono text-xs flex items-center gap-1.5 transition-all ${
-                  canRedo
-                    ? 'bg-stone border-grave text-bone hover:border-gold hover:text-gold cursor-pointer'
-                    : 'bg-stone/50 border-grave/40 text-ash/30 cursor-not-allowed'
-                }`}
-                title={lang === 'ar' ? 'إعادة (Ctrl+Y)' : 'Redo (Ctrl+Y)'}
-              >
-                <Redo2 size={16} />
-                <span className="text-xs">{lang === 'ar' ? 'إعادة' : 'Redo'}</span>
-              </button>
-            </div>
-
+          <div className="flex items-center gap-1 bg-white border border-stone-200/90 shadow-sm rounded-full p-1">
+            <button
+              type="button"
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className={`p-1.5 rounded-full transition-all ${canUndo ? 'text-stone-800 hover:bg-stone-100 cursor-pointer' : 'text-stone-300 cursor-not-allowed'}`}
+              title={lang === 'ar' ? 'تراجع (Ctrl+Z)' : 'Undo'}
+            >
+              <Undo2 size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className={`p-1.5 rounded-full transition-all ${canRedo ? 'text-stone-800 hover:bg-stone-100 cursor-pointer' : 'text-stone-300 cursor-not-allowed'}`}
+              title={lang === 'ar' ? 'إعادة (Ctrl+Y)' : 'Redo'}
+            >
+              <Redo2 size={15} />
+            </button>
             {layers.length > 0 && (
               <button
                 type="button"
                 onClick={() => updateLayersWithHistory([])}
-                className="p-2.5 rounded border border-red-900/40 bg-red-950/20 text-red-400 hover:bg-red-900/30 text-xs font-mono flex items-center gap-1.5 transition-all"
+                className="p-1.5 rounded-full text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+                title={lang === 'ar' ? 'مسح الكل' : 'Clear All'}
               >
-                <Trash2 size={14} />
-                <span className="text-xs">{lang === 'ar' ? 'مسح الكل' : 'Clear All'}</span>
+                <Trash2 size={15} />
               </button>
             )}
           </div>
-
-          <button
-            onClick={handleAddToCart}
-            className="btn-primary w-full max-w-sm py-4 text-sm font-mono tracking-widest min-h-[48px]"
-          >
-            {lang === 'ar'
-              ? `أضف إلى السلة — ${builderPrice || 850} ج.م`
-              : `ADD TO CART — ${builderPrice || 850} EGP`}
-          </button>
-
         </div>
 
-        {/* RIGHT COLUMN: CONTROLS & TABS */}
-        <div className="lg:col-span-6 xl:col-span-7 space-y-6">
-          
-          {/* Model & Finish Selection */}
-          <div className="bg-stone border border-grave p-6 space-y-4">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold">
-              {t('selectModel')} & {t('caseType')}
-            </h3>
+      </main>
 
-            {/* Model Select Dropdown */}
-            <div className="space-y-2">
-              <label className="font-mono text-xs text-ash block">{t('selectModel')}</label>
+
+      {/* ── FLOATING CONTROL BOTTOM SHEET ───────────────────────────────────── */}
+      <footer className="w-full max-w-3xl mx-auto bg-white rounded-t-[32px] sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.06)] border border-stone-200/80 p-4 sm:p-6 space-y-4 font-sans select-none z-30">
+        
+        {/* Sheet Handle */}
+        <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-1" />
+
+        {/* Sheet Header (Title + Next Button) */}
+        <div className="flex items-center justify-between">
+          <h2 className="font-sans font-bold text-base sm:text-lg text-stone-900 tracking-tight">
+            {sheetTitle}
+          </h2>
+
+          <button
+            type="button"
+            onClick={activeCategory === 'presets' || layers.length > 0 ? handleAddToCart : handleNextPill}
+            className="bg-[#18181B] hover:bg-black text-white px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all transform active:scale-95 cursor-pointer"
+          >
+            <span>{lang === 'ar' ? (layers.length > 0 ? 'أضف إلى السلة' : 'التالي') : (layers.length > 0 ? 'ADD TO CART' : 'Next')}</span>
+            {lang === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+          </button>
+        </div>
+
+        {/* Category Pills Row (Horizontal Scroll) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 custom-scrollbar">
+          {CATEGORY_PILLS.map((pill) => {
+            const isActive = activeCategory === pill.id;
+            return (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => setActiveCategory(pill.id)}
+                className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isActive
+                    ? 'bg-[#18181B] text-white shadow-sm font-semibold'
+                    : 'bg-[#F4F3F0] text-stone-700 hover:bg-stone-200/80 border border-stone-200/60'
+                }`}
+              >
+                {lang === 'ar' ? pill.labelAr : pill.labelEn}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected Layer Controls (If layer selected) */}
+        {selectedLayer && (
+          <div className="bg-[#F8F7F4] border border-stone-200 rounded-2xl p-3 space-y-3">
+            <div className="flex justify-between items-center text-xs font-semibold text-stone-800">
+              <span>{lang === 'ar' ? 'تحكم في الاستيكر المحدّد' : 'Selected Sticker Controls'}</span>
+              <button
+                onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
+                className="text-red-600 hover:text-red-800 flex items-center gap-1 text-xs font-bold"
+              >
+                <Trash2 size={13} />
+                <span>{lang === 'ar' ? 'حذف' : 'Remove'}</span>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'الحجم' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
+                <input
+                  type="range"
+                  min="0.4"
+                  max="3.0"
+                  step="0.1"
+                  value={selectedLayer.scale}
+                  onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
+                  className="w-full accent-black cursor-pointer"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'التدوير' : 'Rotation'} ({selectedLayer.rotation}°)</label>
+                <input
+                  type="range"
+                  min="-180"
+                  max="180"
+                  step="5"
+                  value={selectedLayer.rotation}
+                  onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
+                  className="w-full accent-black cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Category Items Content */}
+        {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 custom-scrollbar max-w-full">
+            {filteredStickers.map((st) => {
+              const subLabel = getStickerSubLabel(st);
+              return (
+                <button
+                  key={st.id}
+                  draggable={true}
+                  onDragStart={(e) => handleStickerDragStart(st.id, e)}
+                  onClick={() => handleAddSticker(st.id)}
+                  className="w-24 sm:w-28 flex-shrink-0 bg-[#F9F8F6] border border-stone-200/90 hover:border-stone-900 rounded-2xl p-2.5 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none"
+                  title={lang === 'ar' ? 'انقر أو اسحب على الهاتف' : 'Click or Drag onto phone'}
+                >
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
+                    <StickerIcon
+                      stickerId={st.id}
+                      image={st.image || st.imageUrl}
+                      size={54}
+                      color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
+                      bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
+                    />
+                  </div>
+                  <span className="font-sans text-[11px] sm:text-xs text-stone-600 group-hover:text-stone-900 font-medium tracking-tight truncate max-w-full text-center mt-1.5">
+                    {subLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Case Model & Finish Tab */}
+        {activeCategory === 'model' && (
+          <div className="space-y-4 pt-1">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-stone-800 block">{t('selectModel')}</label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
+                className="w-full bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900 min-h-[44px]"
               >
                 {PHONE_MODELS.map((m) => {
                   const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
@@ -1055,42 +1230,39 @@ export const CustomizerContent = () => {
                 })}
               </select>
 
-              {/* Custom Model Text Input if "جهاز آخر" selected */}
               {isCustomModelOption && (
-                <div className="pt-2 animate-fadeIn space-y-1">
-                  <label className="font-mono text-xs text-gold font-bold block">{t('customModelLabel')}</label>
+                <div className="pt-1 space-y-1">
                   <input
                     type="text"
                     value={customModelInput}
                     onChange={(e) => setCustomModelInput(e.target.value)}
                     placeholder={t('customModelPlaceholder')}
-                    className="w-full bg-coal border border-gold/60 text-bone p-3 font-space text-sm focus:border-gold outline-none rounded"
+                    className="w-full bg-[#F8F7F4] border border-stone-300 text-stone-900 p-2.5 rounded-xl text-xs outline-none focus:border-stone-900"
                   />
                 </div>
               )}
             </div>
 
-            {/* Case Type Finishes Grid */}
-            <div className="space-y-2 pt-2">
-              <label className="font-mono text-xs text-ash block">{t('caseType')}</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-stone-800 block">{t('caseType')}</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {CASE_TYPES.map((ct) => {
                   const active = selectedCaseType?.id === ct.id;
                   return (
                     <button
                       key={ct.id}
                       onClick={() => setSelectedCaseType(ct)}
-                      className={`p-3 border text-left flex items-center gap-2.5 transition-all min-h-[44px] ${
+                      className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
                         active
-                          ? 'border-gold bg-coal text-gold font-bold'
-                          : 'border-grave bg-stone text-bone hover:border-ash'
+                          ? 'border-black bg-stone-900 text-white font-semibold shadow-sm'
+                          : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400'
                       }`}
                     >
                       <div
-                        className="w-4 h-4 rounded-full border border-grave flex-shrink-0"
+                        className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
                         style={{ backgroundColor: ct.color || '#FFFFFF' }}
                       />
-                      <span className="font-space text-xs truncate">
+                      <span className="font-sans text-xs truncate">
                         {lang === 'ar' ? ct.nameAr : ct.nameEn}
                       </span>
                     </button>
@@ -1098,441 +1270,103 @@ export const CustomizerContent = () => {
                 })}
               </div>
             </div>
-
-            {/* Design Notes Textarea */}
-            <div className="space-y-2 pt-3 border-t border-grave/40">
-              <label className="font-mono text-xs text-gold font-bold block flex items-center gap-1.5">
-                <span>{t('designNotesLabel')}</span>
-              </label>
-              <textarea
-                value={designNotes}
-                onChange={(e) => setDesignNotes(e.target.value)}
-                rows={2}
-                placeholder={t('designNotesPlaceholder')}
-                className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded custom-scrollbar resize-none"
-              />
-            </div>
-
           </div>
+        )}
 
-          {/* Builder Controls Tabs */}
-          <div className="bg-stone border border-grave p-6 space-y-6">
-            
-            {/* Tab Buttons */}
-            <div className="grid grid-cols-4 gap-2 border-b border-grave pb-4">
-              <button
-                onClick={() => setActiveTab('stickers')}
-                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
-                  activeTab === 'stickers'
-                    ? 'border-gold text-gold font-bold'
-                    : 'border-transparent text-ash hover:text-bone'
-                }`}
-              >
-                {t('tabStickers')}
-              </button>
-
-              <button
-                onClick={() => setActiveTab('presets')}
-                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
-                  activeTab === 'presets'
-                    ? 'border-gold text-gold font-bold'
-                    : 'border-transparent text-ash hover:text-bone'
-                }`}
-              >
-                {t('tabPresets')}
-              </button>
-
-              <button
-                onClick={() => setActiveTab('text')}
-                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
-                  activeTab === 'text'
-                    ? 'border-gold text-gold font-bold'
-                    : 'border-transparent text-ash hover:text-bone'
-                }`}
-              >
-                {t('tabText')}
-              </button>
-
-              <button
-                onClick={() => setActiveTab('image')}
-                className={`py-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-all min-h-[44px] ${
-                  activeTab === 'image'
-                    ? 'border-gold text-gold font-bold'
-                    : 'border-transparent text-ash hover:text-bone'
-                }`}
-              >
-                {t('tabImage')}
-              </button>
-            </div>
-
-            {/* TAB CONTENTS — DRAGGABLE STICKER PREVIEWS */}
-            {activeTab === 'stickers' && (
-              <div className="space-y-4">
-                {/* Color Selector Bar for Preset Stickers */}
-                <div className="bg-coal p-3 border border-grave space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-mono text-xs text-gold font-bold">{t('textColorLabel')}</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { name: lang === 'ar' ? 'ذهب مصري' : 'Egyptian Gold', value: '#E8A33D' },
-                        { name: lang === 'ar' ? 'عاجي ملكي' : 'Royal Ivory', value: '#EDE4D3' },
-                        { name: lang === 'ar' ? 'أسود فحمي' : 'Obsidian Black', value: '#0A0C16' },
-                        { name: lang === 'ar' ? 'أبيض ناصع' : 'Pure White', value: '#FFFFFF' },
-                        { name: lang === 'ar' ? 'نبيذي قاني' : 'Crimson Ruby', value: '#8B1E24' },
-                        { name: lang === 'ar' ? 'زمردي ملكي' : 'Royal Emerald', value: '#144D37' },
-                        { name: lang === 'ar' ? 'كحلي ملكي' : 'Royal Navy', value: '#0C1B3A' },
-                        { name: lang === 'ar' ? 'روز جولد' : 'Rose Gold', value: '#B76E79' },
-                        { name: lang === 'ar' ? 'عنبر دافئ' : 'Warm Amber', value: '#D97706' },
-                        { name: lang === 'ar' ? 'لافندر ملكي' : 'Royal Lavender', value: '#7C3AED' },
-                        { name: lang === 'ar' ? 'تيتانيوم' : 'Titanium', value: '#9E9A93' },
-                        { name: lang === 'ar' ? 'بنفسجي داكن' : 'Dark Purple', value: '#382049' }
-                      ].map((c) => (
-                        <button
-                          key={c.value}
-                          type="button"
-                          onClick={() => setTextColor(c.value)}
-                          className={`w-5 h-5 rounded-full border-2 transition-transform ${
-                            textColor === c.value ? 'border-gold scale-125 shadow-md' : 'border-grave/60'
-                          }`}
-                          style={{ backgroundColor: c.value }}
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-grave/40 pt-2">
-                    <span className="font-mono text-xs text-gold font-bold">{t('bgColorLabel')}</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { name: lang === 'ar' ? 'داكن فحمي' : 'Obsidian Black', value: '#14110F' },
-                        { name: lang === 'ar' ? 'ذهب مصري' : 'Egyptian Gold', value: '#E8A33D' },
-                        { name: lang === 'ar' ? 'عاجي ملكي' : 'Royal Ivory', value: '#EDE4D3' },
-                        { name: lang === 'ar' ? 'كحلي ملكي' : 'Royal Navy', value: '#0B132B' },
-                        { name: lang === 'ar' ? 'زمردي' : 'Emerald', value: '#1B4332' },
-                        { name: lang === 'ar' ? 'نبيذي جمر' : 'Crimson Ruby', value: '#8B1E24' },
-                        { name: lang === 'ar' ? 'وردي' : 'Rose Quartz', value: '#E8C5C8' },
-                        { name: lang === 'ar' ? 'تيتانيوم' : 'Titanium', value: '#9E9A93' },
-                        { name: lang === 'ar' ? 'شفاف 🚫' : 'Clear 🚫', value: 'transparent' }
-                      ].map((c) => (
-                        <button
-                          key={c.value}
-                          type="button"
-                          onClick={() => setTextBgColor(c.value)}
-                          className={`w-5 h-5 rounded-full border-2 transition-transform flex items-center justify-center font-mono text-[8px] font-bold ${
-                            textBgColor === c.value ? 'border-gold scale-125 shadow-md' : 'border-grave/60'
-                          }`}
-                          style={{ backgroundColor: c.value === 'transparent' ? '#000000' : c.value }}
-                          title={c.name}
-                        >
-                          {c.value === 'transparent' && <span className="text-ash text-[7px]">🚫</span>}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sticker Sub-category Filters (Arabic Letters vs English Letters vs Motifs vs All) */}
-                <div className="flex flex-wrap gap-2 pb-1 border-b border-grave/40">
-                  <button
-                    type="button"
-                    onClick={() => setStickerCategoryFilter('letters')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      stickerCategoryFilter === 'letters' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
-                    }`}
-                  >
-                    <span>حروف رقعة 🔤</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStickerCategoryFilter('letters-en')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      stickerCategoryFilter === 'letters-en' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
-                    }`}
-                  >
-                    <span>حروف إنجليزي 🅰️</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStickerCategoryFilter('motifs')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      stickerCategoryFilter === 'motifs' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
-                    }`}
-                  >
-                    <span>شعارات ومجسمات ✨</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStickerCategoryFilter('all')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      stickerCategoryFilter === 'all' ? 'bg-gold text-void font-bold shadow-md' : 'bg-coal text-ash hover:text-bone border border-grave'
-                    }`}
-                  >
-                    <span>الكل ({STICKER_ITEMS.length})</span>
-                  </button>
-                </div>
-
-                <p className="font-mono text-[11px] text-ash uppercase tracking-wider">
-                  💡 Tip: Click or drag & drop any 3D dome onto the phone canvas
-                </p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[380px] overflow-y-auto p-1 custom-scrollbar">
-                  {STICKER_ITEMS.filter((st) => {
-                    if (stickerCategoryFilter === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
-                    if (stickerCategoryFilter === 'letters-en') return st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
-                    if (stickerCategoryFilter === 'motifs') return !st.id?.startsWith('ar-letter-') && !st.id?.startsWith('en-letter-') && st.category !== 'letters' && st.category !== 'letters-en';
-                    return true;
-                  }).map((st) => (
-                    <button
-                      key={st.id}
-                      draggable={true}
-                      onDragStart={(e) => handleStickerDragStart(st.id, e)}
-                      onClick={() => handleAddSticker(st.id)}
-                      className="p-2 bg-coal border border-grave hover:border-gold flex flex-col items-center justify-between space-y-1.5 transition-all cursor-grab active:cursor-grabbing hover:scale-105 rounded overflow-hidden group"
-                      title="Click or Drag onto phone"
-                    >
-                      <div className="w-full aspect-square flex items-center justify-center overflow-hidden p-1">
-                        <StickerIcon
-                          stickerId={st.id}
-                          image={st.image || st.imageUrl}
-                          size={62}
-                          color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
-                          bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
-                        />
-                      </div>
-                      <span className="font-space text-xs text-bone group-hover:text-gold tracking-wide truncate max-w-full font-bold">
-                        {st.id?.startsWith('ar-letter-')
-                          ? st.id.replace('ar-letter-', '')
-                          : st.id?.startsWith('en-letter-')
-                          ? st.id.replace('en-letter-', '')
-                          : (lang === 'ar' ? (st.nameAr || st.nameEn) : (st.nameEn || st.nameAr))}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'presets' && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {PRESET_TEMPLATES.map((tmpl) => (
-                  <button
-                    key={tmpl.id}
-                    onClick={() => handleLoadPreset(tmpl)}
-                    className="p-4 bg-coal border border-grave hover:border-gold text-left space-y-2 transition-colors"
-                  >
-                    <span className="font-space font-bold text-sm text-bone block">
-                      {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
-                    </span>
-                    <span className="font-mono text-[10px] text-gold uppercase tracking-widest block font-bold">
-                      LOAD PRESET
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'text' && (
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customText}
-                    onChange={(e) => setCustomText(e.target.value)}
-                    placeholder={t('textPlaceholder')}
-                    className="flex-1 bg-coal border border-grave text-bone p-3 font-space text-sm focus:border-gold outline-none min-h-[44px]"
-                  />
-                  <button onClick={handleAddText} className="btn-primary px-6 text-xs min-h-[44px]">
-                    {t('addTextBtn')}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
-                  <button
-                    onClick={() => setTextFont('ruqaa')}
-                    className={`p-2 border font-ruqaa text-sm ${
-                      textFont === 'ruqaa' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
-                    }`}
-                  >
-                    خط رقعة
-                  </button>
-                  <button
-                    onClick={() => setTextFont('kufi')}
-                    className={`p-2 border ${
-                      textFont === 'kufi' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
-                    }`}
-                  >
-                    IBM Plex Arabic
-                  </button>
-                  <button
-                    onClick={() => setTextFont('space')}
-                    className={`p-2 border ${
-                      textFont === 'space' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
-                    }`}
-                  >
-                    Space Grotesk
-                  </button>
-                  <button
-                    onClick={() => setTextFont('mono')}
-                    className={`p-2 border ${
-                      textFont === 'mono' ? 'border-gold text-gold font-bold' : 'border-grave text-ash'
-                    }`}
-                  >
-                    JetBrains Mono
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'image' && (
-              <div className="border-2 border-dashed border-grave p-8 text-center space-y-3 bg-coal">
-                <Upload size={24} className="mx-auto text-ash" />
-                <p className="font-space text-xs text-ash">{t('uploadZoneText')}</p>
+        {/* Custom Text & Upload Photo Tab */}
+        {activeCategory === 'text-photo' && (
+          <div className="space-y-4 pt-1">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-stone-800 block">{t('tabText')}</label>
+              <div className="flex gap-2">
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="block w-full text-xs text-ash file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-gold file:text-void file:font-bold cursor-pointer"
+                  type="text"
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder={t('textPlaceholder')}
+                  className="flex-1 bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900"
                 />
-              </div>
-            )}
-
-          </div>
-
-          {/* Layers Controls Stack */}
-          {selectedLayer && (
-            <div className="bg-stone border border-grave p-6 space-y-4">
-              <div className="flex justify-between items-center border-b border-grave pb-3">
-                <span className="font-mono text-xs uppercase tracking-widest text-gold font-bold">
-                  SELECTED LAYER CONTROLS
-                </span>
                 <button
-                  onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
-                  className="text-ember hover:text-red-400 p-1 flex items-center gap-1 font-mono text-xs font-bold"
+                  type="button"
+                  onClick={handleAddText}
+                  className="bg-[#18181B] text-white px-4 rounded-xl text-xs font-medium hover:bg-black transition-colors"
                 >
-                  <Trash2 size={14} />
-                  <span>REMOVE</span>
+                  {t('addTextBtn')}
                 </button>
               </div>
 
-              {/* Transform Controls & Color Pickers */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Scale Controls */}
-                  <div className="space-y-1">
-                    <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
-                      <span>الحجم (Scale)</span>
-                      <span>{selectedLayer.scale.toFixed(1)}x</span>
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleLayerTransform(selectedLayer.id, 'scale', Math.max(0.4, parseFloat((selectedLayer.scale - 0.1).toFixed(1))))}
-                        className="w-8 h-8 border border-grave bg-coal hover:border-gold text-bone font-mono font-bold text-sm flex items-center justify-center"
-                        title="تصغير"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="range"
-                        min="0.4"
-                        max="3.0"
-                        step="0.1"
-                        value={selectedLayer.scale}
-                        onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
-                        className="flex-1 accent-gold cursor-pointer"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleLayerTransform(selectedLayer.id, 'scale', Math.min(3.0, parseFloat((selectedLayer.scale + 0.1).toFixed(1))))}
-                        className="w-8 h-8 border border-grave bg-coal hover:border-gold text-bone font-mono font-bold text-sm flex items-center justify-center"
-                        title="تكبير"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Rotation Controls */}
-                  <div className="space-y-1">
-                    <label className="font-mono text-[10px] text-ash uppercase flex justify-between font-bold">
-                      <span>التدوير (Rotation)</span>
-                      <span>{selectedLayer.rotation}°</span>
-                    </label>
-                    <input
-                      type="range"
-                      min="-180"
-                      max="180"
-                      step="5"
-                      value={selectedLayer.rotation}
-                      onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
-                      className="w-full accent-gold cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                {/* Color Pickers for Text / Sticker Background */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-grave/40 pt-3">
-                  {/* Text Color Picker */}
-                  <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-gold uppercase block font-bold">لون الخط (Text Color)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي', value: '#EDE4D3' },
-                        { name: 'أسود فحمي', value: '#0A0C16' },
-                        { name: 'أبيض ناصع', value: '#FFFFFF' },
-                        { name: 'أحمر قاني', value: '#8B0000' },
-                        { name: 'زمردي', value: '#1B4332' }
-                      ].map((c) => (
-                        <button
-                          key={c.value}
-                          type="button"
-                          onClick={() => handleLayerTransform(selectedLayer.id, 'color', c.value)}
-                          className={`w-6 h-6 rounded-full border-2 transition-transform ${
-                            (selectedLayer.color || '#E8A33D') === c.value ? 'border-gold scale-125 shadow-lg' : 'border-grave/60'
-                          }`}
-                          style={{ backgroundColor: c.value }}
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Background Pill Color Picker */}
-                  <div className="space-y-1.5">
-                    <label className="font-mono text-[10px] text-gold uppercase block font-bold">خلفية الاستيكر (Background Pill)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { name: 'داكن مائل للأسود', value: '#14110F' },
-                        { name: 'ذهب مصري', value: '#E8A33D' },
-                        { name: 'عاجي', value: '#EDE4D3' },
-                        { name: 'كحلي ملكي', value: '#0B132B' },
-                        { name: 'زمردي', value: '#1B4332' },
-                        { name: 'بدون خلفية (شفاف)', value: 'transparent' }
-                      ].map((c) => (
-                        <button
-                          key={c.value}
-                          type="button"
-                          onClick={() => handleLayerTransform(selectedLayer.id, 'bgColor', c.value)}
-                          className={`w-6 h-6 rounded-full border-2 transition-transform flex items-center justify-center font-mono text-[9px] font-bold ${
-                            (selectedLayer.bgColor || '#14110F') === c.value ? 'border-gold scale-125 shadow-lg' : 'border-grave/60'
-                          }`}
-                          style={{ backgroundColor: c.value === 'transparent' ? '#000000' : c.value }}
-                          title={c.name}
-                        >
-                          {c.value === 'transparent' && <span className="text-ash text-[8px]">🚫</span>}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+              <div className="grid grid-cols-4 gap-1.5 pt-1">
+                <button
+                  onClick={() => setTextFont('ruqaa')}
+                  className={`p-2 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                >
+                  خط رقعة
+                </button>
+                <button
+                  onClick={() => setTextFont('kufi')}
+                  className={`p-2 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                >
+                  IBM Kufi
+                </button>
+                <button
+                  onClick={() => setTextFont('cinzel')}
+                  className={`p-2 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                >
+                  Cinzel
+                </button>
+                <button
+                  onClick={() => setTextFont('mono')}
+                  className={`p-2 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                >
+                  Mono
+                </button>
               </div>
             </div>
-          )}
 
+            <div className="border-t border-stone-200 pt-3 space-y-2">
+              <label className="text-xs font-semibold text-stone-800 block">{t('tabImage')}</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="block w-full text-xs text-stone-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-stone-900 file:text-white file:font-medium cursor-pointer"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Ready Presets Tab */}
+        {activeCategory === 'presets' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {PRESET_TEMPLATES.map((tmpl) => (
+              <button
+                key={tmpl.id}
+                type="button"
+                onClick={() => handleLoadPreset(tmpl)}
+                className="p-3 bg-[#F8F7F4] border border-stone-200 hover:border-black rounded-2xl text-left space-y-1 transition-all cursor-pointer group"
+              >
+                <span className="font-sans font-semibold text-xs sm:text-sm text-stone-900 block group-hover:text-black">
+                  {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
+                </span>
+                <span className="text-[10px] text-stone-500 uppercase tracking-wider block">
+                  {lang === 'ar' ? 'تحميل التصميم' : 'LOAD PRESET'}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Bottom Helper Gesture Guide */}
+        <div className="text-center font-sans text-xs text-stone-500 flex items-center justify-center gap-1.5 pt-2 border-t border-stone-100">
+          <Info size={14} className="text-stone-400" />
+          <span>
+            {lang === 'ar'
+              ? 'ⓘ اسحب للتحريك · إصبعين للتدوير · اضغط مطولاً للإزالة'
+              : 'ⓘ Drag to move · Two fingers to rotate · Long press to remove'}
+          </span>
         </div>
 
-      </div>
+      </footer>
     </div>
   );
 };
