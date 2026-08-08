@@ -99,17 +99,17 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           <img
             src={bgImage}
             alt="Hero Background"
-            className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
+            className="w-full h-full object-cover object-center transition-transform duration-700 brightness-110 contrast-110 saturate-105"
           />
-          {/* Dynamic Theme Background Overlay Vignette (Smooth Soft Fade for Light & Dark Modes) */}
+          {/* Dynamic Theme Background Overlay Vignette (High Clarity Image + Soft Text Backing) */}
           <div
-            className={`absolute inset-0 ${
+            className={`absolute inset-0 sm:w-2/3 ${
               isRtl
-                ? 'bg-gradient-to-l from-void via-void/70 to-transparent'
-                : 'bg-gradient-to-r from-void via-void/70 to-transparent'
+                ? 'bg-gradient-to-l from-void via-void/50 to-transparent'
+                : 'bg-gradient-to-r from-void via-void/50 to-transparent'
             }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-transparent to-void/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-void/30 via-transparent to-transparent pointer-events-none" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
