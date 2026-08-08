@@ -752,12 +752,104 @@ export const CustomizerContent = () => {
 
   const CATEGORY_PILLS = [
     ...dynamicStickerCategories,
-    { id: 'model', labelAr: 'نوع ورسم الجراب', labelEn: 'Case & Model', icon: '📱' },
     { id: 'text-photo', labelAr: 'كتابة وصور', labelEn: 'Text & Upload', icon: '🖼️' },
     { id: 'presets', labelAr: 'قوالب جاهزة', labelEn: 'Presets', icon: '🎨' },
   ];
 
   const [activeCategory, setActiveCategory] = useState(() => CATEGORY_PILLS[0]?.id || 'motifs');
+
+  const renderTopCaseModelBar = () => (
+    <div className={`p-4 rounded-2xl border mb-5 shadow-sm transition-all ${
+      isNight ? 'bg-[#1F1B18] border-stone-800 text-bone' : 'bg-stone-50 border-stone-200/90 text-stone-900'
+    }`}>
+      <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-stone-200/60 dark:border-stone-800">
+        <div className="flex items-center gap-2 font-sans">
+          <span className="text-base sm:text-lg">📱</span>
+          <span className={`font-bold text-xs sm:text-sm tracking-tight ${isNight ? 'text-gold' : 'text-stone-900'}`}>
+            {lang === 'ar' ? 'نوع وتفاصيل الجراب' : 'Phone Model & Case Type'}
+          </span>
+        </div>
+        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border shadow-xs ${
+          isNight ? 'bg-gold/20 text-gold border-gold/40' : 'bg-stone-900 text-white border-stone-900'
+        }`}>
+          {displayModelBadgeText}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start text-xs font-sans">
+        {/* Phone Model Select */}
+        <div className="md:col-span-5 space-y-1.5">
+          <label className={`font-bold block text-[11px] ${isNight ? 'text-stone-300' : 'text-stone-700'}`}>
+            📱 {t('selectModel')}
+          </label>
+          <select
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            className={`w-full p-2.5 rounded-xl font-sans text-xs font-semibold outline-none border min-h-[40px] cursor-pointer ${
+              isNight ? 'bg-[#14110F] border-stone-800 text-bone focus:border-gold' : 'bg-white border-stone-300 text-stone-900 focus:border-stone-900'
+            }`}
+          >
+            {PHONE_MODELS.map((m) => {
+              const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
+              const valueName = typeof m === 'object' ? m.name : m;
+              const id = typeof m === 'object' ? m.id || valueName : m;
+              return (
+                <option key={id} value={valueName}>
+                  {name}
+                </option>
+              );
+            })}
+          </select>
+
+          {isCustomModelOption && (
+            <input
+              type="text"
+              value={customModelInput}
+              onChange={(e) => setCustomModelInput(e.target.value)}
+              placeholder={t('customModelPlaceholder')}
+              className={`w-full mt-1.5 p-2 rounded-xl text-xs font-medium outline-none border ${
+                isNight ? 'bg-[#14110F] border-stone-800 text-bone focus:border-gold' : 'bg-white border-stone-300 text-stone-900 focus:border-stone-900'
+              }`}
+            />
+          )}
+        </div>
+
+        {/* Case Type / Color Selection */}
+        <div className="md:col-span-7 space-y-1.5">
+          <label className={`font-bold block text-[11px] ${isNight ? 'text-stone-300' : 'text-stone-700'}`}>
+            🎨 {t('caseType')}
+          </label>
+          <div className="flex flex-wrap items-center gap-2">
+            {CASE_TYPES.map((ct) => {
+              const active = selectedCaseType?.id === ct.id;
+              return (
+                <button
+                  key={ct.id}
+                  type="button"
+                  onClick={() => setSelectedCaseType(ct)}
+                  className={`px-3 py-2 border rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
+                    active
+                      ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-900 bg-stone-900 text-white font-bold')
+                      : (isNight ? 'border-stone-800 bg-[#14110F] text-bone hover:border-stone-600' : 'border-stone-300 bg-white text-stone-900 hover:border-stone-600 font-medium')
+                  }`}
+                >
+                  <div
+                    className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
+                    style={{ backgroundColor: ct.color || '#FFFFFF' }}
+                  />
+                  <span className={`font-sans text-xs truncate ${
+                    active ? (isNight ? 'text-[#0A0C16] font-bold' : 'text-white font-bold') : (isNight ? 'text-bone' : 'text-stone-900')
+                  }`}>
+                    {lang === 'ar' ? ct.nameAr : ct.nameEn}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const getStickerSubLabel = (st) => {
     if (!st) return '';
@@ -1072,6 +1164,8 @@ export const CustomizerContent = () => {
 
         <footer className={`w-full max-w-3xl mx-auto rounded-t-[32px] sm:rounded-3xl border p-4 sm:p-6 space-y-4 font-sans select-none z-30 ${isNight ? 'bg-[#14110F] border-stone-800/90 text-bone shadow-2xl' : 'bg-white border-stone-200/80 text-stone-900 shadow-[0_-10px_40px_rgba(0,0,0,0.06)]'}`}>
           <div className={`w-12 h-1 rounded-full mx-auto mb-1 ${isNight ? 'bg-stone-700' : 'bg-stone-300'}`} />
+
+          {renderTopCaseModelBar()}
 
           <div className="flex items-center justify-between">
             <h2 className={`font-sans font-bold text-base sm:text-lg tracking-tight ${isNight ? 'text-bone' : 'text-stone-900'}`}>
@@ -1403,9 +1497,11 @@ export const CustomizerContent = () => {
 
           <div className="col-span-7 space-y-6">
             <div className={`rounded-3xl p-6 border space-y-6 ${isNight ? 'bg-[#14110F] border-stone-800/90 text-bone shadow-2xl' : 'bg-white border-stone-200/90 text-stone-900 shadow-lg'}`}>
+              {renderTopCaseModelBar()}
+
               <div>
                 <span className={`font-sans text-xs font-bold uppercase tracking-wider block mb-2.5 ${isNight ? 'text-gold' : 'text-stone-900'}`}>
-                  {lang === 'ar' ? 'أقسام البلدر والتصميم' : 'Builder Categories'}
+                  {lang === 'ar' ? 'أقسام الاستيكرات والتصميم' : 'Sticker & Design Categories'}
                 </span>
                 <div className={`flex flex-wrap items-center gap-2 border-b pb-4 ${isNight ? 'border-stone-800/80' : 'border-stone-100'}`}>
                   {CATEGORY_PILLS.map((pill) => {
