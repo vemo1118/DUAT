@@ -7,7 +7,7 @@ import { useCustomizerConfig } from '../context/CustomizerContext';
 import { StickerIcon } from '../components/StickerIcon';
 import { useTheme } from '../context/ThemeContext';
 import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
-import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft, Info, Check, Plus, Minus } from 'lucide-react';
+import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft, Info, Check, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react';
 
 // Error Boundary Fallback for Customizer View
 class CustomizerErrorBoundary extends Component {
@@ -330,6 +330,14 @@ export const CustomizerContent = () => {
   const [selectedCaseType, setSelectedCaseType] = useState(defaultCaseType);
   const [customModelInput, setCustomModelInput] = useState('');
   const [designNotes, setDesignNotes] = useState('');
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+
+  const getSubLabelFontClass = (st) => {
+    if (st?.id?.startsWith('ar-letter-')) return 'font-ruqaa text-sm sm:text-base font-bold';
+    if (st?.id?.startsWith('en-letter-')) return 'font-cinzel text-xs font-bold';
+    if (st?.category === 'quotes-ar' || st?.id?.startsWith('quote-ar-')) return 'font-ruqaa text-xs font-bold';
+    return 'font-sans text-[11px] sm:text-xs font-medium';
+  };
 
   const isBundle = Boolean(
     location.state?.loadBundlePreset ||
@@ -831,6 +839,123 @@ export const CustomizerContent = () => {
     }
   };
 
+  const renderCollapsibleModelSelector = () => (
+    <div className={`rounded-2xl border transition-all overflow-hidden mb-3 ${isNight ? 'bg-[#1F1B18] border-stone-800' : 'bg-[#F8F7F4] border-stone-200'}`}>
+      <button
+        type="button"
+        onClick={() => setIsModelSelectorOpen((prev) => !prev)}
+        className={`w-full px-4 py-3 flex items-center justify-between transition-colors cursor-pointer text-left ${
+          isNight ? 'hover:bg-stone-800/40 text-bone' : 'hover:bg-stone-200/50 text-stone-900'
+        }`}
+      >
+        <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+          <span className="font-bold flex items-center gap-1">
+            📱 {lang === 'ar' ? 'نوع ولون الجراب:' : 'Case & Color:'}
+          </span>
+          <span className={`px-2.5 py-0.5 rounded-full font-semibold border text-xs ${
+            isNight ? 'bg-gold/20 text-gold border-gold/40' : 'bg-stone-900 text-white border-stone-900'
+          }`}>
+            {currentModelName}
+          </span>
+          <span className={`px-2.5 py-0.5 rounded-full font-semibold border text-xs ${
+            isNight ? 'bg-stone-800 text-bone border-stone-700' : 'bg-white text-stone-800 border-stone-300'
+          }`}>
+            {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
+          </span>
+        </div>
+
+        <div className={`flex items-center gap-1.5 font-sans text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all ${
+          isNight ? 'bg-stone-800 text-gold border-stone-700 hover:border-gold' : 'bg-white text-stone-700 border-stone-300 hover:border-black'
+        }`}>
+          <span>{lang === 'ar' ? (isModelSelectorOpen ? 'إغلاق القائمة' : 'تعديل النوع واللون ✏️') : (isModelSelectorOpen ? 'Close Menu' : 'Edit Model & Color ✏️')}</span>
+          {isModelSelectorOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </button>
+
+      {isModelSelectorOpen && (
+        <div className={`p-4 border-t space-y-4 animate-fade-in ${isNight ? 'border-stone-800 bg-[#161311]' : 'border-stone-200 bg-white'}`}>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold block">{t('selectModel')}</label>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className={`w-full p-2.5 rounded-xl font-sans text-sm outline-none border min-h-[44px] ${
+                isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-200 text-stone-900 focus:border-stone-900'
+              }`}
+            >
+              {PHONE_MODELS.map((m) => {
+                const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
+                const valueName = typeof m === 'object' ? m.name : m;
+                const id = typeof m === 'object' ? m.id || valueName : m;
+                return (
+                  <option key={id} value={valueName}>
+                    {name}
+                  </option>
+                );
+              })}
+            </select>
+
+            {isCustomModelOption && (
+              <div className="pt-1 space-y-1">
+                <input
+                  type="text"
+                  value={customModelInput}
+                  onChange={(e) => setCustomModelInput(e.target.value)}
+                  placeholder={t('customModelPlaceholder')}
+                  className={`w-full p-2.5 rounded-xl text-xs outline-none border ${
+                    isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'
+                  }`}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold block">{t('caseType')}</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {CASE_TYPES.map((ct) => {
+                const active = selectedCaseType?.id === ct.id;
+                return (
+                  <button
+                    key={ct.id}
+                    type="button"
+                    onClick={() => setSelectedCaseType(ct)}
+                    className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
+                      active
+                        ? (isNight ? 'border-gold bg-gold/20 text-gold font-bold shadow-sm' : 'border-black bg-stone-900 text-white font-semibold shadow-sm')
+                        : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600' : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400')
+                    }`}
+                  >
+                    <div
+                      className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
+                      style={{ backgroundColor: ct.color || '#FFFFFF' }}
+                    />
+                    <span className="font-sans text-xs truncate">
+                      {lang === 'ar' ? ct.nameAr : ct.nameEn}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsModelSelectorOpen(false)}
+              className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
+                isNight ? 'bg-gold text-[#0A0C16] hover:bg-amber-400' : 'bg-[#18181B] text-white hover:bg-black'
+              }`}
+            >
+              <Check size={14} />
+              <span>{lang === 'ar' ? 'حفظ وإغلاق القائمة' : 'Save & Close'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderPhoneCanvas = (isDesktopCanvas = false) => (
     <div className="w-[300px] sm:w-[340px] aspect-[3/5] relative flex flex-col items-center justify-center select-none overflow-visible">
       <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
@@ -1059,6 +1184,8 @@ export const CustomizerContent = () => {
         <footer className={`w-full max-w-3xl mx-auto rounded-t-[32px] sm:rounded-3xl border p-4 sm:p-6 space-y-4 font-sans select-none z-30 ${isNight ? 'bg-[#14110F] border-stone-800/90 text-bone shadow-2xl' : 'bg-white border-stone-200/80 text-stone-900 shadow-[0_-10px_40px_rgba(0,0,0,0.06)]'}`}>
           <div className={`w-12 h-1 rounded-full mx-auto mb-1 ${isNight ? 'bg-stone-700' : 'bg-stone-300'}`} />
 
+          {renderCollapsibleModelSelector()}
+
           <div className="flex items-center justify-between">
             <h2 className={`font-sans font-bold text-base sm:text-lg tracking-tight ${isNight ? 'text-bone' : 'text-stone-900'}`}>
               {sheetTitle}
@@ -1081,7 +1208,12 @@ export const CustomizerContent = () => {
                 <button
                   key={pill.id}
                   type="button"
-                  onClick={() => setActiveCategory(pill.id)}
+                  onClick={() => {
+                    setActiveCategory(pill.id);
+                    if (pill.id === 'model') {
+                      setIsModelSelectorOpen((prev) => !prev);
+                    }
+                  }}
                   className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border ${
                     isActive
                       ? (isNight ? 'bg-gold text-[#0A0C16] border-gold font-bold shadow-md' : 'bg-[#18181B] text-white border-[#18181B] font-semibold shadow-sm')
@@ -1157,76 +1289,12 @@ export const CustomizerContent = () => {
                         bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                       />
                     </div>
-                    <span className={`font-sans text-[11px] sm:text-xs font-medium tracking-tight truncate max-w-full text-center mt-1.5 ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
+                    <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
                       {subLabel}
                     </span>
                   </button>
                 );
               })}
-            </div>
-          )}
-
-          {activeCategory === 'model' && (
-            <div className="space-y-4 pt-1">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold block">{t('selectModel')}</label>
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  className={`w-full p-2.5 rounded-xl font-sans text-sm outline-none border min-h-[44px] ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-200 text-stone-900 focus:border-stone-900'}`}
-                >
-                  {PHONE_MODELS.map((m) => {
-                    const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
-                    const valueName = typeof m === 'object' ? m.name : m;
-                    const id = typeof m === 'object' ? m.id || valueName : m;
-                    return (
-                      <option key={id} value={valueName}>
-                        {name}
-                      </option>
-                    );
-                  })}
-                </select>
-
-                {isCustomModelOption && (
-                  <div className="pt-1 space-y-1">
-                    <input
-                      type="text"
-                      value={customModelInput}
-                      onChange={(e) => setCustomModelInput(e.target.value)}
-                      placeholder={t('customModelPlaceholder')}
-                      className={`w-full p-2.5 rounded-xl text-xs outline-none border ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'}`}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold block">{t('caseType')}</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {CASE_TYPES.map((ct) => {
-                    const active = selectedCaseType?.id === ct.id;
-                    return (
-                      <button
-                        key={ct.id}
-                        onClick={() => setSelectedCaseType(ct)}
-                        className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
-                          active
-                            ? (isNight ? 'border-gold bg-gold/20 text-gold font-bold shadow-sm' : 'border-black bg-stone-900 text-white font-semibold shadow-sm')
-                            : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600' : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400')
-                        }`}
-                      >
-                        <div
-                          className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
-                          style={{ backgroundColor: ct.color || '#FFFFFF' }}
-                        />
-                        <span className="font-sans text-xs truncate">
-                          {lang === 'ar' ? ct.nameAr : ct.nameEn}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
           )}
 
@@ -1374,6 +1442,8 @@ export const CustomizerContent = () => {
 
           <div className="col-span-7 space-y-6">
             <div className={`rounded-3xl p-6 border space-y-6 ${isNight ? 'bg-[#14110F] border-stone-800/90 text-bone shadow-2xl' : 'bg-white border-stone-200/90 text-stone-900 shadow-lg'}`}>
+              {renderCollapsibleModelSelector()}
+
               <div>
                 <span className={`font-sans text-xs font-bold uppercase tracking-wider block mb-2.5 ${isNight ? 'text-gold' : 'text-stone-900'}`}>
                   {lang === 'ar' ? 'أقسام البلدر والتصميم' : 'Builder Categories'}
@@ -1385,7 +1455,12 @@ export const CustomizerContent = () => {
                       <button
                         key={pill.id}
                         type="button"
-                        onClick={() => setActiveCategory(pill.id)}
+                        onClick={() => {
+                          setActiveCategory(pill.id);
+                          if (pill.id === 'model') {
+                            setIsModelSelectorOpen((prev) => !prev);
+                          }
+                        }}
                         className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border ${
                           isActive
                             ? (isNight ? 'bg-gold text-[#0A0C16] border-gold font-bold shadow-md shadow-gold/20' : 'bg-[#18181B] text-white border-[#18181B] font-semibold shadow-md')
@@ -1470,76 +1545,12 @@ export const CustomizerContent = () => {
                               bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                             />
                           </div>
-                          <span className={`font-sans text-xs font-semibold truncate max-w-full text-center mt-2 ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
+                          <span className={`truncate max-w-full text-center mt-2 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
                             {subLabel}
                           </span>
                         </button>
                       );
                     })}
-                  </div>
-                </div>
-              )}
-
-              {activeCategory === 'model' && (
-                <div className="space-y-5 font-sans text-xs">
-                  <div className="space-y-2">
-                    <label className={`font-bold block text-sm ${isNight ? 'text-gold' : 'text-stone-900'}`}>📱 {t('selectModel')}:</label>
-                    <select
-                      value={selectedModel}
-                      onChange={(e) => setSelectedModel(e.target.value)}
-                      className={`w-full p-3 rounded-xl font-sans text-sm outline-none border min-h-[44px] ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-200 text-stone-900 focus:border-stone-900'}`}
-                    >
-                      {PHONE_MODELS.map((m) => {
-                        const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
-                        const valueName = typeof m === 'object' ? m.name : m;
-                        const id = typeof m === 'object' ? m.id || valueName : m;
-                        return (
-                          <option key={id} value={valueName}>
-                            {name}
-                          </option>
-                        );
-                      })}
-                    </select>
-
-                    {isCustomModelOption && (
-                      <div className="pt-2 space-y-1">
-                        <input
-                          type="text"
-                          value={customModelInput}
-                          onChange={(e) => setCustomModelInput(e.target.value)}
-                          placeholder={t('customModelPlaceholder')}
-                          className={`w-full p-3 rounded-xl text-xs outline-none border ${isNight ? 'bg-[#1F1B18] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'}`}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className={`space-y-2 pt-3 border-t ${isNight ? 'border-stone-800' : 'border-stone-100'}`}>
-                    <label className={`font-bold block text-sm ${isNight ? 'text-gold' : 'text-stone-900'}`}>🎨 {t('caseType')}:</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {CASE_TYPES.map((ct) => {
-                        const active = selectedCaseType?.id === ct.id;
-                        return (
-                          <button
-                            key={ct.id}
-                            onClick={() => setSelectedCaseType(ct)}
-                            className={`p-3 border rounded-xl text-left flex items-center gap-3 transition-all cursor-pointer ${
-                              active
-                                ? (isNight ? 'border-gold bg-gold/20 text-gold font-bold shadow-md' : 'border-black bg-stone-900 text-white font-semibold shadow-md')
-                                : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600' : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400')
-                            }`}
-                          >
-                            <div
-                              className="w-4 h-4 rounded-full border border-stone-400 flex-shrink-0"
-                              style={{ backgroundColor: ct.color || '#FFFFFF' }}
-                            />
-                            <span className="font-sans text-xs truncate">
-                              {lang === 'ar' ? ct.nameAr : ct.nameEn}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
                   </div>
                 </div>
               )}
