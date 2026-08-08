@@ -74,16 +74,14 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
-      const blendStyle = isSticker ? { mixBlendMode: 'multiply' } : {};
       const fitClass = isSticker
-        ? 'w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out p-4'
+        ? 'w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out p-4 drop-shadow-md'
         : 'w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out';
       return (
         <img
           src={customImage}
           alt={name}
           className={fitClass}
-          style={blendStyle}
           onError={(e) => {
             console.warn('Failed to load image:', customImage);
           }}
@@ -126,11 +124,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     >
       
       {/* 3:4 Aspect Ratio Visual Canvas Area */}
-      <div className="aspect-[3/4] w-full bg-void overflow-hidden relative border-b border-grave flex items-center justify-center p-6">
+      <div className={`aspect-[3/4] w-full overflow-hidden relative border-b border-grave flex items-center justify-center p-6 ${isSticker ? 'bg-gradient-to-b from-stone/60 via-void to-void' : 'bg-void'}`}>
         {renderProductGraphic()}
         
-        {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone/90 via-transparent to-transparent pointer-events-none" />
+        {/* Soft Contrast Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-stone/60 via-transparent to-transparent pointer-events-none" />
 
         {/* Top Badges Bar */}
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10">
