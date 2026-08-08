@@ -855,526 +855,868 @@ export const CustomizerContent = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#F8F7F4] text-stone-900 font-sans flex flex-col justify-between select-none pb-6">
-      
-      {/* ── TOP EDITOR HEADER ("Live Editor" + Step Dots) ────────────────────── */}
-      <header className="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between relative select-none z-20">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="p-2 text-stone-700 hover:text-black transition-colors rounded-full hover:bg-stone-200/60 flex items-center justify-center min-w-[40px] min-h-[40px]"
-          title={lang === 'ar' ? 'الرجوع' : 'Back'}
+    const renderPhoneCanvas = (isDesktop = false) => (
+      <div className="w-[300px] sm:w-[340px] aspect-[3/5] relative flex flex-col items-center justify-center select-none overflow-visible">
+        {/* Hardware Side Buttons */}
+        <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
+        <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
+        <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-400/80 rounded-r-md" />
+
+        {/* Canvas Box */}
+        <div
+          ref={isDesktop ? undefined : canvasRef}
+          onDragOver={handleCanvasDragOver}
+          onDrop={handleCanvasDrop}
+          className={`w-full h-full rounded-[42px] border-[3px] relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.18)] transition-colors duration-500 cursor-crosshair ${
+            isDesktop ? 'border-stone-700/80' : 'border-stone-300/80'
+          }`}
+          style={{ backgroundColor: caseBgColor }}
         >
-          {lang === 'ar' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
-        </button>
+          {/* Acrylic Glass Sheen Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none z-10" />
 
-        <div className="flex flex-col items-center">
-          <h1 className="font-sans font-semibold text-base sm:text-lg text-stone-900 tracking-tight">
-            {lang === 'ar' ? 'محرر مباشر' : 'Live Editor'}
-          </h1>
-          {/* Step Dots Indicator: • • ▬ • */}
-          <div className="flex items-center gap-1.5 mt-1">
-            <button
-              type="button"
-              onClick={() => setActiveCategory('model')}
-              className={`transition-all duration-300 ${activeCategory === 'model' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
-              title="Step 1: Model & Finish"
-            />
-            <button
-              type="button"
-              onClick={() => setActiveCategory('motifs')}
-              className={`transition-all duration-300 ${['motifs','quotes-ar','quotes-en','letters','years','months','letters-en'].includes(activeCategory) ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
-              title="Step 2: Stickers"
-            />
-            <button
-              type="button"
-              onClick={() => setActiveCategory('text-photo')}
-              className={`transition-all duration-300 ${activeCategory === 'text-photo' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
-              title="Step 3: Text & Photos"
-            />
-            <button
-              type="button"
-              onClick={() => setActiveCategory('presets')}
-              className={`transition-all duration-300 ${activeCategory === 'presets' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
-              title="Step 4: Presets & Review"
-            />
-          </div>
-        </div>
-
-        <div className="w-10" />
-      </header>
-
-
-      {/* ── MAIN STUDIO WORKSPACE (Phone Canvas) ─────────────────────────────── */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-2 sm:my-4">
-        
-        {/* Phone Canvas Shell Container */}
-        <div className="w-[300px] sm:w-[340px] aspect-[3/5] relative flex flex-col items-center justify-center select-none overflow-visible">
-          
-          {/* Hardware Side Buttons */}
-          <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
-          <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
-          <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-400/80 rounded-r-md" />
-
-          {/* Canvas Box */}
+          {/* Camera Island Module (Top Left) */}
           <div
-            ref={canvasRef}
-            onDragOver={handleCanvasDragOver}
-            onDrop={handleCanvasDrop}
-            className="w-full h-full rounded-[42px] border-[3px] border-stone-300/80 relative flex flex-col justify-between p-4 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-colors duration-500 cursor-crosshair"
-            style={{ backgroundColor: caseBgColor }}
+            className="self-start w-22 h-22 sm:w-24 sm:h-24 rounded-[22px] border-2 shadow-xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden bg-[#090A0E]"
+            style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
           >
-            {/* Acrylic Glass Sheen Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none z-10" />
-
-            {/* Camera Island Module (Top Left) */}
-            <div
-              className="self-start w-22 h-22 sm:w-24 sm:h-24 rounded-[22px] border-2 shadow-xl flex flex-col justify-between p-2.5 z-20 relative overflow-hidden bg-[#090A0E]"
-              style={{ borderColor: caseRingColor, backgroundColor: '#090A0E' }}
-            >
-              <div className="flex justify-between items-center z-10">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                </div>
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                </div>
+            <div className="flex justify-between items-center z-10">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
               </div>
-              <div className="flex justify-between items-center z-10">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
-                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
-                </div>
-                <div className="flex flex-col items-center gap-1 mr-0.5">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-100/90 border border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-black border border-stone-700" />
-                </div>
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
               </div>
             </div>
+            <div className="flex justify-between items-center z-10">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#161822] border-2 border-stone-600/80 flex items-center justify-center shadow-inner">
+                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-blue-950 border border-ash/40" />
+              </div>
+              <div className="flex flex-col items-center gap-1 mr-0.5">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-100/90 border border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-black border border-stone-700" />
+              </div>
+            </div>
+          </div>
 
-            {/* MagSafe Ring Detail */}
-            {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[3px] border-amber-400/60 shadow-sm pointer-events-none" />
-            )}
+          {/* MagSafe Ring Detail */}
+          {(selectedCaseType?.id === 'magsafe' || selectedCaseType?.id === 'gold-ring') && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[3px] border-amber-400/60 shadow-sm pointer-events-none" />
+          )}
 
-            {/* CANVAS LAYERS STACK */}
-            <div className="absolute inset-0 pointer-events-auto">
-              {layers.map((layer) => {
-                const isSelected = layer.id === selectedLayerId;
-                return (
-                  <div
-                    key={layer.id}
-                    onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
-                    style={{
-                      left: `${layer.x}%`,
-                      top: `${layer.y}%`,
-                      transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
-                    }}
-                    className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
-                      isSelected ? 'ring-2 ring-stone-900 ring-offset-2 ring-offset-transparent z-30' : 'z-10'
-                    }`}
-                  >
-                    {/* Interactive Handles (Visible when selected) */}
-                    {isSelected && (
-                      <>
-                        <div
-                          onPointerDown={(e) => handlePointerDownRotate(layer.id, e)}
-                          className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-ew-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                          title="Drag to rotate"
-                        >
-                          <RotateCw size={13} />
-                        </div>
-
-                        <div
-                          onPointerDown={(e) => handleRemoveLayer(layer.id, e)}
-                          className="absolute -top-3.5 -right-3.5 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                          title="Remove layer"
-                        >
-                          ✕
-                        </div>
-
-                        <div
-                          onPointerDown={(e) => handlePointerDownScale(layer.id, e)}
-                          className="absolute -bottom-3.5 -right-3.5 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-nwse-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
-                          title="Drag to scale"
-                        >
-                          <Maximize2 size={13} />
-                        </div>
-                      </>
-                    )}
-
-                    {/* Sticker Image */}
-                    {layer.type === 'sticker' && (
-                      <StickerIcon
-                        stickerId={layer.stickerId}
-                        image={layer.src || STICKER_ITEMS.find(s => s.id === layer.stickerId)?.image || STICKER_PRESETS.find(s => s.id === layer.stickerId)?.image}
-                        size={48}
-                        color={layer.color}
-                        bgColor={layer.bgColor}
-                        forCanvas={true}
-                      />
-                    )}
-
-                    {/* Custom Text Pill */}
-                    {layer.type === 'text' && (
+          {/* CANVAS LAYERS STACK */}
+          <div className="absolute inset-0 pointer-events-auto">
+            {layers.map((layer) => {
+              const isSelected = layer.id === selectedLayerId;
+              return (
+                <div
+                  key={layer.id}
+                  onPointerDown={(e) => handlePointerDownLayer(layer.id, e)}
+                  style={{
+                    left: `${layer.x}%`,
+                    top: `${layer.y}%`,
+                    transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
+                  }}
+                  className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
+                    isSelected ? 'ring-2 ring-gold ring-offset-2 ring-offset-transparent z-30' : 'z-10'
+                  }`}
+                >
+                  {/* Interactive Handles (Visible when selected) */}
+                  {isSelected && (
+                    <>
                       <div
-                        style={{
-                          color: layer.color || '#18181B',
-                          backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#FFFFFF')
-                        }}
-                        className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-stone-300 shadow-md backdrop-blur-sm ${
-                          layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'cinzel' ? 'font-cinzel text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
-                        }`}
+                        onPointerDown={(e) => handlePointerDownRotate(layer.id, e)}
+                        className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-ew-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                        title="Drag to rotate"
                       >
-                        {layer.text}
+                        <RotateCw size={13} />
                       </div>
-                    )}
 
-                    {/* Uploaded Image */}
-                    {layer.type === 'image' && (
-                      <img
-                        src={layer.src}
-                        alt="Custom Layer"
-                        draggable={false}
-                        className="max-w-[120px] max-h-[120px] object-contain pointer-events-none select-none touch-none shadow-md rounded"
-                      />
-                    )}
-                  </div>
-                );
-              })}
+                      <div
+                        onPointerDown={(e) => handleRemoveLayer(layer.id, e)}
+                        className="absolute -top-3.5 -right-3.5 w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                        title="Remove layer"
+                      >
+                        ✕
+                      </div>
+
+                      <div
+                        onPointerDown={(e) => handlePointerDownScale(layer.id, e)}
+                        className="absolute -bottom-3.5 -right-3.5 w-7 h-7 rounded-full bg-stone-900 text-white flex items-center justify-center cursor-nwse-resize shadow-lg hover:scale-110 transition-transform font-mono text-[10px] font-bold z-40 min-w-[28px] min-h-[28px]"
+                        title="Drag to scale"
+                      >
+                        <Maximize2 size={13} />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Sticker Image */}
+                  {layer.type === 'sticker' && (
+                    <StickerIcon
+                      stickerId={layer.stickerId}
+                      image={layer.src || STICKER_ITEMS.find(s => s.id === layer.stickerId)?.image || STICKER_PRESETS.find(s => s.id === layer.stickerId)?.image}
+                      size={48}
+                      color={layer.color}
+                      bgColor={layer.bgColor}
+                      forCanvas={true}
+                    />
+                  )}
+
+                  {/* Custom Text Pill */}
+                  {layer.type === 'text' && (
+                    <div
+                      style={{
+                        color: layer.color || '#18181B',
+                        backgroundColor: layer.bgColor === 'transparent' ? 'transparent' : (layer.bgColor || '#FFFFFF')
+                      }}
+                      className={`whitespace-nowrap font-bold text-sm select-none px-4 py-2 rounded-full border border-stone-300 shadow-md backdrop-blur-sm ${
+                        layer.font === 'ruqaa' ? 'font-ruqaa text-base' : layer.font === 'cinzel' ? 'font-cinzel text-base' : layer.font === 'kufi' ? 'font-kufi' : layer.font === 'mono' ? 'font-mono' : 'font-space'
+                      }`}
+                    >
+                      {layer.text}
+                    </div>
+                  )}
+
+                  {/* Uploaded Image */}
+                  {layer.type === 'image' && (
+                    <img
+                      src={layer.src}
+                      alt="Custom Layer"
+                      draggable={false}
+                      className="max-w-[120px] max-h-[120px] object-contain pointer-events-none select-none touch-none shadow-md rounded"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Empty Canvas Drop Hint */}
+          {layers.length === 0 && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-stone-400 pointer-events-none">
+              <Move size={28} className="text-gold/80 mb-1 animate-bounce" />
+              <span className="font-sans text-xs uppercase tracking-wider font-semibold text-stone-400">
+                {lang === 'ar' ? 'اختر استيكر لإضافته هنا' : 'ADD STICKERS HERE'}
+              </span>
             </div>
+          )}
+        </div>
+      </div>
+    );
 
-            {/* Empty Canvas Drop Hint */}
-            {layers.length === 0 && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-stone-400 pointer-events-none">
-                <Move size={28} className="text-stone-700 mb-1 animate-bounce" />
-                <span className="font-sans text-xs uppercase tracking-wider font-semibold text-stone-600">
-                  {lang === 'ar' ? 'اختر استيكر لإضافته هنا' : 'ADD STICKERS HERE'}
-                </span>
-              </div>
-            )}
-          </div>
+    const renderQuickToolbar = (isDesktop = false) => (
+      <div className={`flex items-center justify-between gap-3 mt-3 w-[300px] sm:w-[340px] ${isDesktop ? 'text-ash' : 'text-stone-600'}`}>
+        <div className="font-sans text-[11px] sm:text-xs font-medium truncate">
+          {currentModelName} · {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
         </div>
 
-        {/* Floating Quick Action Toolbar (Undo, Redo, Clear) */}
-        <div className="flex items-center justify-between gap-3 mt-3 w-[300px] sm:w-[340px]">
-          <div className="font-sans text-[11px] sm:text-xs text-stone-600 font-medium truncate">
-            {currentModelName} · {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
-          </div>
-
-          <div className="flex items-center gap-1 bg-white border border-stone-200/90 shadow-sm rounded-full p-1">
-            <button
-              type="button"
-              onClick={handleUndo}
-              disabled={!canUndo}
-              className={`p-1.5 rounded-full transition-all ${canUndo ? 'text-stone-800 hover:bg-stone-100 cursor-pointer' : 'text-stone-300 cursor-not-allowed'}`}
-              title={lang === 'ar' ? 'تراجع (Ctrl+Z)' : 'Undo'}
-            >
-              <Undo2 size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={handleRedo}
-              disabled={!canRedo}
-              className={`p-1.5 rounded-full transition-all ${canRedo ? 'text-stone-800 hover:bg-stone-100 cursor-pointer' : 'text-stone-300 cursor-not-allowed'}`}
-              title={lang === 'ar' ? 'إعادة (Ctrl+Y)' : 'Redo'}
-            >
-              <Redo2 size={15} />
-            </button>
-            {layers.length > 0 && (
-              <button
-                type="button"
-                onClick={() => updateLayersWithHistory([])}
-                className="p-1.5 rounded-full text-red-600 hover:bg-red-50 transition-all cursor-pointer"
-                title={lang === 'ar' ? 'مسح الكل' : 'Clear All'}
-              >
-                <Trash2 size={15} />
-              </button>
-            )}
-          </div>
-        </div>
-
-      </main>
-
-
-      {/* ── FLOATING CONTROL BOTTOM SHEET ───────────────────────────────────── */}
-      <footer className="w-full max-w-3xl mx-auto bg-white rounded-t-[32px] sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.06)] border border-stone-200/80 p-4 sm:p-6 space-y-4 font-sans select-none z-30">
-        
-        {/* Sheet Handle */}
-        <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-1" />
-
-        {/* Sheet Header (Title + Next Button) */}
-        <div className="flex items-center justify-between">
-          <h2 className="font-sans font-bold text-base sm:text-lg text-stone-900 tracking-tight">
-            {sheetTitle}
-          </h2>
-
+        <div className={`flex items-center gap-1 border shadow-sm rounded-full p-1 ${isDesktop ? 'bg-[#1C1917] border-stone-700' : 'bg-white border-stone-200/90'}`}>
           <button
             type="button"
-            onClick={activeCategory === 'presets' || layers.length > 0 ? handleAddToCart : handleNextPill}
-            className="bg-[#18181B] hover:bg-black text-white px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all transform active:scale-95 cursor-pointer"
+            onClick={handleUndo}
+            disabled={!canUndo}
+            className={`p-1.5 rounded-full transition-all ${canUndo ? (isDesktop ? 'text-bone hover:bg-stone-800' : 'text-stone-800 hover:bg-stone-100') : 'text-stone-500 opacity-40 cursor-not-allowed'}`}
+            title={lang === 'ar' ? 'تراجع (Ctrl+Z)' : 'Undo'}
           >
-            <span>{lang === 'ar' ? (layers.length > 0 ? 'أضف إلى السلة' : 'التالي') : (layers.length > 0 ? 'ADD TO CART' : 'Next')}</span>
-            {lang === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+            <Undo2 size={15} />
           </button>
+          <button
+            type="button"
+            onClick={handleRedo}
+            disabled={!canRedo}
+            className={`p-1.5 rounded-full transition-all ${canRedo ? (isDesktop ? 'text-bone hover:bg-stone-800' : 'text-stone-800 hover:bg-stone-100') : 'text-stone-500 opacity-40 cursor-not-allowed'}`}
+            title={lang === 'ar' ? 'إعادة (Ctrl+Y)' : 'Redo'}
+          >
+            <Redo2 size={15} />
+          </button>
+          {layers.length > 0 && (
+            <button
+              type="button"
+              onClick={() => updateLayersWithHistory([])}
+              className="p-1.5 rounded-full text-red-500 hover:bg-red-950/40 transition-all cursor-pointer"
+              title={lang === 'ar' ? 'مسح الكل' : 'Clear All'}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
+      </div>
+    );
 
-        {/* Category Pills Row (Horizontal Scroll) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 custom-scrollbar">
-          {CATEGORY_PILLS.map((pill) => {
-            const isActive = activeCategory === pill.id;
-            return (
+  return (
+    <>
+      {/* ========================================================================= */}
+      {/* 📱 1. MOBILE VIEW (Screen < 1024px) — Live Editor with Bottom Sheet */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden min-h-screen bg-[#F8F7F4] text-stone-900 font-sans flex flex-col justify-between select-none pb-6">
+        
+        {/* Top Header */}
+        <header className="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between relative select-none z-20">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="p-2 text-stone-700 hover:text-black transition-colors rounded-full hover:bg-stone-200/60 flex items-center justify-center min-w-[40px] min-h-[40px]"
+            title={lang === 'ar' ? 'الرجوع' : 'Back'}
+          >
+            {lang === 'ar' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+          </button>
+
+          <div className="flex flex-col items-center">
+            <h1 className="font-sans font-semibold text-base sm:text-lg text-stone-900 tracking-tight">
+              {lang === 'ar' ? 'محرر مباشر' : 'Live Editor'}
+            </h1>
+            <div className="flex items-center gap-1.5 mt-1">
               <button
-                key={pill.id}
                 type="button"
-                onClick={() => setActiveCategory(pill.id)}
-                className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
-                  isActive
-                    ? 'bg-[#18181B] text-white shadow-sm font-semibold'
-                    : 'bg-[#F4F3F0] text-stone-700 hover:bg-stone-200/80 border border-stone-200/60'
-                }`}
-              >
-                {lang === 'ar' ? pill.labelAr : pill.labelEn}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Selected Layer Controls (If layer selected) */}
-        {selectedLayer && (
-          <div className="bg-[#F8F7F4] border border-stone-200 rounded-2xl p-3 space-y-3">
-            <div className="flex justify-between items-center text-xs font-semibold text-stone-800">
-              <span>{lang === 'ar' ? 'تحكم في الاستيكر المحدّد' : 'Selected Sticker Controls'}</span>
+                onClick={() => setActiveCategory('model')}
+                className={`transition-all duration-300 ${activeCategory === 'model' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              />
               <button
-                onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
-                className="text-red-600 hover:text-red-800 flex items-center gap-1 text-xs font-bold"
-              >
-                <Trash2 size={13} />
-                <span>{lang === 'ar' ? 'حذف' : 'Remove'}</span>
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="space-y-1">
-                <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'الحجم' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
-                <input
-                  type="range"
-                  min="0.4"
-                  max="3.0"
-                  step="0.1"
-                  value={selectedLayer.scale}
-                  onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
-                  className="w-full accent-black cursor-pointer"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'التدوير' : 'Rotation'} ({selectedLayer.rotation}°)</label>
-                <input
-                  type="range"
-                  min="-180"
-                  max="180"
-                  step="5"
-                  value={selectedLayer.rotation}
-                  onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
-                  className="w-full accent-black cursor-pointer"
-                />
-              </div>
+                type="button"
+                onClick={() => setActiveCategory('motifs')}
+                className={`transition-all duration-300 ${['motifs','quotes-ar','quotes-en','letters','years','months','letters-en'].includes(activeCategory) ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              />
+              <button
+                type="button"
+                onClick={() => setActiveCategory('text-photo')}
+                className={`transition-all duration-300 ${activeCategory === 'text-photo' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              />
+              <button
+                type="button"
+                onClick={() => setActiveCategory('presets')}
+                className={`transition-all duration-300 ${activeCategory === 'presets' ? 'w-5 h-1.5 bg-stone-900 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full hover:bg-stone-500'}`}
+              />
             </div>
           </div>
-        )}
 
-        {/* Category Items Content */}
-        {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 custom-scrollbar max-w-full">
-            {filteredStickers.map((st) => {
-              const subLabel = getStickerSubLabel(st);
+          <div className="w-10" />
+        </header>
+
+        {/* Main Canvas Area */}
+        <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-2 sm:my-4">
+          {renderPhoneCanvas(false)}
+          {renderQuickToolbar(false)}
+        </main>
+
+        {/* Floating Bottom Sheet Controls */}
+        <footer className="w-full max-w-3xl mx-auto bg-white rounded-t-[32px] sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.06)] border border-stone-200/80 p-4 sm:p-6 space-y-4 font-sans select-none z-30">
+          <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-1" />
+
+          <div className="flex items-center justify-between">
+            <h2 className="font-sans font-bold text-base sm:text-lg text-stone-900 tracking-tight">
+              {sheetTitle}
+            </h2>
+
+            <button
+              type="button"
+              onClick={activeCategory === 'presets' || layers.length > 0 ? handleAddToCart : handleNextPill}
+              className="bg-[#18181B] hover:bg-black text-white px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all transform active:scale-95 cursor-pointer"
+            >
+              <span>{lang === 'ar' ? (layers.length > 0 ? 'أضف إلى السلة' : 'التالي') : (layers.length > 0 ? 'ADD TO CART' : 'Next')}</span>
+              {lang === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+            </button>
+          </div>
+
+          {/* Category Pills Row */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 custom-scrollbar">
+            {CATEGORY_PILLS.map((pill) => {
+              const isActive = activeCategory === pill.id;
               return (
                 <button
-                  key={st.id}
-                  draggable={true}
-                  onDragStart={(e) => handleStickerDragStart(st.id, e)}
-                  onClick={() => handleAddSticker(st.id)}
-                  className="w-24 sm:w-28 flex-shrink-0 bg-[#F9F8F6] border border-stone-200/90 hover:border-stone-900 rounded-2xl p-2.5 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none"
-                  title={lang === 'ar' ? 'انقر أو اسحب على الهاتف' : 'Click or Drag onto phone'}
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setActiveCategory(pill.id)}
+                  className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isActive
+                      ? 'bg-[#18181B] text-white shadow-sm font-semibold'
+                      : 'bg-[#F4F3F0] text-stone-700 hover:bg-stone-200/80 border border-stone-200/60'
+                  }`}
                 >
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
-                    <StickerIcon
-                      stickerId={st.id}
-                      image={st.image || st.imageUrl}
-                      size={54}
-                      color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
-                      bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
-                    />
-                  </div>
-                  <span className="font-sans text-[11px] sm:text-xs text-stone-600 group-hover:text-stone-900 font-medium tracking-tight truncate max-w-full text-center mt-1.5">
-                    {subLabel}
-                  </span>
+                  {lang === 'ar' ? pill.labelAr : pill.labelEn}
                 </button>
               );
             })}
           </div>
-        )}
 
-        {/* Case Model & Finish Tab */}
-        {activeCategory === 'model' && (
-          <div className="space-y-4 pt-1">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-stone-800 block">{t('selectModel')}</label>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900 min-h-[44px]"
-              >
-                {PHONE_MODELS.map((m) => {
-                  const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
-                  const valueName = typeof m === 'object' ? m.name : m;
-                  const id = typeof m === 'object' ? m.id || valueName : m;
-                  return (
-                    <option key={id} value={valueName}>
-                      {name}
-                    </option>
-                  );
-                })}
-              </select>
+          {/* Selected Layer Controls */}
+          {selectedLayer && (
+            <div className="bg-[#F8F7F4] border border-stone-200 rounded-2xl p-3 space-y-3">
+              <div className="flex justify-between items-center text-xs font-semibold text-stone-800">
+                <span>{lang === 'ar' ? 'تحكم في الاستيكر المحدّد' : 'Selected Sticker Controls'}</span>
+                <button
+                  onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
+                  className="text-red-600 hover:text-red-800 flex items-center gap-1 text-xs font-bold"
+                >
+                  <Trash2 size={13} />
+                  <span>{lang === 'ar' ? 'حذف' : 'Remove'}</span>
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="space-y-1">
+                  <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'الحجم' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
+                  <input
+                    type="range"
+                    min="0.4"
+                    max="3.0"
+                    step="0.1"
+                    value={selectedLayer.scale}
+                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
+                    className="w-full accent-black cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-stone-500 font-medium block">{lang === 'ar' ? 'التدوير' : 'Rotation'} ({selectedLayer.rotation}°)</label>
+                  <input
+                    type="range"
+                    min="-180"
+                    max="180"
+                    step="5"
+                    value={selectedLayer.rotation}
+                    onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
+                    className="w-full accent-black cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
-              {isCustomModelOption && (
-                <div className="pt-1 space-y-1">
+          {/* Category Content Panels */}
+          {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 custom-scrollbar max-w-full">
+              {filteredStickers.map((st) => {
+                const subLabel = getStickerSubLabel(st);
+                return (
+                  <button
+                    key={st.id}
+                    draggable={true}
+                    onDragStart={(e) => handleStickerDragStart(st.id, e)}
+                    onClick={() => handleAddSticker(st.id)}
+                    className="w-24 sm:w-28 flex-shrink-0 bg-[#F9F8F6] border border-stone-200/90 hover:border-stone-900 rounded-2xl p-2.5 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none"
+                  >
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
+                      <StickerIcon
+                        stickerId={st.id}
+                        image={st.image || st.imageUrl}
+                        size={54}
+                        color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
+                        bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
+                      />
+                    </div>
+                    <span className="font-sans text-[11px] sm:text-xs text-stone-600 group-hover:text-stone-900 font-medium tracking-tight truncate max-w-full text-center mt-1.5">
+                      {subLabel}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Model & Finish */}
+          {activeCategory === 'model' && (
+            <div className="space-y-4 pt-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-stone-800 block">{t('selectModel')}</label>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="w-full bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900 min-h-[44px]"
+                >
+                  {PHONE_MODELS.map((m) => {
+                    const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
+                    const valueName = typeof m === 'object' ? m.name : m;
+                    const id = typeof m === 'object' ? m.id || valueName : m;
+                    return (
+                      <option key={id} value={valueName}>
+                        {name}
+                      </option>
+                    );
+                  })}
+                </select>
+
+                {isCustomModelOption && (
+                  <div className="pt-1 space-y-1">
+                    <input
+                      type="text"
+                      value={customModelInput}
+                      onChange={(e) => setCustomModelInput(e.target.value)}
+                      placeholder={t('customModelPlaceholder')}
+                      className="w-full bg-[#F8F7F4] border border-stone-300 text-stone-900 p-2.5 rounded-xl text-xs outline-none focus:border-stone-900"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-stone-800 block">{t('caseType')}</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {CASE_TYPES.map((ct) => {
+                    const active = selectedCaseType?.id === ct.id;
+                    return (
+                      <button
+                        key={ct.id}
+                        onClick={() => setSelectedCaseType(ct)}
+                        className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
+                          active
+                            ? 'border-black bg-stone-900 text-white font-semibold shadow-sm'
+                            : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400'
+                        }`}
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
+                          style={{ backgroundColor: ct.color || '#FFFFFF' }}
+                        />
+                        <span className="font-sans text-xs truncate">
+                          {lang === 'ar' ? ct.nameAr : ct.nameEn}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Custom Text & Upload */}
+          {activeCategory === 'text-photo' && (
+            <div className="space-y-4 pt-1">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-stone-800 block">{t('tabText')}</label>
+                <div className="flex gap-2">
                   <input
                     type="text"
-                    value={customModelInput}
-                    onChange={(e) => setCustomModelInput(e.target.value)}
-                    placeholder={t('customModelPlaceholder')}
-                    className="w-full bg-[#F8F7F4] border border-stone-300 text-stone-900 p-2.5 rounded-xl text-xs outline-none focus:border-stone-900"
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder={t('textPlaceholder')}
+                    className="flex-1 bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900"
                   />
+                  <button
+                    type="button"
+                    onClick={handleAddText}
+                    className="bg-[#18181B] text-white px-4 rounded-xl text-xs font-medium hover:bg-black transition-colors"
+                  >
+                    {t('addTextBtn')}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-4 gap-1.5 pt-1">
+                  <button
+                    onClick={() => setTextFont('ruqaa')}
+                    className={`p-2 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                  >
+                    خط رقعة
+                  </button>
+                  <button
+                    onClick={() => setTextFont('kufi')}
+                    className={`p-2 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                  >
+                    IBM Kufi
+                  </button>
+                  <button
+                    onClick={() => setTextFont('cinzel')}
+                    className={`p-2 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                  >
+                    Cinzel
+                  </button>
+                  <button
+                    onClick={() => setTextFont('mono')}
+                    className={`p-2 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
+                  >
+                    Mono
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-t border-stone-200 pt-3 space-y-2">
+                <label className="text-xs font-semibold text-stone-800 block">{t('tabImage')}</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="block w-full text-xs text-stone-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-stone-900 file:text-white file:font-medium cursor-pointer"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Ready Presets */}
+          {activeCategory === 'presets' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {PRESET_TEMPLATES.map((tmpl) => (
+                <button
+                  key={tmpl.id}
+                  type="button"
+                  onClick={() => handleLoadPreset(tmpl)}
+                  className="p-3 bg-[#F8F7F4] border border-stone-200 hover:border-black rounded-2xl text-left space-y-1 transition-all cursor-pointer group"
+                >
+                  <span className="font-sans font-semibold text-xs sm:text-sm text-stone-900 block group-hover:text-black">
+                    {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
+                  </span>
+                  <span className="text-[10px] text-stone-500 uppercase tracking-wider block">
+                    {lang === 'ar' ? 'تحميل التصميم' : 'LOAD PRESET'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="text-center font-sans text-xs text-stone-500 flex items-center justify-center gap-1.5 pt-2 border-t border-stone-100">
+            <Info size={14} className="text-stone-400" />
+            <span>
+              {lang === 'ar'
+                ? 'ⓘ اسحب للتحريك · إصبعين للتدوير · اضغط مطولاً للإزالة'
+                : 'ⓘ Drag to move · Two fingers to rotate · Long press to remove'}
+            </span>
+          </div>
+        </footer>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 💻 2. DESKTOP STUDIO VIEW (Screen >= 1024px) — Split 2-Column Luxury Layout */}
+      {/* ========================================================================= */}
+      <div className="hidden lg:block min-h-screen bg-[#0E0C0B] text-bone font-sans select-none pb-12">
+        
+        {/* Top Studio Bar */}
+        <header className="w-full bg-[#161311]/90 backdrop-blur-md border-b border-stone-800/80 px-8 py-4 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-2.5 text-ash hover:text-gold transition-colors rounded-xl border border-stone-800 bg-[#1F1B18] flex items-center justify-center"
+              title={lang === 'ar' ? 'الرجوع' : 'Back'}
+            >
+              {lang === 'ar' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
+
+            <div>
+              <span className="font-mono text-[10px] text-gold font-bold uppercase tracking-widest block">
+                DUAT / LUXURY CUSTOMIZER STUDIO
+              </span>
+              <h1 className="font-clash font-bold text-xl text-bone tracking-tight">
+                {lang === 'ar' ? 'مصنع دوات للجرابات المخصصة' : 'DUAT Custom Case Studio'}
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 font-mono text-xs">
+            <div className="bg-[#1F1B18] border border-stone-800 px-3.5 py-1.5 rounded-full text-bone">
+              📱 <strong className="text-gold">{currentModelName}</strong>
+            </div>
+            <div className="bg-[#1F1B18] border border-stone-800 px-3.5 py-1.5 rounded-full text-bone">
+              🎨 {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
+            </div>
+            <div className="bg-gold text-[#0A0C16] font-bold px-4 py-1.5 rounded-full shadow-lg shadow-gold/20">
+              {builderPrice || 850} EGP
+            </div>
+          </div>
+        </header>
+
+        {/* Studio 2-Column Main Layout */}
+        <main className="max-w-7xl mx-auto px-6 pt-8 grid grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT COLUMN: Elevated Phone Preview Canvas Container */}
+          <div className="col-span-5 bg-[#161311] border border-stone-800/90 rounded-3xl p-8 shadow-2xl flex flex-col items-center justify-center sticky top-24 space-y-4">
+            <div className="font-mono text-[11px] uppercase tracking-widest text-ash flex items-center gap-2">
+              <Sparkles size={14} className="text-gold" />
+              <span>{lang === 'ar' ? 'معاينة الجراب التفاعلية' : 'Interactive Case Canvas'}</span>
+            </div>
+
+            {renderPhoneCanvas(true)}
+            {renderQuickToolbar(true)}
+
+            <div className="font-mono text-[11px] text-ash/80 text-center pt-2 border-t border-stone-800/60 w-full">
+              ⓘ {lang === 'ar' ? 'اسحب أي استيكر مباشرة على الجراب · انقر لتحديده وتعديله' : 'Drag any sticker directly onto phone canvas · Click layer to select'}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Studio Controls & Asset Library Card */}
+          <div className="col-span-7 space-y-6">
+            <div className="bg-[#161311] border border-stone-800/90 rounded-3xl p-6 shadow-2xl space-y-6">
+              
+              {/* Category Pills Navigation Tabs */}
+              <div>
+                <span className="font-mono text-[10px] text-gold font-bold uppercase tracking-widest block mb-2">
+                  {lang === 'ar' ? 'أقسام البلدر والتصميم' : 'Builder Categories'}
+                </span>
+                <div className="flex flex-wrap items-center gap-2 border-b border-stone-800/80 pb-4">
+                  {CATEGORY_PILLS.map((pill) => {
+                    const isActive = activeCategory === pill.id;
+                    return (
+                      <button
+                        key={pill.id}
+                        type="button"
+                        onClick={() => setActiveCategory(pill.id)}
+                        className={`px-4 py-2 rounded-xl font-mono text-xs uppercase font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                          isActive
+                            ? 'bg-gold text-[#0A0C16] border-gold shadow-lg shadow-gold/20'
+                            : 'bg-[#1F1B18] text-bone border-stone-800 hover:border-gold/60 hover:text-gold'
+                        }`}
+                      >
+                        <span>{pill.icon}</span>
+                        <span>{lang === 'ar' ? pill.labelAr : pill.labelEn}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Selected Layer Controls Panel */}
+              {selectedLayer && (
+                <div className="bg-[#1F1B18] border border-gold/40 rounded-2xl p-4 space-y-3 shadow-lg animate-fade-in">
+                  <div className="flex justify-between items-center font-mono text-xs font-bold text-gold border-b border-stone-800 pb-2">
+                    <span>✨ {lang === 'ar' ? 'التحكم في الاستيكر المحدّد (Selected Sticker)' : 'Selected Sticker Controls'}</span>
+                    <button
+                      onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
+                      className="text-red-400 hover:text-red-300 flex items-center gap-1 text-xs font-bold transition-colors"
+                    >
+                      <Trash2 size={14} />
+                      <span>{lang === 'ar' ? 'حذف الاستيكر' : 'Remove Sticker'}</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+                    <div className="space-y-1">
+                      <label className="text-ash block">{lang === 'ar' ? 'الحجم (Scale)' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
+                      <input
+                        type="range"
+                        min="0.4"
+                        max="3.0"
+                        step="0.1"
+                        value={selectedLayer.scale}
+                        onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
+                        className="w-full accent-gold cursor-pointer"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-ash block">{lang === 'ar' ? 'التدوير (Rotation)' : 'Rotation'} ({selectedLayer.rotation}°)</label>
+                      <input
+                        type="range"
+                        min="-180"
+                        max="180"
+                        step="5"
+                        value={selectedLayer.rotation}
+                        onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
+                        className="w-full accent-gold cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STICKER LIBRARY GRID */}
+              {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between font-mono text-xs text-ash">
+                    <span>{lang === 'ar' ? `استيكرات قسم (${sheetTitle}) — ${filteredStickers.length}` : `Stickers in (${sheetTitle}) — ${filteredStickers.length}`}</span>
+                    <span className="text-[11px] text-gold">انقر أو اسحب للجراب 🖱️</span>
+                  </div>
+
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[380px] overflow-y-auto custom-scrollbar p-1">
+                    {filteredStickers.map((st) => {
+                      const subLabel = getStickerSubLabel(st);
+                      return (
+                        <button
+                          key={st.id}
+                          draggable={true}
+                          onDragStart={(e) => handleStickerDragStart(st.id, e)}
+                          onClick={() => handleAddSticker(st.id)}
+                          className="bg-[#1F1B18] border border-stone-800 hover:border-gold rounded-2xl p-3 flex flex-col items-center justify-between transition-all cursor-pointer shadow-md group select-none hover:scale-105"
+                          title={lang === 'ar' ? 'انقر لإضافة الاستيكر للجراب' : 'Click to add sticker to case'}
+                        >
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
+                            <StickerIcon
+                              stickerId={st.id}
+                              image={st.image || st.imageUrl}
+                              size={56}
+                              color={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textColor}
+                              bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
+                            />
+                          </div>
+                          <span className="font-mono text-[11px] text-ash group-hover:text-gold font-medium truncate max-w-full text-center mt-2">
+                            {subLabel}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* MODEL & FINISH TAB CONTENT */}
+              {activeCategory === 'model' && (
+                <div className="space-y-5 font-mono text-xs">
+                  <div className="space-y-2">
+                    <label className="text-gold font-bold block">📱 {t('selectModel')}:</label>
+                    <select
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="w-full bg-[#1F1B18] border border-stone-800 text-bone p-3 rounded-xl font-mono text-sm outline-none focus:border-gold min-h-[44px]"
+                    >
+                      {PHONE_MODELS.map((m) => {
+                        const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
+                        const valueName = typeof m === 'object' ? m.name : m;
+                        const id = typeof m === 'object' ? m.id || valueName : m;
+                        return (
+                          <option key={id} value={valueName}>
+                            {name}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+                    {isCustomModelOption && (
+                      <div className="pt-2 space-y-1">
+                        <input
+                          type="text"
+                          value={customModelInput}
+                          onChange={(e) => setCustomModelInput(e.target.value)}
+                          placeholder={t('customModelPlaceholder')}
+                          className="w-full bg-[#1F1B18] border border-stone-700 text-bone p-3 rounded-xl text-xs outline-none focus:border-gold"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-stone-800">
+                    <label className="text-gold font-bold block">🎨 {t('caseType')}:</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {CASE_TYPES.map((ct) => {
+                        const active = selectedCaseType?.id === ct.id;
+                        return (
+                          <button
+                            key={ct.id}
+                            onClick={() => setSelectedCaseType(ct)}
+                            className={`p-3 border rounded-xl text-left flex items-center gap-3 transition-all cursor-pointer ${
+                              active
+                                ? 'border-gold bg-gold/15 text-gold font-bold shadow-lg shadow-gold/10'
+                                : 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600'
+                            }`}
+                          >
+                            <div
+                              className="w-4 h-4 rounded-full border border-stone-600 flex-shrink-0"
+                              style={{ backgroundColor: ct.color || '#FFFFFF' }}
+                            />
+                            <span className="font-mono text-xs truncate">
+                              {lang === 'ar' ? ct.nameAr : ct.nameEn}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CUSTOM TEXT & UPLOAD TAB CONTENT */}
+              {activeCategory === 'text-photo' && (
+                <div className="space-y-5 font-mono text-xs">
+                  <div className="space-y-2">
+                    <label className="text-gold font-bold block">✍️ {t('tabText')}:</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={customText}
+                        onChange={(e) => setCustomText(e.target.value)}
+                        placeholder={t('textPlaceholder')}
+                        className="flex-1 bg-[#1F1B18] border border-stone-800 text-bone p-3 rounded-xl font-mono text-sm outline-none focus:border-gold"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddText}
+                        className="btn-primary px-5 rounded-xl text-xs font-bold uppercase tracking-wider"
+                      >
+                        {t('addTextBtn')}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-2 pt-2">
+                      <button
+                        onClick={() => setTextFont('ruqaa')}
+                        className={`p-2.5 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                      >
+                        خط رقعة
+                      </button>
+                      <button
+                        onClick={() => setTextFont('kufi')}
+                        className={`p-2.5 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                      >
+                        IBM Kufi
+                      </button>
+                      <button
+                        onClick={() => setTextFont('cinzel')}
+                        className={`p-2.5 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                      >
+                        Cinzel
+                      </button>
+                      <button
+                        onClick={() => setTextFont('mono')}
+                        className={`p-2.5 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                      >
+                        Mono
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-stone-800 pt-4 space-y-2">
+                    <label className="text-gold font-bold block">🖼️ {t('tabImage')}:</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="block w-full text-xs text-ash file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:bg-gold file:text-[#0A0C16] file:font-bold cursor-pointer"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* READY PRESETS TAB CONTENT */}
+              {activeCategory === 'presets' && (
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {PRESET_TEMPLATES.map((tmpl) => (
+                    <button
+                      key={tmpl.id}
+                      type="button"
+                      onClick={() => handleLoadPreset(tmpl)}
+                      className="p-4 bg-[#1F1B18] border border-stone-800 hover:border-gold rounded-2xl text-left space-y-1 transition-all cursor-pointer group"
+                    >
+                      <span className="font-mono font-bold text-xs text-bone block group-hover:text-gold">
+                        {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
+                      </span>
+                      <span className="text-[10px] text-gold uppercase tracking-wider block font-mono">
+                        {lang === 'ar' ? 'تحميل التصميم' : 'LOAD PRESET'}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-stone-800 block">{t('caseType')}</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {CASE_TYPES.map((ct) => {
-                  const active = selectedCaseType?.id === ct.id;
-                  return (
-                    <button
-                      key={ct.id}
-                      onClick={() => setSelectedCaseType(ct)}
-                      className={`p-2.5 border rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer ${
-                        active
-                          ? 'border-black bg-stone-900 text-white font-semibold shadow-sm'
-                          : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400'
-                      }`}
-                    >
-                      <div
-                        className="w-3.5 h-3.5 rounded-full border border-stone-400 flex-shrink-0"
-                        style={{ backgroundColor: ct.color || '#FFFFFF' }}
-                      />
-                      <span className="font-sans text-xs truncate">
-                        {lang === 'ar' ? ct.nameAr : ct.nameEn}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Custom Text & Upload Photo Tab */}
-        {activeCategory === 'text-photo' && (
-          <div className="space-y-4 pt-1">
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-stone-800 block">{t('tabText')}</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  placeholder={t('textPlaceholder')}
-                  className="flex-1 bg-[#F8F7F4] border border-stone-200 text-stone-900 p-2.5 rounded-xl font-sans text-sm outline-none focus:border-stone-900"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddText}
-                  className="bg-[#18181B] text-white px-4 rounded-xl text-xs font-medium hover:bg-black transition-colors"
-                >
-                  {t('addTextBtn')}
-                </button>
+            {/* Sticky Bottom Desktop Action Card */}
+            <div className="bg-[#161311] border border-gold/40 p-5 rounded-3xl flex items-center justify-between shadow-2xl">
+              <div>
+                <span className="font-mono text-xs text-ash block uppercase tracking-wider">
+                  {lang === 'ar' ? 'إجمالي السعر' : 'Total Price'}
+                </span>
+                <div className="font-mono text-2xl font-bold text-bone">
+                  {builderPrice || 850} <span className="text-sm font-bold text-gold">ج.م</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-1.5 pt-1">
-                <button
-                  onClick={() => setTextFont('ruqaa')}
-                  className={`p-2 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
-                >
-                  خط رقعة
-                </button>
-                <button
-                  onClick={() => setTextFont('kufi')}
-                  className={`p-2 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
-                >
-                  IBM Kufi
-                </button>
-                <button
-                  onClick={() => setTextFont('cinzel')}
-                  className={`p-2 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
-                >
-                  Cinzel
-                </button>
-                <button
-                  onClick={() => setTextFont('mono')}
-                  className={`p-2 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-black bg-stone-900 text-white' : 'border-stone-200 bg-[#F8F7F4]'}`}
-                >
-                  Mono
-                </button>
-              </div>
-            </div>
-
-            <div className="border-t border-stone-200 pt-3 space-y-2">
-              <label className="text-xs font-semibold text-stone-800 block">{t('tabImage')}</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="block w-full text-xs text-stone-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-stone-900 file:text-white file:font-medium cursor-pointer"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Ready Presets Tab */}
-        {activeCategory === 'presets' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {PRESET_TEMPLATES.map((tmpl) => (
               <button
-                key={tmpl.id}
                 type="button"
-                onClick={() => handleLoadPreset(tmpl)}
-                className="p-3 bg-[#F8F7F4] border border-stone-200 hover:border-black rounded-2xl text-left space-y-1 transition-all cursor-pointer group"
+                onClick={handleAddToCart}
+                className="btn-primary py-4 px-8 text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-3 shadow-xl shadow-gold/20 cursor-pointer"
               >
-                <span className="font-sans font-semibold text-xs sm:text-sm text-stone-900 block group-hover:text-black">
-                  {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
-                </span>
-                <span className="text-[10px] text-stone-500 uppercase tracking-wider block">
-                  {lang === 'ar' ? 'تحميل التصميم' : 'LOAD PRESET'}
-                </span>
+                <span>{lang === 'ar' ? 'أضف إلى السلة الان' : 'ADD TO CART NOW'}</span>
+                {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
               </button>
-            ))}
+            </div>
+
           </div>
-        )}
 
-        {/* Bottom Helper Gesture Guide */}
-        <div className="text-center font-sans text-xs text-stone-500 flex items-center justify-center gap-1.5 pt-2 border-t border-stone-100">
-          <Info size={14} className="text-stone-400" />
-          <span>
-            {lang === 'ar'
-              ? 'ⓘ اسحب للتحريك · إصبعين للتدوير · اضغط مطولاً للإزالة'
-              : 'ⓘ Drag to move · Two fingers to rotate · Long press to remove'}
-          </span>
-        </div>
-
-      </footer>
-    </div>
+        </main>
+      </div>
+    </>
   );
 };
 
