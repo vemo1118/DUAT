@@ -91,7 +91,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="hero-section relative w-full bg-[#050505] border-b border-[#2E2823] overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-[#F0EBE0]"
+      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-bone transition-colors"
     >
       {/* Full-Bleed Background Image Layer */}
       {bgImage ? (
@@ -101,9 +101,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             alt="Hero Background"
             className="w-full h-full object-cover object-center transition-transform duration-700 brightness-105 contrast-105"
           />
-          {/* Filmic High-Contrast Gradient Vignette Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent sm:w-4/5" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/95 via-transparent to-[#050505]/40" />
+          {/* Dynamic Theme Background Overlay Vignette */}
+          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/90 to-transparent sm:w-4/5" />
+          <div className="absolute inset-0 bg-gradient-to-t from-void/95 via-transparent to-void/30" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */
@@ -119,13 +119,13 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           
           {/* Eyebrow & Offer Badge */}
           <div className={`flex flex-wrap items-center gap-3 ${flexJustifyClass}`}>
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-bold bg-[#D4AF37]/15 px-3.5 py-1.5 border border-[#D4AF37]/40 backdrop-blur-md rounded-sm shadow-md">
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold bg-gold/15 px-3.5 py-1.5 border border-gold/40 backdrop-blur-md rounded-sm shadow-md">
               <SunDisc size={14} variant="gold" />
               <span>{eyebrow}</span>
             </div>
 
             {badge && (
-              <span className="font-mono text-xs uppercase tracking-widest text-red-300 bg-red-950/70 border border-red-500/50 px-3.5 py-1.5 font-bold animate-pulse backdrop-blur-md rounded-sm shadow-md">
+              <span className="font-mono text-xs uppercase tracking-widest text-red-400 bg-red-950/70 border border-red-500/50 px-3.5 py-1.5 font-bold animate-pulse backdrop-blur-md rounded-sm shadow-md">
                 {badge}
               </span>
             )}
@@ -134,15 +134,15 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           {/* Headlines */}
           <div className="space-y-1 w-full">
             <h1
-              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-[#F0EBE0] drop-shadow-xl"
-              style={{ color: current?.headline1Color || '#F0EBE0' }}
+              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone drop-shadow-md"
+              style={{ color: current?.headline1Color || undefined }}
             >
               {headline1}
             </h1>
             {headline2 && (
               <h2
-                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-[#D4AF37] drop-shadow-xl"
-                style={{ color: current?.headline2Color || '#D4AF37' }}
+                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold drop-shadow-md"
+                style={{ color: current?.headline2Color || undefined }}
               >
                 {headline2}
               </h2>
@@ -151,30 +151,30 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
           {/* Subtitle / Description */}
           <p
-            className="font-space text-sm sm:text-base font-normal max-w-xl leading-relaxed text-[#F0EBE0]/95 drop-shadow-lg"
-            style={{ color: current?.subColor || '#F0EBE0' }}
+            className="font-space text-sm sm:text-base font-normal max-w-xl leading-relaxed text-bone/90 drop-shadow-sm"
+            style={{ color: current?.subColor || undefined }}
           >
             {sub}
           </p>
 
-          {/* Action Buttons: High Contrast Gold & Glass Styles */}
+          {/* Action Buttons: Glassmorphism Navbar Style */}
           <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
-            {/* Primary Action Button - Solid Gold */}
+            {/* Primary Action Button - Dynamic Gold */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              className="py-4 px-8 bg-[#D4AF37] hover:bg-[#E0B84C] text-[#0A0C16] font-bold border border-[#D4AF37] transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-4 px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
               {isRtl ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
             </button>
 
-            {/* Secondary Action Button - High Contrast Glass */}
+            {/* Secondary Action Button - Dynamic Frosted Glass */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              className="py-4 px-8 bg-black/60 hover:bg-[#14110F] border border-[#D4AF37]/50 hover:border-[#D4AF37] text-[#F0EBE0] hover:text-[#D4AF37] transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-4 px-8 bg-stone hover:bg-coal border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
             >
-              <Sparkles size={16} className="text-[#D4AF37]" />
+              <Sparkles size={16} className="text-gold" />
               <span>{secondaryBtnText}</span>
             </button>
           </div>
@@ -190,9 +190,8 @@ export const HeroSlider = ({ setSelectedCategory }) => {
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              style={currentSlide === idx ? { backgroundColor: '#E8A33D' } : { backgroundColor: '#28305F' }}
               className={`h-2 transition-all rounded-full shrink-0 ${
-                currentSlide === idx ? 'w-6' : 'w-2 hover:bg-ash'
+                currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-ash hover:bg-gold'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -221,7 +220,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       </div>
 
       {/* Micro Trust Bar Overlay with Strict Language Switching */}
-      <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/60 border-t border-r border-grave font-mono text-[11px] text-ash">
+      <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/80 border-t border-r border-grave font-mono text-[11px] text-ash">
         <span className="flex items-center gap-1.5">
           <ShieldCheck size={14} className="text-gold" />
           <span>{isAr ? 'ضمان سنة استبدال' : '1-YEAR WARRANTY'}</span>
