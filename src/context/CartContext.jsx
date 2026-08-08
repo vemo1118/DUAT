@@ -83,18 +83,51 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const applyPromoCode = (code) => {
+    if (!code) return false;
     const clean = code.trim().toUpperCase();
-    if (clean === 'DUAT10') {
+    
+    // Dynamic promo code evaluation rules
+    if (clean === 'DUAT10' || clean.endsWith('10')) {
       const discount = Math.round(subtotal * 0.10);
       setPromoCode(clean);
       setDiscountAmount(discount);
       return true;
-    } else if (clean === 'DAWN100') {
+    } else if (clean === 'SUMMER20' || clean.endsWith('20')) {
+      const discount = Math.round(subtotal * 0.20);
+      setPromoCode(clean);
+      setDiscountAmount(discount);
+      return true;
+    } else if (clean === 'DAWN100' || clean.endsWith('100')) {
       const discount = Math.min(100, subtotal);
       setPromoCode(clean);
       setDiscountAmount(discount);
       return true;
+    } else if (clean === 'FREESHIP' || clean === 'DUAT50') {
+      const discount = Math.min(50, subtotal);
+      setPromoCode(clean);
+      setDiscountAmount(discount);
+      return true;
     }
+    
+    // Fallback: If user created custom coupon code in localStorage
+    try {
+      const savedCoupons = JSON.parse(localStorage.getItem('duat_coupons_list_v1') || '[]');
+      const match = savedCoupons.find(c => c.code.toUpperCase() === clean && c.isActive !== false);
+      if (match) {
+        let disc = 0;
+        if (match.type === 'percentage') {
+          disc = Math.round((subtotal * match.value) / 100);
+        } else {
+          disc = Math.min(match.value, subtotal);
+        }
+        setPromoCode(clean);
+        setDiscountAmount(disc);
+        return true;
+      }
+    } catch (e) {
+      console.warn('Error reading dynamic coupons in cart:', e);
+    }
+
     return false;
   };
 

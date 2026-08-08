@@ -8,7 +8,7 @@ import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import { toPng } from 'html-to-image';
 import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
-import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2 } from 'lucide-react';
+import { Sparkles, Trash2, Upload, RefreshCw, Move, RotateCw, Maximize2, Undo2, Redo2 } from 'lucide-react';
 
 // Error Boundary Fallback for Customizer View
 class CustomizerErrorBoundary extends Component {
@@ -297,6 +297,63 @@ export const CustomizerContent = () => {
   const [layers, setLayers] = useState(defaultLayers);
   const [selectedLayerId, setSelectedLayerId] = useState(null);
 
+  // Undo / Redo History Stack
+  const [history, setHistory] = useState([defaultLayers]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  const updateLayersWithHistory = (newLayersOrFn) => {
+    setLayers((prevLayers) => {
+      const nextLayers = typeof newLayersOrFn === 'function' ? newLayersOrFn(prevLayers) : newLayersOrFn;
+      setHistory((prevHistory) => {
+        const sliced = prevHistory.slice(0, historyIndex + 1);
+        const updated = [...sliced, nextLayers];
+        if (updated.length > 25) updated.shift();
+        setHistoryIndex(updated.length - 1);
+        return updated;
+      });
+      return nextLayers;
+    });
+  };
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
+
+  const handleUndo = () => {
+    if (canUndo) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setLayers(history[newIndex] || []);
+    }
+  };
+
+  const handleRedo = () => {
+    if (canRedo) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setLayers(history[newIndex] || []);
+    }
+  };
+
+  // Keyboard shortcuts (Ctrl+Z / Cmd+Z for Undo, Ctrl+Y / Cmd+Shift+Z for Redo)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [historyIndex, history]);
+
   // Pre-select case finish and layers if navigated from Product Card or Modal
   useEffect(() => {
     const targetCaseId = location.state?.preselectedCaseTypeId || (
@@ -310,9 +367,15 @@ export const CustomizerContent = () => {
       if (match) setSelectedCaseType(match);
     }
     if (location.state?.presetLayers) {
-      setLayers(location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+      const newL = location.state.presetLayers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` }));
+      setLayers(newL);
+      setHistory([newL]);
+      setHistoryIndex(0);
     } else if (isBundle) {
-      setLayers(PRESET_TEMPLATES[0].layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+      const newL = PRESET_TEMPLATES[0].layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` }));
+      setLayers(newL);
+      setHistory([newL]);
+      setHistoryIndex(0);
     }
   }, [location.state]);
 
@@ -362,7 +425,7 @@ export const CustomizerContent = () => {
       scale: 1.0,
       rotation: 0
     };
-    setLayers((prev) => [...prev, newLayer]);
+    updateLayersWithHistory((prev) => [...prev, newLayer]);
     setSelectedLayerId(newLayer.id);
   };
 
@@ -380,7 +443,7 @@ export const CustomizerContent = () => {
       scale: 1.0,
       rotation: 0
     };
-    setLayers((prev) => [...prev, newLayer]);
+    updateLayersWithHistory((prev) => [...prev, newLayer]);
     setSelectedLayerId(newLayer.id);
     setCustomText('');
   };
@@ -399,7 +462,7 @@ export const CustomizerContent = () => {
         scale: 1.0,
         rotation: 0
       };
-      setLayers((prev) => [...prev, newLayer]);
+      updateLayersWithHistory((prev) => [...prev, newLayer]);
       setSelectedLayerId(newLayer.id);
     };
     reader.readAsDataURL(file);
@@ -408,19 +471,20 @@ export const CustomizerContent = () => {
   const handleLoadPreset = (preset) => {
     const caseType = CASE_TYPES.find((c) => c.id === preset.caseTypeId) || CASE_TYPES[0];
     setSelectedCaseType(caseType);
-    setLayers(preset.layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` })));
+    const newL = preset.layers.map((l) => ({ ...l, id: `preset-${l.id}-${Date.now()}` }));
+    updateLayersWithHistory(newL);
     setSelectedLayerId(null);
     showToast(t('presetLoadedToast'), 'success');
   };
 
   const handleRemoveLayer = (id, e) => {
     e?.stopPropagation();
-    setLayers((prev) => prev.filter((l) => l.id !== id));
+    updateLayersWithHistory((prev) => prev.filter((l) => l.id !== id));
     if (selectedLayerId === id) setSelectedLayerId(null);
   };
 
   const handleLayerTransform = (id, field, value) => {
-    setLayers((prev) =>
+    updateLayersWithHistory((prev) =>
       prev.map((l) => (l.id === id ? { ...l, [field]: value } : l))
     );
   };
@@ -854,6 +918,52 @@ export const CustomizerContent = () => {
 
           <div className="font-mono text-xs text-ash text-center uppercase tracking-widest font-medium">
             {currentModelName} · {selectedCaseType?.nameEn}
+          </div>
+
+          {/* Canvas Undo/Redo & History Toolbar */}
+          <div className="flex items-center justify-between w-full max-w-sm gap-2">
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className={`p-2.5 rounded border font-mono text-xs flex items-center gap-1.5 transition-all ${
+                  canUndo
+                    ? 'bg-stone border-grave text-bone hover:border-gold hover:text-gold cursor-pointer'
+                    : 'bg-stone/50 border-grave/40 text-ash/30 cursor-not-allowed'
+                }`}
+                title={lang === 'ar' ? 'تراجع (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
+              >
+                <Undo2 size={16} />
+                <span className="text-xs">{lang === 'ar' ? 'تراجع' : 'Undo'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className={`p-2.5 rounded border font-mono text-xs flex items-center gap-1.5 transition-all ${
+                  canRedo
+                    ? 'bg-stone border-grave text-bone hover:border-gold hover:text-gold cursor-pointer'
+                    : 'bg-stone/50 border-grave/40 text-ash/30 cursor-not-allowed'
+                }`}
+                title={lang === 'ar' ? 'إعادة (Ctrl+Y)' : 'Redo (Ctrl+Y)'}
+              >
+                <Redo2 size={16} />
+                <span className="text-xs">{lang === 'ar' ? 'إعادة' : 'Redo'}</span>
+              </button>
+            </div>
+
+            {layers.length > 0 && (
+              <button
+                type="button"
+                onClick={() => updateLayersWithHistory([])}
+                className="p-2.5 rounded border border-red-900/40 bg-red-950/20 text-red-400 hover:bg-red-900/30 text-xs font-mono flex items-center gap-1.5 transition-all"
+              >
+                <Trash2 size={14} />
+                <span className="text-xs">{lang === 'ar' ? 'مسح الكل' : 'Clear All'}</span>
+              </button>
+            )}
           </div>
 
           <button

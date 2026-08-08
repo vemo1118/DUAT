@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
 import { SunDisc } from './SunDisc';
-import { ShoppingBag, Menu, X, Globe, Truck, Sun, Moon } from 'lucide-react';
+import { ShoppingBag, Menu, X, Globe, Truck, Sun, Moon, Heart } from 'lucide-react';
 
 export const Navbar = ({ onOpenTracker }) => {
   const { lang, toggleLanguage, t } = useLanguage();
   const { totalItems, toggleCart } = useCart();
+  const { wishlistCount, toggleWishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -103,6 +105,21 @@ export const Navbar = ({ onOpenTracker }) => {
               <span className={lang === 'en' ? 'font-arabic font-bold text-xs tracking-normal' : 'font-mono text-xs'}>
                 {lang === 'en' ? 'عربي' : 'EN'}
               </span>
+            </button>
+
+            {/* Wishlist Icon Trigger */}
+            <button
+              onClick={toggleWishlist}
+              className="relative p-2.5 text-bone hover:text-gold transition-colors border border-grave bg-stone hover:border-gold flex items-center justify-center min-h-[44px] min-w-[44px]"
+              aria-label="Open Wishlist"
+              title={lang === 'ar' ? 'المفضلة' : 'Wishlist'}
+            >
+              <Heart size={18} className={wishlistCount > 0 ? 'text-gold fill-gold/20' : ''} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-gold text-[#050505] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-stone shadow-sm">
+                  {wishlistCount}
+                </span>
+              )}
             </button>
 
             {/* Cart Icon Trigger */}

@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useOrders } from '../context/OrdersContext';
 import { supabase } from '../lib/supabase';
 import { SunDisc } from '../components/SunDisc';
+import { OrderInvoiceModal } from '../components/OrderInvoiceModal';
 import { Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2 } from 'lucide-react';
 
 export const OrderTrackerView = () => {
@@ -12,6 +13,7 @@ export const OrderTrackerView = () => {
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   const statusToStep = (status) => {
     switch (status) {
@@ -213,10 +215,37 @@ export const OrderTrackerView = () => {
                 );
               })}
             </div>
+
+            {/* Action Buttons: Invoice View & WhatsApp Customer Support */}
+            <div className="pt-6 border-t border-grave flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => setIsInvoiceOpen(true)}
+                className="btn-primary py-3 px-6 text-xs font-mono flex items-center justify-center gap-2 flex-1"
+              >
+                <ShieldCheck size={16} />
+                <span>{lang === 'ar' ? 'عرض وطباعة الفاتورة الرسمية' : 'View & Print Invoice'}</span>
+              </button>
+
+              <a
+                href={`https://wa.me/201012345678?text=${encodeURIComponent(`أهلاً خدمة عملاء دوات، أود الاستفسار عن طلبي رقم: ${trackedResult.code}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-3 px-6 border border-emerald-500/50 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-900/40 text-xs font-mono flex items-center justify-center gap-2 transition-colors flex-1"
+              >
+                <span>💬 {lang === 'ar' ? 'محادثة الدعم على واتساب' : 'Chat Support on WhatsApp'}</span>
+              </a>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Invoice Receipt Modal */}
+      <OrderInvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        order={trackedResult?.rawOrder || { id: trackedResult?.code, ref: trackedResult?.code, customer: { fullName: trackedResult?.customerName }, items: trackedResult?.items, total: 0 }}
+      />
     </div>
   );
 };

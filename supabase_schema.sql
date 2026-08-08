@@ -39,13 +39,22 @@ ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT t
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow public all access on products" ON public.products;
-CREATE POLICY "Allow public all access on products"
-  ON public.products FOR ALL
+DROP POLICY IF EXISTS "Allow public read products" ON public.products;
+DROP POLICY IF EXISTS "Allow authenticated modify products" ON public.products;
+
+CREATE POLICY "Allow public read products"
+  ON public.products FOR SELECT
   TO anon, authenticated
+  USING (true);
+
+CREATE POLICY "Allow authenticated modify products"
+  ON public.products FOR ALL
+  TO authenticated
   USING (true)
   WITH CHECK (true);
 
-GRANT ALL ON public.products TO anon, authenticated;
+GRANT SELECT ON public.products TO anon;
+GRANT ALL ON public.products TO authenticated;
 
 
 -- ---------------------------------------------------------------------
@@ -73,13 +82,28 @@ ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_proof_path TEXT;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow public all access on orders" ON public.orders;
-CREATE POLICY "Allow public all access on orders"
-  ON public.orders FOR ALL
+DROP POLICY IF EXISTS "Allow public insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow public read own order" ON public.orders;
+DROP POLICY IF EXISTS "Allow authenticated full orders" ON public.orders;
+
+CREATE POLICY "Allow public insert orders"
+  ON public.orders FOR INSERT
   TO anon, authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Allow public read own order"
+  ON public.orders FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+CREATE POLICY "Allow authenticated full orders"
+  ON public.orders FOR ALL
+  TO authenticated
   USING (true)
   WITH CHECK (true);
 
-GRANT ALL ON public.orders TO anon, authenticated;
+GRANT INSERT, SELECT ON public.orders TO anon;
+GRANT ALL ON public.orders TO authenticated;
 
 
 -- ---------------------------------------------------------------------
@@ -118,13 +142,22 @@ ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 1
 ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow public all access on hero_slides" ON public.hero_slides;
-CREATE POLICY "Allow public all access on hero_slides"
-  ON public.hero_slides FOR ALL
+DROP POLICY IF EXISTS "Allow public read hero_slides" ON public.hero_slides;
+DROP POLICY IF EXISTS "Allow authenticated modify hero_slides" ON public.hero_slides;
+
+CREATE POLICY "Allow public read hero_slides"
+  ON public.hero_slides FOR SELECT
   TO anon, authenticated
+  USING (true);
+
+CREATE POLICY "Allow authenticated modify hero_slides"
+  ON public.hero_slides FOR ALL
+  TO authenticated
   USING (true)
   WITH CHECK (true);
 
-GRANT ALL ON public.hero_slides TO anon, authenticated;
+GRANT SELECT ON public.hero_slides TO anon;
+GRANT ALL ON public.hero_slides TO authenticated;
 
 
 -- ---------------------------------------------------------------------

@@ -48,7 +48,11 @@ import {
   FileSpreadsheet,
   Bell,
   Save,
-  Download
+  Download,
+  TrendingUp,
+  BarChart2,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import { SunDisc } from '../components/SunDisc';
 import {
@@ -217,6 +221,62 @@ export function AdminView() {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [signedProofUrl, setSignedProofUrl] = useState(null);
+
+  // Coupons Tab State
+  const [adminCoupons, setAdminCoupons] = useState(() => {
+    try {
+      const saved = localStorage.getItem('duat_coupons_list_v1');
+      return saved ? JSON.parse(saved) : [
+        { code: 'DUAT10', type: 'percentage', value: 10, isActive: true, description: 'خصم ١٠٪ على جميع المنتجات' },
+        { code: 'DAWN100', type: 'fixed', value: 100, isActive: true, description: 'خصم ١٠٠ ج.م ثابت' },
+        { code: 'SUMMER20', type: 'percentage', value: 20, isActive: true, description: 'خصم الصيف ٢٠٪' }
+      ];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponType, setNewCouponType] = useState('percentage');
+  const [newCouponValue, setNewCouponValue] = useState(10);
+  const [newCouponDesc, setNewCouponDesc] = useState('');
+
+  const saveAdminCoupons = (updated) => {
+    setAdminCoupons(updated);
+    try {
+      localStorage.setItem('duat_coupons_list_v1', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Error saving admin coupons:', e);
+    }
+  };
+
+  const handleAddCoupon = (e) => {
+    e.preventDefault();
+    if (!newCouponCode.trim()) return;
+    const codeClean = newCouponCode.trim().toUpperCase();
+    if (adminCoupons.some(c => c.code === codeClean)) {
+      showToast('كود الخصم موجود بالفعل!', 'error');
+      return;
+    }
+    const updated = [
+      ...adminCoupons,
+      { code: codeClean, type: newCouponType, value: Number(newCouponValue), isActive: true, description: newCouponDesc.trim() || `خصم ${newCouponValue}${newCouponType === 'percentage' ? '%' : ' ج.م'}` }
+    ];
+    saveAdminCoupons(updated);
+    setNewCouponCode('');
+    setNewCouponDesc('');
+    showToast('تمت إضافة كود الخصم بنجاح 🎉', 'success');
+  };
+
+  const handleToggleCoupon = (code) => {
+    const updated = adminCoupons.map(c => c.code === code ? { ...c, isActive: !c.isActive } : c);
+    saveAdminCoupons(updated);
+  };
+
+  const handleDeleteCoupon = (code) => {
+    const updated = adminCoupons.filter(c => c.code !== code);
+    saveAdminCoupons(updated);
+    showToast('تم حذف كود الخصم', 'info');
+  };
 
   useEffect(() => {
     let active = true;
@@ -489,6 +549,16 @@ export function AdminView() {
     );
   }
 
+  // Calculated Sales Analytics Metrics
+  const safeOrdersList = Array.isArray(orders) ? orders : [];
+  const analyticsRevenue = safeOrdersList.reduce((sum, ord) => sum + Number(ord.total || ord.totalPrice || 0), 0);
+  const placedOrdersCount = safeOrdersList.filter((o) => (o.status || 'placed') === 'placed').length;
+  const forgeOrdersCount = safeOrdersList.filter((o) => o.status === 'forge').length;
+  const analyticsShippedCount = safeOrdersList.filter((o) => o.status === 'shipped').length;
+  const deliveredOrdersCount = safeOrdersList.filter((o) => o.status === 'delivered').length;
+  const activeOrdersCount = placedOrdersCount + forgeOrdersCount;
+  const avgOrderValue = safeOrdersList.length > 0 ? analyticsRevenue / safeOrdersList.length : 0;
+
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
       {/* HEADER TITLE & MAIN TABS */}
@@ -559,6 +629,18 @@ export function AdminView() {
             </button>
 
             <button
+              onClick={() => setActiveTab('coupons')}
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+                activeTab === 'coupons'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
+            >
+              <DollarSign size={16} />
+              <span>أكواد الخصم والكوبونات 🏷️</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('builder')}
               className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
                 activeTab === 'builder'
@@ -578,6 +660,75 @@ export function AdminView() {
           >
             <LogOut size={16} />
           </button>
+        </div>
+      </div>
+
+      {/* EXECUTIVE ANALYTICS STATS OVERVIEW WIDGET */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Revenue Card */}
+        <div className="bg-stone border border-grave p-5 rounded-lg space-y-2 card-depth-highlight relative overflow-hidden">
+          <div className="flex items-center justify-between text-ash">
+            <span className="font-mono text-xs uppercase tracking-wider">إجمالي المبيعات</span>
+            <div className="p-2 rounded bg-gold/10 text-gold">
+              <DollarSign size={18} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="font-clash text-2xl sm:text-3xl font-bold text-bone">{analyticsRevenue.toLocaleString()}</span>
+            <span className="font-mono text-xs text-gold">ج.م</span>
+          </div>
+          <p className="font-mono text-[10px] text-ash/80">من إجمالي {orders.length} طلبات مسجلة</p>
+          <div className="absolute right-0 bottom-0 w-24 h-24 bg-gold/5 rounded-full blur-2xl pointer-events-none" />
+        </div>
+
+        {/* Total Orders & Active Fulfillment */}
+        <div className="bg-stone border border-grave p-5 rounded-lg space-y-2 card-depth-highlight relative overflow-hidden">
+          <div className="flex items-center justify-between text-ash">
+            <span className="font-mono text-xs uppercase tracking-wider">الطلبات النشطة (Forge/Placed)</span>
+            <div className="p-2 rounded bg-amber-500/10 text-amber-400">
+              <Clock size={18} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="font-clash text-2xl sm:text-3xl font-bold text-amber-400">{activeOrdersCount}</span>
+            <span className="font-mono text-xs text-ash">طلب قيد المعالجة والتصنيع</span>
+          </div>
+          <div className="w-full bg-coal h-1.5 rounded-full overflow-hidden mt-1 flex">
+            <div style={{ width: `${(placedOrdersCount / Math.max(1, orders.length)) * 100}%` }} className="bg-amber-500 h-full" title="جديدة (Placed)" />
+            <div style={{ width: `${(forgeOrdersCount / Math.max(1, orders.length)) * 100}%` }} className="bg-blue-500 h-full" title="قيد التقفيل (Forge)" />
+            <div style={{ width: `${(analyticsShippedCount / Math.max(1, orders.length)) * 100}%` }} className="bg-purple-500 h-full" title="تم الشحن (Shipped)" />
+            <div style={{ width: `${(deliveredOrdersCount / Math.max(1, orders.length)) * 100}%` }} className="bg-emerald-500 h-full" title="تم التوصيل (Delivered)" />
+          </div>
+        </div>
+
+        {/* Average Order Value (AOV) */}
+        <div className="bg-stone border border-grave p-5 rounded-lg space-y-2 card-depth-highlight relative overflow-hidden">
+          <div className="flex items-center justify-between text-ash">
+            <span className="font-mono text-xs uppercase tracking-wider">متوسط قيمة السلة (AOV)</span>
+            <div className="p-2 rounded bg-blue-500/10 text-blue-400">
+              <TrendingUp size={18} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="font-clash text-2xl sm:text-3xl font-bold text-bone">{Math.round(avgOrderValue).toLocaleString()}</span>
+            <span className="font-mono text-xs text-blue-400">ج.م / طلب</span>
+          </div>
+          <p className="font-mono text-[10px] text-ash/80">معدل إنفاق العميل للطلب الواحد</p>
+        </div>
+
+        {/* Completed Deliveries */}
+        <div className="bg-stone border border-grave p-5 rounded-lg space-y-2 card-depth-highlight relative overflow-hidden">
+          <div className="flex items-center justify-between text-ash">
+            <span className="font-mono text-xs uppercase tracking-wider">الطلبات المسلمة بنجاح</span>
+            <div className="p-2 rounded bg-emerald-500/10 text-emerald-400">
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="font-clash text-2xl sm:text-3xl font-bold text-emerald-400">{deliveredOrdersCount}</span>
+            <span className="font-mono text-xs text-ash">طلب مكتمل</span>
+          </div>
+          <p className="font-mono text-[10px] text-ash/80">نسبة الإنجاز: {Math.round((deliveredOrdersCount / Math.max(1, orders.length)) * 100)}%</p>
         </div>
       </div>
 
@@ -1686,6 +1837,112 @@ export function AdminView() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 5: COUPONS & PROMOS MANAGEMENT */}
+      {/* ============================================================ */}
+      {activeTab === 'coupons' && (
+        <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
+          {/* Add New Coupon Form */}
+          <div className="bg-stone border border-grave p-6 rounded-lg space-y-4">
+            <h3 className="font-clash text-lg font-bold text-bone flex items-center gap-2">
+              <DollarSign className="text-gold" size={20} />
+              <span>إضافة كود خصم جديد (New Promo Coupon)</span>
+            </h3>
+
+            <form onSubmit={handleAddCoupon} className="grid grid-cols-1 sm:grid-cols-12 gap-4 font-mono text-xs">
+              <div className="sm:col-span-4">
+                <label className="block text-ash mb-1 uppercase">كود الخصم (Coupon Code)</label>
+                <input
+                  type="text"
+                  placeholder="مثال: DUAT20"
+                  value={newCouponCode}
+                  onChange={(e) => setNewCouponCode(e.target.value)}
+                  className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none uppercase"
+                  required
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="block text-ash mb-1 uppercase">نوع الخصم</label>
+                <select
+                  value={newCouponType}
+                  onChange={(e) => setNewCouponType(e.target.value)}
+                  className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                >
+                  <option value="percentage">نسبة مئوية (%)</option>
+                  <option value="fixed">مبلغ ثابت (ج.م)</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="block text-ash mb-1 uppercase">القيمة (Value)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={newCouponValue}
+                  onChange={(e) => setNewCouponValue(e.target.value)}
+                  className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                  required
+                />
+              </div>
+
+              <div className="sm:col-span-2 flex items-end">
+                <button
+                  type="submit"
+                  className="btn-primary w-full py-2.5 font-mono text-xs uppercase tracking-wider min-h-[42px]"
+                >
+                  إضافة الكوبون
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Active Coupons List */}
+          <div className="bg-stone border border-grave p-6 rounded-lg space-y-4">
+            <h3 className="font-clash text-lg font-bold text-bone">قائمة الكوبونات النشطة ({adminCoupons.length})</h3>
+
+            <div className="space-y-3">
+              {adminCoupons.map((coupon) => (
+                <div
+                  key={coupon.code}
+                  className="p-4 bg-coal border border-grave flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 rounded"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-base font-bold text-gold tracking-wider">{coupon.code}</span>
+                      <span className={`px-2 py-0.5 text-[10px] font-mono rounded ${coupon.isActive ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40' : 'bg-red-950 text-red-400 border border-red-500/40'}`}>
+                        {coupon.isActive ? 'مفعل' : 'معطل'}
+                      </span>
+                    </div>
+                    <p className="font-mono text-xs text-ash">{coupon.description || `خصم ${coupon.value}${coupon.type === 'percentage' ? '%' : ' ج.م'}`}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleCoupon(coupon.code)}
+                      className={`px-3 py-1.5 font-mono text-xs border rounded transition-colors ${
+                        coupon.isActive ? 'border-amber-500/40 text-amber-400 hover:bg-amber-950/30' : 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-950/30'
+                      }`}
+                    >
+                      {coupon.isActive ? 'إيقاف' : 'تفعيل'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCoupon(coupon.code)}
+                      className="p-1.5 border border-red-900/40 text-red-400 hover:bg-red-950/30 rounded transition-colors"
+                      title="حذف الكوبون"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

@@ -2,16 +2,28 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
-import { ShoppingBag, Check, Sparkles, Star } from 'lucide-react';
+import { ShoppingBag, Check, Sparkles, Star, Heart } from 'lucide-react';
 import { CaseGraphic } from './CaseGraphic';
 
 export const ProductCard = ({ product, onSelectProduct }) => {
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlistItem } = useWishlist();
   const { showToast } = useToast();
   const [added, setAdded] = useState(false);
   const navigate = useNavigate();
+
+  const isLiked = isInWishlist(product?.id);
+
+  const handleToggleWishlist = (e) => {
+    e?.stopPropagation();
+    toggleWishlistItem(product);
+    if (!isLiked) {
+      showToast(lang === 'ar' ? 'تمت الإضافة للمفضلة ❤️' : 'Saved to Wishlist ❤️', 'success');
+    }
+  };
 
   const handleAdd = (e) => {
     e?.stopPropagation();
@@ -121,18 +133,32 @@ export const ProductCard = ({ product, onSelectProduct }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-stone/90 via-transparent to-transparent pointer-events-none" />
 
         {/* Top Badges Bar */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10 pointer-events-none">
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10">
           {tag ? (
-            <div className="bg-void/85 backdrop-blur-sm border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest truncate">
+            <div className="bg-void/85 backdrop-blur-sm border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest truncate pointer-events-none">
               {tag}
             </div>
-          ) : <div />}
-
-          {craftTag && (
-            <div className="bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider flex-shrink-0 ml-auto">
+          ) : craftTag ? (
+            <div className="bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider shrink-0 pointer-events-none">
               CRAFT
             </div>
+          ) : (
+            <div />
           )}
+
+          {/* Wishlist Heart Toggle Button */}
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            className={`p-2 rounded-full border backdrop-blur-md transition-all duration-300 pointer-events-auto shrink-0 shadow-lg ${
+              isLiked
+                ? 'bg-gold border-gold text-[#0A0C16] scale-110'
+                : 'bg-void/70 border-grave text-bone hover:border-gold hover:text-gold'
+            }`}
+            title={isLiked ? (lang === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (lang === 'ar' ? 'إضافة للمفضلة' : 'Save to wishlist')}
+          >
+            <Heart size={14} className={isLiked ? 'fill-current' : ''} />
+          </button>
         </div>
       </div>
 

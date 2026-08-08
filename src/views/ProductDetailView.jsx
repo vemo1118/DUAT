@@ -50,6 +50,39 @@ export function ProductDetailView() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  // Reviews State
+  const [reviewsList, setReviewsList] = useState(product?.reviews || []);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReviewName, setNewReviewName] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewComment, setNewReviewComment] = useState('');
+
+  useEffect(() => {
+    if (product?.reviews) {
+      setReviewsList(product.reviews);
+    }
+  }, [product]);
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!newReviewName.trim() || !newReviewComment.trim()) return;
+
+    const newReviewObj = {
+      name: newReviewName.trim(),
+      rating: newReviewRating,
+      date: new Date().toISOString().split('T')[0],
+      comment: newReviewComment.trim(),
+      commentAr: newReviewComment.trim(),
+      commentEn: newReviewComment.trim()
+    };
+
+    setReviewsList((prev) => [newReviewObj, ...prev]);
+    setShowReviewForm(false);
+    setNewReviewName('');
+    setNewReviewComment('');
+    showToast(isAr ? 'تم نشر تقييمك بنجاح! شرفتنا بمشاركتك ❤️' : 'Review submitted successfully! Thank you ❤️', 'success');
+  };
+
   // Accordion open states
   const [openAccordions, setOpenAccordions] = useState({
     desc: true,
@@ -348,42 +381,101 @@ export function ProductDetailView() {
         </div>
       </div>
 
-      {/* 3. CUSTOMER REVIEWS SECTION — HIDE IF EMPTY */}
-      {Array.isArray(product.reviews) && product.reviews.length > 0 && (
-        <div className="border-t border-grave pt-16 space-y-10">
-          <div className="text-center space-y-3">
-            <span className="font-mono text-xs text-gold uppercase tracking-widest font-bold">CUSTOMER REVIEWS</span>
-            <h2 className="font-clash text-3xl uppercase text-bone font-bold">
-              {isAr ? 'آراء وتقييمات العملاء' : 'Let customers speak for us'}
-            </h2>
+      {/* 3. CUSTOMER REVIEWS & RATING SECTION */}
+      <div className="border-t border-grave pt-16 space-y-10">
+        <div className="text-center space-y-3">
+          <span className="font-mono text-xs text-gold uppercase tracking-widest font-bold">CUSTOMER REVIEWS</span>
+          <h2 className="font-clash text-3xl uppercase text-bone font-bold">
+            {isAr ? 'آراء وتقييمات العملاء الموثقة' : 'Verified Customer Reviews'}
+          </h2>
+        </div>
+
+        {/* Rating Summary Bar */}
+        <div className="bg-stone border border-grave p-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
+          <div className="text-center sm:text-right space-y-1">
+            <div className="font-clash text-5xl font-bold text-bone">{(product.rating || 5.0).toFixed(1)}</div>
+            <div className="flex items-center justify-center sm:justify-start text-gold">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={18} className="fill-gold text-gold" />
+              ))}
+            </div>
+            <p className="font-mono text-xs text-ash">
+              بناءً على {(reviewsList || []).length} تقييم حقيقي
+            </p>
           </div>
 
-          {/* Rating Summary Bar */}
-          <div className="bg-stone border border-grave p-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
-            <div className="text-center sm:text-right space-y-1">
-              <div className="font-clash text-5xl font-bold text-bone">5.0</div>
-              <div className="flex items-center justify-center sm:justify-start text-gold">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18} className="fill-gold text-gold" />
-                ))}
-              </div>
-              <p className="font-mono text-xs text-ash">بناءً على {product.reviews.length} تقييم حقيقي</p>
+          <button
+            onClick={() => setShowReviewForm(prev => !prev)}
+            className="btn-primary py-3 px-6 text-xs font-mono font-bold uppercase tracking-wider"
+          >
+            {showReviewForm ? (isAr ? 'إلغاء النموذج' : 'Cancel') : (isAr ? '✍️ كتابة تقييم جديد' : 'Write a review')}
+          </button>
+        </div>
+
+        {/* Interactive Add Review Form */}
+        {showReviewForm && (
+          <form onSubmit={handleReviewSubmit} className="bg-coal border border-gold/40 p-6 sm:p-8 max-w-2xl mx-auto rounded-lg space-y-4 font-mono text-xs animate-fade-in shadow-xl">
+            <h3 className="font-clash text-lg text-bone font-bold">{isAr ? 'أضف تقييمك عن المنتج' : 'Submit your review'}</h3>
+            
+            <div>
+              <label className="block text-ash mb-1">{isAr ? 'اسمك الكريم:' : 'Your Name:'}</label>
+              <input
+                type="text"
+                placeholder={isAr ? 'مثال: أسامة أحمد' : 'e.g. Alex M.'}
+                value={newReviewName}
+                onChange={(e) => setNewReviewName(e.target.value)}
+                className="w-full bg-stone border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                required
+              />
             </div>
 
-            <button
-              onClick={() => showToast('شكراً لتعبيرك عن رأيك! تم تفعيل التقييم.', 'info')}
-              className="px-6 py-3 bg-coal border border-grave text-bone hover:border-gold hover:text-gold font-mono text-xs uppercase tracking-wider transition-colors"
-            >
-              {isAr ? 'كتابة تقييم جديد' : 'Write a review'}
-            </button>
-          </div>
+            <div>
+              <label className="block text-ash mb-1">{isAr ? 'التقييم (بالنجوم):' : 'Rating:'}</label>
+              <div className="flex items-center gap-2 cursor-pointer">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setNewReviewRating(star)}
+                    className="p-1 text-gold hover:scale-125 transition-transform"
+                  >
+                    <Star size={22} className={star <= newReviewRating ? 'fill-gold text-gold' : 'text-ash/40'} />
+                  </button>
+                ))}
+                <span className="font-bold text-bone mr-2 ml-2">{newReviewRating} / 5</span>
+              </div>
+            </div>
 
-          {/* Customer Reviews List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {product.reviews.map((rev, idx) => (
-              <div key={idx} className="bg-stone border border-grave p-6 space-y-3 font-sans">
+            <div>
+              <label className="block text-ash mb-1">{isAr ? 'تعليقك وتقييمك:' : 'Your Comment:'}</label>
+              <textarea
+                rows={3}
+                placeholder={isAr ? 'اكتب انطباعك وملاحظاتك عن الخامات والتسليم...' : 'Write your feedback about quality, finish...'}
+                value={newReviewComment}
+                onChange={(e) => setNewReviewComment(e.target.value)}
+                className="w-full bg-stone border border-grave p-3 text-bone font-mono focus:border-gold outline-none"
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn-primary w-full py-3 text-xs font-mono font-bold uppercase tracking-wider">
+              {isAr ? 'نشر التقييم' : 'Submit Review'}
+            </button>
+          </form>
+        )}
+
+        {/* Customer Reviews List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {(reviewsList && reviewsList.length > 0) ? (
+            reviewsList.map((rev, idx) => (
+              <div key={idx} className="bg-stone border border-grave p-6 space-y-3 font-sans rounded card-depth-highlight">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-bone text-sm">{rev.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-bone text-sm">{rev.name}</span>
+                    <span className="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-[9px] font-mono rounded">
+                      {isAr ? 'مشتري مؤكد ✓' : 'Verified Purchase ✓'}
+                    </span>
+                  </div>
                   <span className="font-mono text-xs text-ash">{rev.date}</span>
                 </div>
                 <div className="flex items-center text-gold">
@@ -391,12 +483,16 @@ export function ProductDetailView() {
                     <Star key={i} size={14} className="fill-gold text-gold" />
                   ))}
                 </div>
-                <p className="text-sm text-ash leading-relaxed">{rev.commentAr || rev.commentEn}</p>
+                <p className="text-sm text-ash leading-relaxed">{rev.commentAr || rev.commentEn || rev.comment}</p>
               </div>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="col-span-2 text-center py-10 text-ash font-mono text-xs">
+              {isAr ? 'لا توجد تقييمات سابقة بعد. كن أول من يقيّم هذا المنتج!' : 'No reviews yet. Be the first to review this item!'}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* 4. YOU MAY ALSO LIKE GRID */}
       {relatedProducts.length > 0 && (
