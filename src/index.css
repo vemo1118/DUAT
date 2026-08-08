@@ -85,40 +85,18 @@ html[data-theme="dawn"] body {
   min-height: 100vh;
 }
 
-/* Dawn Mode Class Overrides for High Contrast (excluding hero section) */
-html[data-theme="dawn"] :not(.hero-section) .text-bone,
-html[data-theme="dawn"] body:not(.hero-section) h1,
-html[data-theme="dawn"] body:not(.hero-section) h2,
-html[data-theme="dawn"] body:not(.hero-section) h3,
-html[data-theme="dawn"] body:not(.hero-section) h4,
-html[data-theme="dawn"] body:not(.hero-section) p {
+/* Dawn Mode Class Overrides for High Contrast */
+html[data-theme="dawn"] .text-bone,
+html[data-theme="dawn"] h1,
+html[data-theme="dawn"] h2,
+html[data-theme="dawn"] h3,
+html[data-theme="dawn"] h4,
+html[data-theme="dawn"] p {
   color: #1A1714;
 }
 
-/* Hero Section Text Color Protection across all Themes (especially Dawn Mode) */
-.hero-section h1:not([style*="color"]),
-.hero-section .text-bone:not([style*="color"]),
-html[data-theme="dawn"] .hero-section h1:not([style*="color"]),
-html[data-theme="dawn"] .hero-section .text-bone:not([style*="color"]) {
-  color: #EDE4D3;
-}
-
-.hero-section h2:not([style*="color"]),
-.hero-section .text-gold:not([style*="color"]),
-html[data-theme="dawn"] .hero-section h2:not([style*="color"]),
-html[data-theme="dawn"] .hero-section .text-gold:not([style*="color"]) {
-  color: #E8A33D;
-}
-
-.hero-section p:not([style*="color"]),
-.hero-section .text-ash:not([style*="color"]),
-html[data-theme="dawn"] .hero-section p:not([style*="color"]),
-html[data-theme="dawn"] .hero-section .text-ash:not([style*="color"]) {
-  color: #8E98BF;
-}
-
-html[data-theme="dawn"] :not(.hero-section) .text-ash {
-  color: #524C44 !important;
+html[data-theme="dawn"] .text-ash {
+  color: #524C44;
 }
 
 html[data-theme="dawn"] .bg-stone {
