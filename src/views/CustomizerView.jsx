@@ -233,7 +233,7 @@ export function generateCaseMockupSnapshot(canvasEl, layers = [], caseBgColor, c
             ctx.stroke();
           }
           ctx.fillStyle = fgColor && fgColor !== '#E8A33D' ? fgColor : '#141414';
-          ctx.font = 'bold 26px "Aref Ruqaa", serif';
+          ctx.font = 'bold 28px "Aref Ruqaa Ink", "Aref Ruqaa", "Katibeh", serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(char, 0, 2);

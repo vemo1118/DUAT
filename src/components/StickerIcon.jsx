@@ -55,8 +55,8 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
         <span
           className="font-ruqaa font-bold select-none leading-none transform translate-y-[-1px]"
           style={{
-            fontSize: `${Math.round(boxSize * 0.54)}px`,
-            fontFamily: "'Aref Ruqaa', serif",
+            fontSize: `${Math.round(boxSize * 0.58)}px`,
+            fontFamily: "'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', serif",
             textShadow: isTransparentBg ? 'none' : '0 1px 1px rgba(255,255,255,0.4)'
           }}
         >

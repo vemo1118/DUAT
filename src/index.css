@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .font-ruqaa {
-  font-family: 'Aref Ruqaa', serif;
+  font-family: 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', 'Rakkas', serif;
 }
 
 /* High contrast text selection fix */
