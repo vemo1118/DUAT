@@ -68,6 +68,50 @@ export const CategoryBannersProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // Load saved banners from Supabase on mount
+  useEffect(() => {
+    async function loadFromSupabase() {
+      try {
+        const { data: forgeData } = await supabase
+          .from('store_settings')
+          .select('value')
+          .eq('key', 'forge_banner')
+          .maybeSingle();
+
+        if (forgeData?.value && typeof forgeData.value === 'object') {
+          setForgeBanner((prev) => ({ ...prev, ...forgeData.value }));
+        }
+
+        const { data: catData } = await supabase
+          .from('category_banners')
+          .select('*');
+
+        if (Array.isArray(catData) && catData.length > 0) {
+          setCategoryBanners((prev) =>
+            prev.map((b) => {
+              const match = catData.find((dbRow) => dbRow.id === b.id);
+              if (match) {
+                return {
+                  ...b,
+                  imageUrl: match.image_url || b.imageUrl,
+                  nameEn: match.name_en || b.nameEn,
+                  nameAr: match.name_ar || b.nameAr,
+                  subtitleEn: match.subtitle_en || b.subtitleEn,
+                  subtitleAr: match.subtitle_ar || b.subtitleAr,
+                  is_active: match.is_active !== undefined ? match.is_active : b.is_active
+                };
+              }
+              return b;
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('Error loading banners from Supabase:', err);
+      }
+    }
+    loadFromSupabase();
+  }, []);
+
   // Sync categoryBanners to localStorage
   useEffect(() => {
     try {

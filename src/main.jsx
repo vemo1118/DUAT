@@ -19,12 +19,7 @@ class GlobalErrorBoundary extends Component {
   }
 
   handleReset = () => {
-    try {
-      localStorage.removeItem('duat_category_banners');
-      localStorage.removeItem('duat_forge_banner_v1');
-      sessionStorage.clear();
-    } catch (e) {}
-    window.location.href = window.location.origin + window.location.pathname + '?reset=' + Date.now();
+    window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
   };
 
   handleRetry = () => {
