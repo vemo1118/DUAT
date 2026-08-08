@@ -775,11 +775,11 @@ export const CustomizerContent = () => {
           <button
             type="button"
             onClick={() => setIsModelSelectorOpen(false)}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer ${
-              isNight ? 'bg-gold text-[#0A0C16] hover:bg-amber-400' : 'bg-stone-900 text-white hover:bg-black'
+            className={`px-5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer ${
+              isNight ? 'bg-gold text-[#0A0C16] hover:bg-amber-400 font-bold' : 'bg-stone-900 text-white hover:bg-black font-bold'
             }`}
           >
-            <Check size={14} />
+            <Check size={16} />
             <span>{lang === 'ar' ? 'حفظ وتأكيد ✓' : 'Done ✓'}</span>
           </button>
         </div>
@@ -792,12 +792,7 @@ export const CustomizerContent = () => {
             </label>
             <select
               value={selectedModel}
-              onChange={(e) => {
-                setSelectedModel(e.target.value);
-                if (e.target.value !== 'Other Device (Type model below 📱)') {
-                  setIsModelSelectorOpen(false);
-                }
-              }}
+              onChange={(e) => setSelectedModel(e.target.value)}
               className={`w-full p-3 rounded-xl font-sans text-xs font-semibold outline-none border min-h-[42px] cursor-pointer ${
                 isNight ? 'bg-[#14110F] border-stone-800 text-bone focus:border-gold' : 'bg-[#F8F7F4] border-stone-300 text-stone-900 focus:border-stone-900'
               }`}
@@ -839,14 +834,11 @@ export const CustomizerContent = () => {
                   <button
                     key={ct.id}
                     type="button"
-                    onClick={() => {
-                      setSelectedCaseType(ct);
-                      setIsModelSelectorOpen(false);
-                    }}
+                    onClick={() => setSelectedCaseType(ct)}
                     className={`px-3.5 py-2 border rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
                       active
-                        ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold shadow-md' : 'border-stone-900 bg-stone-900 text-white font-bold shadow-md')
-                        : (isNight ? 'border-stone-800 bg-[#14110F] text-bone hover:border-stone-600' : 'border-stone-300 bg-[#F8F7F4] text-stone-900 hover:border-stone-600 font-medium')
+                        ? (isNight ? 'border-gold bg-gold font-bold shadow-md' : 'border-stone-900 bg-stone-900 font-bold shadow-md')
+                        : (isNight ? 'border-stone-800 bg-[#14110F] hover:border-stone-600 font-medium' : 'border-stone-300 bg-[#F8F7F4] hover:border-stone-400 font-medium')
                     }`}
                   >
                     <div
@@ -854,7 +846,9 @@ export const CustomizerContent = () => {
                       style={{ backgroundColor: ct.color || '#FFFFFF' }}
                     />
                     <span className={`font-sans text-xs truncate ${
-                      active ? (isNight ? 'text-[#0A0C16] font-bold' : 'text-white font-bold') : (isNight ? 'text-bone' : 'text-stone-900')
+                      active
+                        ? (isNight ? 'text-[#0A0C16] font-bold' : 'text-white font-bold')
+                        : (isNight ? 'text-bone font-medium' : 'text-stone-900 font-semibold')
                     }`}>
                       {lang === 'ar' ? ct.nameAr : ct.nameEn}
                     </span>
@@ -1482,7 +1476,9 @@ export const CustomizerContent = () => {
               }`}
             >
               <span>📱</span>
-              <span>{displayModelBadgeText}</span>
+              <span className={`font-bold ${isModelSelectorOpen ? (isNight ? 'text-[#0A0C16]' : 'text-white') : (isNight ? 'text-gold' : 'text-stone-900')}`}>
+                {displayModelBadgeText}
+              </span>
               <span className="opacity-70 text-[10px]">✏️</span>
             </button>
 
@@ -1497,7 +1493,9 @@ export const CustomizerContent = () => {
               }`}
             >
               <span>🎨</span>
-              <span>{lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}</span>
+              <span className={`font-bold ${isModelSelectorOpen ? (isNight ? 'text-[#0A0C16]' : 'text-white') : (isNight ? 'text-bone' : 'text-stone-900')}`}>
+                {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
+              </span>
               <span className="opacity-70 text-[10px]">✏️</span>
             </button>
 
