@@ -15,19 +15,20 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
   const isArabicLetter = stickerId && (stickerId.startsWith('ar-letter-') || stickerId.startsWith('st-letter-'));
   const customImg = image || imageUrl;
 
-  // ── Synthetic 3D Epoxy Arabic Square Letter Domes ──────────────────
+  // ── Arabic Letter Square Dome ──────────────────────────────────────────────
   if (isArabicLetter) {
     const char = stickerId.replace(/^(ar-letter-|st-letter-)/, '');
-    const boxSize = forCanvas ? 64 : size;
+    // Same size for both panel and canvas for visual consistency
+    const boxSize = forCanvas ? 58 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = color || '#000000';
-
+    // Default: white background, navy text (as requested)
+    const finalTextColor = color || '#182744';
     const finalBg = isTransparentBg
       ? 'transparent'
       : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
           ? bgColor
-          : 'linear-gradient(145deg, #FFFFFF 0%, #F6F4ED 60%, #ECE8DD 100%)');
+          : '#FFFFFF');
 
     return (
       <div
@@ -43,7 +44,6 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
         }}
         className="rounded-2xl border flex items-center justify-center relative overflow-hidden select-none shrink-0 pointer-events-none transition-transform"
       >
-        {/* 3D Epoxy Glass Bevel Gloss */}
         {!isTransparentBg && (
           <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
@@ -54,7 +54,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
             fontFamily: "'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'Arsenica Arabic', 'IBM Plex Sans Arabic', serif",
             fontWeight: 800,
             color: finalTextColor,
-            textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.15)'
+            textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.12)'
           }}
         >
           {char}
@@ -63,20 +63,20 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     );
   }
 
-  // ── Synthetic 3D Epoxy English Serif Square Letter Domes ──────────────────
+  // ── English Letter Square Dome ──────────────────────────────────────────────
   const isEnglishLetter = stickerId && (stickerId.startsWith('en-letter-') || stickerId.startsWith('st-en-letter-'));
   if (isEnglishLetter) {
     const char = stickerId.replace(/^(en-letter-|st-en-letter-)/, '').toUpperCase();
-    const boxSize = forCanvas ? 64 : size;
+    const boxSize = forCanvas ? 58 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    const finalTextColor = color || '#FFFFFF';
-
+    // Default: white background, navy text (as requested)
+    const finalTextColor = color || '#182744';
     const finalBg = isTransparentBg
       ? 'transparent'
       : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
           ? bgColor
-          : 'linear-gradient(145deg, #182744 0%, #0D1629 60%, #070C18 100%)');
+          : '#FFFFFF');
 
     return (
       <div
@@ -87,23 +87,22 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           color: finalTextColor,
           boxShadow: isTransparentBg
             ? 'none'
-            : '0 8px 18px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.4)',
-          borderColor: isTransparentBg ? 'transparent' : 'rgba(55, 80, 125, 0.7)'
+            : '0 8px 18px rgba(0,0,0,0.22), inset 0 2px 4px rgba(255,255,255,1), inset 0 -2px 4px rgba(0,0,0,0.08)',
+          borderColor: isTransparentBg ? 'transparent' : 'rgba(210, 200, 182, 0.85)'
         }}
         className="rounded-2xl border flex items-center justify-center relative overflow-hidden select-none shrink-0 pointer-events-none transition-transform"
       >
-        {/* 3D Epoxy Glass Bevel Gloss */}
         {!isTransparentBg && (
-          <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
+          <div className="absolute top-1 left-2.5 right-2.5 h-1/2 bg-gradient-to-b from-white/90 to-transparent rounded-t-xl blur-[0.3px] pointer-events-none" />
         )}
         <span
           className="font-arsenica font-bold select-none leading-none tracking-tight transform translate-y-[-0.5px]"
           style={{
             fontSize: `${Math.round(boxSize * 0.54)}px`,
             fontFamily: "'Arsenica Arabic', 'Arsenica-Arabic-Demibold-TRIAL', 'Cinzel', serif",
-            fontWeight: 600,
+            fontWeight: 700,
             color: finalTextColor,
-            textShadow: isTransparentBg ? 'none' : '0 2px 4px rgba(0,0,0,0.6)'
+            textShadow: isTransparentBg ? 'none' : '0 0.5px 1px rgba(0,0,0,0.12)'
           }}
         >
           {char}
@@ -112,53 +111,46 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     );
   }
 
-  // ── Synthetic 3D Gregorian Year Badges ─────────────────────────────────────
+  // ── Year Badges — unified look for both panel and canvas ───────────────────
   const isYearBadge = stickerId && stickerId.startsWith('year-');
   if (isYearBadge) {
     const yearKey = stickerId.replace('year-', '');
     const is199x = yearKey === '199x';
-    const labelText = is199x ? 'Made in 199x' : `${yearKey}'s`;
-    
-    if (forCanvas) {
-      return (
-        <div
-          style={{
-            color: '#FFFFFF',
-            background: is199x
-              ? 'linear-gradient(135deg, #5C1D38 0%, #3B1023 100%)'
-              : 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
-            borderColor: is199x ? 'rgba(219,39,119,0.5)' : 'rgba(100,116,139,0.6)',
-            boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
-          }}
-          className={`${is199x ? 'rounded-full px-4 py-1.5' : 'rounded-2xl px-5 py-2'} border flex items-center justify-center font-bold font-sans text-xs sm:text-sm select-none pointer-events-none whitespace-nowrap shadow-lg`}
-        >
-          {labelText}
-        </div>
-      );
-    }
+
+    const pillBg = is199x
+      ? 'linear-gradient(145deg, #4A152E 0%, #2A0B1A 100%)'
+      : 'linear-gradient(145deg, #FFFFFF 0%, #F0EDEA 100%)';
+    const pillTextColor = is199x ? '#F9B8D0' : '#182744';
+    const pillBorderColor = is199x ? 'rgba(219,39,119,0.5)' : 'rgba(24,39,68,0.25)';
+    const badgeAccentColor = is199x ? '#F472B6' : '#E0A93B';
 
     return (
       <div
         style={{
-          background: is199x
-            ? 'linear-gradient(145deg, #4A152E 0%, #2A0B1A 100%)'
-            : 'linear-gradient(145deg, #1A2436 0%, #0E1726 100%)',
-          borderColor: is199x ? 'rgba(219,39,119,0.5)' : 'rgba(224, 169, 59, 0.4)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.2)'
+          background: pillBg,
+          borderColor: pillBorderColor,
+          boxShadow: '0 4px 14px rgba(0,0,0,0.28), inset 0 1px 3px rgba(255,255,255,0.4)',
+          minWidth: forCanvas ? 100 : 84,
         }}
-        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full max-w-[84px] sm:max-w-[94px]"
+        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full transition-transform"
       >
-        <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
+        <span
+          className="text-[7px] font-mono font-bold uppercase tracking-widest leading-none mb-0.5 opacity-90"
+          style={{ color: badgeAccentColor }}
+        >
           MADE IN
         </span>
-        <span className="font-sans font-bold text-[10px] sm:text-[11px] text-[#F0ECE1] leading-tight tracking-tight">
+        <span
+          className="font-serif italic font-bold text-[11px] leading-tight tracking-tight"
+          style={{ color: pillTextColor }}
+        >
           {is199x ? '199X' : `${yearKey}'s`}
         </span>
       </div>
     );
   }
 
-  // ── Synthetic 3D Month Badges ──────────────────────────────────────────────
+  // ── Month Badges — unified look for both panel and canvas ──────────────────
   const isMonthBadge = stickerId && stickerId.startsWith('month-');
   if (isMonthBadge) {
     if (customImg) {
@@ -192,35 +184,21 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const monthCode = stickerId.replace('month-', '');
     const monthFullName = monthMap[monthCode] || monthCode;
 
-    if (forCanvas) {
-      return (
-        <div
-          style={{
-            color: '#F0ECE1',
-            background: 'linear-gradient(135deg, #182744 0%, #0D1629 60%, #070C18 100%)',
-            borderColor: 'rgba(55, 80, 125, 0.7)',
-            boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
-          }}
-          className="rounded-full px-4 py-1.5 border flex items-center justify-center font-serif italic font-semibold text-xs sm:text-sm select-none pointer-events-none whitespace-nowrap shadow-lg"
-        >
-          Made In {monthFullName}
-        </div>
-      );
-    }
-
+    // Single unified style — white base with navy text, gold accent (matches the panel)
     return (
       <div
         style={{
-          background: 'linear-gradient(145deg, #1A2436 0%, #0E1726 60%, #070D18 100%)',
-          borderColor: 'rgba(224, 169, 59, 0.4)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.2)'
+          background: 'linear-gradient(145deg, #FFFFFF 0%, #F0EDEA 100%)',
+          borderColor: 'rgba(24,39,68,0.22)',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.22), inset 0 1px 3px rgba(255,255,255,0.8)',
+          minWidth: forCanvas ? 100 : 84,
         }}
-        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full max-w-[84px] sm:max-w-[94px] transition-transform"
+        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full transition-transform"
       >
-        <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
+        <span className="text-[7px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
           MADE IN
         </span>
-        <span className="font-serif italic font-bold text-[10px] sm:text-[11px] text-[#F0ECE1] leading-tight tracking-tight truncate max-w-full text-center">
+        <span className="font-serif italic font-bold text-[11px] text-[#182744] leading-tight tracking-tight truncate max-w-full text-center">
           {monthFullName}
         </span>
       </div>

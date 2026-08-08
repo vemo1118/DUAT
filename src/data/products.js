@@ -215,6 +215,119 @@ export const PRODUCTS = [
   }
 ];
 
+
+// ── Arabic Letter Sticker Products ──────────────────────────────────────────
+const ARABIC_LETTERS_CHARS = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','هـ','و','ي'];
+export const ARABIC_LETTER_PRODUCTS = ARABIC_LETTERS_CHARS.map((char) => ({
+  id: `ar-letter-${char}`,
+  category: 'stickers',
+  nameEn: `Arabic Letter ${char}`,
+  nameAr: `حرف ${char}`,
+  price: 100,
+  tagEn: '3D EPOXY ARABIC LETTER',
+  tagAr: 'حرف عربي إيبوكسي مجسم',
+  craftTagEn: 'Ships in 3-5 Days',
+  craftTagAr: 'يُشحن خلال 3-5 أيام',
+  descriptionEn: `Raised 3D epoxy dome Arabic letter ${char}.`,
+  descriptionAr: `حرف عربي إيبوكسي مجسم ${char}.`,
+  specsEn: ['Material: 3D Polyurethane Epoxy','Finish: Glossy Dome','Adhesive: High-tack 3M'],
+  specsAr: ['المادة: إيبوكسي مجسم','التشطيب: لامع','اللاصق: 3M'],
+  stickerRenderId: `ar-letter-${char}`,
+  is_active: true,
+  reviewCount: 0,
+  reviews: []
+}));
+
+// ── English Letter Sticker Products ─────────────────────────────────────────
+const ENGLISH_LETTERS_CHARS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+export const ENGLISH_LETTER_PRODUCTS = ENGLISH_LETTERS_CHARS.map((char) => ({
+  id: `en-letter-${char}`,
+  category: 'stickers',
+  nameEn: `English Letter ${char}`,
+  nameAr: `حرف إنجليزي ${char}`,
+  price: 100,
+  tagEn: '3D EPOXY ENGLISH LETTER',
+  tagAr: 'حرف إنجليزي إيبوكسي مجسم',
+  craftTagEn: 'Ships in 3-5 Days',
+  craftTagAr: 'يُشحن خلال 3-5 أيام',
+  descriptionEn: `Raised 3D epoxy dome English letter ${char}.`,
+  descriptionAr: `حرف إنجليزي إيبوكسي مجسم ${char}.`,
+  specsEn: ['Material: 3D Polyurethane Epoxy','Finish: Glossy Dome','Adhesive: High-tack 3M'],
+  specsAr: ['المادة: إيبوكسي مجسم','التشطيب: لامع','اللاصق: 3M'],
+  stickerRenderId: `en-letter-${char}`,
+  is_active: true,
+  reviewCount: 0,
+  reviews: []
+}));
+
+// ── Month Sticker Products ───────────────────────────────────────────────────
+const MONTHS_PRODUCT_LIST = [
+  { id:'month-jan', en:'Made In January',   ar:'شارة يناير' },
+  { id:'month-feb', en:'Made In February',  ar:'شارة فبراير' },
+  { id:'month-mar', en:'Made In March',     ar:'شارة مارس' },
+  { id:'month-apr', en:'Made In April',     ar:'شارة أبريل' },
+  { id:'month-may', en:'Made In May',       ar:'شارة مايو' },
+  { id:'month-jun', en:'Made In June',      ar:'شارة يونيو' },
+  { id:'month-jul', en:'Made In July',      ar:'شارة يوليو' },
+  { id:'month-aug', en:'Made In August',    ar:'شارة أغسطس' },
+  { id:'month-sep', en:'Made In September', ar:'شارة سبتمبر' },
+  { id:'month-oct', en:'Made In October',   ar:'شارة أكتوبر' },
+  { id:'month-nov', en:'Made In November',  ar:'شارة نوفمبر' },
+  { id:'month-dec', en:'Made In December',  ar:'شارة ديسمبر' },
+];
+export const MONTH_STICKER_PRODUCTS = MONTHS_PRODUCT_LIST.map((m) => ({
+  id: m.id,
+  category: 'stickers',
+  nameEn: m.en,
+  nameAr: m.ar,
+  price: 100,
+  tagEn: '3D MONTH BADGE',
+  tagAr: 'شارة شهر ميلاد إيبوكسي',
+  craftTagEn: 'Ships in 3-5 Days',
+  craftTagAr: 'يُشحن خلال 3-5 أيام',
+  descriptionEn: `Raised 3D epoxy badge ${m.en}.`,
+  descriptionAr: `شارة إيبوكسي ${m.ar}.`,
+  specsEn: ['Material: 3D Polyurethane Epoxy','Finish: Glossy Dome','Adhesive: High-tack 3M'],
+  specsAr: ['المادة: إيبوكسي مجسم','التشطيب: لامع','اللاصق: 3M'],
+  stickerRenderId: m.id,
+  is_active: true,
+  reviewCount: 0,
+  reviews: []
+}));
+
+// ── Year Sticker Products ────────────────────────────────────────────────────
+const YEARS_PRODUCT_LIST = [
+  { id:'year-199x', en:'Made In 199x',  ar:'شارة التسعينات' },
+  { id:'year-2000', en:"2000's Badge",  ar:'شارة عام 2000' },
+  { id:'year-2001', en:"2001's Badge",  ar:'شارة عام 2001' },
+  { id:'year-2002', en:"2002's Badge",  ar:'شارة عام 2002' },
+  { id:'year-2003', en:"2003's Badge",  ar:'شارة عام 2003' },
+  { id:'year-2004', en:"2004's Badge",  ar:'شارة عام 2004' },
+  { id:'year-2005', en:"2005's Badge",  ar:'شارة عام 2005' },
+  { id:'year-2006', en:"2006's Badge",  ar:'شارة عام 2006' },
+  { id:'year-2007', en:"2007's Badge",  ar:'شارة عام 2007' },
+  { id:'year-2008', en:"2008's Badge",  ar:'شارة عام 2008' },
+];
+export const YEAR_STICKER_PRODUCTS = YEARS_PRODUCT_LIST.map((y) => ({
+  id: y.id,
+  category: 'stickers',
+  nameEn: y.en,
+  nameAr: y.ar,
+  price: 100,
+  tagEn: '3D YEAR BADGE',
+  tagAr: 'شارة سنة ميلادية إيبوكسي',
+  craftTagEn: 'Ships in 3-5 Days',
+  craftTagAr: 'يُشحن خلال 3-5 أيام',
+  descriptionEn: `Raised 3D epoxy badge ${y.en}.`,
+  descriptionAr: `شارة إيبوكسي ${y.ar}.`,
+  specsEn: ['Material: 3D Polyurethane Epoxy','Finish: Glossy Dome','Adhesive: High-tack 3M'],
+  specsAr: ['المادة: إيبوكسي مجسم','التشطيب: لامع','اللاصق: 3M'],
+  stickerRenderId: y.id,
+  is_active: true,
+  reviewCount: 0,
+  reviews: []
+}));
+
 export const CASE_TYPES = [
   { id: 'clear', nameEn: 'Clear Acrylic Canvas', nameAr: 'شفاف أكرليك نقي', color: '#FAF9F6', bg: '#FAF9F6', ring: '#C0C0C0' },
   { id: 'frost', nameEn: 'Frost Iced White', nameAr: 'أبيض ثلجي مطفي', color: '#F4F5F7', bg: '#F4F5F7', ring: '#D8DCE3' },
@@ -230,6 +343,7 @@ export const CASE_TYPES = [
   { id: 'gold-ring', nameEn: 'Gold Ring Armor (MagSafe)', nameAr: 'درع حلقة الذهب (ماج سيف)', color: '#E0A93B', bg: '#121214', ring: '#E0A93B' },
   { id: 'carbon', nameEn: 'Carbon Techwear', nameAr: 'كربون تكتيكي', color: '#1C1D21', bg: '#1C1D21', ring: '#444' }
 ];
+
 
 export const PHONE_MODELS = [
   // 1. Custom User Input Option (DEFAULT FIRST OPTION)

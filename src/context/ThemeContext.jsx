@@ -5,7 +5,7 @@ const THEME_STORAGE_KEY = 'duat_theme_v2';
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem(THEME_STORAGE_KEY) || 'dawn';
+    return localStorage.getItem(THEME_STORAGE_KEY) || 'night';
   });
 
   useEffect(() => {

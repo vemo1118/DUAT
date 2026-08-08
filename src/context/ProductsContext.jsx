@@ -1,6 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { PRODUCTS as INITIAL_PRODUCTS } from '../data/products';
+import {
+  PRODUCTS as INITIAL_PRODUCTS_BASE,
+  ARABIC_LETTER_PRODUCTS,
+  ENGLISH_LETTER_PRODUCTS,
+  MONTH_STICKER_PRODUCTS,
+  YEAR_STICKER_PRODUCTS
+} from '../data/products';
 import { supabase } from '../lib/supabase';
+
+// Merge all sticker product groups into one flat list
+const INITIAL_PRODUCTS = [
+  ...INITIAL_PRODUCTS_BASE,
+  ...ARABIC_LETTER_PRODUCTS,
+  ...ENGLISH_LETTER_PRODUCTS,
+  ...MONTH_STICKER_PRODUCTS,
+  ...YEAR_STICKER_PRODUCTS,
+];
 
 const ProductsContext = createContext();
 

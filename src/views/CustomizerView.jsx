@@ -439,8 +439,8 @@ export const CustomizerContent = () => {
   const [activeTab, setActiveTab] = useState('stickers');
   const [stickerCategoryFilter, setStickerCategoryFilter] = useState('letters');
   const [customText, setCustomText] = useState('');
-  const [textColor, setTextColor] = useState('#E8A33D');
-  const [textBgColor, setTextBgColor] = useState('#14110F');
+  const [textColor, setTextColor] = useState('#182744');
+  const [textBgColor, setTextBgColor] = useState('#FFFFFF');
   const [textFont, setTextFont] = useState('kufi'); // 'ruqaa', 'kufi', 'space', 'mono'
 
   const handleColorSelect = (newColor) => {
@@ -494,8 +494,8 @@ export const CustomizerContent = () => {
       type: 'sticker',
       stickerId,
       src: img,
-      color: textColor || '#E8A33D',
-      bgColor: textBgColor || '#14110F',
+      color: textColor || '#182744',
+      bgColor: textBgColor || '#FFFFFF',
       x: 50,
       y: 50,
       scale: 1.0,
@@ -1050,10 +1050,11 @@ export const CustomizerContent = () => {
                 style={{
                   left: `${layer.x}%`,
                   top: `${layer.y}%`,
-                  transform: `translate(-50%, -50%) scale(${layer.scale}) rotate(${layer.rotation}deg)`
+                  transform: `translate(-50%, -50%) scale(${layer.scale || 1}) rotate(${layer.rotation || 0}deg)`,
+                  willChange: 'transform',
                 }}
-                className={`absolute cursor-grab active:cursor-grabbing p-2 select-none touch-none ${
-                  isSelected ? 'ring-2 ring-gold ring-offset-2 ring-offset-transparent z-30' : 'z-10'
+                className={`absolute cursor-grab active:cursor-grabbing select-none touch-none ${
+                  isSelected ? 'ring-2 ring-gold ring-offset-1 ring-offset-transparent z-30' : 'z-10'
                 }`}
               >
                 {isSelected && (
@@ -1357,37 +1358,66 @@ export const CustomizerContent = () => {
             </div>
           )}
 
-          {['letters', 'letters-en', 'text-photo'].includes(activeCategory) && (
-            <div className={`p-2.5 sm:p-3 border rounded-2xl space-y-2 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
+          {['letters', 'letters-en', 'text-photo', 'years', 'months'].includes(activeCategory) && (
+            <div className={`p-2.5 sm:p-3 border rounded-2xl space-y-2.5 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold font-sans flex items-center gap-1.5">
                   <span>🎨</span>
-                  <span>{lang === 'ar' ? 'اختر لون الحرف والخط:' : 'Choose Letter / Text Color:'}</span>
+                  <span>{lang === 'ar' ? 'لون النص والخلفية:' : 'Text & Background Color:'}</span>
                 </span>
                 {selectedLayerId && (
                   <span className="text-[10px] text-gold font-bold">{lang === 'ar' ? 'يعدّل الاستيكر المحدد' : 'Editing Selected'}</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-                {[
-                  { name: 'أسود', color: '#000000' },
-                  { name: 'أبيض', color: '#FFFFFF' },
-                  { name: 'ذهبي', color: '#E0A93B' },
-                  { name: 'أحمر', color: '#C93A43' },
-                  { name: 'كحلي', color: '#182744' },
-                  { name: 'زمردي', color: '#054A29' }
-                ].map((c) => (
-                  <button
-                    key={c.color}
-                    type="button"
-                    onClick={() => handleColorSelect(c.color)}
-                    className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
-                      textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: c.color }}
-                    title={c.name}
-                  />
-                ))}
+              {/* Text Color */}
+              <div>
+                <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الحرف / النص' : 'Text Color'}</p>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                  {[
+                    { name: 'كحلي', color: '#182744' },
+                    { name: 'أسود', color: '#000000' },
+                    { name: 'أبيض', color: '#FFFFFF' },
+                    { name: 'ذهبي', color: '#E0A93B' },
+                    { name: 'أحمر', color: '#C93A43' },
+                    { name: 'زمردي', color: '#054A29' }
+                  ].map((c) => (
+                    <button
+                      key={c.color}
+                      type="button"
+                      onClick={() => handleColorSelect(c.color)}
+                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
+                        textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
+                      }`}
+                      style={{ background: c.color }}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
+              </div>
+              {/* Background Color */}
+              <div>
+                <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الخلفية' : 'Background'}</p>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                  {[
+                    { name: 'أبيض', color: '#FFFFFF' },
+                    { name: 'كحلي', color: '#182744' },
+                    { name: 'أسود', color: '#000000' },
+                    { name: 'شفاف', color: 'transparent' },
+                    { name: 'ذهبي', color: '#E0A93B' },
+                    { name: 'أحمر', color: '#C93A43' },
+                  ].map((c) => (
+                    <button
+                      key={c.color}
+                      type="button"
+                      onClick={() => handleBgColorSelect(c.color)}
+                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
+                        textBgColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : (c.color === '#FFFFFF' ? 'border-stone-300' : 'border-stone-400/60 opacity-80 hover:opacity-100')
+                      }`}
+                      style={{ background: c.color === 'transparent' ? 'repeating-conic-gradient(#ccc 0% 25%, white 0% 50%) 0 0 / 8px 8px' : c.color }}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -1747,37 +1777,70 @@ export const CustomizerContent = () => {
                 </div>
               )}
 
-              {['letters', 'letters-en', 'text-photo'].includes(activeCategory) && (
-                <div className={`p-3 border rounded-2xl space-y-2 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
+              {['letters', 'letters-en', 'text-photo', 'years', 'months'].includes(activeCategory) && (
+                <div className={`p-3 border rounded-2xl space-y-2.5 mb-3 ${isNight ? 'bg-[#182744] border-amber-900/30 text-stone-100' : 'bg-white border-stone-200 text-stone-900'}`}>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold font-sans flex items-center gap-1.5">
                       <span>🎨</span>
-                      <span>{lang === 'ar' ? 'اختر لون الحرف والخط:' : 'Choose Letter / Text Color:'}</span>
+                      <span>{lang === 'ar' ? 'لون النص والخلفية:' : 'Text & Background Color:'}</span>
                     </span>
                     {selectedLayerId && (
                       <span className="text-[10px] text-gold font-bold">{lang === 'ar' ? 'يعدّل الاستيكر المحدد' : 'Editing Selected'}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-                    {[
-                      { name: 'أسود', color: '#000000' },
-                      { name: 'أبيض', color: '#FFFFFF' },
-                      { name: 'ذهبي', color: '#E0A93B' },
-                      { name: 'أحمر', color: '#C93A43' },
-                      { name: 'كحلي', color: '#182744' },
-                      { name: 'زمردي', color: '#054A29' }
-                    ].map((c) => (
-                      <button
-                        key={c.color}
-                        type="button"
-                        onClick={() => handleColorSelect(c.color)}
-                        className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
-                          textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
-                        }`}
-                        style={{ backgroundColor: c.color }}
-                        title={c.name}
-                      />
-                    ))}
+                  {/* Text Color */}
+                  <div>
+                    <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الحرف / النص' : 'Letter / Text Color'}</p>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                      {[
+                        { name: 'كحلي', color: '#182744' },
+                        { name: 'أسود', color: '#000000' },
+                        { name: 'أبيض', color: '#FFFFFF' },
+                        { name: 'ذهبي', color: '#E0A93B' },
+                        { name: 'أحمر', color: '#C93A43' },
+                        { name: 'زمردي', color: '#054A29' }
+                      ].map((c) => (
+                        <button
+                          key={c.color}
+                          type="button"
+                          onClick={() => handleColorSelect(c.color)}
+                          className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer shrink-0 ${
+                            textColor === c.color ? 'scale-110 ring-2 ring-gold border-white shadow-md' : 'border-stone-400/60 opacity-80 hover:opacity-100'
+                          }`}
+                          style={{ backgroundColor: c.color }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {/* Background Color */}
+                  <div>
+                    <p className={`text-[10px] font-semibold mb-1.5 uppercase tracking-wider ${isNight ? 'text-stone-400' : 'text-stone-500'}`}>{lang === 'ar' ? 'لون الخلفية' : 'Background Color'}</p>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                      {[
+                        { name: 'أبيض', color: '#FFFFFF' },
+                        { name: 'كحلي', color: '#182744' },
+                        { name: 'أسود', color: '#000000' },
+                        { name: 'شفاف', color: 'transparent' },
+                        { name: 'ذهبي', color: '#E0A93B' },
+                        { name: 'أحمر', color: '#C93A43' },
+                      ].map((c) => (
+                        <button
+                          key={c.color}
+                          type="button"
+                          onClick={() => handleBgColorSelect(c.color)}
+                          className={`w-8 h-8 rounded-lg transition-all cursor-pointer shrink-0 border-2 ${
+                            textBgColor === c.color ? 'scale-110 ring-2 ring-gold border-gold shadow-md' : (c.color === '#FFFFFF' ? 'border-stone-300' : 'border-transparent opacity-90 hover:opacity-100')
+                          }`}
+                          style={{
+                            background: c.color === 'transparent'
+                              ? 'repeating-conic-gradient(#aaa 0% 25%, #fff 0% 50%) 0 0 / 10px 10px'
+                              : c.color
+                          }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

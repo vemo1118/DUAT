@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import { ShoppingBag, Check, Sparkles, Star, Heart } from 'lucide-react';
 import { CaseGraphic } from './CaseGraphic';
+import { StickerIcon } from './StickerIcon';
 
 export const ProductCard = ({ product, onSelectProduct }) => {
   const { lang, t, formatPrice } = useLanguage();
@@ -64,13 +65,14 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   if (!product) return null;
 
-  const isSticker = product.category === 'stickers' || String(product.id || '').startsWith('st-') || String(product.id || '').startsWith('pack-') || String(product.id || '').startsWith('sticker');
-  const isCaseCategory = (product.category === 'cases' || String(product.id || '').startsWith('bundle-') || String(product.id || '').startsWith('case-')) && !isSticker;
+  const id = String(product.id || '');
+  const isSticker = product.category === 'stickers' || id.startsWith('st-') || id.startsWith('pack-') || id.startsWith('sticker') || id.startsWith('ar-letter-') || id.startsWith('en-letter-') || id.startsWith('month-') || id.startsWith('year-');
+  const isCaseCategory = (product.category === 'cases' || id.startsWith('bundle-') || id.startsWith('case-')) && !isSticker;
   const name = (lang === 'ar' ? product.nameAr : product.nameEn) || product.nameEn || product.nameAr || 'Product';
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
 
-  // Render graphic using CaseGraphic or images
+  // Render graphic using CaseGraphic, StickerIcon, or images
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
@@ -86,6 +88,21 @@ export const ProductCard = ({ product, onSelectProduct }) => {
             console.warn('Failed to load image:', customImage);
           }}
         />
+      );
+    }
+
+    // Letter / Month / Year stickers: render the live StickerIcon preview
+    const renderId = product.stickerRenderId || product.id;
+    if (renderId && (renderId.startsWith('ar-letter-') || renderId.startsWith('en-letter-') || renderId.startsWith('month-') || renderId.startsWith('year-'))) {
+      return (
+        <div className="w-full h-full flex items-center justify-center p-3">
+          <StickerIcon
+            stickerId={renderId}
+            size={72}
+            color="#182744"
+            bgColor="#FFFFFF"
+          />
+        </div>
       );
     }
 
