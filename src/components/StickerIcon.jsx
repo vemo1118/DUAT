@@ -20,19 +20,17 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const char = stickerId.replace(/^(ar-letter-|st-letter-)/, '');
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
-    const isDarkDefaultBg = !bgColor || bgColor === '#14110F' || bgColor === '#0A0C16' || bgColor === '#181E3B';
+
+    const isDefaultColor = !color || color === '#E8A33D';
+    const finalTextColor = isTransparentBg
+      ? (isDefaultColor ? '#FFFFFF' : color)
+      : (isDefaultColor ? '#141414' : color);
 
     const finalBg = isTransparentBg
       ? 'transparent'
-      : isDarkDefaultBg
-      ? 'linear-gradient(145deg, #FFFFFF 0%, #F6F3EB 60%, #EAE4D4 100%)'
-      : bgColor;
-
-    const finalTextColor = isTransparentBg
-      ? (color && color !== '#E8A33D' ? color : '#FFFFFF')
-      : isDarkDefaultBg
-      ? '#141414'
-      : (color || '#141414');
+      : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
+          ? bgColor
+          : 'linear-gradient(145deg, #FFFFFF 0%, #F5F1E6 60%, #EAE4D4 100%)');
 
     return (
       <div
@@ -57,6 +55,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           style={{
             fontSize: `${Math.round(boxSize * 0.58)}px`,
             fontFamily: "'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', serif",
+            color: finalTextColor,
             textShadow: isTransparentBg ? 'none' : '0 1px 1px rgba(255,255,255,0.4)'
           }}
         >
@@ -72,19 +71,17 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const char = stickerId.replace(/^(en-letter-|st-en-letter-)/, '').toUpperCase();
     const boxSize = forCanvas ? 64 : size;
     const isTransparentBg = bgColor === 'transparent';
-    const isDefaultNavyBg = !bgColor || bgColor === '#14110F' || bgColor === '#0A0C16' || bgColor === '#181E3B';
+
+    const isDefaultColor = !color || color === '#E8A33D';
+    const finalTextColor = isTransparentBg
+      ? (isDefaultColor ? '#FFFFFF' : color)
+      : (isDefaultColor ? '#FFFFFF' : color);
 
     const finalBg = isTransparentBg
       ? 'transparent'
-      : isDefaultNavyBg
-      ? 'linear-gradient(145deg, #182744 0%, #0D1629 60%, #070C18 100%)'
-      : bgColor;
-
-    const finalTextColor = isTransparentBg
-      ? (color || '#FFFFFF')
-      : isDefaultNavyBg
-      ? (color && color !== '#E8A33D' ? color : '#FFFFFF')
-      : (color || '#FFFFFF');
+      : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
+          ? bgColor
+          : 'linear-gradient(145deg, #182744 0%, #0D1629 60%, #070C18 100%)');
 
     return (
       <div
@@ -109,6 +106,7 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
           style={{
             fontSize: `${Math.round(boxSize * 0.52)}px`,
             fontFamily: "'Cinzel', 'Playfair Display', Georgia, serif",
+            color: finalTextColor,
             textShadow: isTransparentBg ? 'none' : '0 2px 4px rgba(0,0,0,0.6)'
           }}
         >
