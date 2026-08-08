@@ -155,6 +155,29 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
   // ── Synthetic 3D Month Badges ──────────────────────────────────────────────
   const isMonthBadge = stickerId && stickerId.startsWith('month-');
   if (isMonthBadge) {
+    if (customImg) {
+      if (forCanvas) {
+        const dims = CANVAS_DIMS[stickerId] || { w: 125, h: 42 };
+        return (
+          <img
+            src={customImg}
+            alt="Sticker"
+            style={{ width: dims.w, height: dims.h, objectFit: 'contain', display: 'block' }}
+            className="pointer-events-none select-none"
+            draggable={false}
+          />
+        );
+      }
+      return (
+        <img
+          src={customImg}
+          alt="Sticker"
+          className="max-w-full max-h-full object-contain pointer-events-none select-none"
+          style={{ display: 'block' }}
+        />
+      );
+    }
+
     const monthMap = {
       jan: 'January', feb: 'February', mar: 'March', apr: 'April',
       may: 'May', jun: 'June', jul: 'July', aug: 'August',
@@ -167,12 +190,12 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     return (
       <div
         style={{
-          color: '#334155',
-          background: 'linear-gradient(145deg, #F8F5EE 0%, #EAE4D6 100%)',
-          borderColor: 'rgba(203,195,178,0.9)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.9)',
+          color: '#EDE4D3',
+          background: 'linear-gradient(135deg, #1E2B45 0%, #0E1626 100%)',
+          borderColor: '#334155',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.25)',
         }}
-        className="rounded-full px-3 py-1 sm:px-4 sm:py-1.5 border flex items-center justify-center font-serif italic font-semibold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap shadow-sm"
+        className="rounded-full px-2.5 py-1 sm:px-3 sm:py-1 border flex items-center justify-center font-serif italic font-semibold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap shadow-sm max-w-full overflow-hidden text-ellipsis"
       >
         {labelText}
       </div>
@@ -194,12 +217,12 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
       );
     }
 
-    // Selection panel: fill the square card
+    // Selection panel: fill the container smoothly
     return (
       <img
         src={customImg}
         alt="Sticker"
-        className="w-full h-full object-contain pointer-events-none select-none"
+        className="max-w-full max-h-full object-contain pointer-events-none select-none"
         style={{ display: 'block' }}
       />
     );

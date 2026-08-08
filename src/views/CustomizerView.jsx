@@ -1275,9 +1275,9 @@ export const CustomizerContent = () => {
                     draggable={true}
                     onDragStart={(e) => handleStickerDragStart(st.id, e)}
                     onClick={() => handleAddSticker(st.id)}
-                    className={`w-24 sm:w-28 flex-shrink-0 border rounded-2xl p-2.5 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none ${isNight ? 'bg-[#1F1B18] border-stone-800 hover:border-gold' : 'bg-[#F9F8F6] border-stone-200/90 hover:border-stone-900'}`}
+                    className={`w-24 sm:w-28 flex-shrink-0 border rounded-2xl p-2 sm:p-2.5 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none ${isNight ? 'bg-[#181E30] border-amber-900/30 hover:border-gold' : 'bg-[#F9F8F6] border-stone-200/90 hover:border-stone-900'}`}
                   >
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
+                    <div className="w-full h-16 sm:h-20 flex items-center justify-center overflow-hidden p-1 sm:p-1.5">
                       <StickerIcon
                         stickerId={st.id}
                         image={st.image || st.imageUrl}
@@ -1632,10 +1632,10 @@ export const CustomizerContent = () => {
                           draggable={true}
                           onDragStart={(e) => handleStickerDragStart(st.id, e)}
                           onClick={() => handleAddSticker(st.id)}
-                          className={`rounded-2xl p-3 flex flex-col items-center justify-between transition-all cursor-pointer group select-none hover:shadow-md hover:scale-105 border ${isNight ? 'bg-[#1F1B18] border-stone-800 hover:border-gold shadow-md' : 'bg-[#F9F8F6] border-stone-200/90 hover:border-stone-900 shadow-sm'}`}
+                          className={`rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-between transition-all cursor-pointer group select-none hover:shadow-md hover:scale-105 border ${isNight ? 'bg-[#181E30] border-amber-900/30 hover:border-gold shadow-md' : 'bg-[#F9F8F6] border-stone-200/90 hover:border-stone-900 shadow-sm'}`}
                           title={lang === 'ar' ? 'انقر لإضافة الاستيكر للجراب' : 'Click to add sticker to case'}
                         >
-                          <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
+                          <div className="w-full h-16 sm:h-20 flex items-center justify-center overflow-hidden p-1 sm:p-1.5">
                             <StickerIcon
                               stickerId={st.id}
                               image={st.image || st.imageUrl}
@@ -1644,7 +1644,7 @@ export const CustomizerContent = () => {
                               bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                             />
                           </div>
-                          <span className={`truncate max-w-full text-center mt-2 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
+                          <span className={`truncate max-w-full text-center mt-1.5 transition-colors ${getSubLabelFontClass(st)} ${isNight ? 'text-bone group-hover:text-gold' : 'text-stone-600 group-hover:text-stone-900'}`}>
                             {subLabel}
                           </span>
                         </button>
