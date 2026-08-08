@@ -1372,73 +1372,73 @@ export const CustomizerContent = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 💻 2. DESKTOP STUDIO VIEW (Screen >= 1024px) — Split 2-Column Luxury Layout */}
+      {/* 💻 2. DESKTOP STUDIO VIEW (Screen >= 1024px) — High-Contrast Studio Layout */}
       {/* ========================================================================= */}
-      <div className="hidden lg:block min-h-screen bg-[#0E0C0B] text-bone font-sans select-none pb-12">
+      <div className="hidden lg:block min-h-screen bg-[#F7F6F2] text-stone-900 font-sans select-none pb-12">
         
         {/* Top Studio Bar */}
-        <header className="w-full bg-[#161311]/90 backdrop-blur-md border-b border-stone-800/80 px-8 py-4 flex items-center justify-between sticky top-0 z-40">
+        <header className="w-full bg-white/90 backdrop-blur-md border-b border-stone-200/90 px-8 py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-sm">
           <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="p-2.5 text-ash hover:text-gold transition-colors rounded-xl border border-stone-800 bg-[#1F1B18] flex items-center justify-center"
+              className="p-2.5 text-stone-700 hover:text-black transition-colors rounded-xl border border-stone-200 bg-[#F8F7F4] hover:bg-stone-200/60 flex items-center justify-center cursor-pointer"
               title={lang === 'ar' ? 'الرجوع' : 'Back'}
             >
               {lang === 'ar' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
             </button>
 
             <div>
-              <span className="font-mono text-[10px] text-gold font-bold uppercase tracking-widest block">
+              <span className="font-mono text-[10px] text-amber-700 font-bold uppercase tracking-widest block">
                 DUAT / LUXURY CUSTOMIZER STUDIO
               </span>
-              <h1 className="font-clash font-bold text-xl text-bone tracking-tight">
+              <h1 className="font-sans font-bold text-xl text-stone-900 tracking-tight">
                 {lang === 'ar' ? 'مصنع دوات للجرابات المخصصة' : 'DUAT Custom Case Studio'}
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-xs">
-            <div className="bg-[#1F1B18] border border-stone-800 px-3.5 py-1.5 rounded-full text-bone">
-              📱 <strong className="text-gold">{currentModelName}</strong>
+          <div className="flex items-center gap-3 font-sans text-xs">
+            <div className="bg-[#F4F3F0] border border-stone-200 px-4 py-1.5 rounded-full text-stone-800 font-medium">
+              📱 <strong className="text-stone-900">{currentModelName}</strong>
             </div>
-            <div className="bg-[#1F1B18] border border-stone-800 px-3.5 py-1.5 rounded-full text-bone">
+            <div className="bg-[#F4F3F0] border border-stone-200 px-4 py-1.5 rounded-full text-stone-800 font-medium">
               🎨 {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
             </div>
-            <div className="bg-gold text-[#0A0C16] font-bold px-4 py-1.5 rounded-full shadow-lg shadow-gold/20">
+            <div className="bg-[#18181B] text-white font-bold px-4 py-1.5 rounded-full shadow-sm">
               {builderPrice || 850} EGP
             </div>
           </div>
         </header>
 
         {/* Studio 2-Column Main Layout */}
-        <main className="max-w-7xl mx-auto px-6 pt-8 grid grid-cols-12 gap-8 items-start">
+        <main className="max-w-7xl mx-auto px-6 pt-6 grid grid-cols-12 gap-8 items-start">
           
           {/* LEFT COLUMN: Elevated Phone Preview Canvas Container */}
-          <div className="col-span-5 bg-[#161311] border border-stone-800/90 rounded-3xl p-8 shadow-2xl flex flex-col items-center justify-center sticky top-24 space-y-4">
-            <div className="font-mono text-[11px] uppercase tracking-widest text-ash flex items-center gap-2">
-              <Sparkles size={14} className="text-gold" />
+          <div className="col-span-5 bg-white border border-stone-200/90 rounded-3xl p-8 shadow-lg flex flex-col items-center justify-center sticky top-24 space-y-4">
+            <div className="font-sans text-xs font-semibold uppercase tracking-wider text-stone-600 flex items-center gap-2">
+              <Sparkles size={15} className="text-amber-600" />
               <span>{lang === 'ar' ? 'معاينة الجراب التفاعلية' : 'Interactive Case Canvas'}</span>
             </div>
 
-            {renderPhoneCanvas(true)}
-            {renderQuickToolbar(true)}
+            {renderPhoneCanvas(false)}
+            {renderQuickToolbar(false)}
 
-            <div className="font-mono text-[11px] text-ash/80 text-center pt-2 border-t border-stone-800/60 w-full">
+            <div className="font-sans text-xs text-stone-500 text-center pt-3 border-t border-stone-100 w-full">
               ⓘ {lang === 'ar' ? 'اسحب أي استيكر مباشرة على الجراب · انقر لتحديده وتعديله' : 'Drag any sticker directly onto phone canvas · Click layer to select'}
             </div>
           </div>
 
           {/* RIGHT COLUMN: Studio Controls & Asset Library Card */}
           <div className="col-span-7 space-y-6">
-            <div className="bg-[#161311] border border-stone-800/90 rounded-3xl p-6 shadow-2xl space-y-6">
+            <div className="bg-white border border-stone-200/90 rounded-3xl p-6 shadow-lg space-y-6">
               
               {/* Category Pills Navigation Tabs */}
               <div>
-                <span className="font-mono text-[10px] text-gold font-bold uppercase tracking-widest block mb-2">
+                <span className="font-sans text-xs font-bold uppercase tracking-wider text-stone-900 block mb-2.5">
                   {lang === 'ar' ? 'أقسام البلدر والتصميم' : 'Builder Categories'}
                 </span>
-                <div className="flex flex-wrap items-center gap-2 border-b border-stone-800/80 pb-4">
+                <div className="flex flex-wrap items-center gap-2 border-b border-stone-100 pb-4">
                   {CATEGORY_PILLS.map((pill) => {
                     const isActive = activeCategory === pill.id;
                     return (
@@ -1446,10 +1446,10 @@ export const CustomizerContent = () => {
                         key={pill.id}
                         type="button"
                         onClick={() => setActiveCategory(pill.id)}
-                        className={`px-4 py-2 rounded-xl font-mono text-xs uppercase font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                        className={`px-4 py-2 rounded-full font-medium text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border ${
                           isActive
-                            ? 'bg-gold text-[#0A0C16] border-gold shadow-lg shadow-gold/20'
-                            : 'bg-[#1F1B18] text-bone border-stone-800 hover:border-gold/60 hover:text-gold'
+                            ? 'bg-[#18181B] text-white border-[#18181B] shadow-md font-semibold'
+                            : 'bg-[#F4F3F0] text-stone-700 hover:bg-stone-200/80 border-stone-200/70'
                         }`}
                       >
                         <span>{pill.icon}</span>
@@ -1462,21 +1462,21 @@ export const CustomizerContent = () => {
 
               {/* Selected Layer Controls Panel */}
               {selectedLayer && (
-                <div className="bg-[#1F1B18] border border-gold/40 rounded-2xl p-4 space-y-3 shadow-lg animate-fade-in">
-                  <div className="flex justify-between items-center font-mono text-xs font-bold text-gold border-b border-stone-800 pb-2">
-                    <span>✨ {lang === 'ar' ? 'التحكم في الاستيكر المحدّد (Selected Sticker)' : 'Selected Sticker Controls'}</span>
+                <div className="bg-[#F8F7F4] border border-stone-200 rounded-2xl p-4 space-y-3 shadow-sm animate-fade-in">
+                  <div className="flex justify-between items-center text-xs font-bold text-stone-900 border-b border-stone-200/80 pb-2">
+                    <span>✨ {lang === 'ar' ? 'التحكم في الاستيكر المحدّد' : 'Selected Sticker Controls'}</span>
                     <button
                       onClick={(e) => handleRemoveLayer(selectedLayer.id, e)}
-                      className="text-red-400 hover:text-red-300 flex items-center gap-1 text-xs font-bold transition-colors"
+                      className="text-red-600 hover:text-red-800 flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer"
                     >
                       <Trash2 size={14} />
                       <span>{lang === 'ar' ? 'حذف الاستيكر' : 'Remove Sticker'}</span>
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+                  <div className="grid grid-cols-2 gap-4 text-xs font-medium text-stone-700">
                     <div className="space-y-1">
-                      <label className="text-ash block">{lang === 'ar' ? 'الحجم (Scale)' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
+                      <label className="block">{lang === 'ar' ? 'الحجم' : 'Scale'} ({selectedLayer.scale.toFixed(1)}x)</label>
                       <input
                         type="range"
                         min="0.4"
@@ -1484,11 +1484,11 @@ export const CustomizerContent = () => {
                         step="0.1"
                         value={selectedLayer.scale}
                         onChange={(e) => handleLayerTransform(selectedLayer.id, 'scale', parseFloat(e.target.value))}
-                        className="w-full accent-gold cursor-pointer"
+                        className="w-full accent-black cursor-pointer"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-ash block">{lang === 'ar' ? 'التدوير (Rotation)' : 'Rotation'} ({selectedLayer.rotation}°)</label>
+                      <label className="block">{lang === 'ar' ? 'التدوير' : 'Rotation'} ({selectedLayer.rotation}°)</label>
                       <input
                         type="range"
                         min="-180"
@@ -1496,7 +1496,7 @@ export const CustomizerContent = () => {
                         step="5"
                         value={selectedLayer.rotation}
                         onChange={(e) => handleLayerTransform(selectedLayer.id, 'rotation', parseInt(e.target.value))}
-                        className="w-full accent-gold cursor-pointer"
+                        className="w-full accent-black cursor-pointer"
                       />
                     </div>
                   </div>
@@ -1506,9 +1506,9 @@ export const CustomizerContent = () => {
               {/* STICKER LIBRARY GRID */}
               {['motifs', 'quotes-ar', 'quotes-en', 'letters', 'years', 'months', 'letters-en', 'all'].includes(activeCategory) && (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between font-mono text-xs text-ash">
+                  <div className="flex items-center justify-between font-sans text-xs text-stone-600 font-medium">
                     <span>{lang === 'ar' ? `استيكرات قسم (${sheetTitle}) — ${filteredStickers.length}` : `Stickers in (${sheetTitle}) — ${filteredStickers.length}`}</span>
-                    <span className="text-[11px] text-gold">انقر أو اسحب للجراب 🖱️</span>
+                    <span className="text-amber-700 font-semibold">انقر أو اسحب للجراب 🖱️</span>
                   </div>
 
                   <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[380px] overflow-y-auto custom-scrollbar p-1">
@@ -1520,7 +1520,7 @@ export const CustomizerContent = () => {
                           draggable={true}
                           onDragStart={(e) => handleStickerDragStart(st.id, e)}
                           onClick={() => handleAddSticker(st.id)}
-                          className="bg-[#1F1B18] border border-stone-800 hover:border-gold rounded-2xl p-3 flex flex-col items-center justify-between transition-all cursor-pointer shadow-md group select-none hover:scale-105"
+                          className="bg-[#F9F8F6] border border-stone-200/90 hover:border-stone-900 rounded-2xl p-3 flex flex-col items-center justify-between transition-all cursor-pointer shadow-sm group select-none hover:shadow-md hover:scale-105"
                           title={lang === 'ar' ? 'انقر لإضافة الاستيكر للجراب' : 'Click to add sticker to case'}
                         >
                           <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden p-1">
@@ -1532,7 +1532,7 @@ export const CustomizerContent = () => {
                               bgColor={(st.id?.startsWith('ar-letter-') || st.id?.startsWith('en-letter-')) ? undefined : textBgColor}
                             />
                           </div>
-                          <span className="font-mono text-[11px] text-ash group-hover:text-gold font-medium truncate max-w-full text-center mt-2">
+                          <span className="font-sans text-xs text-stone-600 group-hover:text-stone-900 font-semibold truncate max-w-full text-center mt-2">
                             {subLabel}
                           </span>
                         </button>
@@ -1544,13 +1544,13 @@ export const CustomizerContent = () => {
 
               {/* MODEL & FINISH TAB CONTENT */}
               {activeCategory === 'model' && (
-                <div className="space-y-5 font-mono text-xs">
+                <div className="space-y-5 font-sans text-xs">
                   <div className="space-y-2">
-                    <label className="text-gold font-bold block">📱 {t('selectModel')}:</label>
+                    <label className="text-stone-900 font-bold block text-sm">📱 {t('selectModel')}:</label>
                     <select
                       value={selectedModel}
                       onChange={(e) => setSelectedModel(e.target.value)}
-                      className="w-full bg-[#1F1B18] border border-stone-800 text-bone p-3 rounded-xl font-mono text-sm outline-none focus:border-gold min-h-[44px]"
+                      className="w-full bg-[#F8F7F4] border border-stone-200 text-stone-900 p-3 rounded-xl font-sans text-sm outline-none focus:border-stone-900 min-h-[44px]"
                     >
                       {PHONE_MODELS.map((m) => {
                         const name = typeof m === 'object' ? (lang === 'ar' ? (m.nameAr || m.name) : (m.nameEn || m.name)) : m;
@@ -1571,14 +1571,14 @@ export const CustomizerContent = () => {
                           value={customModelInput}
                           onChange={(e) => setCustomModelInput(e.target.value)}
                           placeholder={t('customModelPlaceholder')}
-                          className="w-full bg-[#1F1B18] border border-stone-700 text-bone p-3 rounded-xl text-xs outline-none focus:border-gold"
+                          className="w-full bg-[#F8F7F4] border border-stone-300 text-stone-900 p-3 rounded-xl text-xs outline-none focus:border-stone-900"
                         />
                       </div>
                     )}
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-stone-800">
-                    <label className="text-gold font-bold block">🎨 {t('caseType')}:</label>
+                  <div className="space-y-2 pt-3 border-t border-stone-100">
+                    <label className="text-stone-900 font-bold block text-sm">🎨 {t('caseType')}:</label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {CASE_TYPES.map((ct) => {
                         const active = selectedCaseType?.id === ct.id;
@@ -1588,15 +1588,15 @@ export const CustomizerContent = () => {
                             onClick={() => setSelectedCaseType(ct)}
                             className={`p-3 border rounded-xl text-left flex items-center gap-3 transition-all cursor-pointer ${
                               active
-                                ? 'border-gold bg-gold/15 text-gold font-bold shadow-lg shadow-gold/10'
-                                : 'border-stone-800 bg-[#1F1B18] text-bone hover:border-stone-600'
+                                ? 'border-black bg-stone-900 text-white font-semibold shadow-md'
+                                : 'border-stone-200 bg-[#F8F7F4] text-stone-800 hover:border-stone-400'
                             }`}
                           >
                             <div
-                              className="w-4 h-4 rounded-full border border-stone-600 flex-shrink-0"
+                              className="w-4 h-4 rounded-full border border-stone-400 flex-shrink-0"
                               style={{ backgroundColor: ct.color || '#FFFFFF' }}
                             />
-                            <span className="font-mono text-xs truncate">
+                            <span className="font-sans text-xs truncate">
                               {lang === 'ar' ? ct.nameAr : ct.nameEn}
                             </span>
                           </button>
@@ -1609,21 +1609,21 @@ export const CustomizerContent = () => {
 
               {/* CUSTOM TEXT & UPLOAD TAB CONTENT */}
               {activeCategory === 'text-photo' && (
-                <div className="space-y-5 font-mono text-xs">
+                <div className="space-y-5 font-sans text-xs">
                   <div className="space-y-2">
-                    <label className="text-gold font-bold block">✍️ {t('tabText')}:</label>
+                    <label className="text-stone-900 font-bold block text-sm">✍️ {t('tabText')}:</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={customText}
                         onChange={(e) => setCustomText(e.target.value)}
                         placeholder={t('textPlaceholder')}
-                        className="flex-1 bg-[#1F1B18] border border-stone-800 text-bone p-3 rounded-xl font-mono text-sm outline-none focus:border-gold"
+                        className="flex-1 bg-[#F8F7F4] border border-stone-200 text-stone-900 p-3 rounded-xl font-sans text-sm outline-none focus:border-stone-900"
                       />
                       <button
                         type="button"
                         onClick={handleAddText}
-                        className="btn-primary px-5 rounded-xl text-xs font-bold uppercase tracking-wider"
+                        className="bg-[#18181B] hover:bg-black text-white px-5 rounded-xl text-xs font-semibold transition-colors"
                       >
                         {t('addTextBtn')}
                       </button>
@@ -1632,38 +1632,38 @@ export const CustomizerContent = () => {
                     <div className="grid grid-cols-4 gap-2 pt-2">
                       <button
                         onClick={() => setTextFont('ruqaa')}
-                        className={`p-2.5 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                        className={`p-2.5 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? 'border-black bg-stone-900 text-white font-semibold' : 'border-stone-200 bg-[#F8F7F4]'}`}
                       >
                         خط رقعة
                       </button>
                       <button
                         onClick={() => setTextFont('kufi')}
-                        className={`p-2.5 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                        className={`p-2.5 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? 'border-black bg-stone-900 text-white font-semibold' : 'border-stone-200 bg-[#F8F7F4]'}`}
                       >
                         IBM Kufi
                       </button>
                       <button
                         onClick={() => setTextFont('cinzel')}
-                        className={`p-2.5 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                        className={`p-2.5 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? 'border-black bg-stone-900 text-white font-semibold' : 'border-stone-200 bg-[#F8F7F4]'}`}
                       >
                         Cinzel
                       </button>
                       <button
                         onClick={() => setTextFont('mono')}
-                        className={`p-2.5 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-stone-800 bg-[#1F1B18]'}`}
+                        className={`p-2.5 border rounded-xl font-mono text-xs ${textFont === 'mono' ? 'border-black bg-stone-900 text-white font-semibold' : 'border-stone-200 bg-[#F8F7F4]'}`}
                       >
                         Mono
                       </button>
                     </div>
                   </div>
 
-                  <div className="border-t border-stone-800 pt-4 space-y-2">
-                    <label className="text-gold font-bold block">🖼️ {t('tabImage')}:</label>
+                  <div className="border-t border-stone-100 pt-4 space-y-2">
+                    <label className="text-stone-900 font-bold block text-sm">🖼️ {t('tabImage')}:</label>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
-                      className="block w-full text-xs text-ash file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:bg-gold file:text-[#0A0C16] file:font-bold cursor-pointer"
+                      className="block w-full text-xs text-stone-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:bg-stone-900 file:text-white file:font-semibold cursor-pointer"
                     />
                   </div>
                 </div>
@@ -1677,12 +1677,12 @@ export const CustomizerContent = () => {
                       key={tmpl.id}
                       type="button"
                       onClick={() => handleLoadPreset(tmpl)}
-                      className="p-4 bg-[#1F1B18] border border-stone-800 hover:border-gold rounded-2xl text-left space-y-1 transition-all cursor-pointer group"
+                      className="p-4 bg-[#F8F7F4] border border-stone-200 hover:border-stone-900 rounded-2xl text-left space-y-1 transition-all cursor-pointer group shadow-sm"
                     >
-                      <span className="font-mono font-bold text-xs text-bone block group-hover:text-gold">
+                      <span className="font-sans font-semibold text-xs text-stone-900 block group-hover:text-black">
                         {lang === 'ar' ? tmpl.nameAr : tmpl.nameEn}
                       </span>
-                      <span className="text-[10px] text-gold uppercase tracking-wider block font-mono">
+                      <span className="text-[10px] text-stone-500 uppercase tracking-wider block font-sans">
                         {lang === 'ar' ? 'تحميل التصميم' : 'LOAD PRESET'}
                       </span>
                     </button>
@@ -1692,22 +1692,22 @@ export const CustomizerContent = () => {
             </div>
 
             {/* Sticky Bottom Desktop Action Card */}
-            <div className="bg-[#161311] border border-gold/40 p-5 rounded-3xl flex items-center justify-between shadow-2xl">
+            <div className="bg-white border border-stone-200/90 p-5 rounded-3xl flex items-center justify-between shadow-xl">
               <div>
-                <span className="font-mono text-xs text-ash block uppercase tracking-wider">
+                <span className="font-sans text-xs text-stone-500 block uppercase tracking-wider font-medium">
                   {lang === 'ar' ? 'إجمالي السعر' : 'Total Price'}
                 </span>
-                <div className="font-mono text-2xl font-bold text-bone">
-                  {builderPrice || 850} <span className="text-sm font-bold text-gold">ج.م</span>
+                <div className="font-sans text-2xl font-bold text-stone-900">
+                  {builderPrice || 850} <span className="text-sm font-semibold text-amber-700">ج.م</span>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="btn-primary py-4 px-8 text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-3 shadow-xl shadow-gold/20 cursor-pointer"
+                className="bg-[#18181B] hover:bg-black text-white py-4 px-8 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-3 shadow-lg hover:shadow-xl transition-all transform active:scale-95 cursor-pointer"
               >
-                <span>{lang === 'ar' ? 'أضف إلى السلة الان' : 'ADD TO CART NOW'}</span>
+                <span>{lang === 'ar' ? 'أضف إلى السلة الآن' : 'ADD TO CART NOW'}</span>
                 {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
               </button>
             </div>
