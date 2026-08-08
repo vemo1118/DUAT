@@ -603,30 +603,41 @@ export function AdminView() {
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
       {/* HEADER TITLE & MAIN TABS */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-grave pb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="p-2 border border-gold/40 bg-gold/10 text-gold rounded">
-              <Sparkles size={20} />
-            </span>
-            <h1 className="font-clash text-2xl sm:text-3xl font-bold tracking-wide text-bone">
-              لوحة التحكم الرئيسية (Admin Dashboard)
-            </h1>
+      <div className="space-y-6 border-b border-grave pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="p-2 border border-gold/40 bg-gold/10 text-gold rounded-sm">
+                <Sparkles size={22} />
+              </span>
+              <h1 className="font-clash text-2xl sm:text-3xl font-bold tracking-wide text-bone">
+                لوحة التحكم الرئيسية (Admin Dashboard)
+              </h1>
+            </div>
+            <p className="font-mono text-xs text-ash">
+              تحكم كامل بالمنتجات والصور، بنرات الشاشة الرئيسية، والعروض وتتبع الطلبات.
+            </p>
           </div>
-          <p className="font-mono text-xs text-ash">
-            تحكم كامل بالمنتجات والصور، بنرات الشاشة الرئيسية، والعروض وتتبع الطلبات.
-          </p>
+
+          <button
+            onClick={handleAdminLogout}
+            className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-colors font-mono text-xs font-bold rounded-sm min-h-[40px]"
+            title="تسجيل الخروج من لوحة الأدمن"
+          >
+            <span>تسجيل الخروج</span>
+            <LogOut size={16} />
+          </button>
         </div>
 
-        {/* TABS SWITCHER & LOGOUT */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="flex flex-wrap items-center gap-2 bg-coal/90 p-1.5 border border-grave w-full sm:w-auto">
+        {/* TABS SWITCHER SCROLLABLE STRIP */}
+        <div className="w-full overflow-x-auto custom-scrollbar bg-stone/90 p-2 border border-grave rounded-sm">
+          <div className="flex items-center gap-2 min-w-max">
             <button
               onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'products'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <Package size={16} />
@@ -635,10 +646,10 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'orders'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <ShoppingBag size={16} />
@@ -647,10 +658,10 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('hero')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'hero'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <ImageIcon size={16} />
@@ -659,10 +670,10 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('forge_banner')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'forge_banner'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <Sparkles size={16} />
@@ -671,10 +682,10 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'notifications'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <Bell size={16} />
@@ -683,10 +694,10 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('coupons')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'coupons'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <DollarSign size={16} />
@@ -695,24 +706,16 @@ export function AdminView() {
 
             <button
               onClick={() => setActiveTab('builder')}
-              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
                 activeTab === 'builder'
-                  ? 'bg-[#E8A33D] text-[#0A0C16] border-[#E8A33D] shadow-lg shadow-amber-500/20 scale-[1.02]'
-                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
+                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
               }`}
             >
               <Sliders size={16} />
               <span>محرر الجرابات (Builder Engine) 🎨</span>
             </button>
           </div>
-
-          <button
-            onClick={handleAdminLogout}
-            className="p-2.5 border border-grave bg-stone/80 hover:border-red-500/50 text-ash hover:text-red-400 transition-colors shrink-0"
-            title="تسجيل الخروج وقفل التحكم"
-          >
-            <LogOut size={16} />
-          </button>
         </div>
       </div>
 
