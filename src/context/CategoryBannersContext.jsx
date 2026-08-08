@@ -26,6 +26,20 @@ export const INITIAL_CATEGORY_BANNERS = [
   }
 ];
 
+export const DEFAULT_FORGE_BANNER = {
+  eyebrowEn: 'THE FORGE',
+  eyebrowAr: 'دوات / كور الفن',
+  titleEn: 'BUILD A CASE FOR YOURSELF.',
+  titleAr: 'صمم درعك الخاص بنفسك.',
+  descEn: 'Select your phone model, choose your armor finish, and stack 3D epoxy domes or custom text on canvas. Made to order. Shipped in 5 days.',
+  descAr: 'اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة ثلاثية الأبعاد. يُصنع حسب الطلب ويُشحن في ٥ أيام.',
+  buttonTextEn: 'OPEN THE BUILDER →',
+  buttonTextAr: 'افتح أداة التصميم ←',
+  buttonLink: '/customizer',
+  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
+  isActive: true
+};
+
 export const CategoryBannersProvider = ({ children }) => {
   const [categoryBanners, setCategoryBanners] = useState(() => {
     try {
@@ -45,131 +59,47 @@ export const CategoryBannersProvider = ({ children }) => {
     return INITIAL_CATEGORY_BANNERS;
   });
 
+  // Forge Feature Banner State
+  const [forgeBanner, setForgeBanner] = useState(() => {
+    try {
+      const saved = localStorage.getItem('duat_forge_banner_v1');
+      return saved ? JSON.parse(saved) : DEFAULT_FORGE_BANNER;
+    } catch (e) {
+      return DEFAULT_FORGE_BANNER;
+    }
+  });
+
   const [loading, setLoading] = useState(false);
 
-  // Sync to localStorage
+  // Sync forgeBanner to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_category_banners', JSON.stringify(categoryBanners));
+      localStorage.setItem('duat_forge_banner_v1', JSON.stringify(forgeBanner));
     } catch (e) {
-      console.warn('Failed saving duat_category_banners to localStorage:', e);
+      console.warn('Failed saving duat_forge_banner to localStorage:', e);
     }
-  }, [categoryBanners]);
+  }, [forgeBanner]);
 
-  // Fetch from Supabase category_banners table if available
-  useEffect(() => {
-    let isMounted = true;
-    const fetchBanners = async () => {
-      try {
-        const { data, error } = await supabase.from('category_banners').select('*');
-        if (!error && data && data.length > 0 && isMounted) {
-          const formatted = INITIAL_CATEGORY_BANNERS.map((def) => {
-            const match = data.find((d) => d.id === def.id);
-            if (match) {
-              return {
-                ...def,
-                nameEn: match.name_en || match.nameEn || def.nameEn,
-                nameAr: match.name_ar || match.nameAr || def.nameAr,
-                subtitleEn: match.subtitle_en || match.subtitleEn || def.subtitleEn,
-                subtitleAr: match.subtitle_ar || match.subtitleAr || def.subtitleAr,
-                imageUrl: match.image_url || match.imageUrl || def.imageUrl
-              };
-            }
-            return def;
-          });
-          setCategoryBanners(formatted);
-        }
-      } catch (err) {
-        console.warn('Category banners table fallback:', err);
-      }
-    };
-    fetchBanners();
-    return () => { isMounted = false; };
-  }, []);
-
-  const addCategoryBanner = async (newBanner) => {
-    const id = newBanner.id || `cat-${Date.now()}`;
-    const formatted = {
-      ...newBanner,
-      id,
-      is_active: newBanner.is_active !== undefined ? newBanner.is_active : true,
-      badge: newBanner.badge || `0${categoryBanners.length + 1}`
-    };
-    setCategoryBanners((prev) => [...prev, formatted]);
+  const updateForgeBanner = async (updatedFields) => {
+    const updated = { ...forgeBanner, ...updatedFields };
+    setForgeBanner(updated);
 
     try {
-      await supabase.from('category_banners').upsert({
-        id,
-        name_en: formatted.nameEn,
-        name_ar: formatted.nameAr,
-        subtitle_en: formatted.subtitleEn,
-        subtitle_ar: formatted.subtitleAr,
-        image_url: formatted.imageUrl,
-        is_active: formatted.is_active,
+      await supabase.from('store_settings').upsert({
+        key: 'forge_banner',
+        value: updated,
         updated_at: new Date().toISOString()
       });
     } catch (err) {
-      console.warn('Supabase add category banner error:', err);
-    }
-  };
-
-  const updateCategoryBanner = async (bannerId, updatedFields) => {
-    setCategoryBanners((prev) =>
-      prev.map((b) => (b.id === bannerId ? { ...b, ...updatedFields } : b))
-    );
-
-    try {
-      await supabase.from('category_banners').upsert({
-        id: bannerId,
-        name_en: updatedFields.nameEn,
-        name_ar: updatedFields.nameAr,
-        subtitle_en: updatedFields.subtitleEn,
-        subtitle_ar: updatedFields.subtitleAr,
-        image_url: updatedFields.imageUrl,
-        is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
-        updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Supabase category banner upsert error:', err);
-    }
-  };
-
-  const toggleCategoryBannerVisibility = async (bannerId) => {
-    let newStatus = true;
-    setCategoryBanners((prev) =>
-      prev.map((b) => {
-        if (b.id === bannerId) {
-          const current = b.is_active !== false && b.isActive !== false;
-          newStatus = !current;
-          return { ...b, is_active: newStatus, isActive: newStatus };
-        }
-        return b;
-      })
-    );
-
-    try {
-      await supabase
-        .from('category_banners')
-        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
-        .eq('id', bannerId);
-    } catch (err) {
-      console.warn('Supabase toggle category banner visibility error:', err);
-    }
-  };
-
-  const deleteCategoryBanner = async (bannerId) => {
-    setCategoryBanners((prev) => prev.filter((b) => b.id !== bannerId));
-
-    try {
-      await supabase.from('category_banners').delete().eq('id', bannerId);
-    } catch (err) {
-      console.warn('Supabase delete category banner error:', err);
+      console.warn('Supabase update forge banner error:', err);
     }
   };
 
   const resetCategoryBanners = () => {
     setCategoryBanners(INITIAL_CATEGORY_BANNERS);
+    setForgeBanner(DEFAULT_FORGE_BANNER);
     localStorage.removeItem('duat_category_banners');
+    localStorage.removeItem('duat_forge_banner_v1');
   };
 
   return (
@@ -181,6 +111,8 @@ export const CategoryBannersProvider = ({ children }) => {
         toggleCategoryBannerVisibility,
         deleteCategoryBanner,
         resetCategoryBanners,
+        forgeBanner,
+        updateForgeBanner,
         loading
       }}
     >

@@ -9,10 +9,12 @@ import { REVIEWS, FAQS } from '../data/products';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductsContext';
+import { useCategoryBanners } from '../context/CategoryBannersContext';
 import { Star, ChevronDown, ChevronUp, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const { products } = useProducts();
+  const { forgeBanner } = useCategoryBanners();
   const { lang, t } = useLanguage();
   const { theme } = useTheme();
   const isDawn = theme === 'dawn';
@@ -22,6 +24,9 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
   const navigate = useNavigate();
   const [openFaqId, setOpenFaqId] = useState(null);
+
+  const forge = forgeBanner || {};
+  const isForgeActive = forge.isActive !== false;
 
   const filteredProducts = Array.isArray(products)
     ? products.filter((p) => p && p.is_active !== false && p.isActive !== false)
@@ -57,42 +62,44 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         />
       </div>
 
-      {/* 5. THE FORGE FEATURE BAND — SOFTENED THEME-AWARE GRADIENT BAND 2 */}
-      <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E5DFC5] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#1A2042] to-[#0A0C16]'} border-y border-gold/40 py-20 sm:py-28 shadow-2xl relative overflow-hidden`}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative reveal-fade-up">
-          <div className="bg-stone border border-grave p-8 sm:p-14 relative overflow-hidden card-depth-highlight grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <div className="lg:col-span-7 space-y-6 relative z-10">
-              <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold block">
-                {t('forgeEyebrow')}
-              </span>
-              <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone font-bold">
-                {t('forgeTitle')}
-              </h2>
-              <p className="font-space text-base text-bone/90 font-medium leading-relaxed max-w-xl">
-                {t('forgeDesc')}
-              </p>
-              <button
-                onClick={() => navigate('/customizer')}
-                className="btn-primary py-4 px-8 text-xs font-mono font-bold tracking-widest flex items-center gap-3 min-h-[48px]"
-              >
-                <Sparkles size={16} />
-                <span>{t('forgeCta')}</span>
-                <ArrowIcon size={16} />
-              </button>
-            </div>
+      {/* 5. THE FORGE FEATURE BAND — DYNAMIC ADMIN MANAGED PROMO BANNER */}
+      {isForgeActive && (
+        <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E5DFC5] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#1A2042] to-[#0A0C16]'} border-y border-gold/40 py-20 sm:py-28 shadow-2xl relative overflow-hidden`}>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative reveal-fade-up">
+            <div className="bg-stone border border-grave p-8 sm:p-14 relative overflow-hidden card-depth-highlight grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              <div className="lg:col-span-7 space-y-6 relative z-10">
+                <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold block">
+                  {isAr ? (forge.eyebrowAr || 'دوات / كور الفن') : (forge.eyebrowEn || 'THE FORGE')}
+                </span>
+                <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone font-bold">
+                  {isAr ? (forge.titleAr || 'صمم درعك الخاص بنفسك.') : (forge.titleEn || 'BUILD A CASE FOR YOURSELF.')}
+                </h2>
+                <p className="font-space text-base text-bone/90 font-medium leading-relaxed max-w-xl">
+                  {isAr ? (forge.descAr || t('forgeDesc')) : (forge.descEn || t('forgeDesc'))}
+                </p>
+                <button
+                  onClick={() => navigate(forge.buttonLink || '/customizer')}
+                  className="btn-primary py-4 px-8 text-xs font-mono font-bold tracking-widest flex items-center gap-3 min-h-[48px]"
+                >
+                  <Sparkles size={16} />
+                  <span>{isAr ? (forge.buttonTextAr || t('forgeCta')) : (forge.buttonTextEn || t('forgeCta'))}</span>
+                  <ArrowIcon size={16} />
+                </button>
+              </div>
 
-            <div className="lg:col-span-5 relative z-10 flex items-center justify-center">
-              <img
-                src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg"
-                alt="DUAT Clear Case Bundle"
-                className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 rounded-xl"
-              />
-            </div>
+              <div className="lg:col-span-5 relative z-10 flex items-center justify-center">
+                <img
+                  src={forge.imageUrl || "https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg"}
+                  alt={isAr ? forge.titleAr : forge.titleEn}
+                  className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 rounded-xl"
+                />
+              </div>
 
-          </div>
-        </section>
-      </div>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* 6. PRODUCT ROW 2 — BEST SELLERS */}
       <div className="py-4">

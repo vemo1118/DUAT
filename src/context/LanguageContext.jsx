@@ -13,8 +13,8 @@ export const LanguageProvider = ({ children }) => {
         return urlLang;
       }
     }
-    // 2. Check localStorage or default to Egyptian Arabic ('ar')
-    return localStorage.getItem('duat_lang') || 'ar';
+    // 2. Check localStorage or default to English ('en')
+    return localStorage.getItem('duat_lang') || 'en';
   });
 
   useEffect(() => {

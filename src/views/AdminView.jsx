@@ -86,7 +86,9 @@ export function AdminView() {
     updateCategoryBanner,
     toggleCategoryBannerVisibility,
     deleteCategoryBanner,
-    resetCategoryBanners
+    resetCategoryBanners,
+    forgeBanner,
+    updateForgeBanner
   } = useCategoryBanners();
   const {
     settings: socialSettings,
@@ -215,6 +217,45 @@ export function AdminView() {
   // Category Banners Tab State
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategoryBanner, setEditingCategoryBanner] = useState(null);
+
+  // Forge Feature Banner Edit State
+  const [forgeEdit, setForgeEdit] = useState({
+    eyebrowEn: forgeBanner?.eyebrowEn || 'THE FORGE',
+    eyebrowAr: forgeBanner?.eyebrowAr || 'دوات / كور الفن',
+    titleEn: forgeBanner?.titleEn || 'BUILD A CASE FOR YOURSELF.',
+    titleAr: forgeBanner?.titleAr || 'صمم درعك الخاص بنفسك.',
+    descEn: forgeBanner?.descEn || 'Select your phone model, choose your armor finish, and stack 3D epoxy domes or custom text on canvas. Made to order. Shipped in 5 days.',
+    descAr: forgeBanner?.descAr || 'اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة ثلاثية الأبعاد. يُصنع حسب الطلب ويُشحن في ٥ أيام.',
+    buttonTextEn: forgeBanner?.buttonTextEn || 'OPEN THE BUILDER →',
+    buttonTextAr: forgeBanner?.buttonTextAr || 'افتح أداة التصميم ←',
+    buttonLink: forgeBanner?.buttonLink || '/customizer',
+    imageUrl: forgeBanner?.imageUrl || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
+    isActive: forgeBanner?.isActive !== false
+  });
+
+  useEffect(() => {
+    if (forgeBanner) {
+      setForgeEdit({
+        eyebrowEn: forgeBanner.eyebrowEn || '',
+        eyebrowAr: forgeBanner.eyebrowAr || '',
+        titleEn: forgeBanner.titleEn || '',
+        titleAr: forgeBanner.titleAr || '',
+        descEn: forgeBanner.descEn || '',
+        descAr: forgeBanner.descAr || '',
+        buttonTextEn: forgeBanner.buttonTextEn || '',
+        buttonTextAr: forgeBanner.buttonTextAr || '',
+        buttonLink: forgeBanner.buttonLink || '/customizer',
+        imageUrl: forgeBanner.imageUrl || '',
+        isActive: forgeBanner.isActive !== false
+      });
+    }
+  }, [forgeBanner]);
+
+  const handleSaveForgeBanner = (e) => {
+    e.preventDefault();
+    updateForgeBanner(forgeEdit);
+    showToast('تم حفظ بنر "صمم درعك بنفسك" (The Forge Banner) بنجاح ✨', 'success');
+  };
 
   // Orders Tab State
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
@@ -614,6 +655,18 @@ export function AdminView() {
             >
               <ImageIcon size={16} />
               <span>السلايدر والعروض ({slides.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('forge_banner')}
+              className={`flex items-center gap-2 px-4.5 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
+                activeTab === 'forge_banner'
+                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                  : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+              }`}
+            >
+              <Sparkles size={16} />
+              <span>بنر صمم درعك (The Forge) ⚡</span>
             </button>
 
             <button
@@ -1749,6 +1802,195 @@ export function AdminView() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 3.5: THE FORGE FEATURE PROMO BANNER EDITOR */}
+      {/* ============================================================ */}
+      {activeTab === 'forge_banner' && (
+        <div className="space-y-8 animate-fade-in max-w-5xl mx-auto">
+          {/* Header Description */}
+          <div className="bg-stone border border-gold/40 p-6 sm:p-8 space-y-6 rounded-lg card-depth-highlight shadow-2xl">
+            <div className="flex items-center gap-3 border-b border-grave pb-4">
+              <Sparkles className="text-gold" size={26} />
+              <div>
+                <h2 className="font-clash text-xl font-bold text-bone">إدارة بنر "صمم درعك بنفسك" (The Forge Banner Control Panel)</h2>
+                <p className="font-mono text-xs text-ash">تعديل كافة نصوص، شارة، صورة، ورابط التوجيه للبنر الترويجي الفاخر بمنتصف الصفحة الرئيسية.</p>
+              </div>
+            </div>
+
+            {/* Live Banner Preview Box */}
+            <div className="p-6 bg-coal border border-grave rounded-lg space-y-3">
+              <span className="font-mono text-xs text-gold uppercase tracking-widest block font-bold">معاينة حية للبنر في الصفحة الرئيسية (Live Banner Preview)</span>
+              <div className="p-6 bg-stone border border-gold/30 rounded flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="space-y-2 flex-1">
+                  <span className="font-mono text-[10px] text-gold uppercase tracking-widest font-bold block">{forgeEdit.eyebrowEn || 'THE FORGE'}</span>
+                  <h3 className="font-clash text-2xl font-bold text-bone uppercase tracking-tight">{forgeEdit.titleEn || 'BUILD A CASE FOR YOURSELF.'}</h3>
+                  <p className="font-space text-xs text-ash leading-relaxed max-w-lg">{forgeEdit.descEn}</p>
+                  <span className="inline-block mt-2 px-5 py-2.5 bg-gold text-[#0A0C16] font-mono text-xs font-bold uppercase rounded shadow-lg">{forgeEdit.buttonTextEn || 'OPEN THE BUILDER →'}</span>
+                </div>
+                {forgeEdit.imageUrl && (
+                  <div className="w-36 h-36 flex-shrink-0 flex items-center justify-center p-2 bg-void border border-grave rounded shadow-md">
+                    <img src={forgeEdit.imageUrl} alt="Preview" className="max-w-full max-h-full object-contain drop-shadow-lg" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Form Inputs */}
+            <form onSubmit={handleSaveForgeBanner} className="space-y-6 font-mono text-xs">
+              
+              {/* Active Toggle & Image URL */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-coal/70 p-4 border border-grave rounded">
+                <div className="sm:col-span-4 flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="forgeIsActive"
+                    checked={forgeEdit.isActive}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, isActive: e.target.checked })}
+                    className="w-4 h-4 accent-gold cursor-pointer"
+                  />
+                  <label htmlFor="forgeIsActive" className="text-bone font-bold cursor-pointer">
+                    تفعيل إظهار البنر في الصفحة الرئيسية
+                  </label>
+                </div>
+
+                <div className="sm:col-span-8">
+                  <label className="block text-ash mb-1 uppercase font-bold">رابط صورة المعاينة (Cloudinary / Image URL)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.imageUrl}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, imageUrl: e.target.value })}
+                    placeholder="https://res.cloudinary.com/..."
+                    className="w-full bg-stone border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Bilingual Eyebrow & Title */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gold mb-1 font-bold">العنوان الفرعي بالإنجليزية (Eyebrow EN)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.eyebrowEn}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, eyebrowEn: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gold mb-1 font-bold">العنوان الفرعي بالعربية (Eyebrow AR)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.eyebrowAr}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, eyebrowAr: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gold mb-1 font-bold">العنوان الرئيسي بالإنجليزية (Title EN)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.titleEn}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, titleEn: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none uppercase font-bold"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gold mb-1 font-bold">العنوان الرئيسي بالعربية (Title AR)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.titleAr}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, titleAr: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none font-bold"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Bilingual Description */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-ash mb-1">الوصف بالإنجليزية (Description EN)</label>
+                  <textarea
+                    rows={3}
+                    value={forgeEdit.descEn}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, descEn: e.target.value })}
+                    className="w-full bg-coal border border-grave p-3 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ash mb-1">الوصف بالعربية (Description AR)</label>
+                  <textarea
+                    rows={3}
+                    value={forgeEdit.descAr}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, descAr: e.target.value })}
+                    className="w-full bg-coal border border-grave p-3 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Button Text & Link */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div className="sm:col-span-4">
+                  <label className="block text-ash mb-1">نص الزر بالإنجليزية (CTA Button EN)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.buttonTextEn}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, buttonTextEn: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none uppercase"
+                    required
+                  />
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label className="block text-ash mb-1">نص الزر بالعربية (CTA Button AR)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.buttonTextAr}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, buttonTextAr: e.target.value })}
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label className="block text-ash mb-1">رابط الزر (Target Link)</label>
+                  <input
+                    type="text"
+                    value={forgeEdit.buttonLink}
+                    onChange={(e) => setForgeEdit({ ...forgeEdit, buttonLink: e.target.value })}
+                    placeholder="/customizer"
+                    className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4 border-t border-grave flex items-center justify-end">
+                <button
+                  type="submit"
+                  className="btn-primary py-3.5 px-8 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-gold/20"
+                >
+                  <Sparkles size={16} />
+                  <span>حفظ التعديلات في البنر</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
