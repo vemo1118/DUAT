@@ -68,15 +68,19 @@ export const HeroSlider = ({ setSelectedCategory }) => {
 
   const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
 
-  const alignClass = current?.textAlign === 'center'
+  const effectiveAlign = current?.textAlign
+    ? current.textAlign
+    : isAr ? 'right' : 'left';
+
+  const alignClass = effectiveAlign === 'center'
     ? 'text-center items-center mx-auto'
-    : current?.textAlign === 'right'
+    : effectiveAlign === 'right'
     ? 'text-right items-end ml-auto'
     : 'text-left items-start mr-auto';
 
-  const flexJustifyClass = current?.textAlign === 'center'
+  const flexJustifyClass = effectiveAlign === 'center'
     ? 'justify-center'
-    : current?.textAlign === 'right'
+    : effectiveAlign === 'right'
     ? 'justify-end'
     : 'justify-start';
 
@@ -99,14 +103,16 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           <img
             src={bgImage}
             alt="Hero Background"
-            className="w-full h-full object-cover object-center transition-transform duration-700 brightness-110 contrast-110 saturate-105"
+            className={`w-full h-full object-cover object-center transition-transform duration-700 brightness-110 contrast-110 saturate-105 ${
+              effectiveAlign === 'right' ? 'scale-x-[-1]' : 'scale-x-1'
+            }`}
           />
-          {/* Dynamic Theme Background Overlay Vignette (High Clarity Image + Soft Text Backing) */}
+          {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
           <div
             className={`absolute inset-0 sm:w-2/3 ${
-              isRtl
-                ? 'bg-gradient-to-l from-void via-void/50 to-transparent'
-                : 'bg-gradient-to-r from-void via-void/50 to-transparent'
+              effectiveAlign === 'right'
+                ? 'bg-gradient-to-l from-void via-void/60 to-transparent right-0'
+                : 'bg-gradient-to-r from-void via-void/60 to-transparent left-0'
             }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-void/30 via-transparent to-transparent pointer-events-none" />
@@ -117,11 +123,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       )}
 
       {/* Full Bleed Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-16 sm:py-24 relative z-10">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-16 sm:py-24 relative z-10">
         <div
-          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${
-            isRtl ? '-mr-2 lg:-mr-6' : '-ml-2 lg:-ml-6'
-          } ${alignClass}`}
+          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${alignClass}`}
           key={current.id}
         >
           
