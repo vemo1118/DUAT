@@ -138,16 +138,20 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     return (
       <div
         style={{
-          color: '#FFFFFF',
           background: is199x
-            ? 'linear-gradient(135deg, #6B2144 0%, #421229 100%)'
-            : 'linear-gradient(135deg, #1E2B45 0%, #0E1626 100%)',
-          borderColor: is199x ? '#9D174D' : '#334155',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            ? 'linear-gradient(145deg, #4A152E 0%, #2A0B1A 100%)'
+            : 'linear-gradient(145deg, #1A2436 0%, #0E1726 100%)',
+          borderColor: is199x ? 'rgba(219,39,119,0.5)' : 'rgba(224, 169, 59, 0.4)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.2)'
         }}
-        className={`${is199x ? 'rounded-full px-3 py-1' : 'rounded-xl px-3 py-1.5'} border flex items-center justify-center font-bold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap w-full`}
+        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full max-w-[84px] sm:max-w-[94px]"
       >
-        {labelText}
+        <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
+          MADE IN
+        </span>
+        <span className="font-sans font-bold text-[10px] sm:text-[11px] text-[#F0ECE1] leading-tight tracking-tight">
+          {is199x ? '199X' : `${yearKey}'s`}
+        </span>
       </div>
     );
   }
@@ -185,19 +189,38 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     };
     const monthCode = stickerId.replace('month-', '');
     const monthFullName = monthMap[monthCode] || monthCode;
-    const labelText = `Made In ${monthFullName}`;
+
+    if (forCanvas) {
+      return (
+        <div
+          style={{
+            color: '#F0ECE1',
+            background: 'linear-gradient(135deg, #182744 0%, #0D1629 60%, #070C18 100%)',
+            borderColor: 'rgba(55, 80, 125, 0.7)',
+            boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+          }}
+          className="rounded-full px-4 py-1.5 border flex items-center justify-center font-serif italic font-semibold text-xs sm:text-sm select-none pointer-events-none whitespace-nowrap shadow-lg"
+        >
+          Made In {monthFullName}
+        </div>
+      );
+    }
 
     return (
       <div
         style={{
-          color: '#EDE4D3',
-          background: 'linear-gradient(135deg, #1E2B45 0%, #0E1626 100%)',
-          borderColor: '#334155',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.25)',
+          background: 'linear-gradient(145deg, #1A2436 0%, #0E1726 60%, #070D18 100%)',
+          borderColor: 'rgba(224, 169, 59, 0.4)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.2)'
         }}
-        className="rounded-full px-2.5 py-1 sm:px-3 sm:py-1 border flex items-center justify-center font-serif italic font-semibold text-[10px] sm:text-xs select-none pointer-events-none whitespace-nowrap shadow-sm max-w-full overflow-hidden text-ellipsis"
+        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full max-w-[84px] sm:max-w-[94px] transition-transform"
       >
-        {labelText}
+        <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
+          MADE IN
+        </span>
+        <span className="font-serif italic font-bold text-[10px] sm:text-[11px] text-[#F0ECE1] leading-tight tracking-tight truncate max-w-full text-center">
+          {monthFullName}
+        </span>
       </div>
     );
   }
