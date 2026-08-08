@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 @font-face {
+  font-family: 'The Year of The Camel';
+  src: url('/fonts/ArbFONTS-TheYearofTheCamel-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'The Year of The Camel';
+  src: url('/fonts/ArbFONTS-TheYearofTheCamel-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-camel {
+  font-family: 'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'Arsenica Arabic', 'IBM Plex Sans Arabic', serif;
+}
+
+@font-face {
   font-family: 'Arsenica Arabic';
   src: url('/fonts/Arsenica-Arabic-Demibold-TRIAL.ttf') format('truetype');
   font-weight: 600;
