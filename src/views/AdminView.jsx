@@ -3003,14 +3003,37 @@ export function AdminView() {
               <div className="border border-grave divide-y divide-grave bg-stone/20 max-h-96 overflow-y-auto custom-scrollbar rounded">
                 {selectedOrderDetails.items?.map((item, idx) => {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
-                  const cfg = item.customConfig || item.customDetails;
-                  const layers = item.customConfig?.layers || item.customDetails?.layers || [];
+                  const cfg = item.customConfig || item.customDetails || item.product?.customConfig || item.product?.customDetails;
+                  const layers = cfg?.layers || item.layers || item.product?.layers || [];
                   const caseBgColor = getCaseFinishColor(cfg?.caseFinish || cfg?.caseType || cfg?.caseTypeId);
-                  const dynamicSnapshot = generateCaseMockupSnapshot(null, layers, caseBgColor, '#E8A33D', cfg);
-                  const mockupImg = item.designSnapshot || item.customConfig?.designSnapshot || (item.image && item.image.startsWith('data:image') ? item.image : null) || dynamicSnapshot;
-                  const thumbImage = mockupImg || item.image || item.images?.[0];
+
+                  // Only generate dynamic snapshot if we actually have layer motifs!
+                  const dynamicSnapshot = layers.length > 0 ? generateCaseMockupSnapshot(null, layers, caseBgColor, '#E8A33D', cfg) : null;
+
+                  // Real Snapshot Image stored on item
+                  const rawSnapshot = item.designSnapshot ||
+                                     cfg?.designSnapshot ||
+                                     (typeof item.image === 'string' && item.image.startsWith('data:image') ? item.image : null) ||
+                                     (typeof item.product?.image === 'string' && item.product.image.startsWith('data:image') ? item.product.image : null);
+
+                  const mockupImg = rawSnapshot || dynamicSnapshot || (typeof item.image === 'string' && item.image.length > 15 ? item.image : null);
+                  const thumbImage = mockupImg || (item.images && item.images[0]) || item.product?.image;
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
-                  const isCustomCase = item.category === 'cases' || !!cfg || !!item.designSnapshot || layers.length > 0;
+
+                  const isCustomCase = item.category === 'cases' ||
+                                       item.category === 'customizer' ||
+                                       item.isCustom ||
+                                       !!cfg ||
+                                       !!item.designSnapshot ||
+                                       layers.length > 0 ||
+                                       (typeof name === 'string' && (name.includes('جراب مخصص') || name.includes('Custom Case') || name.includes('مخصص')));
+
+                  const extractedModel = cfg?.phoneModel ||
+                                         cfg?.model ||
+                                         item.tagAr ||
+                                         item.tagEn ||
+                                         (typeof name === 'string' && name.includes('—') ? name.split('—')[1]?.trim() : null) ||
+                                         (typeof name === 'string' && name.includes('-') ? name.split('-')[1]?.trim() : 'غير محدد');
 
                   const STICKER_NAME_MAP = {
                     'st-born-dawn': 'طالع نور (Born at Dawn)',
@@ -3063,17 +3086,39 @@ export function AdminView() {
                       </div>
 
                       {/* Custom Case Specifications & Layers Breakdown */}
-                      {cfg && (
-                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px] rounded">
+                      {(cfg || isCustomCase) && (
+                        <div className="bg-coal p-3 border border-gold/30 space-y-2.5 font-mono text-[11px] rounded">
                           <div className="flex flex-wrap gap-3 text-gold font-bold">
-                            <span>📱 الموديل: {cfg.phoneModel || cfg.model || 'غير محدد'}</span>
-                            {cfg.customModelInput && (
+                            <span>📱 الموديل: {extractedModel}</span>
+                            {cfg?.customModelInput && (
                               <span className="text-bone">({cfg.customModelInput})</span>
                             )}
-                            <span>🎨 التقفيل: {cfg.caseFinish || cfg.caseType || 'جراب شفاف'}</span>
+                            <span>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'جراب مخصص'}</span>
                           </div>
 
-                          {cfg.designNotes && (
+                          {mockupImg ? (
+                            <div className="pt-2 border-t border-grave/40 flex flex-col sm:flex-row items-center justify-between gap-3 bg-stone/40 p-2.5 rounded border border-gold/30">
+                              <div className="flex items-center gap-2">
+                                <img src={mockupImg} alt="Custom Case Preview" className="w-12 h-16 object-contain rounded bg-stone border border-gold/40 shadow-sm" />
+                                <span className="text-gold font-bold text-xs">🖼️ معاينة صورة الجراب التصميمية:</span>
+                              </div>
+                              <a
+                                href={mockupImg}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download={`custom-case-design-${selectedOrderDetails.id || 'order'}.png`}
+                                className="px-3.5 py-1.5 bg-gold text-void font-bold text-xs rounded hover:bg-amber-400 transition-colors flex items-center gap-1.5 shadow"
+                              >
+                                <span>تحميل/فتح صورة التصميم 📥</span>
+                              </a>
+                            </div>
+                          ) : (
+                            <div className="pt-2 border-t border-grave/40 text-ash text-[11px] italic">
+                              ℹ️ هذا الطلب مسجل سابقاً قبل تفعيل لقطات التصميم التلقائية. الطلبات الجديدة المخصصة تتضمن لقطة التصميم بالكامل.
+                            </div>
+                          )}
+
+                          {cfg?.designNotes && (
                             <div className="text-stone-950 bg-amber-400 p-2.5 rounded font-bold border border-amber-500 shadow-sm text-xs">
                               <strong>📝 ملاحظات التصميم والورشة:</strong> "{cfg.designNotes}"
                             </div>

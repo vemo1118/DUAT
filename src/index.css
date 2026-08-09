@@ -35,7 +35,7 @@
 }
 
 .font-ruqaa {
-  font-family: 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', 'Rakkas', serif;
+  font-family: 'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'ArbFONTS-TheYearofTheCamel-Bold', 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', serif;
 }
 
 .font-cinzel {
@@ -86,6 +86,11 @@ html:not([data-theme]) {
   --ash-rgb: 142 152 191;
   --ember: #D9432E;
   --ember-rgb: 217 67 46;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 html[data-theme="night"] body,

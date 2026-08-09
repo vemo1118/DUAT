@@ -23,6 +23,16 @@ export const INITIAL_CATEGORY_BANNERS = [
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     badge: '02',
     categoryLink: '/shop'
+  },
+  {
+    id: 'letters',
+    nameEn: 'LETTERS & BADGES',
+    nameAr: 'الحروف والشهور والسنين',
+    subtitleEn: '3D epoxy letters, birth month & year badges',
+    subtitleAr: 'استيكرات حروف عربي وإنجليزي وشهور وسنين الميلاد',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+    badge: '03',
+    categoryLink: '/shop'
   }
 ];
 
@@ -87,27 +97,33 @@ export const CategoryBannersProvider = ({ children }) => {
           .select('*');
 
         if (Array.isArray(catData) && catData.length > 0) {
-          setCategoryBanners((prev) =>
-            prev.map((b) => {
-              const match = catData.find((dbRow) => dbRow.id === b.id);
-              if (match && match.image_url) {
-                // Keep local image URL if user customized it
-                const localSaved = localStorage.getItem('duat_category_banners_v3');
-                if (!localSaved) {
-                  return {
-                    ...b,
-                    imageUrl: match.image_url || b.imageUrl,
-                    nameEn: match.name_en || b.nameEn,
-                    nameAr: match.name_ar || b.nameAr,
-                    subtitleEn: match.subtitle_en || b.subtitleEn,
-                    subtitleAr: match.subtitle_ar || b.subtitleAr,
-                    is_active: match.is_active !== undefined ? match.is_active : (b.is_active !== undefined ? b.is_active : true)
-                  };
-                }
+          setCategoryBanners((prev) => {
+            const mappedFromDb = catData.map((dbRow) => ({
+              id: dbRow.id,
+              nameEn: dbRow.name_en || '',
+              nameAr: dbRow.name_ar || '',
+              subtitleEn: dbRow.subtitle_en || '',
+              subtitleAr: dbRow.subtitle_ar || '',
+              imageUrl: dbRow.image_url || '',
+              badge: dbRow.badge || `01`,
+              categoryLink: dbRow.category_link || '/shop',
+              is_active: dbRow.is_active !== undefined ? dbRow.is_active : true
+            }));
+
+            // Merge with INITIAL_CATEGORY_BANNERS to preserve any non-db fields if needed
+            const dbMap = new Map(mappedFromDb.map((b) => [String(b.id), b]));
+            return prev.map((b) => {
+              const match = dbMap.get(String(b.id));
+              if (match) {
+                return {
+                  ...b,
+                  ...match,
+                  imageUrl: match.imageUrl || b.imageUrl
+                };
               }
               return b;
-            })
-          );
+            });
+          });
         }
       } catch (err) {
         console.warn('Error loading banners from Supabase:', err);

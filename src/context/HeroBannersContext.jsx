@@ -194,12 +194,7 @@ export function HeroBannersProvider({ children }) {
   const fetchSlides = async () => {
     setLoading(true);
     try {
-      const local = loadLocalSlides();
-      if (local && local.length > 0) {
-        setSlides(local);
-        setLoading(false);
-        return;
-      }
+      // 1. Primary: Load from Supabase
       let query = supabase.from('hero_slides').select('*');
       try {
         query = query.order('sort_order', { ascending: true });
@@ -212,7 +207,6 @@ export function HeroBannersProvider({ children }) {
         // Exclude deleted slide 2 if it's the old promo slide
         const filtered = fetched.filter((s) => s.id !== 'hero-slide-2');
         if (filtered.length > 0) {
-          // If hero-slide-1 in DB has old copy, update it with new defaults
           const merged = filtered.map((s) => {
             if (s.id === 'hero-slide-1' && (s.headline1En === 'CRAFT YOUR OWN' || s.eyebrowEn === 'DUAT / THE FORGE')) {
               return { ...s, ...INITIAL_HERO_SLIDES[0] };
@@ -225,6 +219,16 @@ export function HeroBannersProvider({ children }) {
           return;
         }
       }
+
+      // 2. Fallback to localStorage
+      const local = loadLocalSlides();
+      if (local && local.length > 0) {
+        setSlides(local);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Fallback to INITIAL_HERO_SLIDES
       setSlides(INITIAL_HERO_SLIDES);
       saveLocalSlides(INITIAL_HERO_SLIDES);
     } catch (err) {

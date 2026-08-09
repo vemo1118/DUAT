@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, Component } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toPng } from 'html-to-image';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -439,9 +440,9 @@ export const CustomizerContent = () => {
   const [activeTab, setActiveTab] = useState('stickers');
   const [stickerCategoryFilter, setStickerCategoryFilter] = useState('letters');
   const [customText, setCustomText] = useState('');
-  const [textColor, setTextColor] = useState('#182744');
-  const [textBgColor, setTextBgColor] = useState('#FFFFFF');
-  const [textFont, setTextFont] = useState('kufi'); // 'ruqaa', 'kufi', 'space', 'mono'
+  const [textColor, setTextColor] = useState('#FFFFFF');
+  const [textBgColor, setTextBgColor] = useState('transparent');
+  const [textFont, setTextFont] = useState('ruqaa'); // 'ruqaa', 'kufi', 'cinzel', 'mono'
 
   const handleColorSelect = (newColor) => {
     setTextColor(newColor);
@@ -481,7 +482,7 @@ export const CustomizerContent = () => {
     : currentModelName;
 
   const displayModelBadgeText = isCustomModelOption
-    ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز آخر (حدد بالأسفل)' : 'Other Device'))
+    ? (customModelInput.trim() || (lang === 'ar' ? 'جهاز آخر' : 'Other Device'))
     : currentModelName;
 
   // Layer Operations
@@ -494,8 +495,8 @@ export const CustomizerContent = () => {
       type: 'sticker',
       stickerId,
       src: img,
-      color: textColor || '#182744',
-      bgColor: textBgColor || '#FFFFFF',
+      color: textColor || '#FFFFFF',
+      bgColor: textBgColor || 'transparent',
       x: 50,
       y: 50,
       scale: 1.0,
@@ -963,6 +964,17 @@ export const CustomizerContent = () => {
 
     const priceNum = Number(builderPrice) || 850;
 
+    const customConfigObj = {
+      phoneModel: currentModelName,
+      customModelInput: selectedModel === 'other-custom' ? customModelInput : null,
+      caseType: selectedCaseType?.nameAr || selectedCaseType?.nameEn,
+      caseFinish: selectedCaseType?.caseFinish || selectedCaseType?.nameEn || 'Matte',
+      designSnapshot: mockupSnapshotUrl,
+      layers: layers,
+      caseBgColor: caseBgColor,
+      caseRingColor: caseRingColor
+    };
+
     const customizerItem = {
       id: `custom-case-${Date.now()}`,
       name: lang === 'ar' ? `جراب مخصص — ${currentModelName}` : `Custom Case — ${currentModelName}`,
@@ -970,16 +982,18 @@ export const CustomizerContent = () => {
       nameEn: `Custom Case — ${currentModelName}`,
       price: priceNum,
       image: mockupSnapshotUrl || 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=600&q=80',
+      designSnapshot: mockupSnapshotUrl,
       category: 'customizer',
       isCustom: true,
       selectedModel: currentModelName,
       caseType: selectedCaseType?.nameEn || selectedCaseType?.nameAr || 'Standard Matte',
       caseFinish: selectedCaseType?.caseFinish || selectedCaseType?.nameEn || 'Matte',
+      customConfig: customConfigObj,
       layers,
       quantity: 1
     };
 
-    addToCart(customizerItem);
+    addToCart(customizerItem, customConfigObj);
     showToast(lang === 'ar' ? 'تمت إضافة تصميم الجراب للسلة بنجاح! 📱✨' : 'Custom case design added to cart! 📱✨');
     navigate('/checkout');
   };
@@ -996,7 +1010,7 @@ export const CustomizerContent = () => {
 
 
   const renderPhoneCanvas = (isDesktopCanvas = false) => (
-    <div className="w-[300px] sm:w-[340px] aspect-[3/5] relative flex flex-col items-center justify-center select-none overflow-visible">
+    <div className="w-[270px] xs:w-[295px] sm:w-[330px] aspect-[3/5] max-h-[50vh] sm:max-h-[60vh] relative flex flex-col items-center justify-center select-none overflow-visible my-auto">
       <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
       <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
       <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-400/80 rounded-r-md" />
@@ -1180,7 +1194,8 @@ export const CustomizerContent = () => {
   return (
     <>
       <div className={`lg:hidden min-h-screen font-sans flex flex-col justify-between select-none pb-6 ${isNight ? 'bg-[#0A0C16] text-bone' : 'bg-[#F8F7F4] text-stone-900'}`}>
-        <header className="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between relative select-none z-20">
+        {/* Mobile Header Bar */}
+        <header className="w-full max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between relative select-none z-20">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -1190,91 +1205,52 @@ export const CustomizerContent = () => {
             {lang === 'ar' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
           </button>
 
-          <div className="flex flex-col items-center">
-            <h1 className={`font-sans font-semibold text-base sm:text-lg tracking-tight ${isNight ? 'text-bone' : 'text-stone-900'}`}>
-              {lang === 'ar' ? 'محرر مباشر' : 'Live Editor'}
-            </h1>
-            <div className="flex items-center gap-1.5 mt-1">
-              <button
-                type="button"
-                onClick={() => { setIsModelSelectorOpen(true); setActiveCategory('model'); }}
-                className={`transition-all duration-300 ${activeCategory === 'model' || isModelSelectorOpen ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveCategory('motifs')}
-                className={`transition-all duration-300 ${['motifs','quotes-ar','quotes-en','letters','years','months','letters-en'].includes(activeCategory) ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveCategory('text-photo')}
-                className={`transition-all duration-300 ${activeCategory === 'text-photo' ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveCategory('presets')}
-                className={`transition-all duration-300 ${activeCategory === 'presets' ? (isNight ? 'w-5 h-1.5 bg-gold rounded-full' : 'w-5 h-1.5 bg-stone-900 rounded-full') : (isNight ? 'w-1.5 h-1.5 bg-stone-700 rounded-full' : 'w-1.5 h-1.5 bg-stone-300 rounded-full')}`}
-              />
-            </div>
+          {/* Sleek Integrated Phone Model & Finish Selector Button */}
+          <button
+            type="button"
+            onClick={() => setIsModelSelectorOpen(true)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer ${
+              isNight
+                ? 'bg-[#182744] border-gold/50 text-gold hover:bg-[#203258]'
+                : 'bg-white border-stone-300 text-stone-900 hover:bg-stone-100'
+            }`}
+          >
+            <Smartphone size={14} className="text-gold shrink-0" />
+            <span className="truncate max-w-[130px] font-bold">{currentModelName}</span>
+            <span className="text-[10px] opacity-75 font-normal">
+              · {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
+            </span>
+            <ChevronDown size={14} className="text-gold shrink-0" />
+          </button>
+
+          <div className="w-10 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsNight((prev) => !prev)}
+              className={`p-2 rounded-full transition-colors ${isNight ? 'text-gold hover:bg-stone-800' : 'text-stone-700 hover:bg-stone-200'}`}
+              title={lang === 'ar' ? 'تغيير الوضع' : 'Toggle Theme'}
+            >
+              <Sparkles size={18} />
+            </button>
           </div>
-          <div className="w-10" />
         </header>
 
-        <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-1 sm:my-3">
-          {/* Prominent Mobile Model & Case Finish Selector Bar */}
-          <div className="w-full max-w-sm mx-auto mb-2 flex items-center justify-between gap-2 z-20">
-            <button
-              type="button"
-              onClick={() => setIsModelSelectorOpen((prev) => !prev)}
-              className={`flex-1 flex items-center justify-between gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer ${
-                isNight
-                  ? 'bg-[#182744] border-gold/50 text-gold hover:border-gold hover:bg-[#203258]'
-                  : 'bg-white border-stone-300 text-stone-900 hover:border-black'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 truncate">
-                <Smartphone size={15} className="text-gold shrink-0" />
-                <span className="truncate">{currentModelName}</span>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/20 text-gold font-bold shrink-0">
-                {lang === 'ar' ? 'تغيير' : 'Edit'}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsModelSelectorOpen((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer ${
-                isNight
-                  ? 'bg-[#182744] border-gold/50 text-bone hover:border-gold hover:bg-[#203258]'
-                  : 'bg-white border-stone-300 text-stone-900 hover:border-black'
-              }`}
-              title={lang === 'ar' ? 'لون ونوع الجراب' : 'Case Finish & Color'}
-            >
-              <div
-                className="w-3.5 h-3.5 rounded-full border border-stone-400/50 shadow-inner shrink-0"
-                style={{ backgroundColor: selectedCaseType?.color || '#000000' }}
-              />
-              <span className="text-xs font-medium truncate max-w-[70px]">{lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}</span>
-              <Palette size={14} className="text-gold shrink-0" />
-            </button>
-          </div>
-
-          {/* Inline Model Selector Drawer for Mobile when active */}
-          {isModelSelectorOpen && (
-            <div className="w-full max-w-sm mx-auto mb-3 z-30">
+        {/* Mobile Model Selector Modal Overlay (Does not shift layout or push canvas) */}
+        {isModelSelectorOpen && (
+          <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scrollbar">
               {renderTopCaseModelBar()}
             </div>
-          )}
+          </div>
+        )}
 
+        <main className="flex-1 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center my-1 sm:my-2">
           {renderPhoneCanvas(false)}
           {renderQuickToolbar(isNight)}
         </main>
 
         <footer className={`w-full max-w-3xl mx-auto rounded-t-[32px] sm:rounded-3xl border p-4 sm:p-6 space-y-4 font-sans select-none z-30 ${isNight ? 'bg-[#14110F] border-stone-800/90 text-bone shadow-2xl' : 'bg-white border-stone-200/80 text-stone-900 shadow-[0_-10px_40px_rgba(0,0,0,0.06)]'}`}>
           <div className={`w-12 h-1 rounded-full mx-auto mb-1 ${isNight ? 'bg-stone-700' : 'bg-stone-300'}`} />
-
-          {renderTopCaseModelBar()}
 
           <div className="flex items-center justify-between">
             <h2 className={`font-sans font-bold text-base sm:text-lg tracking-tight ${isNight ? 'text-bone' : 'text-stone-900'}`}>
@@ -1555,25 +1531,25 @@ export const CustomizerContent = () => {
                 <div className="grid grid-cols-4 gap-1.5 pt-1">
                   <button
                     onClick={() => setTextFont('ruqaa')}
-                    className={`p-2 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white') : (isNight ? 'border-stone-800 bg-[#1F1B18]' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                    className={`p-2 border rounded-xl font-ruqaa text-xs transition-all ${textFont === 'ruqaa' ? 'border-gold bg-[#182744] text-white font-bold shadow-sm' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                   >
                     خط رقعة
                   </button>
                   <button
                     onClick={() => setTextFont('kufi')}
-                    className={`p-2 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white') : (isNight ? 'border-stone-800 bg-[#1F1B18]' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                    className={`p-2 border rounded-xl font-sans text-xs transition-all ${textFont === 'kufi' ? 'border-gold bg-[#182744] text-white font-bold shadow-sm' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                   >
                     IBM Kufi
                   </button>
                   <button
                     onClick={() => setTextFont('cinzel')}
-                    className={`p-2 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white') : (isNight ? 'border-stone-800 bg-[#1F1B18]' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                    className={`p-2 border rounded-xl font-cinzel text-xs transition-all ${textFont === 'cinzel' ? 'border-gold bg-[#182744] text-white font-bold shadow-sm' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                   >
                     Cinzel
                   </button>
                   <button
                     onClick={() => setTextFont('mono')}
-                    className={`p-2 border rounded-xl font-mono text-xs ${textFont === 'mono' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white') : (isNight ? 'border-stone-800 bg-[#1F1B18]' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                    className={`p-2 border rounded-xl font-mono text-xs transition-all ${textFont === 'mono' ? 'border-gold bg-[#182744] text-white font-bold shadow-sm' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                   >
                     Mono
                   </button>
@@ -1655,16 +1631,16 @@ export const CustomizerContent = () => {
                 color: isModelSelectorOpen ? (isNight ? '#0A0C16' : '#FFFFFF') : (isNight ? '#E0A93B' : '#18181B'),
                 borderColor: isModelSelectorOpen ? (isNight ? '#E0A93B' : '#18181B') : (isNight ? '#3A4259' : '#D6D3D1')
               }}
-              className="px-3.5 py-1.5 rounded-full border font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 shadow-sm"
+              className="px-3.5 py-1.5 rounded-full border font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 shadow-sm max-w-[180px] lg:max-w-[220px]"
             >
-              <span>📱</span>
+              <span className="shrink-0">📱</span>
               <span
                 style={{ color: isModelSelectorOpen ? (isNight ? '#0A0C16' : '#FFFFFF') : (isNight ? '#E0A93B' : '#18181B') }}
-                className="font-bold"
+                className="font-bold truncate"
               >
                 {displayModelBadgeText}
               </span>
-              <span className="opacity-70 text-[10px]">✏️</span>
+              <span className="opacity-70 text-[10px] shrink-0">✏️</span>
             </button>
 
             <button
@@ -1676,16 +1652,16 @@ export const CustomizerContent = () => {
                 color: isModelSelectorOpen ? (isNight ? '#0A0C16' : '#FFFFFF') : (isNight ? '#E0A93B' : '#18181B'),
                 borderColor: isModelSelectorOpen ? (isNight ? '#E0A93B' : '#18181B') : (isNight ? '#3A4259' : '#D6D3D1')
               }}
-              className="px-3.5 py-1.5 rounded-full border font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 shadow-sm"
+              className="px-3.5 py-1.5 rounded-full border font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 shadow-sm max-w-[180px] lg:max-w-[220px]"
             >
-              <span>🎨</span>
+              <span className="shrink-0">🎨</span>
               <span
                 style={{ color: isModelSelectorOpen ? (isNight ? '#0A0C16' : '#FFFFFF') : (isNight ? '#EDE4D3' : '#18181B') }}
-                className="font-bold"
+                className="font-bold truncate"
               >
                 {lang === 'ar' ? selectedCaseType?.nameAr : selectedCaseType?.nameEn}
               </span>
-              <span className="opacity-70 text-[10px]">✏️</span>
+              <span className="opacity-70 text-[10px] shrink-0">✏️</span>
             </button>
 
             <div
@@ -1994,25 +1970,25 @@ export const CustomizerContent = () => {
                     <div className="grid grid-cols-4 gap-2 pt-2">
                       <button
                         onClick={() => setTextFont('ruqaa')}
-                        className={`p-2.5 border rounded-xl font-ruqaa text-xs ${textFont === 'ruqaa' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white font-semibold') : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                        className={`p-2.5 border rounded-xl font-ruqaa text-xs transition-all ${textFont === 'ruqaa' ? 'border-gold bg-[#182744] text-white font-bold shadow-md' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                       >
                         خط رقعة
                       </button>
                       <button
                         onClick={() => setTextFont('kufi')}
-                        className={`p-2.5 border rounded-xl font-sans text-xs ${textFont === 'kufi' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white font-semibold') : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                        className={`p-2.5 border rounded-xl font-sans text-xs transition-all ${textFont === 'kufi' ? 'border-gold bg-[#182744] text-white font-bold shadow-md' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                       >
                         IBM Kufi
                       </button>
                       <button
                         onClick={() => setTextFont('cinzel')}
-                        className={`p-2.5 border rounded-xl font-cinzel text-xs ${textFont === 'cinzel' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white font-semibold') : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                        className={`p-2.5 border rounded-xl font-cinzel text-xs transition-all ${textFont === 'cinzel' ? 'border-gold bg-[#182744] text-white font-bold shadow-md' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                       >
                         Cinzel
                       </button>
                       <button
                         onClick={() => setTextFont('mono')}
-                        className={`p-2.5 border rounded-xl font-mono text-xs ${textFont === 'mono' ? (isNight ? 'border-gold bg-gold text-[#0A0C16] font-bold' : 'border-black bg-stone-900 text-white font-semibold') : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4]')}`}
+                        className={`p-2.5 border rounded-xl font-mono text-xs transition-all ${textFont === 'mono' ? 'border-gold bg-[#182744] text-white font-bold shadow-md' : (isNight ? 'border-stone-800 bg-[#1F1B18] text-bone' : 'border-stone-200 bg-[#F8F7F4] text-stone-900')}`}
                       >
                         Mono
                       </button>

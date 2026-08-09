@@ -18,6 +18,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
   const [sortBy, setSortBy] = useState('featured');
   const [selectedCaseType, setSelectedCaseType] = useState('all');
   const [selectedPhoneModel, setSelectedPhoneModel] = useState('all');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [maxPrice, setMaxPrice] = useState(5000);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -32,6 +33,16 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
     const matchesCategory = !selectedCategory || selectedCategory === 'all' || product.category === selectedCategory;
     const matchesCaseType = !selectedCaseType || selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
     const matchesPrice = (product.price || 0) <= maxPrice;
+
+    // Sub-category matching (for letters & badges)
+    let matchesSubCategory = true;
+    if (selectedCategory === 'letters' && selectedSubCategory !== 'all') {
+      const pid = String(product.id || '');
+      if (selectedSubCategory === 'arabic') matchesSubCategory = pid.startsWith('ar-letter-');
+      else if (selectedSubCategory === 'english') matchesSubCategory = pid.startsWith('en-letter-');
+      else if (selectedSubCategory === 'months') matchesSubCategory = pid.startsWith('month-');
+      else if (selectedSubCategory === 'years') matchesSubCategory = pid.startsWith('year-');
+    }
 
     // Phone model matching logic
     let matchesPhoneModel = true;
@@ -55,7 +66,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
       (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
       (product.tagAr && product.tagAr.toLowerCase().includes(query));
 
-    return isVisible && matchesCategory && matchesCaseType && matchesPrice && matchesSearch && matchesPhoneModel;
+    return isVisible && matchesCategory && matchesSubCategory && matchesCaseType && matchesPrice && matchesSearch && matchesPhoneModel;
   });
 
   // Sort Logic with defensive checks
@@ -73,6 +84,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
     setSelectedCategory('all');
     setSelectedCaseType('all');
     setSelectedPhoneModel('all');
+    setSelectedSubCategory('all');
     setMaxPrice(5000);
     setSearchQuery('');
   };
@@ -194,6 +206,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                       {cat.id === 'all' && t('allProducts')}
                       {cat.id === 'cases' && t('catCases')}
                       {cat.id === 'stickers' && t('catStickers')}
+                      {cat.id === 'letters' && t('catLetters')}
                       {cat.id === 'charms' && t('catCharms')}
                       {cat.id === 'accessories' && t('catAccessories')}
                     </span>
@@ -281,6 +294,32 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
 
         {/* RIGHT MAIN PRODUCT GRID (LG: COL 9) */}
         <main className="lg:col-span-9 space-y-6">
+
+          {/* Sub-category Quick Filters for Letters & Badges */}
+          {selectedCategory === 'letters' && (
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-grave pb-4">
+              {[
+                { id: 'all', label: t('subCatAll') },
+                { id: 'arabic', label: t('subCatArabic') },
+                { id: 'english', label: t('subCatEnglish') },
+                { id: 'months', label: t('subCatMonths') },
+                { id: 'years', label: t('subCatYears') }
+              ].map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setSelectedSubCategory(sub.id)}
+                  className={`px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-sm transition-all whitespace-nowrap border ${
+                    selectedSubCategory === sub.id
+                      ? 'bg-gold text-void border-gold font-bold shadow-md shadow-gold/20'
+                      : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           {filteredProducts.length === 0 ? (
             <div className="py-24 text-center space-y-4 bg-stone border border-grave card-depth-highlight">
               <SunDisc size={48} variant="gold" className="opacity-40" />
@@ -332,6 +371,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                     {cat.id === 'all' && t('allProducts')}
                     {cat.id === 'cases' && t('catCases')}
                     {cat.id === 'stickers' && t('catStickers')}
+                    {cat.id === 'letters' && t('catLetters')}
                     {cat.id === 'charms' && t('catCharms')}
                     {cat.id === 'accessories' && t('catAccessories')}
                   </button>

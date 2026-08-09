@@ -23,8 +23,16 @@ export const TRANSLATIONS = {
     catTitle: 'What we make.',
     catCases: 'Cases',
     catStickers: 'Dome Stickers',
+    catLetters: 'Letters & Badges',
     catCharms: 'Charms',
     catAccessories: 'Accessories',
+
+    // Letters & Badges Sub-Filters
+    subCatAll: 'All Letters & Badges',
+    subCatArabic: 'Arabic Letters',
+    subCatEnglish: 'English Letters',
+    subCatMonths: 'Birth Months',
+    subCatYears: 'Birth Years',
 
     // Forge
     forgeEyebrow: 'THE FORGE',
@@ -244,8 +252,16 @@ export const TRANSLATIONS = {
     catTitle: 'ما نصنعه.',
     catCases: 'الجرابات',
     catStickers: 'الملصقات المجسمة',
+    catLetters: 'الحروف والشهور والسنين',
     catCharms: 'التعليقات',
     catAccessories: 'الإكسسوارات',
+
+    // Letters & Badges Sub-Filters
+    subCatAll: 'كل الحروف والشارات',
+    subCatArabic: 'حروف عربي',
+    subCatEnglish: 'حروف إنجليزي',
+    subCatMonths: 'الشهور',
+    subCatYears: 'السنين',
 
     // Forge
     forgeEyebrow: 'المصنع',

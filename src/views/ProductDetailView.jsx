@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { ProductCard } from '../components/ProductCard';
 import { CaseGraphic } from '../components/CaseGraphic';
+import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import {
   Star,
@@ -190,12 +191,16 @@ export function ProductDetailView() {
 
           {/* Main Visual Display Box */}
           <div className="flex-1 w-full bg-void border border-grave aspect-[3/4] relative overflow-hidden flex items-center justify-center p-6 card-depth-highlight order-1 md:order-2">
-            {images.length > 0 ? (
+            {images.length > 0 && images[0] ? (
               <img
                 src={images[activeImageIndex] || images[0]}
                 alt={name}
-                className="w-full h-full object-cover object-center transition-all duration-300"
+                className="w-full h-full object-contain object-center transition-all duration-300 p-4"
               />
+            ) : (product?.stickerRenderId || product?.id?.startsWith('ar-letter-') || product?.id?.startsWith('en-letter-') || product?.id?.startsWith('month-') || product?.id?.startsWith('year-')) ? (
+              <div className="w-full h-full flex items-center justify-center p-6">
+                <StickerIcon stickerId={product.stickerRenderId || product.id} size={140} color="#182744" bgColor="#FFFFFF" />
+              </div>
             ) : (
               <CaseGraphic finish={product.caseTypeId || 'clear'} size="lg" showLabel={true} />
             )}

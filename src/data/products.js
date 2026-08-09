@@ -2,8 +2,9 @@ export const CATEGORIES = [
   { id: 'all', key: 'all' },
   { id: 'cases', key: 'cases', num: '01' },
   { id: 'stickers', key: 'stickers', num: '02' },
-  { id: 'charms', key: 'charms', num: '03' },
-  { id: 'accessories', key: 'accessories', num: '04' }
+  { id: 'letters', key: 'letters', num: '03' },
+  { id: 'charms', key: 'charms', num: '04' },
+  { id: 'accessories', key: 'accessories', num: '05' }
 ];
 
 export const PRODUCTS = [
@@ -220,7 +221,7 @@ export const PRODUCTS = [
 const ARABIC_LETTERS_CHARS = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','هـ','و','ي'];
 export const ARABIC_LETTER_PRODUCTS = ARABIC_LETTERS_CHARS.map((char) => ({
   id: `ar-letter-${char}`,
-  category: 'stickers',
+  category: 'letters',
   nameEn: `Arabic Letter ${char}`,
   nameAr: `حرف ${char}`,
   price: 100,
@@ -242,7 +243,7 @@ export const ARABIC_LETTER_PRODUCTS = ARABIC_LETTERS_CHARS.map((char) => ({
 const ENGLISH_LETTERS_CHARS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 export const ENGLISH_LETTER_PRODUCTS = ENGLISH_LETTERS_CHARS.map((char) => ({
   id: `en-letter-${char}`,
-  category: 'stickers',
+  category: 'letters',
   nameEn: `English Letter ${char}`,
   nameAr: `حرف إنجليزي ${char}`,
   price: 100,
@@ -277,7 +278,7 @@ const MONTHS_PRODUCT_LIST = [
 ];
 export const MONTH_STICKER_PRODUCTS = MONTHS_PRODUCT_LIST.map((m) => ({
   id: m.id,
-  category: 'stickers',
+  category: 'letters',
   nameEn: m.en,
   nameAr: m.ar,
   price: 100,
@@ -310,7 +311,7 @@ const YEARS_PRODUCT_LIST = [
 ];
 export const YEAR_STICKER_PRODUCTS = YEARS_PRODUCT_LIST.map((y) => ({
   id: y.id,
-  category: 'stickers',
+  category: 'letters',
   nameEn: y.en,
   nameAr: y.ar,
   price: 100,

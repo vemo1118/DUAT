@@ -27,7 +27,7 @@ function mapFromDb(row) {
   return {
     ...data,
     id: row.id || data.id,
-    category: row.category || data.category || (String(row.id || data.id || '').startsWith('st-') || String(row.id || data.id || '').startsWith('pack-') || String(row.id || data.id || '').startsWith('sticker') ? 'stickers' : 'cases'),
+    category: row.category || data.category || (String(row.id || data.id || '').startsWith('ar-letter-') || String(row.id || data.id || '').startsWith('en-letter-') || String(row.id || data.id || '').startsWith('month-') || String(row.id || data.id || '').startsWith('year-') ? 'letters' : (String(row.id || data.id || '').startsWith('st-') || String(row.id || data.id || '').startsWith('pack-') || String(row.id || data.id || '').startsWith('sticker') ? 'stickers' : 'cases')),
     price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || 0),
     is_active: isActiveVal,
     isActive: isActiveVal,
@@ -143,23 +143,47 @@ export function ProductsProvider({ children }) {
   const [products, setProducts] = useState(() => loadLocalProducts());
   const [loading, setLoading] = useState(true);
 
-  // Fetch products safely without overwriting local admin edits
+  // Fetch products safely with Supabase as primary source of truth
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const isCustomOrder = localStorage.getItem('duat_custom_product_order') === 'true';
+
+      // 1. Primary: Attempt to load from Supabase
+      const { data, error } = await supabase.from('products').select('*');
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const fetchedProds = data.map(mapFromDb).filter(Boolean);
+
+        // Merge DB prods with INITIAL_PRODUCTS to ensure any missing default product exists
+        const dbMap = new Map(fetchedProds.map((p) => [String(p.id), p]));
+        const merged = [
+          ...fetchedProds,
+          ...INITIAL_PRODUCTS.filter((initP) => !dbMap.has(String(initP.id)))
+        ];
+
+        const finalProducts = isCustomOrder ? merged : sortProductsByDefaultOrder(merged);
+        setProducts(finalProducts);
+        saveLocalProducts(finalProducts);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Fallback to localStorage if Supabase call returned empty or error
       const local = loadLocalProducts();
       if (local && local.length > 0) {
         setProducts(isCustomOrder ? local : sortProductsByDefaultOrder(local));
         setLoading(false);
         return;
       }
+
+      // 3. Fallback to INITIAL_PRODUCTS
       const initialSorted = sortProductsByDefaultOrder(INITIAL_PRODUCTS);
       setProducts(initialSorted);
       saveLocalProducts(initialSorted);
     } catch (err) {
       console.warn('Products fetch fallback to local/initial:', err);
-      setProducts(sortProductsByDefaultOrder(INITIAL_PRODUCTS));
+      const local = loadLocalProducts();
+      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(INITIAL_PRODUCTS));
     } finally {
       setLoading(false);
     }

@@ -22,13 +22,13 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const boxSize = forCanvas ? 58 : size;
     const isTransparentBg = bgColor === 'transparent';
 
-    // Default: white background, navy text (as requested)
-    const finalTextColor = color || '#182744';
+    // Default text color: white (#FFFFFF)
+    const finalTextColor = color || '#FFFFFF';
     const finalBg = isTransparentBg
       ? 'transparent'
       : (bgColor && bgColor !== '#14110F' && bgColor !== '#0A0C16' && bgColor !== '#181E3B'
           ? bgColor
-          : '#FFFFFF');
+          : '#14110F');
 
     return (
       <div

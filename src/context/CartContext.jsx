@@ -15,20 +15,34 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product, customConfig = null) => {
     setCartItems(prevItems => {
       const cfg = customConfig || product.customConfig || product.customDetails;
-      if (cfg) {
+      const isCustomProduct = product.isCustom || product.category === 'customizer' || !!cfg || !!product.designSnapshot;
+
+      if (isCustomProduct) {
+        const snapshot = product.designSnapshot || cfg?.designSnapshot || product.image;
+        const phoneModel = cfg?.phoneModel || product.selectedModel || product.phoneModel || 'iPhone';
         const newItem = {
-          cartItemId: `custom-${Date.now()}`,
-          id: product.id || 'custom-case',
-          nameEn: product.nameEn || 'Customized Case',
-          nameAr: product.nameAr || 'جراب مخصص',
+          cartItemId: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          id: product.id || `custom-case-${Date.now()}`,
+          name: product.name || product.nameAr || `جراب مخصص — ${phoneModel}`,
+          nameEn: product.nameEn || `Custom Case — ${phoneModel}`,
+          nameAr: product.nameAr || `جراب مخصص — ${phoneModel}`,
           price: product.price || 850,
-          tagEn: product.tagEn || cfg.phoneModel || 'Custom',
-          tagAr: product.tagAr || cfg.phoneModel || 'مخصص',
-          image: product.image || product.designSnapshot || cfg.designSnapshot,
-          designSnapshot: product.designSnapshot || cfg.designSnapshot,
-          quantity: 1,
+          tagEn: product.tagEn || phoneModel || 'Custom',
+          tagAr: product.tagAr || phoneModel || 'مخصص',
+          image: snapshot,
+          designSnapshot: snapshot,
+          quantity: product.quantity || 1,
           isCustom: true,
-          customConfig: product.customConfig || cfg
+          category: product.category || 'customizer',
+          customConfig: {
+            ...(cfg || {}),
+            phoneModel: phoneModel,
+            customModelInput: cfg?.customModelInput || product.customModelInput,
+            caseType: cfg?.caseType || product.caseType,
+            caseFinish: cfg?.caseFinish || product.caseFinish,
+            designSnapshot: snapshot,
+            layers: cfg?.layers || product.layers || []
+          }
         };
         return [...prevItems, newItem];
       }
@@ -36,19 +50,22 @@ export const CartProvider = ({ children }) => {
       const existingIndex = prevItems.findIndex(item => item.id === product.id && !item.isCustom);
       if (existingIndex > -1) {
         const updated = [...prevItems];
-        updated[existingIndex].quantity += 1;
+        updated[existingIndex].quantity += (product.quantity || 1);
         return updated;
       }
 
       const newItem = {
         cartItemId: `${product.id}-${Date.now()}`,
         id: product.id,
-        nameEn: product.nameEn,
-        nameAr: product.nameAr,
+        nameEn: product.nameEn || product.name,
+        nameAr: product.nameAr || product.name,
+        name: product.name || product.nameAr,
         price: product.price,
+        image: product.image || product.images?.[0],
+        images: product.images || (product.image ? [product.image] : []),
         tagEn: product.tagEn,
         tagAr: product.tagAr,
-        quantity: 1,
+        quantity: product.quantity || 1,
         isCustom: false,
         product
       };

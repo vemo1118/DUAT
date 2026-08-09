@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const SocialGridContext = createContext();
 
@@ -82,6 +83,37 @@ export const SocialGridProvider = ({ children }) => {
     return INITIAL_SOCIAL_TILES;
   });
 
+  // Fetch from Supabase on mount
+  useEffect(() => {
+    async function loadSocialFromSupabase() {
+      try {
+        const { data: setRes } = await supabase
+          .from('store_settings')
+          .select('value')
+          .eq('key', 'social_grid_settings')
+          .maybeSingle();
+
+        if (setRes?.value && typeof setRes.value === 'object') {
+          setSettings((prev) => ({ ...prev, ...setRes.value }));
+        }
+
+        const { data: tileRes } = await supabase
+          .from('store_settings')
+          .select('value')
+          .eq('key', 'social_grid_tiles')
+          .maybeSingle();
+
+        if (Array.isArray(tileRes?.value) && tileRes.value.length > 0) {
+          setTiles(tileRes.value);
+        }
+      } catch (err) {
+        console.warn('Error loading social grid from Supabase:', err);
+      }
+    }
+
+    loadSocialFromSupabase();
+  }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -94,56 +126,72 @@ export const SocialGridProvider = ({ children }) => {
     } catch (e) {}
   }, [tiles]);
 
-  const updateSettings = (newFields) => {
-    setSettings((prev) => {
-      const updated = { ...prev, ...newFields };
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  const updateSettings = async (newFields) => {
+    const updated = { ...settings, ...newFields };
+    setSettings(updated);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
+
+    try {
+      await supabase.from('store_settings').upsert({
+        key: 'social_grid_settings',
+        value: updated,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Error saving social grid settings to Supabase:', err);
+    }
   };
 
-  const addTile = (tileData) => {
+  const saveTilesToSupabase = async (updatedTiles) => {
+    try {
+      await supabase.from('store_settings').upsert({
+        key: 'social_grid_tiles',
+        value: updatedTiles,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Error saving social tiles to Supabase:', err);
+    }
+  };
+
+  const addTile = async (tileData) => {
     const newTile = {
       ...tileData,
       id: tileData.id || `tile-${Date.now()}`,
       is_active: tileData.is_active !== undefined ? tileData.is_active : true
     };
-    setTiles((prev) => {
-      const updated = [...prev, newTile];
-      localStorage.setItem(TILES_KEY, JSON.stringify(updated));
-      return updated;
-    });
+    const updated = [...tiles, newTile];
+    setTiles(updated);
+    localStorage.setItem(TILES_KEY, JSON.stringify(updated));
+    await saveTilesToSupabase(updated);
     return newTile;
   };
 
-  const updateTile = (id, updatedFields) => {
-    setTiles((prev) => {
-      const updated = prev.map((t) => (t.id === id ? { ...t, ...updatedFields } : t));
-      localStorage.setItem(TILES_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  const updateTile = async (id, updatedFields) => {
+    const updated = tiles.map((t) => (t.id === id ? { ...t, ...updatedFields } : t));
+    setTiles(updated);
+    localStorage.setItem(TILES_KEY, JSON.stringify(updated));
+    await saveTilesToSupabase(updated);
   };
 
-  const toggleTileVisibility = (id) => {
-    setTiles((prev) => {
-      const updated = prev.map((t) => {
-        if (t.id === id) {
-          const current = t.is_active !== false && t.isActive !== false;
-          return { ...t, is_active: !current, isActive: !current };
-        }
-        return t;
-      });
-      localStorage.setItem(TILES_KEY, JSON.stringify(updated));
-      return updated;
+  const toggleTileVisibility = async (id) => {
+    const updated = tiles.map((t) => {
+      if (t.id === id) {
+        const current = t.is_active !== false && t.isActive !== false;
+        return { ...t, is_active: !current, isActive: !current };
+      }
+      return t;
     });
+    setTiles(updated);
+    localStorage.setItem(TILES_KEY, JSON.stringify(updated));
+    await saveTilesToSupabase(updated);
   };
 
-  const deleteTile = (id) => {
-    setTiles((prev) => {
-      const updated = prev.filter((t) => t.id !== id);
-      localStorage.setItem(TILES_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  const deleteTile = async (id) => {
+    const updated = tiles.filter((t) => t.id !== id);
+    setTiles(updated);
+    localStorage.setItem(TILES_KEY, JSON.stringify(updated));
+    await saveTilesToSupabase(updated);
   };
 
   const resetSocialGrid = () => {
