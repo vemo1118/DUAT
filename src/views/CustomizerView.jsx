@@ -882,7 +882,10 @@ export const CustomizerContent = () => {
                   <button
                     key={ct.id}
                     type="button"
-                    onClick={() => setSelectedCaseType(ct)}
+                    onClick={() => {
+                      setSelectedCaseType(ct);
+                      setIsModelSelectorOpen(false);
+                    }}
                     style={{
                       backgroundColor: active ? activeBg : inactiveBg,
                       borderColor: borderColor,
@@ -905,6 +908,23 @@ export const CustomizerContent = () => {
               })}
             </div>
           </div>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-stone-200 dark:border-amber-900/20 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsModelSelectorOpen(false)}
+            style={{
+              backgroundColor: isNight ? '#E0A93B' : '#18181B',
+              color: isNight ? '#0A0C16' : '#FFFFFF'
+            }}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-95"
+          >
+            <Check size={16} style={{ color: isNight ? '#0A0C16' : '#FFFFFF' }} />
+            <span style={{ color: isNight ? '#0A0C16' : '#FFFFFF', fontWeight: 700 }}>
+              {lang === 'ar' ? 'تم وتأكيد الاختيار ✨' : 'Apply & Continue ✨'}
+            </span>
+          </button>
         </div>
       </div>
     );
@@ -1010,7 +1030,7 @@ export const CustomizerContent = () => {
 
 
   const renderPhoneCanvas = (isDesktopCanvas = false) => (
-    <div className="w-[270px] xs:w-[295px] sm:w-[330px] aspect-[3/5] max-h-[50vh] sm:max-h-[60vh] relative flex flex-col items-center justify-center select-none overflow-visible my-auto">
+    <div className="w-[245px] xs:w-[270px] sm:w-[300px] aspect-[9/18.5] relative flex flex-col items-center justify-center select-none overflow-visible my-auto">
       <div className="absolute -left-1.5 top-20 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
       <div className="absolute -left-1.5 top-34 w-1.5 h-10 bg-stone-400/80 rounded-l-md" />
       <div className="absolute -right-1.5 top-28 w-1.5 h-12 bg-stone-400/80 rounded-r-md" />
@@ -1237,8 +1257,14 @@ export const CustomizerContent = () => {
 
         {/* Mobile Model Selector Modal Overlay (Does not shift layout or push canvas) */}
         {isModelSelectorOpen && (
-          <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scrollbar">
+          <div
+            onClick={() => setIsModelSelectorOpen(false)}
+            className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scrollbar animate-fade-in"
+            >
               {renderTopCaseModelBar()}
             </div>
           </div>
