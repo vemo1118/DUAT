@@ -15,6 +15,7 @@ import { AdminBuilderStickerModal } from '../components/AdminBuilderStickerModal
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
+import { StickerIcon } from '../components/StickerIcon';
 import {
   ArrowUp,
   ArrowDown,
@@ -2218,24 +2219,25 @@ export function AdminView() {
                 DUAT / BUILDER ENGINE & ASSETS CONTROL
               </span>
               <h2 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
-                محرر الجرابات التفاعلي (Case Builder Engine)
+                محرر بيلدر الاستيكرات التفاعلي (Sticker Builder Engine)
               </h2>
               <p className="font-mono text-xs text-ash mt-1">
-                التحكم الكامل في ألوان وتصميمات الجرابات، موديلات الهواتف المتاحة، سعر التصميم، والإظهار/الإخفاء الفوري.
+                التحكم الكامل في استيكرات وموتيفات البيلدر، أشكال الحروف، أسعار الاستيكرات المخصصة، الترتيب، والإظهار/الإخفاء الفوري.
               </p>
             </div>
 
             <button
               onClick={() => {
-                if (window.confirm('هل أنت تأكد من إعادة ضبط ألوان الجرابات والموديلات إلى الإعدادات الافتراضية؟')) {
-                  resetCustomizerConfig();
-                  showToast('تمت إعادة ضبط إعدادات البلدر بنجاح!', 'info');
+                if (window.confirm('هل أنت تأكد من إعادة ضبط استيكرات وأقسام البلدر إلى الإعدادات الافتراضية؟')) {
+                  resetBuilderStickers();
+                  resetBuilderCategories();
+                  showToast('تمت إعادة ضبط إعدادات بيلدر الاستيكرات بنجاح! 🎨', 'info');
                 }
               }}
               className="flex items-center gap-2 px-4 py-2 border border-grave bg-coal hover:border-gold text-ash hover:text-bone font-mono text-xs uppercase transition-colors"
             >
               <RotateCcw size={15} />
-              <span>إعادة ضبط البلدر الافتراضي</span>
+              <span>إعادة ضبط البيلدر الافتراضي 🔄</span>
             </button>
           </div>
 
@@ -2243,7 +2245,7 @@ export function AdminView() {
           <div className="bg-stone border border-grave p-6 space-y-4">
             <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
               <DollarSign size={16} />
-              <span>سعر التصميم المخصص الافتراضي (Default Custom Case Price)</span>
+              <span>سعر الاستيكر المخصص الافتراضي في البيلدر (Default Custom Sticker Price)</span>
             </h3>
             <form
               onSubmit={(e) => {
