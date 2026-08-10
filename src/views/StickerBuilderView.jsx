@@ -245,19 +245,19 @@ export function StickerBuilderView() {
             <div className="relative group transition-all duration-300 transform hover:scale-105 my-auto">
               
               {/* Soft Drop Shadow under 3D dome */}
-              <div className="absolute inset-0 bg-black/60 rounded-full blur-xl transform translate-y-4 scale-95" />
+              <div className={`absolute inset-0 bg-black/70 blur-lg transform translate-y-3 scale-95 ${activeShapeObj.class}`} />
 
               {/* Mode A: TEXT STICKER DOME */}
               {mode === 'text' && (
                 <div
                   ref={stickerCanvasRef}
-                  className={`relative z-10 transition-all duration-300 border shadow-2xl flex items-center justify-center text-center ${activeBgObj.bg} ${activeBgObj.border} ${activeShapeObj.class}`}
+                  className={`relative z-10 transition-all duration-300 border shadow-2xl flex items-center justify-center text-center overflow-hidden ${activeBgObj.bg} ${activeBgObj.border} ${activeShapeObj.class}`}
                   style={{
-                    boxShadow: '0 12px 30px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.5)'
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
                   }}
                 >
                   {/* Glossy Polyurethane Epoxy Sheen Glare */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none rounded-inherit" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent pointer-events-none" />
 
                   {/* Sticker Text */}
                   <span
