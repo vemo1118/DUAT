@@ -38,6 +38,15 @@ export function InteractiveBundleModal({ bundle, isOpen, onClose }) {
 
   // Letter options for 4-Letter bundle
   const ALL_LETTERS = [...ARABIC_LETTER_PRODUCTS.slice(0, 28), ...ENGLISH_LETTER_PRODUCTS.slice(0, 26)];
+  const DATE_OPTIONS = [...MONTH_STICKER_PRODUCTS, ...YEAR_STICKER_PRODUCTS];
+  const ALL_MIX_OPTIONS = [...SLOGAN_OPTIONS, ...ARABIC_LETTER_PRODUCTS.slice(0, 15), ...MONTH_STICKER_PRODUCTS.slice(0, 6), ...YEAR_STICKER_PRODUCTS.slice(0, 6)];
+
+  const getAvailableOptions = () => {
+    if (isLettersBundle) return ALL_LETTERS;
+    if (isTrioBundle) return SLOGAN_OPTIONS;
+    if (isDateBundle) return DATE_OPTIONS;
+    return ALL_MIX_OPTIONS;
+  };
 
   const toggleSelectItem = (item) => {
     const isSelected = selectedItems.some((s) => s.id === item.id);
@@ -143,7 +152,7 @@ export function InteractiveBundleModal({ bundle, isOpen, onClose }) {
             </h4>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-60 overflow-y-auto pr-1">
-              {(isTrioBundle ? SLOGAN_OPTIONS : isLettersBundle ? ALL_LETTERS : SLOGAN_OPTIONS).map((item) => {
+              {getAvailableOptions().map((item) => {
                 const isSelected = selectedItems.some((s) => s.id === item.id);
                 const name = isAr ? item.nameAr : item.nameEn;
 
