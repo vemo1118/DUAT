@@ -15,9 +15,35 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product, customConfig = null) => {
     setCartItems(prevItems => {
       const cfg = customConfig || product.customConfig || product.customDetails;
-      const isCustomProduct = product.isCustom || product.category === 'customizer' || !!cfg || !!product.designSnapshot;
+      const isStickerOrBundle = product.id?.startsWith('custom-sticker-') ||
+                                product.category === 'stickers' ||
+                                product.category === 'bundles' ||
+                                cfg?.mode === 'text' ||
+                                cfg?.mode === 'image';
 
-      if (isCustomProduct) {
+      const isCustomCase = !isStickerOrBundle && (product.isCustom || product.category === 'customizer' || product.category === 'cases');
+
+      if (isStickerOrBundle) {
+        const newItem = {
+          cartItemId: `sticker-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          id: product.id || `custom-sticker-${Date.now()}`,
+          name: product.nameAr || product.name || product.nameEn,
+          nameEn: product.nameEn || product.name || product.nameAr,
+          nameAr: product.nameAr || product.name || product.nameEn,
+          price: product.price || 100,
+          tagEn: product.tagEn || 'Custom 3D Epoxy Sticker',
+          tagAr: product.tagAr || 'استيكر إيبوكسي مجسم مخصص',
+          image: product.image || product.designSnapshot,
+          designSnapshot: product.designSnapshot || product.image,
+          quantity: product.quantity || 1,
+          category: product.category || 'stickers',
+          customDetails: product.customDetails || cfg,
+          isCustom: false
+        };
+        return [...prevItems, newItem];
+      }
+
+      if (isCustomCase) {
         const snapshot = product.designSnapshot || cfg?.designSnapshot || product.image;
         const phoneModel = cfg?.phoneModel || product.selectedModel || product.phoneModel || 'iPhone';
         const newItem = {
@@ -33,7 +59,7 @@ export const CartProvider = ({ children }) => {
           designSnapshot: snapshot,
           quantity: product.quantity || 1,
           isCustom: true,
-          category: product.category || 'customizer',
+          category: 'cases',
           customConfig: {
             ...(cfg || {}),
             phoneModel: phoneModel,
@@ -67,6 +93,7 @@ export const CartProvider = ({ children }) => {
         tagAr: product.tagAr,
         quantity: product.quantity || 1,
         isCustom: false,
+        category: product.category || 'stickers',
         product
       };
       return [...prevItems, newItem];
