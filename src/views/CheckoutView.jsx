@@ -412,17 +412,22 @@ export const CheckoutView = ({ setView }) => {
             {cartItems.map((item) => {
               const name = isRtl ? (item.nameAr || item.nameEn || item.name) : (item.nameEn || item.nameAr || item.name);
               const thumb = item.designSnapshot || item.customConfig?.designSnapshot || item.image || item.images?.[0];
-              const isCustomCase = item.category === 'cases' || !!item.customConfig;
-              const model = item.customConfig?.phoneModel || item.customDetails?.model;
-              const caseFinish = item.customConfig?.caseFinish || item.customDetails?.caseType;
+              const cDetails = item.customDetails || item.customConfig || {};
+
+              const isCustomSticker = item.id?.startsWith('custom-sticker-') || item.category === 'stickers' || cDetails?.mode === 'text' || cDetails?.mode === 'image';
+              const isCustomBundle = item.category === 'bundles' || item.id?.startsWith('bundle-') || !!cDetails?.selectedItems;
+              const isCustomCase = !isCustomSticker && !isCustomBundle && (item.category === 'cases' || !!item.customConfig);
+
+              const model = cDetails?.phoneModel || cDetails?.model;
+              const caseFinish = cDetails?.caseFinish || cDetails?.caseType;
 
               return (
                 <div
-                  key={item.cartId}
+                  key={item.cartId || item.id}
                   className="flex gap-3 p-3 bg-coal/80 border border-grave hover:border-gold/60 transition-colors rounded relative group"
                 >
                   {/* Thumbnail / Mockup Image */}
-                  <div className="w-14 h-18 bg-stone border border-grave rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
+                  <div className="w-16 h-16 bg-stone border border-grave rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
                     {thumb ? (
                       <img src={thumb} alt={name} className="w-full h-full object-contain" />
                     ) : (
@@ -437,6 +442,19 @@ export const CheckoutView = ({ setView }) => {
                       <span className="font-mono text-gold font-bold flex-shrink-0">{formatPrice(item.price * item.quantity)}</span>
                     </div>
 
+                    {isCustomSticker && cDetails?.customText && (
+                      <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
+                        <p className="text-gold font-bold">✍️ "{cDetails.customText}"</p>
+                        {cDetails.cutShape && <p className="text-[10px]">📐 {cDetails.cutShape} • {cDetails.bgFinish || 'إيبوكسي 3D'}</p>}
+                      </div>
+                    )}
+
+                    {isCustomBundle && cDetails?.selectedNames && (
+                      <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
+                        <p className="text-gold font-bold">🎁 {cDetails.selectedNames}</p>
+                      </div>
+                    )}
+
                     {isCustomCase && (
                       <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
                         {model && <p className="text-gold font-bold">📱 {model}</p>}
@@ -449,8 +467,10 @@ export const CheckoutView = ({ setView }) => {
                       <button
                         type="button"
                         onClick={() => {
-                          if (isCustomCase) {
-                            navigate('/customize', { state: { preselectedCaseTypeId: item.customConfig?.caseTypeId } });
+                          if (isCustomSticker) {
+                            navigate('/sticker-builder');
+                          } else if (isCustomBundle) {
+                            navigate('/bundles');
                           } else if (item.id) {
                             navigate(`/product/${item.id}`);
                           }

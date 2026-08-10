@@ -148,12 +148,19 @@ export const CartDrawer = () => {
                     <h3 className="font-space font-bold text-sm">
                       {isRtl ? item.nameAr : item.nameEn}
                     </h3>
-                    <p className="font-mono text-[10px] uppercase tracking-wider opacity-75">
-                      CASE: {isRtl ? item.tagAr : item.tagEn}
-                    </p>
+                    { (item.tagAr || item.tagEn) && (
+                      <p className="font-mono text-[10px] uppercase tracking-wider opacity-75">
+                        {isRtl ? item.tagAr : item.tagEn}
+                      </p>
+                    )}
+                    {item.customDetails?.customText && (
+                      <p className="font-mono text-[10px] text-[#E0A93B] font-bold">
+                        ✍️ "{item.customDetails.customText}"
+                      </p>
+                    )}
                     {item.customConfig?.phoneModel && (
                       <p className="font-mono text-[10px] text-[#E0A93B] uppercase font-bold">
-                        {item.customConfig.phoneModel}
+                        📱 {item.customConfig.phoneModel}
                       </p>
                     )}
                     <p className="font-mono text-sm text-[#E0A93B] font-bold pt-1">
