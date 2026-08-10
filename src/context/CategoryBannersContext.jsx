@@ -5,59 +5,51 @@ const CategoryBannersContext = createContext();
 
 export const INITIAL_CATEGORY_BANNERS = [
   {
-    id: 'cases',
-    nameEn: 'LUXURY CASES',
-    nameAr: 'الجرابات الفاخرة',
-    subtitleEn: 'Case + 6 DUAT stickers, made to order',
-    subtitleAr: 'جراب + ٦ استيكرات دوات، حسب الطلب',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
+    id: 'bundles',
+    nameEn: 'READY STICKER BUNDLES',
+    nameAr: 'البندلات المجمعة والعروض',
+    subtitleEn: 'Exclusive 3D epoxy sticker sets with bundle discount savings',
+    subtitleAr: 'باكدجات مجمعة جاهزة من الاستيكرات بخصم وتوفير خاص',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     badge: '01',
-    categoryLink: '/shop'
+    categoryLink: '/bundles'
   },
   {
     id: 'stickers',
-    nameEn: 'STICKERS',
-    nameAr: 'الاستيكرات',
-    subtitleEn: '3D epoxy dome stickers, sold on their own',
-    subtitleAr: 'استيكرات إيبوكسي، تتباع لوحدها',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
-    badge: '02',
-    categoryLink: '/shop'
-  },
-  {
-    id: 'letters',
-    nameEn: 'LETTERS & BADGES',
-    nameAr: 'الحروف والشهور والسنين',
-    subtitleEn: '3D epoxy letters, birth month & year badges',
-    subtitleAr: 'استيكرات حروف عربي وإنجليزي وشهور وسنين الميلاد',
+    nameEn: '3D EPOXY STICKERS',
+    nameAr: 'الاستيكرات المجسمة (3D)',
+    subtitleEn: 'Individual 3D epoxy dome slogans, badges & letters',
+    subtitleAr: 'استيكرات إيبوكسي 3D، تشكيلة العبارات والحروف والشارات',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
-    badge: '03',
-    categoryLink: '/shop'
+    badge: '02',
+    categoryLink: '/stickers'
   }
 ];
 
 export const DEFAULT_FORGE_BANNER = {
-  eyebrowEn: 'THE FORGE',
-  eyebrowAr: 'دوات / كور الفن',
-  titleEn: 'BUILD A CASE FOR YOURSELF.',
-  titleAr: 'صمم درعك الخاص بنفسك.',
-  descEn: 'Select your phone model, choose your armor finish, and stack 3D epoxy domes or custom text on canvas. Made to order. Shipped in 5 days.',
-  descAr: 'اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة ثلاثية الأبعاد. يُصنع حسب الطلب ويُشحن في ٥ أيام.',
-  buttonTextEn: 'OPEN THE BUILDER →',
-  buttonTextAr: 'افتح أداة التصميم ←',
-  buttonLink: '/customizer',
-  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
+  eyebrowEn: 'DUAT / STICKER BUILDER',
+  eyebrowAr: 'دوات / مصمم الاستيكرات',
+  titleEn: 'BUILD A STICKER FOR YOURSELF.',
+  titleAr: 'صمّم استيكرك الخاص بنفسك.',
+  descEn: 'Write custom text or upload your design to turn it into a 3D epoxy dome sticker. Made to order.',
+  descAr: 'اختر نصك المخصص، خطك العربي، أو ارفع صورتك لتتحول إلى استيكر إيبوكسي مجسم ثلاثي الأبعاد 3D.',
+  buttonTextEn: 'OPEN STICKER BUILDER →',
+  buttonTextAr: 'افتح بيلدر الاستيكرز ←',
+  buttonLink: '/sticker-builder',
+  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
   isActive: true
 };
 
 export const CategoryBannersProvider = ({ children }) => {
   const [categoryBanners, setCategoryBanners] = useState(() => {
     try {
-      const saved = localStorage.getItem('duat_category_banners_v3');
+      const saved = localStorage.getItem('duat_category_banners_v5');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // Filter out legacy luxe/cases banners
+          const valid = parsed.filter(b => b.id === 'bundles' || b.id === 'stickers' || b.id === 'builder');
+          if (valid.length > 0) return valid;
         }
       }
     } catch (e) {
@@ -110,9 +102,8 @@ export const CategoryBannersProvider = ({ children }) => {
               is_active: dbRow.is_active !== undefined ? dbRow.is_active : true
             }));
 
-            // Merge with INITIAL_CATEGORY_BANNERS to preserve any non-db fields if needed
             const dbMap = new Map(mappedFromDb.map((b) => [String(b.id), b]));
-            return prev.map((b) => {
+            const updated = prev.map((b) => {
               const match = dbMap.get(String(b.id));
               if (match) {
                 return {
@@ -123,6 +114,11 @@ export const CategoryBannersProvider = ({ children }) => {
               }
               return b;
             });
+
+            // Ensure initial category banners aren't lost
+            const updatedIds = new Set(updated.map((b) => b.id));
+            const missingInitials = INITIAL_CATEGORY_BANNERS.filter((b) => !updatedIds.has(b.id));
+            return [...updated, ...missingInitials];
           });
         }
       } catch (err) {
@@ -136,7 +132,7 @@ export const CategoryBannersProvider = ({ children }) => {
   // Sync categoryBanners to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_category_banners_v3', JSON.stringify(categoryBanners));
+      localStorage.setItem('duat_category_banners_v4', JSON.stringify(categoryBanners));
     } catch (e) {
       console.warn('Failed saving duat_category_banners to localStorage:', e);
     }

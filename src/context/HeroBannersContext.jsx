@@ -5,24 +5,24 @@ const HeroBannersContext = createContext();
 
 export const INITIAL_HERO_SLIDES = [
   {
-    id: 'hero-slide-1',
-    eyebrowEn: 'DUAT / EGYPT',
-    eyebrowAr: 'دوات / مصر',
+    id: 'hero-slide-luxe',
+    eyebrowEn: 'DUAT / LUXE COLLECTION',
+    eyebrowAr: 'دوات / الفئة الفاخرة',
     headline1En: 'THROUGH THE NIGHT,',
     headline1Ar: 'نعدّي الليل،',
     headline2En: 'BORN AT DAWN.',
     headline2Ar: 'ونطلع نور.',
-    subEn: '3D epoxy dome stickers, made to order in Egypt. The case is just the canvas — you tell the story.',
-    subAr: 'استيكرات إيبوكسي مجسّمة، تصنيع حسب الطلب في مصر. الجراب مجرد كانفس — وإنت اللي بتحكي.',
-    badgeEn: 'MADE TO ORDER',
-    badgeAr: 'تصنيع حسب الطلب',
+    subEn: 'Luxury Phone Cases + 3D Epoxy Dome Motifs. Made to order in Egypt.',
+    subAr: 'جرابات الفئة الفاخرة + ملصقات إيبوكسي مجسّمة. الجراب هو الكانفس — وإنت اللي بتحكي.',
+    badgeEn: 'LUXE CATEGORY',
+    badgeAr: 'فئة LUXE الفاخرة',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
-    ctaPrimaryTextEn: 'SHOP STICKERS',
-    ctaPrimaryTextAr: 'تسوق الاستيكرات',
+    ctaPrimaryTextEn: 'SHOP LUXE',
+    ctaPrimaryTextAr: 'تسوق الفئة الفاخرة',
     ctaPrimaryLink: '/shop',
     ctaSecondaryTextEn: 'BUILD A CASE',
-    ctaSecondaryTextAr: 'صمم جرابك',
-    ctaSecondaryLink: '/customize',
+    ctaSecondaryTextAr: 'صمم درعك بنفسك',
+    ctaSecondaryLink: '/customizer',
     textAlign: 'left',
     headline1Color: '',
     headline2Color: '',
@@ -34,6 +34,68 @@ export const INITIAL_HERO_SLIDES = [
     fontSizeScale: 92,
     is_active: true,
     sort_order: 1
+  },
+  {
+    id: 'hero-slide-nineties',
+    eyebrowEn: 'DUAT / NINETIES VIBES',
+    eyebrowAr: 'دوات / فئة التسعيناتي',
+    headline1En: '90s NOSTALGIA & POP,',
+    headline1Ar: 'نوستالجيا التسعينات،',
+    headline2En: 'IN 3D EPOXY DOMES.',
+    headline2Ar: 'بلمسة مجسمة.',
+    subEn: 'Retro vintage Egyptian pop culture icons in raised 3D epoxy domes.',
+    subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.',
+    badgeEn: 'NINETIES 90S',
+    badgeAr: 'فئة التسعيناتي 90s',
+    imageUrl: '/banners/nineties.png',
+    ctaPrimaryTextEn: 'SHOP NINETIES',
+    ctaPrimaryTextAr: 'تسوق فئة التسعيناتي',
+    ctaPrimaryLink: '/shop',
+    ctaSecondaryTextEn: 'STICKER BUILDER',
+    ctaSecondaryTextAr: 'صمم استيكرك',
+    ctaSecondaryLink: '/sticker-builder',
+    textAlign: 'left',
+    headline1Color: '#00F0FF',
+    headline2Color: '#FF007A',
+    subColor: '#E2E8F0',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 46,
+    fontSizeScale: 92,
+    is_active: true,
+    sort_order: 2
+  },
+  {
+    id: 'hero-slide-youth',
+    eyebrowEn: 'DUAT / YOUTH STREETWEAR',
+    eyebrowAr: 'دوات / الفئة الشبابية',
+    headline1En: 'BOLD & UNAPOLOGETIC,',
+    headline1Ar: 'عصري، جريء،',
+    headline2En: 'EXPRESS YOURSELF.',
+    headline2Ar: 'وبيعدّي الحدود.',
+    subEn: 'Vibrant neon street aesthetics & high-impact 3D epoxy dome badges.',
+    subAr: 'تشكيلة الجرابات والاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
+    badgeEn: 'YOUTH COLLECTION',
+    badgeAr: 'الفئة الشبابية YOUTH',
+    imageUrl: '/banners/youth.png',
+    ctaPrimaryTextEn: 'SHOP YOUTH',
+    ctaPrimaryTextAr: 'تسوق الفئة الشبابية',
+    ctaPrimaryLink: '/shop',
+    ctaSecondaryTextEn: 'CUSTOMIZER',
+    ctaSecondaryTextAr: 'افتح أداة التصميم',
+    ctaSecondaryLink: '/customizer',
+    textAlign: 'left',
+    headline1Color: '#38BDF8',
+    headline2Color: '#FACC15',
+    subColor: '#F3F4F6',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 46,
+    fontSizeScale: 92,
+    is_active: true,
+    sort_order: 3
   }
 ];
 
@@ -116,7 +178,7 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v9';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v12';
 
 function loadLocalSlides() {
   try {

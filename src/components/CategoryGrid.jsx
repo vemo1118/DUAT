@@ -25,9 +25,10 @@ export const CategoryGrid = ({ onSelectCategory }) => {
     image: cat.imageUrl || cat.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg'
   }));
 
-  const handleClick = (catId) => {
-    if (onSelectCategory) onSelectCategory(catId);
-    navigate('/shop');
+  const handleClick = (cat) => {
+    const link = cat.categoryLink || (cat.id === 'bundles' ? '/bundles' : cat.id === 'builder' ? '/sticker-builder' : '/stickers');
+    if (onSelectCategory) onSelectCategory(cat.id);
+    navigate(link);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -48,7 +49,7 @@ export const CategoryGrid = ({ onSelectCategory }) => {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            onClick={() => handleClick(cat.id)}
+            onClick={() => handleClick(cat)}
             className="group relative h-80 sm:h-96 bg-stone border border-grave overflow-hidden cursor-pointer card-depth-highlight flex flex-col justify-between p-6 sm:p-8"
           >
             {/* Background Image / Render */}
