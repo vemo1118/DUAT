@@ -53,7 +53,8 @@ import {
   TrendingUp,
   BarChart2,
   CheckCircle2,
-  Clock
+  Clock,
+  Palette
 } from 'lucide-react';
 import { SunDisc } from '../components/SunDisc';
 import {
