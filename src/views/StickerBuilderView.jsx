@@ -272,6 +272,7 @@ export function StickerBuilderView() {
               {/* Mode B: IMAGE STICKER DOME */}
               {mode === 'image' && (
                 <div
+                  ref={stickerCanvasRef}
                   className={`relative z-10 transition-all duration-300 border shadow-2xl overflow-hidden flex items-center justify-center p-4 ${
                     imgCutShape === 'circle' ? 'rounded-full w-44 h-44' :
                     imgCutShape === 'oval' ? 'rounded-[40%] w-52 h-36' : 'rounded-xl w-48 h-48'
@@ -279,9 +280,9 @@ export function StickerBuilderView() {
                     borderStyle === 'gold' ? 'border-4 border-gold' :
                     borderStyle === 'white' ? 'border-4 border-white' :
                     borderStyle === 'black' ? 'border-4 border-black' : 'border-none'
-                  } bg-coal`}
+                  } ${activeBgObj.bg} ${activeBgObj.border}`}
                   style={{
-                    boxShadow: '0 12px 30px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.3)'
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
                   }}
                 >
                   {/* Polyurethane Gloss Sheen Overlay */}
@@ -528,6 +529,29 @@ export function StickerBuilderView() {
                       }`}
                     >
                       {b.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Select Background Finish */}
+              <div className="space-y-2">
+                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
+                  {isAr ? '🎨 اختر خامة خلفية الاستيكر:' : '🎨 Select Base Finish:'}
+                </label>
+                <div className="grid grid-cols-1 gap-2">
+                  {BG_FINISHES.map((bg) => (
+                    <button
+                      key={bg.id}
+                      onClick={() => setBgFinish(bg.id)}
+                      className={`p-3 font-mono text-xs border flex items-center justify-between transition-all ${
+                        bgFinish === bg.id
+                          ? 'border-gold bg-gold/10 text-gold font-bold'
+                          : 'border-grave bg-coal text-bone hover:border-gold/40'
+                      }`}
+                    >
+                      <span>{isAr ? bg.nameAr : bg.nameEn}</span>
+                      {bgFinish === bg.id && <Check size={14} className="text-gold" />}
                     </button>
                   ))}
                 </div>
