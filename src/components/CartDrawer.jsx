@@ -97,6 +97,27 @@ export const CartDrawer = () => {
             </button>
           </div>
 
+          {/* Smart Bundle Nudge Bar */}
+          {(() => {
+            const stickerTotalCount = cartList.reduce((sum, i) => sum + (i.category === 'stickers' ? i.quantity : 0), 0);
+            if (stickerTotalCount === 0) return null;
+
+            return (
+              <div className="bg-gold/10 border-b border-gold/30 px-5 py-3 font-mono text-xs text-gold flex items-center gap-2">
+                <Tag size={15} className="flex-shrink-0" />
+                {stickerTotalCount === 1 && (
+                  <span>{isRtl ? '🎁 أضف استيكرين كمان وافتَح خصم الثلاثية (توفير ٥٠ ج.م)!' : '🎁 Add 2 more stickers for Trio Discount (Save 50 EGP)!'}</span>
+                )}
+                {stickerTotalCount === 2 && (
+                  <span>{isRtl ? '🎉 باقي استيكر واحد بس وتوفر ٥٠ ج.م بخصم البندل!' : '🎉 Add 1 more sticker to save 50 EGP with Trio Bundle!'}</span>
+                )}
+                {stickerTotalCount >= 3 && (
+                  <span>{isRtl ? '✨ مبروك! حصلت على الخصم المجمع لاستيكرات دوات.' : '✨ Congrats! You unlocked DUAT Bundle Savings.'}</span>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Body — Scrollable Items List or Empty State */}
           <div className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDawn ? 'bg-[#EFEAE0]' : 'bg-[#14110F]'}`}>
             {cartList.length === 0 ? (

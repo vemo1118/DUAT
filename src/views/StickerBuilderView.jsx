@@ -219,7 +219,11 @@ export function StickerBuilderView() {
 
             {/* Scale / Dimension guide badge */}
             <div className="absolute bottom-4 right-4 z-10 font-mono text-[10px] text-ash uppercase bg-coal/80 px-2.5 py-1 border border-grave">
-              <span>{isAr ? 'المقاس: ٥.٥ × ٥.٥ سم تقريباً' : 'Approx: 5.5 x 5.5 cm'}</span>
+              <span>
+                {isAr
+                  ? `المقاس: ${Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1)} × ${cutShape === 'circle' ? Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1) : 2.5} سم تقريباً`
+                  : `Approx: ${Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1)} x ${cutShape === 'circle' ? Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1) : 2.5} cm`}
+              </span>
             </div>
 
             {/* RENDERED 3D EPOXY STICKER ITEM */}
@@ -320,7 +324,26 @@ export function StickerBuilderView() {
                   className="w-full bg-coal border border-grave px-4 py-3 text-sm font-space text-bone placeholder:text-ash focus:border-gold focus:outline-none"
                   maxLength={30}
                 />
-                <span className="font-mono text-[10px] text-ash block text-right">
+                
+                {/* One-Click Quick Presets */}
+                <div className="pt-1.5 space-y-1">
+                  <span className="font-mono text-[10px] text-ash block">
+                    {isAr ? '💡 أو اختر من العبارات الشائعة بنقرة واحدة:' : '💡 Or pick from quick presets:'}
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['طالع نور', 'عدّي الليل', 'دوات', 'سنة 2004', 'DUAT', 'Born at Dawn', '1999'].map((preset) => (
+                      <button
+                        key={preset}
+                        onClick={() => setCustomText(preset)}
+                        className="bg-coal hover:bg-stone border border-grave hover:border-gold px-2.5 py-1 text-[11px] font-mono text-bone transition-colors rounded-xs"
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <span className="font-mono text-[10px] text-ash block text-right pt-1">
                   {customText.length} / 30 {isAr ? 'حرف' : 'chars'}
                 </span>
               </div>

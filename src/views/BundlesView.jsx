@@ -7,12 +7,16 @@ import { useToast } from '../context/ToastContext';
 import { SunDisc } from '../components/SunDisc';
 import { ShoppingBag, Sparkles, Check, ChevronLeft, ChevronRight, Gift, Tag, Zap, ArrowLeft, ArrowRight } from 'lucide-react';
 
+import { InteractiveBundleModal } from '../components/InteractiveBundleModal';
+
 export function BundlesView() {
   const { products = [] } = useProducts();
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
   const { addToast } = useToast();
   const navigate = useNavigate();
+
+  const [activeBundleModal, setActiveBundleModal] = useState(null);
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -24,13 +28,7 @@ export function BundlesView() {
 
   const handleAddBundle = (bundle, e) => {
     e.stopPropagation();
-    addToCart(bundle, 1, {});
-    addToast(
-      isAr 
-        ? `تمت إضافة ${bundle.nameAr} إلى السلة! 🎉` 
-        : `Added ${bundle.nameEn} to cart! 🎉`, 
-      'success'
-    );
+    setActiveBundleModal(bundle);
   };
 
   return (
@@ -196,6 +194,13 @@ export function BundlesView() {
           <CtaArrow size={16} />
         </Link>
       </div>
+
+      {/* Interactive Bundle Configurator Modal */}
+      <InteractiveBundleModal
+        bundle={activeBundleModal}
+        isOpen={!!activeBundleModal}
+        onClose={() => setActiveBundleModal(null)}
+      />
 
     </div>
   );
