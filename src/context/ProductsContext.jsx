@@ -17,37 +17,55 @@ const INITIAL_PRODUCTS = [
   ...YEAR_STICKER_PRODUCTS,
 ];
 
-const ProductsContext = createContext();
+const INITIAL_PRODUCTS_MAP = new Map(INITIAL_PRODUCTS.map((p) => [String(p.id), p]));
+
+const LEGACY_FAKE_PRODUCT_IDS = new Set([
+  'case-ember', 'case-void', 'case-frost', 'case-solar', 'case-bone', 'case-sage',
+  'case-carbon', 'case-gold-ring', 'case-tide', 'charm-gold-ring', 'charm-ember-bead',
+  'sticker-disc', 'sticker-tale3-noor', 'sticker-3addi-lel', 'sticker-born-dawn'
+]);
 
 function mapFromDb(row) {
   if (!row) return null;
+  const idStr = String(row.id || (row.data && row.data.id) || '');
+  if (LEGACY_FAKE_PRODUCT_IDS.has(idStr)) return null;
+
+  const initP = INITIAL_PRODUCTS_MAP.get(idStr);
   const data = row.data && typeof row.data === 'object' ? row.data : {};
   const isActiveVal = row.is_active !== undefined ? Boolean(row.is_active) : (data.is_active !== undefined ? Boolean(data.is_active) : (data.isActive !== undefined ? Boolean(data.isActive) : true));
-  const img = data.imageUrl || data.image || row.image_url || '';
+
+  let img = data.imageUrl || data.image || row.image_url || '';
+  if ((!img || img.includes('SH1_ST_j1z2h3.png')) && initP && (initP.image || initP.imageUrl)) {
+    img = initP.imageUrl || initP.image;
+  }
+
+  const baseObj = initP ? { ...initP } : {};
+
   return {
+    ...baseObj,
     ...data,
-    id: row.id || data.id,
-    category: row.category || data.category || (String(row.id || data.id || '').startsWith('ar-letter-') || String(row.id || data.id || '').startsWith('en-letter-') || String(row.id || data.id || '').startsWith('month-') || String(row.id || data.id || '').startsWith('year-') ? 'letters' : (String(row.id || data.id || '').startsWith('st-') || String(row.id || data.id || '').startsWith('pack-') || String(row.id || data.id || '').startsWith('sticker') ? 'stickers' : 'cases')),
-    price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || 0),
+    id: idStr,
+    category: row.category || data.category || baseObj.category || (idStr.startsWith('ar-letter-') || idStr.startsWith('en-letter-') || idStr.startsWith('month-') || idStr.startsWith('year-') ? 'letters' : (idStr.startsWith('st-') || idStr.startsWith('pack-') || idStr.startsWith('sticker') ? 'stickers' : 'cases')),
+    price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || baseObj.price || 0),
     is_active: isActiveVal,
     isActive: isActiveVal,
     imageUrl: img,
     image: img,
-    images: img ? [img] : (Array.isArray(data.images) ? data.images : []),
-    nameEn: data.nameEn || row.name_en || '',
-    nameAr: data.nameAr || row.name_ar || '',
-    tagEn: data.tagEn || row.tag_en || '',
-    tagAr: data.tagAr || row.tag_ar || '',
-    craftTagEn: data.craftTagEn || row.craft_tag_en || '',
-    craftTagAr: data.craftTagAr || row.craft_tag_ar || '',
-    descriptionEn: data.descriptionEn || row.description_en || '',
-    descriptionAr: data.descriptionAr || row.description_ar || '',
-    specsEn: Array.isArray(data.specsEn) ? data.specsEn : (Array.isArray(row.specs_en) ? row.specs_en : []),
-    specsAr: Array.isArray(data.specsAr) ? data.specsAr : (Array.isArray(row.specs_ar) ? row.specs_ar : []),
-    caseTypeId: data.caseTypeId || row.case_type_id || 'clear',
-    rating: Number(data.rating || row.rating || 5.0),
-    reviewCount: Number(data.reviewCount || row.review_count || 0),
-    reviews: Array.isArray(data.reviews) ? data.reviews : (Array.isArray(row.reviews) ? row.reviews : [])
+    images: img ? [img] : (Array.isArray(baseObj.images) && baseObj.images.length > 0 ? baseObj.images : (Array.isArray(data.images) ? data.images : [])),
+    nameEn: data.nameEn || row.name_en || baseObj.nameEn || '',
+    nameAr: data.nameAr || row.name_ar || baseObj.nameAr || '',
+    tagEn: data.tagEn || row.tag_en || baseObj.tagEn || '',
+    tagAr: data.tagAr || row.tag_ar || baseObj.tagAr || '',
+    craftTagEn: data.craftTagEn || row.craft_tag_en || baseObj.craftTagEn || '',
+    craftTagAr: data.craftTagAr || row.craft_tag_ar || baseObj.craftTagAr || '',
+    descriptionEn: data.descriptionEn || row.description_en || baseObj.descriptionEn || '',
+    descriptionAr: data.descriptionAr || row.description_ar || baseObj.descriptionAr || '',
+    specsEn: Array.isArray(data.specsEn) && data.specsEn.length > 0 ? data.specsEn : (Array.isArray(baseObj.specsEn) ? baseObj.specsEn : []),
+    specsAr: Array.isArray(data.specsAr) && data.specsAr.length > 0 ? data.specsAr : (Array.isArray(baseObj.specsAr) ? baseObj.specsAr : []),
+    caseTypeId: data.caseTypeId || row.case_type_id || baseObj.caseTypeId || 'clear',
+    rating: Number(data.rating || row.rating || baseObj.rating || 5.0),
+    reviewCount: Number(data.reviewCount || row.review_count || baseObj.reviewCount || 0),
+    reviews: Array.isArray(data.reviews) ? data.reviews : (Array.isArray(baseObj.reviews) ? baseObj.reviews : [])
   };
 }
 
@@ -73,7 +91,7 @@ function mapToDb(p) {
   };
 }
 
-const PRODUCTS_STORAGE_KEY = 'duat_products_v9';
+const PRODUCTS_STORAGE_KEY = 'duat_products_v11';
 
 const PREFERRED_BUNDLE_ORDER = [
   'bundle-clear',
