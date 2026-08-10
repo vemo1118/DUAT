@@ -17,6 +17,8 @@ const INITIAL_PRODUCTS = [
   ...YEAR_STICKER_PRODUCTS,
 ];
 
+const ProductsContext = createContext();
+
 const INITIAL_PRODUCTS_MAP = new Map(INITIAL_PRODUCTS.map((p) => [String(p.id), p]));
 
 const LEGACY_FAKE_PRODUCT_IDS = new Set([
