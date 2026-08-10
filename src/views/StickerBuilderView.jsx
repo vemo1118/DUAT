@@ -22,7 +22,7 @@ export function StickerBuilderView() {
 
   // Text Sticker State
   const [customText, setCustomText] = useState('طالع نور');
-  const [selectedFont, setSelectedFont] = useState('arabic'); // 'arabic', 'display', 'mono', 'serif'
+  const [selectedFont, setSelectedFont] = useState('camel'); // 'camel', 'ruqaa', 'kufi', 'amiri', 'rakkas', 'cairo', 'changa', 'katibeh'
   const [textColor, setTextColor] = useState('#E0A93B'); // Gold default
   const [bgFinish, setBgFinish] = useState('obsidian'); // 'clear', 'obsidian', 'gold-foil', 'ivory', 'amber'
   const [cutShape, setCutShape] = useState('pill'); // 'pill', 'badge', 'circle', 'shield'
@@ -39,12 +39,16 @@ export function StickerBuilderView() {
 
   const stickerCanvasRef = useRef(null);
 
-  // Fonts Options
+  // 8 Distinct Arabic Calligraphy & Modern Fonts Options
   const FONTS = [
-    { id: 'arabic', nameAr: 'خط ريم كوفي (عربي أنيق)', nameEn: 'Reem Kufi (Arabic)', fontClass: 'font-arabic' },
-    { id: 'display', nameAr: 'خط مودرن (Space Grotesk)', nameEn: 'Space Grotesk (Modern)', fontClass: 'font-space' },
-    { id: 'mono', nameAr: 'خط تكنولوجي (Monospace)', nameEn: 'Monospace (Tech)', fontClass: 'font-mono' },
-    { id: 'clash', nameAr: 'خط بارز (Clash Display)', nameEn: 'Clash Display (Bold)', fontClass: 'font-clash' }
+    { id: 'camel', nameAr: 'خط دوات الملكي', nameEn: 'DUAT Royal Camel', fontClass: 'font-arabic-camel', sample: 'دوات' },
+    { id: 'ruqaa', nameAr: 'خط رقعة ديواني', nameEn: 'Traditional Ruqaa', fontClass: 'font-arabic-ruqaa', sample: 'رقعة' },
+    { id: 'kufi', nameAr: 'خط كوفي هندسي', nameEn: 'Geometric Kufi', fontClass: 'font-arabic-kufi', sample: 'كوفي' },
+    { id: 'amiri', nameAr: 'خط أميري نسخي', nameEn: 'Amiri Naskh', fontClass: 'font-arabic-amiri', sample: 'نسخ' },
+    { id: 'rakkas', nameAr: 'خط رقّاص عريض', nameEn: 'Rakkas Heavy', fontClass: 'font-arabic-rakkas', sample: 'رقاص' },
+    { id: 'cairo', nameAr: 'خط كايبرو عصري', nameEn: 'Cairo Modern Bold', fontClass: 'font-arabic-cairo', sample: 'مودرن' },
+    { id: 'changa', nameAr: 'خط تشانجا مجسّم', nameEn: 'Changa 3D Tech', fontClass: 'font-arabic-changa', sample: 'مجسم' },
+    { id: 'katibeh', nameAr: 'خط كتيبة ديواني', nameEn: 'Katibeh Script', fontClass: 'font-arabic-katibeh', sample: 'كتيبة' }
   ];
 
   // Text Colors
@@ -362,20 +366,25 @@ export function StickerBuilderView() {
               {/* 2. Select Font */}
               <div className="space-y-2">
                 <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '🔤 اختر شكل الخط:' : '🔤 Select Font Style:'}
+                  {isAr ? '🔤 اختر نوع الخط العربي (٨ خطوط متنوعة):' : '🔤 Select Arabic Font Style (8 Styles):'}
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {FONTS.map((font) => (
                     <button
                       key={font.id}
                       onClick={() => setSelectedFont(font.id)}
-                      className={`p-2.5 text-xs font-mono border transition-all text-center ${
+                      className={`p-3 border transition-all text-center flex flex-col items-center justify-center gap-1 rounded ${
                         selectedFont === font.id
-                          ? 'border-gold bg-gold/10 text-gold font-bold'
+                          ? 'border-gold bg-gold/15 text-gold font-bold shadow-md ring-1 ring-gold'
                           : 'border-grave bg-coal text-bone hover:border-gold/50'
                       }`}
                     >
-                      {isAr ? font.nameAr : font.nameEn}
+                      <span className={`text-lg font-bold ${font.fontClass}`}>
+                        {font.sample}
+                      </span>
+                      <span className="font-mono text-[10px] opacity-80 truncate max-w-full">
+                        {isAr ? font.nameAr : font.nameEn}
+                      </span>
                     </button>
                   ))}
                 </div>

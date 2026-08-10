@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@600;700;900&family=Changa:wght@600;700;800&family=El+Messiri:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@500;700&family=Katibeh&family=Rakkas&family=Reem+Kufi:wght@600;700&family=Tajawal:wght@700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,8 +20,36 @@
   font-display: swap;
 }
 
-.font-camel {
-  font-family: 'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'Arsenica Arabic', 'IBM Plex Sans Arabic', serif;
+.font-camel, .font-arabic-camel {
+  font-family: 'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'Arsenica Arabic', 'IBM Plex Sans Arabic', serif !important;
+}
+
+.font-arabic-kufi {
+  font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif !important;
+}
+
+.font-arabic-ruqaa {
+  font-family: 'Aref Ruqaa', 'Aref Ruqaa Ink', serif !important;
+}
+
+.font-arabic-amiri {
+  font-family: 'Amiri', serif !important;
+}
+
+.font-arabic-rakkas {
+  font-family: 'Rakkas', display !important;
+}
+
+.font-arabic-cairo {
+  font-family: 'Cairo', sans-serif !important;
+}
+
+.font-arabic-changa {
+  font-family: 'Changa', sans-serif !important;
+}
+
+.font-arabic-katibeh {
+  font-family: 'Katibeh', cursive !important;
 }
 
 @font-face {
@@ -35,7 +65,7 @@
 }
 
 .font-ruqaa {
-  font-family: 'The Year of The Camel', 'ArbFONTS-TheYearofTheCamel-ExtraBold', 'ArbFONTS-TheYearofTheCamel-Bold', 'Aref Ruqaa Ink', 'Aref Ruqaa', 'Katibeh', serif;
+  font-family: 'Aref Ruqaa', 'Aref Ruqaa Ink', 'Katibeh', serif;
 }
 
 .font-cinzel {

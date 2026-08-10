@@ -56,6 +56,20 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
     }
   };
 
+  const getFontClass = (fontId) => {
+    switch (fontId) {
+      case 'ruqaa': return 'font-arabic-ruqaa';
+      case 'kufi': return 'font-arabic-kufi';
+      case 'amiri': return 'font-arabic-amiri';
+      case 'rakkas': return 'font-arabic-rakkas';
+      case 'cairo': return 'font-arabic-cairo';
+      case 'changa': return 'font-arabic-changa';
+      case 'katibeh': return 'font-arabic-katibeh';
+      case 'camel':
+      default: return 'font-arabic-camel';
+    }
+  };
+
   return (
     <div className="w-full h-full flex items-center justify-center p-1 bg-coal/90 rounded relative overflow-hidden select-none">
       {/* 3D Polyurethane Epoxy Dome Element */}
@@ -70,7 +84,7 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
 
         {/* Sticker Custom Text */}
         <span
-          className="font-arabic font-bold text-[10px] sm:text-xs truncate relative z-10 drop-shadow-sm px-1"
+          className={`font-bold text-[10px] sm:text-xs truncate relative z-10 drop-shadow-sm px-1 ${getFontClass(cDetails.selectedFont)}`}
           style={{ color: textColor }}
         >
           {text}
