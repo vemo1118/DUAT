@@ -14,7 +14,7 @@ import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
 import { AdminBuilderStickerModal } from '../components/AdminBuilderStickerModal';
 import { CATEGORIES } from '../data/products';
 import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
-import { StickerIcon } from '../components/StickerIcon';
+import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
 import {
   ArrowUp,
   ArrowDown,
@@ -3021,23 +3021,25 @@ export function AdminView() {
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
 
                   const cDetails = item.customDetails || item.customizerConfig || {};
+                  const itemNameLower = String(name || '').toLowerCase();
 
-                  const isCustomSticker = item.id.startsWith('custom-sticker-') ||
+                  const isCustomSticker = (item.id && item.id.startsWith('custom-sticker-')) ||
                                           item.category === 'stickers' ||
                                           cDetails.mode === 'text' ||
                                           cDetails.mode === 'image' ||
-                                          (typeof name === 'string' && (name.includes('استيكر مخصص') || name.includes('Custom Sticker')));
+                                          itemNameLower.includes('sticker') ||
+                                          itemNameLower.includes('استيكر');
 
                   const isCustomBundle = item.category === 'bundles' ||
-                                        item.id.startsWith('bundle-') ||
+                                        (item.id && item.id.startsWith('bundle-')) ||
                                         !!cDetails.selectedItems ||
-                                        (typeof name === 'string' && (name.includes('بندل') || name.includes('Bundle')));
+                                        itemNameLower.includes('bundle') ||
+                                        itemNameLower.includes('بندل');
 
                   const isCustomCase = !isCustomSticker && !isCustomBundle && (
                     item.category === 'cases' ||
-                    item.category === 'customizer' ||
-                    item.isCustom ||
-                    (typeof name === 'string' && (name.includes('جراب مخصص') || name.includes('Custom Case')))
+                    itemNameLower.includes('case') ||
+                    itemNameLower.includes('جراب')
                   );
 
                   const extractedModel = cfg?.phoneModel ||
@@ -3070,12 +3072,8 @@ export function AdminView() {
                       {/* Top Product Header Row with Thumbnail Image */}
                       <div className="flex items-center gap-3">
                         {/* Thumbnail Image Box */}
-                        <div className="w-16 h-20 bg-stone border border-gold/40 rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1 shadow-md">
-                          {thumbImage ? (
-                            <img src={thumbImage} alt={name} className="w-full h-full object-contain" />
-                          ) : (
-                            <SunDisc size={20} variant="gold" />
-                          )}
+                        <div className="w-16 h-16 bg-stone border border-gold/40 rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1 shadow-md">
+                          <CustomStickerThumbnail item={item} />
                         </div>
 
                         {/* Title, Quantity & Price */}
