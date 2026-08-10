@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toPng } from 'html-to-image';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -90,7 +91,7 @@ export function StickerBuilderView() {
   const totalPrice = basePrice * quantity;
 
   // Handle Add Custom Sticker to Cart
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (mode === 'text' && !customText.trim()) {
       addToast(isAr ? 'برجاء كتابة النص الخاص بالاستيكر أولاً' : 'Please enter custom sticker text first', 'error');
       return;
@@ -98,6 +99,15 @@ export function StickerBuilderView() {
     if (mode === 'image' && !uploadedImage) {
       addToast(isAr ? 'برجاء رفع صورة الاستيكر أولاً' : 'Please upload an image first', 'error');
       return;
+    }
+
+    let stickerSnapshot = uploadedImage;
+    if (mode === 'text' && stickerCanvasRef.current) {
+      try {
+        stickerSnapshot = await toPng(stickerCanvasRef.current, { cacheBust: true, pixelRatio: 2 });
+      } catch (err) {
+        console.warn('Canvas snapshot capture fallback:', err);
+      }
     }
 
     const customItem = {
@@ -110,7 +120,8 @@ export function StickerBuilderView() {
       tagEn: 'Custom 3D Epoxy Dome Sticker',
       craftTagAr: 'تصنيع خاص حسب الطلب • مصر',
       craftTagEn: 'Custom Made to Order • Egypt',
-      image: uploadedImage || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+      image: stickerSnapshot || null,
+      designSnapshot: stickerSnapshot || null,
       specsAr: [
         mode === 'text' ? `النص: ${customText}` : `استيكر صورة مرفقة`,
         `القص والتشكيل: ${cutShape}`,

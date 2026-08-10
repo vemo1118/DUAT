@@ -8,6 +8,8 @@ import { useTheme } from '../context/ThemeContext';
 import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag, MessageSquare } from 'lucide-react';
 import { sendTelegramOrderNotification, generateWhatsAppOrderLink } from '../utils/orderNotifier';
 
+import { CustomStickerThumbnail } from './CustomStickerThumbnail';
+
 export const CartDrawer = () => {
   const {
     items,
@@ -142,10 +144,14 @@ export const CartDrawer = () => {
               cartList.map((item) => (
                 <div
                   key={item.cartItemId || item.id}
-                  className={`p-4 border ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} flex gap-4 justify-between items-start card-depth-highlight`}
+                  className={`p-4 border ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} flex gap-3 justify-between items-start card-depth-highlight`}
                 >
-                  <div className="flex-1 space-y-1">
-                    <h3 className="font-space font-bold text-sm">
+                  <div className="w-14 h-14 bg-stone border border-grave rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
+                    <CustomStickerThumbnail item={item} />
+                  </div>
+
+                  <div className="flex-1 space-y-1 min-w-0">
+                    <h3 className="font-space font-bold text-sm truncate">
                       {isRtl ? item.nameAr : item.nameEn}
                     </h3>
                     { (item.tagAr || item.tagEn) && (

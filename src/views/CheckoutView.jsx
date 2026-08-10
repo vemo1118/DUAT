@@ -11,6 +11,8 @@ import { ShieldCheck, Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, Ext
 
 import { sendTelegramOrderNotification, generateSequentialOrderRef } from '../utils/orderNotifier';
 
+import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
+
 const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 
 export const CheckoutView = ({ setView }) => {
@@ -428,11 +430,7 @@ export const CheckoutView = ({ setView }) => {
                 >
                   {/* Thumbnail / Mockup Image */}
                   <div className="w-16 h-16 bg-stone border border-grave rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
-                    {thumb ? (
-                      <img src={thumb} alt={name} className="w-full h-full object-contain" />
-                    ) : (
-                      <SunDisc size={18} variant="gold" />
-                    )}
+                    <CustomStickerThumbnail item={item} />
                   </div>
 
                   {/* Product Metadata & Custom Details */}
