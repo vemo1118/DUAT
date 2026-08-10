@@ -40,18 +40,25 @@ export const Footer = () => {
             </h4>
             <div className="flex flex-col space-y-2">
               <Link
-                to="/shop"
+                to="/bundles"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-left text-bone/80 hover:text-gold transition-colors py-1"
               >
-                {t('navShop')}
+                {t('navBundles')}
               </Link>
               <Link
-                to="/customize"
+                to="/stickers"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-left text-bone/80 hover:text-gold transition-colors py-1"
               >
-                {t('navCustomize')}
+                {t('navStickers')}
+              </Link>
+              <Link
+                to="/sticker-builder"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
+              >
+                {t('navStickerBuilder')}
               </Link>
               <Link
                 to="/the-duat"

@@ -52,17 +52,17 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
       {/* 3. CATEGORY TILES BLOCK */}
       <CategoryGrid onSelectCategory={setSelectedCategory} />
 
-      {/* 4. PRODUCT ROW 1 — LATEST DROPS */}
+      {/* 4. PRODUCT ROW 1 — LATEST STICKER DROPS */}
       <div className="py-4">
         <ProductRow
           eyebrow="DUAT / 01"
-          title={isAr ? 'أحدث الإصدارات' : 'LATEST DROPS'}
+          title={isAr ? 'أحدث استيكرات الإيبوكسي' : 'LATEST STICKERS'}
           products={latestDrops}
-          viewAllPath="/shop"
+          viewAllPath="/stickers"
         />
       </div>
 
-      {/* 5. THE FORGE FEATURE BAND — DYNAMIC ADMIN MANAGED PROMO BANNER */}
+      {/* 5. STICKER BUILDER FEATURE BAND */}
       {isForgeActive && (
         <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E5DFC5] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#1A2042] to-[#0A0C16]'} border-y border-gold/40 py-20 sm:py-28 shadow-2xl relative overflow-hidden`}>
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative reveal-fade-up">
@@ -70,28 +70,30 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
               
               <div className="lg:col-span-7 space-y-6 relative z-10">
                 <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold block">
-                  {isAr ? (forge.eyebrowAr || 'دوات / كور الفن') : (forge.eyebrowEn || 'THE FORGE')}
+                  {isAr ? 'دوات / مصمم الاستيكرات' : 'DUAT / STICKER BUILDER'}
                 </span>
                 <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone font-bold">
-                  {isAr ? (forge.titleAr || 'صمم درعك الخاص بنفسك.') : (forge.titleEn || 'BUILD A CASE FOR YOURSELF.')}
+                  {isAr ? 'صمّم استيكرك المجسم بنفسك.' : 'BUILD YOUR OWN STICKER.'}
                 </h2>
                 <p className="font-space text-base text-bone/90 font-medium leading-relaxed max-w-xl">
-                  {isAr ? (forge.descAr || t('forgeDesc')) : (forge.descEn || t('forgeDesc'))}
+                  {isAr
+                    ? 'اكتب أي كلمة، عبارة، أو ارفع تصميمك وصورتك الخاصة ونعملها لك استيكر إيبوكسي مجسم 3D بتشطيب فاخر ومقاوم للماء.'
+                    : 'Write custom text or upload your design to turn it into a 3D epoxy dome sticker.'}
                 </p>
                 <button
-                  onClick={() => navigate(forge.buttonLink || '/customizer')}
+                  onClick={() => navigate('/sticker-builder')}
                   className="btn-primary py-4 px-8 text-xs font-mono font-bold tracking-widest flex items-center gap-3 min-h-[48px]"
                 >
                   <Sparkles size={16} />
-                  <span>{isAr ? (forge.buttonTextAr || t('forgeCta')) : (forge.buttonTextEn || t('forgeCta'))}</span>
+                  <span>{isAr ? 'افتح بيلدر الاستيكرز' : 'OPEN STICKER BUILDER'}</span>
                   <ArrowIcon size={16} />
                 </button>
               </div>
 
               <div className="lg:col-span-5 relative z-10 flex items-center justify-center">
                 <img
-                  src={forge.imageUrl || "https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg"}
-                  alt={isAr ? forge.titleAr : forge.titleEn}
+                  src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png"
+                  alt="Sticker Builder Preview"
                   className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 rounded-xl"
                 />
               </div>
@@ -101,13 +103,13 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       )}
 
-      {/* 6. PRODUCT ROW 2 — BEST SELLERS */}
+      {/* 6. PRODUCT ROW 2 — FEATURED BUNDLES */}
       <div className="py-4">
         <ProductRow
           eyebrow="DUAT / 02"
-          title={isAr ? 'قطع مختارة' : 'FEATURED PIECES'}
-          products={bestSellers}
-          viewAllPath="/shop"
+          title={isAr ? 'قسم البندلز الجاهزة' : 'FEATURED BUNDLES'}
+          products={activeProducts.filter(p => p.category === 'bundles')}
+          viewAllPath="/bundles"
         />
       </div>
 

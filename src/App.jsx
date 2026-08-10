@@ -24,8 +24,10 @@ import { ScrollToTop } from './components/ScrollToTop';
 
 // Lazy-loaded Views for Bundle Optimization & Fast First Contentful Paint
 const HomeView = lazy(() => import('./views/HomeView').then(m => ({ default: m.HomeView })));
+const BundlesView = lazy(() => import('./views/BundlesView').then(m => ({ default: m.BundlesView })));
+const StickersView = lazy(() => import('./views/StickersView').then(m => ({ default: m.StickersView })));
+const StickerBuilderView = lazy(() => import('./views/StickerBuilderView').then(m => ({ default: m.StickerBuilderView })));
 const ShopView = lazy(() => import('./views/ShopView').then(m => ({ default: m.ShopView })));
-const CustomizerView = lazy(() => import('./views/CustomizerView').then(m => ({ default: m.CustomizerView })));
 const AboutView = lazy(() => import('./views/AboutView').then(m => ({ default: m.AboutView })));
 const CheckoutView = lazy(() => import('./views/CheckoutView').then(m => ({ default: m.CheckoutView })));
 const OrderTrackerView = lazy(() => import('./views/OrderTrackerView').then(m => ({ default: m.OrderTrackerView })));
@@ -120,6 +122,10 @@ export function App() {
                                       />
                                     }
                                   />
+                                  <Route path="/bundles" element={<BundlesView />} />
+                                  <Route path="/stickers" element={<StickersView />} />
+                                  <Route path="/sticker-builder" element={<StickerBuilderView />} />
+                                  
                                   <Route
                                     path="/shop"
                                     element={
@@ -131,8 +137,8 @@ export function App() {
                                     }
                                   />
                                   <Route path="/product/:id" element={<ProductDetailView />} />
-                                  <Route path="/customize" element={<CustomizerView />} />
-                                  <Route path="/customizer" element={<Navigate to="/customize" replace />} />
+                                  <Route path="/customize" element={<Navigate to="/sticker-builder" replace />} />
+                                  <Route path="/customizer" element={<Navigate to="/sticker-builder" replace />} />
                                   
                                   <Route path="/the-duat" element={<AboutView />} />
                                   <Route path="/about" element={<Navigate to="/the-duat" replace />} />

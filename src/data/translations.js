@@ -2,7 +2,10 @@ export const TRANSLATIONS = {
   en: {
     // Nav
     navShop: 'Shop',
-    navCustomize: 'Customize',
+    navBundles: 'Bundles',
+    navStickers: 'Stickers',
+    navStickerBuilder: 'Sticker Builder',
+    navCustomize: 'Sticker Builder',
     navDuat: 'The Duat',
     cartTitle: 'Your cart',
     trackOrderNav: 'Track Order',
@@ -14,9 +17,20 @@ export const TRANSLATIONS = {
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
     heroHeadline1: 'THROUGH THE NIGHT',
     heroHeadline2: 'BORN AT DAWN.',
-    heroSub: 'Objects for the night crossing. Custom 3D epoxy stickers and made-to-order cases.',
-    heroCtaPrimary: 'BUILD YOUR CASE',
-    heroCtaSecondary: 'SEE THE COLLECTION',
+    heroSub: 'Objects for the night crossing. Custom 3D epoxy stickers and pre-packaged bundles.',
+    heroCtaPrimary: 'STICKER BUILDER',
+    heroCtaSecondary: 'EXPLORE BUNDLES',
+
+    // Sections
+    bundlesEyebrow: 'DUAT / STICKER BUNDLES',
+    bundlesTitle: 'Sticker Bundles',
+    bundlesSubtitle: 'Discounted pre-packaged sets of 3D epoxy stickers.',
+    stickersEyebrow: 'DUAT / STICKER COLLECTION',
+    stickersTitle: 'Stickers Collection',
+    stickersSubtitle: 'Explore our 3D epoxy dome stickers, slogans, letters, and badges.',
+    stickerBuilderTitle: 'Sticker Builder',
+    stickerBuilderEyebrow: 'DUAT / STICKER BUILDER',
+    stickerBuilderSubtitle: 'Create custom 3D epoxy stickers with your text or uploaded image.',
 
     // Categories
     catEyebrow: 'THE FOUR HOURS',
@@ -231,7 +245,10 @@ export const TRANSLATIONS = {
   ar: {
     // Nav
     navShop: 'المتجر',
-    navCustomize: 'صمم جرابك',
+    navBundles: 'البندلز',
+    navStickers: 'الاستيكرات',
+    navStickerBuilder: 'بيلدر الاستيكرز',
+    navCustomize: 'بيلدر الاستيكرز',
     navDuat: 'الدوات',
     cartTitle: 'سلة الشراء',
     trackOrderNav: 'تتبع طلبك',
@@ -243,9 +260,20 @@ export const TRANSLATIONS = {
     heroEyebrow: 'دوات / ٠٠ — العبور',
     heroHeadline1: 'عبر ظلمة الليل',
     heroHeadline2: 'مولود مع الفجر.',
-    heroSub: 'أغراض مخصصة لعبور الليل. ملصقات إيبوكسي مجسمة وجرابات مُصنعة حسب الطلب.',
-    heroCtaPrimary: 'صمم جرابك الآن',
-    heroCtaSecondary: 'استكشف التشكيلة',
+    heroSub: 'أغراض مخصصة لعبور الليل. ملصقات إيبوكسي مجسمة وبندلات مجمعة موفّرة.',
+    heroCtaPrimary: 'بيلدر الاستيكرز',
+    heroCtaSecondary: 'تصفح البندلز',
+
+    // Sections
+    bundlesEyebrow: 'دوات / البندلز المجمعة',
+    bundlesTitle: 'قسم البندلز الجاهزة',
+    bundlesSubtitle: 'باقات استيكرات مجمعة ومجهزة بسعر موفر وأرخص من الشراء المنفرد.',
+    stickersEyebrow: 'دوات / تشكيلة الاستيكرات',
+    stickersTitle: 'قسم الاستيكرات',
+    stickersSubtitle: 'استكشف ملصقات الإيبوكسي البارزة، العبارات، الحروف وشارات الميلاد.',
+    stickerBuilderTitle: 'بيلدر الاستيكرز',
+    stickerBuilderEyebrow: 'دوات / مصمم الاستيكرات',
+    stickerBuilderSubtitle: 'صمم استيكرك الخاص بالكلمة اللي تحبها أو ارفع صورتك ونعملها لك استيكر إيبوكسي مجسم.',
 
     // Categories
     catEyebrow: 'الساعات الأربع',

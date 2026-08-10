@@ -17,8 +17,9 @@ export const Navbar = ({ onOpenTracker }) => {
 
   const navLinks = [
     { path: '/', label: lang === 'ar' ? 'الرئيسية' : 'Home', end: true },
-    { path: '/shop', label: t('navShop') },
-    { path: '/customize', label: t('navCustomize') },
+    { path: '/bundles', label: t('navBundles') },
+    { path: '/stickers', label: t('navStickers') },
+    { path: '/sticker-builder', label: t('navStickerBuilder') },
     { path: '/the-duat', label: t('navDuat') }
   ];
 
