@@ -3020,13 +3020,25 @@ export function AdminView() {
                   const thumbImage = mockupImg || (item.images && item.images[0]) || item.product?.image;
                   const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
 
-                  const isCustomCase = item.category === 'cases' ||
-                                       item.category === 'customizer' ||
-                                       item.isCustom ||
-                                       !!cfg ||
-                                       !!item.designSnapshot ||
-                                       layers.length > 0 ||
-                                       (typeof name === 'string' && (name.includes('جراب مخصص') || name.includes('Custom Case') || name.includes('مخصص')));
+                  const cDetails = item.customDetails || item.customizerConfig || {};
+
+                  const isCustomSticker = item.id.startsWith('custom-sticker-') ||
+                                          item.category === 'stickers' ||
+                                          cDetails.mode === 'text' ||
+                                          cDetails.mode === 'image' ||
+                                          (typeof name === 'string' && (name.includes('استيكر مخصص') || name.includes('Custom Sticker')));
+
+                  const isCustomBundle = item.category === 'bundles' ||
+                                        item.id.startsWith('bundle-') ||
+                                        !!cDetails.selectedItems ||
+                                        (typeof name === 'string' && (name.includes('بندل') || name.includes('Bundle')));
+
+                  const isCustomCase = !isCustomSticker && !isCustomBundle && (
+                    item.category === 'cases' ||
+                    item.category === 'customizer' ||
+                    item.isCustom ||
+                    (typeof name === 'string' && (name.includes('جراب مخصص') || name.includes('Custom Case')))
+                  );
 
                   const extractedModel = cfg?.phoneModel ||
                                          cfg?.model ||
@@ -3076,6 +3088,16 @@ export function AdminView() {
                           </div>
                           <div className="flex items-center justify-between font-mono text-ash text-[11px]">
                             <span>الكمية: {item.quantity || 1}</span>
+                            {isCustomSticker && (
+                              <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
+                                🎨 استيكر مخصص
+                              </span>
+                            )}
+                            {isCustomBundle && (
+                              <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
+                                🎁 بندل مخصص
+                              </span>
+                            )}
                             {isCustomCase && (
                               <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
                                 🖼️ جراب مخصص
@@ -3085,89 +3107,68 @@ export function AdminView() {
                         </div>
                       </div>
 
-                      {/* Custom Case Specifications & Layers Breakdown */}
-                      {(cfg || isCustomCase) && (
-                        <div className="bg-coal p-3 border border-gold/30 space-y-2.5 font-mono text-[11px] rounded">
-                          <div className="flex flex-wrap gap-3 text-gold font-bold">
-                            <span>📱 الموديل: {extractedModel}</span>
-                            {cfg?.customModelInput && (
-                              <span className="text-bone">({cfg.customModelInput})</span>
-                            )}
-                            <span>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'جراب مخصص'}</span>
+                      {/* Custom Sticker Details Section */}
+                      {isCustomSticker && (
+                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px] rounded">
+                          <span className="text-gold font-bold block text-xs">
+                            🎨 تفاصيل الاستيكر المخصص:
+                          </span>
+                          
+                          {cDetails.customText && (
+                            <p className="text-bone font-bold text-xs bg-stone/50 p-2 rounded border border-grave/40">
+                              ✍️ النص المكتوب: "{cDetails.customText}"
+                            </p>
+                          )}
+
+                          <div className="grid grid-cols-2 gap-2 text-ash text-[10px]">
+                            {cDetails.selectedFont && <span>🔤 الخط: {cDetails.selectedFont}</span>}
+                            {cDetails.textColor && <span>🎨 اللون: {cDetails.textColor}</span>}
+                            {cDetails.bgFinish && <span>✨ الخامة: {cDetails.bgFinish}</span>}
+                            {cDetails.cutShape && <span>📐 القص: {cDetails.cutShape}</span>}
                           </div>
 
-                          {mockupImg ? (
-                            <div className="pt-2 border-t border-grave/40 flex flex-col sm:flex-row items-center justify-between gap-3 bg-stone/40 p-2.5 rounded border border-gold/30">
-                              <div className="flex items-center gap-2">
-                                <img src={mockupImg} alt="Custom Case Preview" className="w-12 h-16 object-contain rounded bg-stone border border-gold/40 shadow-sm" />
-                                <span className="text-gold font-bold text-xs">🖼️ معاينة صورة الجراب التصميمية:</span>
-                              </div>
+                          {cDetails.designNotes && (
+                            <div className="text-stone-950 bg-amber-400 p-2 rounded font-bold text-[10px]">
+                              📝 ملاحظات الورشة: "{cDetails.designNotes}"
+                            </div>
+                          )}
+
+                          {/* Image download for custom sticker */}
+                          {(mockupImg || cDetails.uploadedImage) && (
+                            <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2">
+                              <img src={mockupImg || cDetails.uploadedImage} alt="Sticker Preview" className="w-12 h-12 object-contain bg-stone border border-gold/40 rounded p-1" />
                               <a
-                                href={mockupImg}
+                                href={mockupImg || cDetails.uploadedImage}
+                                download={`custom-sticker-${selectedOrderDetails.id || 'order'}.png`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                download={`custom-case-design-${selectedOrderDetails.id || 'order'}.png`}
-                                className="px-3.5 py-1.5 bg-gold text-void font-bold text-xs rounded hover:bg-amber-400 transition-colors flex items-center gap-1.5 shadow"
+                                className="px-3 py-1.5 bg-gold text-void font-bold text-[10px] rounded hover:bg-amber-400 transition-colors flex items-center gap-1"
                               >
-                                <span>تحميل/فتح صورة التصميم 📥</span>
+                                <span>تحميل صورة الاستيكر عالية الجودة 📥</span>
                               </a>
                             </div>
-                          ) : (
-                            <div className="pt-2 border-t border-grave/40 text-ash text-[11px] italic">
-                              ℹ️ هذا الطلب مسجل سابقاً قبل تفعيل لقطات التصميم التلقائية. الطلبات الجديدة المخصصة تتضمن لقطة التصميم بالكامل.
-                            </div>
                           )}
+                        </div>
+                      )}
 
-                          {cfg?.designNotes && (
-                            <div className="text-stone-950 bg-amber-400 p-2.5 rounded font-bold border border-amber-500 shadow-sm text-xs">
-                              <strong>📝 ملاحظات التصميم والورشة:</strong> "{cfg.designNotes}"
-                            </div>
+                      {/* Custom Bundle Details Section */}
+                      {isCustomBundle && cDetails.selectedItems && cDetails.selectedItems.length > 0 && (
+                        <div className="bg-coal p-3 border border-gold/30 space-y-2 font-mono text-[11px] rounded">
+                          <span className="text-gold font-bold block text-xs">
+                            🎁 محتويات البندل المحددة من العميل ({cDetails.selectedItems.length}):
+                          </span>
+                          {cDetails.customText && (
+                            <p className="text-bone font-bold text-xs">✍️ الاسم المكتوب: "{cDetails.customText}"</p>
                           )}
-
-                          {layers.length > 0 && (
-                            <div className="space-y-1 text-ash border-t border-grave/40 pt-2">
-                              <span className="text-bone font-bold block">الموتيفات والطبقات المصممة ({layers.length}):</span>
-                              {layers.map((l, lIdx) => (
-                                <div key={lIdx} className="flex items-center justify-between gap-2">
-                                  <span className="text-bone font-bold">
-                                    • {l.type === 'text' ? `نص محفور: "${l.text}"` : l.type === 'image' ? 'صورة استيكر مرفوعة من العميل' : `موتيف: ${getStickerDisplayName(l.stickerId)}`}
-                                  </span>
-                                  {l.src && (
-                                    <a
-                                      href={l.src}
-                                      download={`custom-sticker-${lIdx + 1}.png`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-gold underline hover:text-gold-light font-bold flex items-center gap-1"
-                                    >
-                                      <span>تحميل الصورة الأصلية للطباعة 📥</span>
-                                    </a>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Render Uploaded Image Thumbnail Preview */}
-                          {uploadedImages.length > 0 && (
-                            <div className="pt-2 border-t border-grave/40 space-y-1">
-                              <span className="text-gold font-bold block">معاينة الصور المرفوعة من العميل:</span>
-                              <div className="flex flex-wrap gap-2">
-                                {uploadedImages.map((img, iIdx) => (
-                                  <div key={iIdx} className="relative group border border-gold/50 bg-void p-1 rounded">
-                                    <img src={img.src} alt="Uploaded Sticker" className="w-16 h-16 object-contain" />
-                                    <a
-                                      href={img.src}
-                                      download={`sticker-uploaded-${iIdx + 1}.png`}
-                                      className="absolute inset-0 bg-void/80 text-gold text-[10px] flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      تحميل 📥
-                                    </a>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <div className="flex flex-wrap gap-1.5">
+                            {cDetails.selectedItems.map((sItem, sIdx) => (
+                              <span key={sIdx} className="bg-stone border border-gold/40 text-gold font-bold px-2 py-0.5 rounded text-[10px]">
+                                • {sItem.nameAr || sItem.nameEn}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {/* Render Visual Case Mockup Card */}
                       {isCustomCase && (
                         <div className="pt-3 border-t border-grave/40 space-y-2">
@@ -3285,8 +3286,6 @@ export function AdminView() {
                               )}
                             </div>
                           </div>
-                        </div>
-                      )}
                         </div>
                       )}
                     </div>
