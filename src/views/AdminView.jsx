@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductsContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
@@ -72,6 +73,7 @@ import {
 } from '../utils/orderNotifier';
 
 export function AdminView() {
+  const { formatPrice } = useLanguage();
   const {
     products,
     addProduct,
