@@ -660,147 +660,226 @@ export function AdminView() {
   const avgOrderValue = safeOrdersList.length > 0 ? analyticsRevenue / safeOrdersList.length : 0;
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
-      {/* HEADER TITLE & MAIN TABS */}
-      <div className="space-y-6 border-b border-grave pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <span className="p-2 border border-gold/40 bg-gold/10 text-gold rounded-sm">
-                <Sparkles size={22} />
-              </span>
-              <h1 className="font-clash text-2xl sm:text-3xl font-bold tracking-wide text-bone">
-                لوحة التحكم الرئيسية (Admin Dashboard)
-              </h1>
-            </div>
-            <p className="font-mono text-xs text-ash">
-              تحكم كامل بالمنتجات والصور، بنرات الشاشة الرئيسية، والعروض وتتبع الطلبات.
-            </p>
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto space-y-8 animate-fade-in" dir="rtl">
+      
+      {/* TOP COMMAND CENTER HEADER */}
+      <div className="bg-stone/90 border border-grave p-6 card-depth-highlight flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-gold/10 border border-gold/40 flex items-center justify-center text-gold shadow-lg shadow-gold/10">
+            <Sparkles size={24} />
           </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] text-gold uppercase tracking-widest font-bold bg-gold/10 px-2 py-0.5 border border-gold/30">
+                DUAT / COMMAND CENTER
+              </span>
+            </div>
+            <h1 className="font-clash text-2xl md:text-3xl uppercase text-bone font-bold mt-1">
+              لوحة التحكم الرئيسية وإدارة الصفحات (DUAT Control Portal)
+            </h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-coal border border-gold/40 hover:border-gold text-gold font-mono text-xs uppercase font-bold transition-all shadow-md"
+          >
+            <ExternalLink size={15} />
+            <span>معاينة المتجر الحية</span>
+          </a>
 
           <button
             onClick={handleAdminLogout}
-            className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-colors font-mono text-xs font-bold rounded-sm min-h-[40px]"
-            title="تسجيل الخروج من لوحة الأدمن"
+            className="flex items-center gap-2 px-4 py-2.5 border border-red-500/40 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-all font-mono text-xs font-bold"
           >
             <span>تسجيل الخروج</span>
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
+      </div>
 
-        {/* TABS SWITCHER SCROLLABLE STRIP */}
-        <div className="w-full overflow-x-auto custom-scrollbar bg-stone/90 p-2 border border-grave rounded-sm">
-          <div className="flex items-center gap-2 min-w-max">
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'products'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Package size={16} />
-              <span>المنتجات ({products.length})</span>
-            </button>
+      {/* 2-COLUMN MAIN PORTAL GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* SIDEBAR NAVIGATION MENU (Right column in RTL: 3 cols out of 12) */}
+        <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-24">
+          <div className="bg-stone border border-grave p-4 space-y-6 shadow-xl card-depth-highlight">
+            
+            <div className="border-b border-grave/60 pb-3 font-mono text-xs uppercase tracking-wider text-ash font-bold flex items-center justify-between">
+              <span>أقسام التحكم والصفحات</span>
+              <Sliders size={14} className="text-gold" />
+            </div>
 
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'orders'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <ShoppingBag size={16} />
-              <span>الطلبات ({orders.length})</span>
-            </button>
+            {/* GROUP 1: SALES & CATALOG */}
+            <div className="space-y-2">
+              <span className="font-mono text-[11px] text-gold/80 uppercase font-bold block px-2">
+                📊 المبيعات والمنتجات
+              </span>
+              <div className="space-y-1">
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'products'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Package size={16} />
+                    <span>المنتجات والكاتالوج</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-void/40 border border-current">
+                    {products.length}
+                  </span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('hero')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'hero'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <ImageIcon size={16} />
-              <span>السلايدر والعروض ({slides.length})</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'orders'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShoppingBag size={16} />
+                    <span>إدارة الطلبات والشحن</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-void/40 border border-current">
+                    {orders.length}
+                  </span>
+                </button>
+              </div>
+            </div>
 
-            <button
-              onClick={() => setActiveTab('forge_banner')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'forge_banner'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Sparkles size={16} />
-              <span>بنر صمم درعك (The Forge) ⚡</span>
-            </button>
+            {/* GROUP 2: PAGE-BY-PAGE WEBSITE CONTROL */}
+            <div className="space-y-2 pt-2 border-t border-grave/40">
+              <span className="font-mono text-[11px] text-gold/80 uppercase font-bold block px-2">
+                🌐 تحكم صفحات الموقع
+              </span>
+              <div className="space-y-1">
+                <button
+                  onClick={() => setActiveTab('hero')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'hero'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ImageIcon size={16} />
+                    <span>1. الرئيسية (/)</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-void/40 border border-current">
+                    {slides.length}
+                  </span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('notifications')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'notifications'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Bell size={16} />
-              <span>إشعارات الموبايل 📲</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('bundles_page')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'bundles_page'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Gift size={16} />
+                    <span>2. صفحة البندلات (/bundles)</span>
+                  </div>
+                  <span className="text-[10px] px-1.5 py-0.5 text-emerald-400 font-mono">مباشر</span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('coupons')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'coupons'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <DollarSign size={16} />
-              <span>أكواد الخصم والكوبونات 🏷️</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('stickers_page')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'stickers_page'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={16} />
+                    <span>3. صفحة الاستيكرات (/stickers)</span>
+                  </div>
+                  <span className="text-[10px] px-1.5 py-0.5 text-emerald-400 font-mono">مباشر</span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('builder')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'builder'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Sliders size={16} />
-              <span>محرر بيلدر الاستيكرات (Sticker Builder Engine) 🎨</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('builder')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'builder'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sliders size={16} />
+                    <span>4. محرك البلدر (/builder)</span>
+                  </div>
+                  <span className="text-[10px] px-1.5 py-0.5 text-amber-400 font-mono">محرك</span>
+                </button>
 
-            <button
-              onClick={() => setActiveTab('bundles_page')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'bundles_page'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Gift size={16} />
-              <span>إدارة صفحة البندلات (Bundles) 🎁</span>
-            </button>
+                <button
+                  onClick={() => setActiveTab('forge_banner')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'forge_banner'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={16} />
+                    <span>5. بنر صمم درعك (Forge)</span>
+                  </div>
+                </button>
+              </div>
+            </div>
 
-            <button
-              onClick={() => setActiveTab('stickers_page')}
-              className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all border rounded-sm ${
-                activeTab === 'stickers_page'
-                  ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20 scale-[1.02]'
-                  : 'bg-coal text-bone border-grave hover:border-gold hover:text-gold'
-              }`}
-            >
-              <Sparkles size={16} />
-              <span>إدارة صفحة الاستيكرات (Stickers) ✨</span>
-            </button>
+            {/* GROUP 3: MARKETING & SYSTEM */}
+            <div className="space-y-2 pt-2 border-t border-grave/40">
+              <span className="font-mono text-[11px] text-gold/80 uppercase font-bold block px-2">
+                ⚙️ التسويق والإشعارات
+              </span>
+              <div className="space-y-1">
+                <button
+                  onClick={() => setActiveTab('coupons')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'coupons'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <DollarSign size={16} />
+                    <span>أكواد الخصم والكوبونات</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('notifications')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
+                    activeTab === 'notifications'
+                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
+                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Bell size={16} />
+                    <span>إشعارات الموبايل وتليجرام</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
+
+        {/* MAIN CONTENT AREA (Left column in RTL: 9 cols out of 12) */}
+        <div className="lg:col-span-9 space-y-8">
 
       {/* EXECUTIVE ANALYTICS STATS OVERVIEW WIDGET */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -3696,6 +3775,8 @@ export function AdminView() {
           </div>
         </div>
       )}
+    </div>
+  </div>
 
       {/* ADMIN PRODUCT MODAL */}
       <AdminProductModal
