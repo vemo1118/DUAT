@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { useHeroBanners } from '../context/HeroBannersContext';
+import { useHeroBanners, INITIAL_HERO_SLIDES } from '../context/HeroBannersContext';
 import { SunDisc } from './SunDisc';
 import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, ShieldCheck, Truck, Clock } from 'lucide-react';
 

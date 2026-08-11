@@ -43,11 +43,17 @@ function notifyListeners() {
  */
 export async function fetchCloudEdits() {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
     const res = await fetch(BLOB_URL, {
       method: 'GET',
       headers: { 'Accept': 'application/json' },
-      cache: 'no-cache'
+      cache: 'no-cache',
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const remoteData = await res.json();
       if (remoteData && typeof remoteData === 'object') {
@@ -91,14 +97,19 @@ export async function publishCloudEdits(partialState) {
 
     notifyListeners();
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
     const res = await fetch(BLOB_URL, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(inMemoryState)
+      body: JSON.stringify(inMemoryState),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     if (res.ok) {
       console.log('⚡ Successfully published live edits to global cloud store!');
