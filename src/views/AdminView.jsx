@@ -54,7 +54,8 @@ import {
   BarChart2,
   CheckCircle2,
   Clock,
-  Palette
+  Palette,
+  Gift
 } from 'lucide-react';
 import { SunDisc } from '../components/SunDisc';
 import {
