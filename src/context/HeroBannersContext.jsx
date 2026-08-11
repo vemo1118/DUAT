@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import liveCustomEdits from '../data/live_custom_edits.json';
 
 const HeroBannersContext = createContext();
 
@@ -47,7 +48,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.',
     badgeEn: 'NINETIES 90S',
     badgeAr: 'فئة التسعيناتي 90s',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
     ctaPrimaryTextEn: 'SHOP NINETIES',
     ctaPrimaryTextAr: 'تسوق فئة التسعيناتي',
     ctaPrimaryLink: '/shop',
@@ -78,7 +79,7 @@ export const INITIAL_HERO_SLIDES = [
     subAr: 'تشكيلة الجرابات والاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
     badgeEn: 'YOUTH COLLECTION',
     badgeAr: 'الفئة الشبابية YOUTH',
-    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     ctaPrimaryTextEn: 'SHOP YOUTH',
     ctaPrimaryTextAr: 'تسوق الفئة الشبابية',
     ctaPrimaryLink: '/shop',
@@ -230,6 +231,9 @@ function loadLocalSlides() {
     }
   } catch (e) {
     // ignore
+  }
+  if (Array.isArray(liveCustomEdits?.heroSlides) && liveCustomEdits.heroSlides.length > 0) {
+    return sanitizeSlideUrls(liveCustomEdits.heroSlides);
   }
   return null;
 }

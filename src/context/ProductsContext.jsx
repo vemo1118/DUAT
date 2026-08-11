@@ -7,6 +7,7 @@ import {
   YEAR_STICKER_PRODUCTS
 } from '../data/products';
 import { supabase } from '../lib/supabase';
+import liveCustomEdits from '../data/live_custom_edits.json';
 
 // Merge all sticker product groups into one flat list
 const INITIAL_PRODUCTS = [
@@ -111,12 +112,17 @@ const ADDED_PRODUCTS_KEY = 'duat_custom_added_products_v3';
 const DELETED_PRODUCTS_KEY = 'duat_deleted_product_ids_v3';
 
 function getCustomEdits() {
+  let edits = { ...(liveCustomEdits.productEdits || {}) };
   try {
     const saved = localStorage.getItem(CUSTOM_EDITS_KEY);
-    return saved ? JSON.parse(saved) : {};
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      edits = { ...edits, ...parsed };
+    }
   } catch (e) {
-    return {};
+    // ignore
   }
+  return edits;
 }
 
 function saveCustomEdit(id, updatedFields) {
@@ -133,12 +139,20 @@ function saveCustomEdit(id, updatedFields) {
 }
 
 function getAddedProducts() {
+  let added = Array.isArray(liveCustomEdits.addedProducts) ? [...liveCustomEdits.addedProducts] : [];
   try {
     const saved = localStorage.getItem(ADDED_PRODUCTS_KEY);
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        const localMap = new Map(parsed.map((p) => [String(p.id), p]));
+        added = [...parsed, ...added.filter((p) => !localMap.has(String(p.id)))];
+      }
+    }
   } catch (e) {
-    return [];
+    // ignore
   }
+  return added;
 }
 
 function saveAddedProduct(newProd) {
@@ -152,12 +166,19 @@ function saveAddedProduct(newProd) {
 }
 
 function getDeletedProductIds() {
+  let deleted = Array.isArray(liveCustomEdits.deletedProductIds) ? [...liveCustomEdits.deletedProductIds] : [];
   try {
     const saved = localStorage.getItem(DELETED_PRODUCTS_KEY);
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        deleted = Array.from(new Set([...deleted, ...parsed]));
+      }
+    }
   } catch (e) {
-    return [];
+    // ignore
   }
+  return deleted;
 }
 
 function saveDeletedProductId(id) {

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import liveCustomEdits from '../data/live_custom_edits.json';
 
 const StickersSettingsContext = createContext();
 
@@ -46,6 +47,13 @@ export const StickersSettingsProvider = ({ children }) => {
       }
     } catch (e) {
       console.warn('Error reading duat_stickers_settings from localStorage:', e);
+    }
+    if (liveCustomEdits?.stickersSettings) {
+      return {
+        hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...liveCustomEdits.stickersSettings.hero },
+        promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...liveCustomEdits.stickersSettings.promo },
+        grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...liveCustomEdits.stickersSettings.grid }
+      };
     }
     return DEFAULT_STICKERS_SETTINGS;
   });

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import liveCustomEdits from '../data/live_custom_edits.json';
 
 const BundlesSettingsContext = createContext();
 
@@ -59,6 +60,13 @@ export const BundlesSettingsProvider = ({ children }) => {
       }
     } catch (e) {
       console.warn('Error reading duat_bundles_settings from localStorage:', e);
+    }
+    if (liveCustomEdits?.bundlesSettings) {
+      return {
+        hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...liveCustomEdits.bundlesSettings.hero },
+        cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...liveCustomEdits.bundlesSettings.cta },
+        grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...liveCustomEdits.bundlesSettings.grid }
+      };
     }
     return DEFAULT_BUNDLES_SETTINGS;
   });
