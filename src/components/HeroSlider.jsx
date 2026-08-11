@@ -18,17 +18,9 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const activeSlides = (Array.isArray(slides) ? slides : [])
-    .filter((s) => s && s.is_active !== false && s.isActive !== false && String(s.is_active) !== 'false')
-    .filter((s) => {
-      const sid = String(s?.id || '');
-      const eyebrow = String(s?.eyebrowEn || s?.eyebrowAr || '').toUpperCase();
-      const headline = String(s?.headline1En || s?.headline1Ar || '').toUpperCase();
-      if (sid === 'hero-slide-nineties' || sid === 'hero-slide-youth' || sid === 'hero-slide-2' || sid === 'hero-slide-3') return false;
-      if (eyebrow.includes('NINETIES') || eyebrow.includes('YOUTH')) return false;
-      if (headline.includes('90S NOSTALGIA') || headline.includes('BOLD & UNAPOLOGETIC')) return false;
-      return true;
-    });
+  const activeSlides = Array.isArray(slides)
+    ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false && String(s.is_active) !== 'false')
+    : [];
 
   const isAr = lang === 'ar';
   const isRtl = isAr;

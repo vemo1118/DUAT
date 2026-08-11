@@ -23,10 +23,10 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextEn: 'BUILD A CASE',
     ctaSecondaryTextAr: 'صمم درعك بنفسك',
     ctaSecondaryLink: '/customizer',
-    textAlign: '',
-    headline1Color: '',
-    headline2Color: '',
-    subColor: '',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
     overlayStrength: 'medium',
     posX: 0,
     posY: 30,
@@ -34,6 +34,68 @@ export const INITIAL_HERO_SLIDES = [
     fontSizeScale: 92,
     is_active: true,
     sort_order: 1
+  },
+  {
+    id: 'hero-slide-nineties',
+    eyebrowEn: 'DUAT / NINETIES VIBES',
+    eyebrowAr: 'دوات / فئة التسعيناتي',
+    headline1En: '90s NOSTALGIA & POP,',
+    headline1Ar: 'نوستالجيا التسعينات،',
+    headline2En: 'IN 3D EPOXY DOMES.',
+    headline2Ar: 'بلمسة مجسمة.',
+    subEn: 'Retro vintage Egyptian pop culture icons in raised 3D epoxy domes.',
+    subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.',
+    badgeEn: 'NINETIES 90S',
+    badgeAr: 'فئة التسعيناتي 90s',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
+    ctaPrimaryTextEn: 'SHOP NINETIES',
+    ctaPrimaryTextAr: 'تسوق فئة التسعيناتي',
+    ctaPrimaryLink: '/shop',
+    ctaSecondaryTextEn: 'STICKER BUILDER',
+    ctaSecondaryTextAr: 'صمم استيكرك',
+    ctaSecondaryLink: '/sticker-builder',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 46,
+    fontSizeScale: 92,
+    is_active: true,
+    sort_order: 2
+  },
+  {
+    id: 'hero-slide-youth',
+    eyebrowEn: 'DUAT / YOUTH STREETWEAR',
+    eyebrowAr: 'دوات / الفئة الشبابية',
+    headline1En: 'BOLD & UNAPOLOGETIC,',
+    headline1Ar: 'عصري، جريء،',
+    headline2En: 'EXPRESS YOURSELF.',
+    headline2Ar: 'وبيعدّي الحدود.',
+    subEn: 'Vibrant neon street aesthetics & high-impact 3D epoxy dome badges.',
+    subAr: 'تشكيلة الجرابات والاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
+    badgeEn: 'YOUTH COLLECTION',
+    badgeAr: 'الفئة الشبابية YOUTH',
+    imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
+    ctaPrimaryTextEn: 'SHOP YOUTH',
+    ctaPrimaryTextAr: 'تسوق الفئة الشبابية',
+    ctaPrimaryLink: '/shop',
+    ctaSecondaryTextEn: 'CUSTOMIZER',
+    ctaSecondaryTextAr: 'افتح أداة التصميم',
+    ctaSecondaryLink: '/customizer',
+    textAlign: 'left',
+    headline1Color: '#EDE4D3',
+    headline2Color: '#E8A33D',
+    subColor: '#8E98BF',
+    overlayStrength: 'medium',
+    posX: 0,
+    posY: 30,
+    maxWidth: 46,
+    fontSizeScale: 92,
+    is_active: true,
+    sort_order: 3
   }
 ];
 
@@ -116,24 +178,15 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v50';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v60';
 
 function cleanLegacyStorage() {
   try {
-    for (let i = 1; i < 50; i++) {
+    for (let i = 1; i < 60; i++) {
       localStorage.removeItem(`duat_hero_slides_v${i}`);
     }
     localStorage.removeItem('duat_hero_slides');
   } catch (e) {}
-}
-
-function filterOutOldSampleSlides(slides) {
-  if (!Array.isArray(slides)) return slides;
-  return slides.filter((s) => {
-    if (!s || typeof s !== 'object') return false;
-    const sid = String(s.id || '');
-    return sid !== 'hero-slide-nineties' && sid !== 'hero-slide-youth' && sid !== 'hero-slide-2' && sid !== 'hero-slide-3';
-  });
 }
 
 function sanitizeSlideUrls(slides) {
@@ -144,7 +197,7 @@ function sanitizeSlideUrls(slides) {
     if (!url || url === '/banners/nineties.png' || url.includes('nineties.png') || url.includes('B1_DarkNight')) {
       url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
     } else if (url === '/banners/youth.png' || url.includes('youth.png')) {
-      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg';
+      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
     }
     const h1Color = s.headline1Color === '#00F0FF' ? '#EDE4D3' : s.headline1Color;
     const h2Color = s.headline2Color === '#FF007A' ? '#E8A33D' : s.headline2Color;
@@ -166,9 +219,8 @@ function loadLocalSlides() {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const valid = parsed.filter((item) => item && typeof item === 'object' && item.id);
-        const filtered = filterOutOldSampleSlides(valid);
-        if (filtered.length > 0) {
-          const sanitized = sanitizeSlideUrls(filtered);
+        if (valid.length > 0) {
+          const sanitized = sanitizeSlideUrls(valid);
           saveLocalSlides(sanitized);
           return sanitized;
         }

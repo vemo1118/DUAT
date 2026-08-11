@@ -6,17 +6,6 @@ import './index.css';
 
 // Automatic auto-recovery for module script import errors / stale mobile cache
 if (typeof window !== 'undefined') {
-  try {
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('duat_hero_slides') || key.startsWith('hero_slides')) {
-        const val = localStorage.getItem(key);
-        if (val && (val.includes('nineties') || val.includes('youth') || val.includes('00F0FF') || val.includes('FF007A'))) {
-          localStorage.removeItem(key);
-        }
-      }
-    });
-  } catch (e) {}
-
   window.addEventListener('error', (event) => {
     const errorMsg = String(event?.message || event?.error || '');
     if (
