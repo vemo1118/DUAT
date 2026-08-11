@@ -106,36 +106,99 @@ function mapToDb(p) {
 }
 
 const PRODUCTS_STORAGE_KEY = 'duat_products_v11';
-const VISIBILITY_OVERRIDES_KEY = 'duat_visibility_overrides_v2';
+const CUSTOM_EDITS_KEY = 'duat_product_custom_edits_v3';
+const ADDED_PRODUCTS_KEY = 'duat_custom_added_products_v3';
+const DELETED_PRODUCTS_KEY = 'duat_deleted_product_ids_v3';
 
-function getVisibilityOverrides() {
+function getCustomEdits() {
   try {
-    const saved = localStorage.getItem(VISIBILITY_OVERRIDES_KEY);
+    const saved = localStorage.getItem(CUSTOM_EDITS_KEY);
     return saved ? JSON.parse(saved) : {};
   } catch (e) {
     return {};
   }
 }
 
-function saveVisibilityOverride(id, isActive) {
+function saveCustomEdit(id, updatedFields) {
   try {
-    const current = getVisibilityOverrides();
-    current[id] = Boolean(isActive);
-    localStorage.setItem(VISIBILITY_OVERRIDES_KEY, JSON.stringify(current));
+    const current = getCustomEdits();
+    current[id] = {
+      ...(current[id] || {}),
+      ...updatedFields
+    };
+    localStorage.setItem(CUSTOM_EDITS_KEY, JSON.stringify(current));
   } catch (e) {
     // ignore
   }
 }
 
-function applyVisibilityOverrides(prods) {
-  if (!Array.isArray(prods)) return [];
-  const overrides = getVisibilityOverrides();
-  if (!overrides || Object.keys(overrides).length === 0) return prods;
+function getAddedProducts() {
+  try {
+    const saved = localStorage.getItem(ADDED_PRODUCTS_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+}
 
-  return prods.map((p) => {
-    if (p && p.id && overrides[p.id] !== undefined) {
-      const status = Boolean(overrides[p.id]);
-      return { ...p, is_active: status, isActive: status };
+function saveAddedProduct(newProd) {
+  try {
+    const current = getAddedProducts();
+    const filtered = current.filter((p) => String(p.id) !== String(newProd.id));
+    localStorage.setItem(ADDED_PRODUCTS_KEY, JSON.stringify([newProd, ...filtered]));
+  } catch (e) {
+    // ignore
+  }
+}
+
+function getDeletedProductIds() {
+  try {
+    const saved = localStorage.getItem(DELETED_PRODUCTS_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveDeletedProductId(id) {
+  try {
+    const current = getDeletedProductIds();
+    if (!current.includes(String(id))) {
+      localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify([...current, String(id)]));
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+function applyOverridesAndMergedProducts(prods) {
+  if (!Array.isArray(prods)) return [];
+  const edits = getCustomEdits();
+  const addedProds = getAddedProducts();
+  const deletedIds = new Set(getDeletedProductIds());
+
+  // Filter out deleted
+  let list = prods.filter((p) => p && p.id && !deletedIds.has(String(p.id)));
+
+  // Merge added prods if missing
+  const prodMap = new Map(list.map((p) => [String(p.id), p]));
+  const missingAdded = addedProds.filter((ap) => !deletedIds.has(String(ap.id)) && !prodMap.has(String(ap.id)));
+  list = [...missingAdded, ...list];
+
+  // Apply custom edits (image, price, name, is_active, etc.)
+  return list.map((p) => {
+    if (p && p.id && edits[p.id]) {
+      const custom = edits[p.id];
+      const img = custom.imageUrl !== undefined
+        ? custom.imageUrl
+        : (custom.image !== undefined ? custom.image : (p.imageUrl || p.image || ''));
+      return {
+        ...p,
+        ...custom,
+        imageUrl: img,
+        image: img,
+        images: img ? [img] : (Array.isArray(p.images) ? p.images : [])
+      };
     }
     return p;
   });
@@ -172,7 +235,7 @@ function loadLocalProducts() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const withOverrides = applyVisibilityOverrides(parsed);
+        const withOverrides = applyOverridesAndMergedProducts(parsed);
         if (!isCustomOrder) {
           return sortProductsByDefaultOrder(withOverrides);
         }
@@ -182,7 +245,7 @@ function loadLocalProducts() {
   } catch (e) {
     // ignore
   }
-  return sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS));
+  return sortProductsByDefaultOrder(applyOverridesAndMergedProducts(INITIAL_PRODUCTS));
 }
 
 function saveLocalProducts(products) {
@@ -228,7 +291,7 @@ export function ProductsProvider({ children }) {
           ...INITIAL_PRODUCTS.filter((initP) => !dbMap.has(String(initP.id)))
         ];
 
-        const withOverrides = applyVisibilityOverrides(merged);
+        const withOverrides = applyOverridesAndMergedProducts(merged);
         const finalProducts = isCustomOrder ? withOverrides : sortProductsByDefaultOrder(withOverrides);
         setProducts(finalProducts);
         saveLocalProducts(finalProducts);
@@ -245,13 +308,13 @@ export function ProductsProvider({ children }) {
       }
 
       // 3. Fallback to INITIAL_PRODUCTS
-      const initialSorted = sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS));
+      const initialSorted = sortProductsByDefaultOrder(applyOverridesAndMergedProducts(INITIAL_PRODUCTS));
       setProducts(initialSorted);
       saveLocalProducts(initialSorted);
     } catch (err) {
       console.warn('Products fetch fallback to local/initial:', err);
       const local = loadLocalProducts();
-      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS)));
+      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(applyOverridesAndMergedProducts(INITIAL_PRODUCTS)));
     } finally {
       setLoading(false);
     }
@@ -313,6 +376,9 @@ export function ProductsProvider({ children }) {
       image: img,
       images: img ? [img] : (Array.isArray(prodData.images) ? prodData.images : [])
     };
+    saveAddedProduct(newProduct);
+    saveCustomEdit(newProduct.id, newProduct);
+
     setProducts((prev) => {
       const updated = [newProduct, ...prev];
       saveLocalProducts(updated);
@@ -323,11 +389,7 @@ export function ProductsProvider({ children }) {
   };
 
   const updateProduct = async (id, updatedFields) => {
-    if (updatedFields.is_active !== undefined) {
-      saveVisibilityOverride(id, updatedFields.is_active);
-    } else if (updatedFields.isActive !== undefined) {
-      saveVisibilityOverride(id, updatedFields.isActive);
-    }
+    saveCustomEdit(id, updatedFields);
 
     let targetProduct = null;
     setProducts((prev) => {
@@ -362,6 +424,7 @@ export function ProductsProvider({ children }) {
       prev.map((prod) => {
         if (prod.id === id) {
           const newPrice = Math.max(0, prod.price + delta);
+          saveCustomEdit(id, { price: newPrice });
           const updated = { ...prod, price: newPrice };
           targetProduct = updated;
           return updated;
@@ -387,7 +450,7 @@ export function ProductsProvider({ children }) {
         if (prod.id === id) {
           const currentStatus = prod.is_active !== undefined ? Boolean(prod.is_active) : (prod.isActive !== undefined ? Boolean(prod.isActive) : true);
           const newStatus = !currentStatus;
-          saveVisibilityOverride(id, newStatus);
+          saveCustomEdit(id, { is_active: newStatus, isActive: newStatus });
           const updated = { ...prod, is_active: newStatus, isActive: newStatus };
           targetProduct = updated;
           return updated;
@@ -404,6 +467,7 @@ export function ProductsProvider({ children }) {
   };
 
   const deleteProduct = async (id) => {
+    saveDeletedProductId(id);
     setProducts((prev) => {
       const updatedList = prev.filter((prod) => prod.id !== id);
       saveLocalProducts(updatedList);
@@ -426,7 +490,9 @@ export function ProductsProvider({ children }) {
   // Reset products
   const resetProducts = async () => {
     try {
-      localStorage.removeItem(VISIBILITY_OVERRIDES_KEY);
+      localStorage.removeItem(CUSTOM_EDITS_KEY);
+      localStorage.removeItem(ADDED_PRODUCTS_KEY);
+      localStorage.removeItem(DELETED_PRODUCTS_KEY);
     } catch (e) {
       // ignore
     }
