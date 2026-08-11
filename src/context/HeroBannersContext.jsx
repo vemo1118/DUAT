@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
+import {
+  fetchCloudEdits,
+  publishCloudEdits,
+  subscribeToLiveSync,
+  getLiveSyncState
+} from '../services/liveSyncService';
 
 const HeroBannersContext = createContext();
 
@@ -215,6 +221,10 @@ function sanitizeSlideUrls(slides) {
 }
 
 function loadLocalSlides() {
+  const syncState = getLiveSyncState();
+  if (Array.isArray(syncState?.heroSlides) && syncState.heroSlides.length > 0) {
+    return sanitizeSlideUrls(syncState.heroSlides);
+  }
   try {
     cleanLegacyStorage();
     const saved = localStorage.getItem(HERO_SLIDES_STORAGE_KEY);
@@ -224,7 +234,6 @@ function loadLocalSlides() {
         const valid = parsed.filter((item) => item && typeof item === 'object' && item.id);
         if (valid.length > 0) {
           const sanitized = sanitizeSlideUrls(valid);
-          saveLocalSlides(sanitized);
           return sanitized;
         }
       }
@@ -241,6 +250,7 @@ function loadLocalSlides() {
 function saveLocalSlides(slides) {
   try {
     localStorage.setItem(HERO_SLIDES_STORAGE_KEY, JSON.stringify(slides));
+    publishCloudEdits({ heroSlides: slides });
   } catch (e) {
     // ignore
   }
@@ -313,6 +323,13 @@ export function HeroBannersProvider({ children }) {
 
   useEffect(() => {
     fetchSlides();
+
+    const unsubscribe = subscribeToLiveSync(() => {
+      const local = loadLocalSlides();
+      if (local && local.length > 0) setSlides(local);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const addSlide = async (slideData) => {

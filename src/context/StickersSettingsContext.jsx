@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
+import {
+  fetchCloudEdits,
+  publishCloudEdits,
+  subscribeToLiveSync,
+  getLiveSyncState
+} from '../services/liveSyncService';
 
 const StickersSettingsContext = createContext();
 
@@ -34,31 +40,38 @@ export const DEFAULT_STICKERS_SETTINGS = {
 };
 
 export const StickersSettingsProvider = ({ children }) => {
-  const [stickersSettings, setStickersSettings] = useState(() => {
+  const getCombinedSettings = () => {
+    const syncState = getLiveSyncState();
+    const source = syncState?.stickersSettings || liveCustomEdits?.stickersSettings || {};
     try {
       const saved = localStorage.getItem('duat_stickers_settings_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
-          hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...parsed.hero },
-          promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...parsed.promo },
-          grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...parsed.grid }
+          hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...source.hero, ...parsed.hero },
+          promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...source.promo, ...parsed.promo },
+          grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...source.grid, ...parsed.grid }
         };
       }
     } catch (e) {
       console.warn('Error reading duat_stickers_settings from localStorage:', e);
     }
-    if (liveCustomEdits?.stickersSettings) {
-      return {
-        hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...liveCustomEdits.stickersSettings.hero },
-        promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...liveCustomEdits.stickersSettings.promo },
-        grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...liveCustomEdits.stickersSettings.grid }
-      };
-    }
-    return DEFAULT_STICKERS_SETTINGS;
-  });
+    return {
+      hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...source.hero },
+      promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...source.promo },
+      grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...source.grid }
+    };
+  };
 
+  const [stickersSettings, setStickersSettings] = useState(() => getCombinedSettings());
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync(() => {
+      setStickersSettings(getCombinedSettings());
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Load settings from Supabase on mount
   useEffect(() => {
@@ -92,10 +105,11 @@ export const StickersSettingsProvider = ({ children }) => {
     loadFromSupabase();
   }, []);
 
-  // Save settings to localStorage whenever changed
+  // Save settings to localStorage and publish to global cloud store whenever changed
   useEffect(() => {
     try {
       localStorage.setItem('duat_stickers_settings_v1', JSON.stringify(stickersSettings));
+      publishCloudEdits({ stickersSettings });
     } catch (e) {
       console.warn('Failed saving duat_stickers_settings to localStorage:', e);
     }

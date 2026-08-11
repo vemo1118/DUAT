@@ -8,6 +8,12 @@ import {
 } from '../data/products';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
+import {
+  fetchCloudEdits,
+  publishCloudEdits,
+  subscribeToLiveSync,
+  getLiveSyncState
+} from '../services/liveSyncService';
 
 // Merge all sticker product groups into one flat list
 const INITIAL_PRODUCTS = [
@@ -112,7 +118,8 @@ const ADDED_PRODUCTS_KEY = 'duat_custom_added_products_v3';
 const DELETED_PRODUCTS_KEY = 'duat_deleted_product_ids_v3';
 
 function getCustomEdits() {
-  let edits = { ...(liveCustomEdits.productEdits || {}) };
+  const syncState = getLiveSyncState();
+  let edits = { ...(liveCustomEdits.productEdits || {}), ...(syncState.productEdits || {}) };
   try {
     const saved = localStorage.getItem(CUSTOM_EDITS_KEY);
     if (saved) {
@@ -133,13 +140,17 @@ function saveCustomEdit(id, updatedFields) {
       ...updatedFields
     };
     localStorage.setItem(CUSTOM_EDITS_KEY, JSON.stringify(current));
+    publishCloudEdits({ productEdits: current });
   } catch (e) {
     // ignore
   }
 }
 
 function getAddedProducts() {
-  let added = Array.isArray(liveCustomEdits.addedProducts) ? [...liveCustomEdits.addedProducts] : [];
+  const syncState = getLiveSyncState();
+  let added = Array.isArray(syncState.addedProducts) && syncState.addedProducts.length > 0
+    ? [...syncState.addedProducts]
+    : (Array.isArray(liveCustomEdits.addedProducts) ? [...liveCustomEdits.addedProducts] : []);
   try {
     const saved = localStorage.getItem(ADDED_PRODUCTS_KEY);
     if (saved) {
@@ -159,14 +170,19 @@ function saveAddedProduct(newProd) {
   try {
     const current = getAddedProducts();
     const filtered = current.filter((p) => String(p.id) !== String(newProd.id));
-    localStorage.setItem(ADDED_PRODUCTS_KEY, JSON.stringify([newProd, ...filtered]));
+    const updated = [newProd, ...filtered];
+    localStorage.setItem(ADDED_PRODUCTS_KEY, JSON.stringify(updated));
+    publishCloudEdits({ addedProducts: updated });
   } catch (e) {
     // ignore
   }
 }
 
 function getDeletedProductIds() {
-  let deleted = Array.isArray(liveCustomEdits.deletedProductIds) ? [...liveCustomEdits.deletedProductIds] : [];
+  const syncState = getLiveSyncState();
+  let deleted = Array.isArray(syncState.deletedProductIds) && syncState.deletedProductIds.length > 0
+    ? [...syncState.deletedProductIds]
+    : (Array.isArray(liveCustomEdits.deletedProductIds) ? [...liveCustomEdits.deletedProductIds] : []);
   try {
     const saved = localStorage.getItem(DELETED_PRODUCTS_KEY);
     if (saved) {
@@ -185,7 +201,9 @@ function saveDeletedProductId(id) {
   try {
     const current = getDeletedProductIds();
     if (!current.includes(String(id))) {
-      localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify([...current, String(id)]));
+      const updated = [...current, String(id)];
+      localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(updated));
+      publishCloudEdits({ deletedProductIds: updated });
     }
   } catch (e) {
     // ignore
@@ -343,6 +361,28 @@ export function ProductsProvider({ children }) {
 
   useEffect(() => {
     fetchProducts();
+
+    // Initial fetch from global cloud store
+    fetchCloudEdits().then(() => {
+      setProducts(loadLocalProducts());
+    });
+
+    // Subscribe to real-time live sync broadcasts across all tabs/browsers/devices
+    const unsubscribe = subscribeToLiveSync(() => {
+      setProducts(loadLocalProducts());
+    });
+
+    // Poll global cloud store every 10 seconds for real-time customer updates
+    const interval = setInterval(() => {
+      fetchCloudEdits().then(() => {
+        setProducts(loadLocalProducts());
+      });
+    }, 10000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const moveProductUp = (id) => {
