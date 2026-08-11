@@ -60,18 +60,20 @@ export function BundlesView() {
 
       {/* Hero Banner Header for Bundles */}
       {heroSettings?.isActive !== false && (
-        <div
-          className="relative overflow-hidden bg-coal/90 border border-grave p-8 sm:p-12 card-depth-highlight space-y-6"
-          style={
-            heroSettings?.bgImage
-              ? {
-                  backgroundImage: `linear-gradient(to bottom, rgba(5,5,5,0.75), rgba(5,5,5,0.9)), url(${heroSettings.bgImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }
-              : {}
-          }
-        >
+        <div className="relative overflow-hidden bg-coal/90 border border-grave p-8 sm:p-12 card-depth-highlight space-y-6">
+          {heroSettings?.bgImage && (
+            <picture className="absolute inset-0 w-full h-full pointer-events-none">
+              {heroSettings?.mobileBgImage && (
+                <source media="(max-width: 767px)" srcSet={heroSettings.mobileBgImage} />
+              )}
+              <img
+                src={heroSettings.bgImage}
+                alt="Bundles Hero Background"
+                className="w-full h-full object-cover opacity-35"
+              />
+            </picture>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-coal/80 via-coal/90 to-coal pointer-events-none" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 max-w-3xl space-y-4">
@@ -239,18 +241,20 @@ export function BundlesView() {
 
       {/* CTA Box to Sticker Builder */}
       {ctaSettings?.isActive !== false && (
-        <div
-          className="bg-gradient-to-r from-coal via-stone to-coal border border-gold/40 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left relative overflow-hidden card-depth-highlight"
-          style={
-            ctaSettings?.bgImage
-              ? {
-                  backgroundImage: `linear-gradient(to right, rgba(5,5,5,0.85), rgba(5,5,5,0.85)), url(${ctaSettings.bgImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }
-              : {}
-          }
-        >
+        <div className="bg-gradient-to-r from-coal via-stone to-coal border border-gold/40 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left relative overflow-hidden card-depth-highlight">
+          {ctaSettings?.bgImage && (
+            <picture className="absolute inset-0 w-full h-full pointer-events-none">
+              {ctaSettings?.mobileBgImage && (
+                <source media="(max-width: 767px)" srcSet={ctaSettings.mobileBgImage} />
+              )}
+              <img
+                src={ctaSettings.bgImage}
+                alt="CTA Background"
+                className="w-full h-full object-cover opacity-25"
+              />
+            </picture>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-coal/90 via-stone/90 to-coal/90 pointer-events-none" />
           <div className="space-y-3 max-w-2xl relative z-10">
             {(ctaSettings?.eyebrowAr || ctaSettings?.eyebrowEn) && (
               <span className="font-mono text-xs text-gold uppercase tracking-[0.25em] font-bold block">

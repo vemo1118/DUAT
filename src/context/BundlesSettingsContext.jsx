@@ -13,6 +13,7 @@ export const DEFAULT_BUNDLES_SETTINGS = {
     descAr: 'تجميعات مجهزة من استيكرات الإيبوكسي المجسمة بسعر موفّر وأرخص من الشراء المنفرد لو اشتريت نفس العدد حبة حبة!',
     descEn: 'Pre-packaged sets of raised 3D epoxy stickers at discounted bundle prices compared to buying individually!',
     bgImage: '',
+    mobileBgImage: '',
     showPerks: true,
     perks: [
       { id: 1, textAr: 'توفير يصل إلى ١٥٠ ج.م بالبندل', textEn: 'Save up to 150 EGP per bundle', icon: 'Tag', active: true },
@@ -31,7 +32,8 @@ export const DEFAULT_BUNDLES_SETTINGS = {
     buttonTextAr: 'افتح بيلدر الاستيكرز',
     buttonTextEn: 'OPEN STICKER BUILDER',
     buttonLink: '/sticker-builder',
-    bgImage: ''
+    bgImage: '',
+    mobileBgImage: ''
   },
   grid: {
     titleAr: 'جميع البندلات والعروض المتاحة',

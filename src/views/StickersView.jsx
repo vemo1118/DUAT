@@ -84,20 +84,20 @@ export function StickersView() {
 
       {/* Header & Title Area */}
       {heroSettings?.isActive !== false && (
-        <div
-          className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-grave pb-8 relative overflow-hidden"
-          style={
-            heroSettings?.bgImage
-              ? {
-                  backgroundImage: `linear-gradient(to bottom, rgba(5,5,5,0.7), rgba(5,5,5,0.9)), url(${heroSettings.bgImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  padding: '2rem',
-                  borderRadius: '2px'
-                }
-              : {}
-          }
-        >
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-grave p-6 sm:p-10 relative overflow-hidden rounded-sm">
+          {heroSettings?.bgImage && (
+            <picture className="absolute inset-0 w-full h-full pointer-events-none">
+              {heroSettings?.mobileBgImage && (
+                <source media="(max-width: 767px)" srcSet={heroSettings.mobileBgImage} />
+              )}
+              <img
+                src={heroSettings.bgImage}
+                alt="Stickers Header Background"
+                className="w-full h-full object-cover opacity-30"
+              />
+            </picture>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-coal/80 via-coal/90 to-coal pointer-events-none" />
           <div className="space-y-2 relative z-10 max-w-3xl">
             {(heroSettings?.eyebrowAr || heroSettings?.eyebrowEn) && (
               <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold">

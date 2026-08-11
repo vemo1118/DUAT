@@ -12,7 +12,8 @@ export const DEFAULT_STICKERS_SETTINGS = {
     titleEn: 'Stickers Collection ✦',
     descAr: 'تشكيلة ملصقات الإيبوكسي ثلاثية الأبعاد البارزة، عبارات العبور، الحروف العربية والإنجليزية وشارات الميلاد.',
     descEn: 'Browse our 3D epoxy dome stickers, slogans, letters, and badges.',
-    bgImage: ''
+    bgImage: '',
+    mobileBgImage: ''
   },
   promo: {
     isActive: true,
@@ -22,7 +23,8 @@ export const DEFAULT_STICKERS_SETTINGS = {
     descEn: 'Use our Sticker Builder to write custom text or upload an image to turn into a 3D epoxy sticker!',
     buttonTextAr: 'بيلدر الاستيكرز',
     buttonTextEn: 'STICKER BUILDER',
-    buttonLink: '/sticker-builder'
+    buttonLink: '/sticker-builder',
+    mobileBgImage: ''
   },
   grid: {
     emptyMessageAr: 'لم يتم العثور على استيكرات مطابقة للفلتر المحدد.',

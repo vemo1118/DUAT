@@ -3017,15 +3017,28 @@ export function AdminView() {
                 />
               </div>
 
-              {/* Background Image URL */}
-              <div className="space-y-2 md:col-span-2">
-                <label className="font-mono text-xs text-bone block uppercase font-bold">رابط صورة خلفية البنر (Background Image URL - اختياري):</label>
+              {/* Background Image URLs (Desktop & Mobile) */}
+              <div className="space-y-2">
+                <label className="font-mono text-xs text-gold block uppercase font-bold">💻 صورة خلفية الهيدر للكمبيوتر (Desktop Image URL):</label>
                 <input
                   type="url"
                   value={bundlesFormHero.bgImage || ''}
                   onChange={(e) => setBundlesFormHero({ ...bundlesFormHero, bgImage: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
                   className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-gold focus:outline-none"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs text-amber-400 block uppercase font-bold">📱 صورة خلفية الهيدر للموبايل (Mobile Image URL - اختياري):</label>
+                <input
+                  type="url"
+                  value={bundlesFormHero.mobileBgImage || ''}
+                  onChange={(e) => setBundlesFormHero({ ...bundlesFormHero, mobileBgImage: e.target.value })}
+                  placeholder="رابط صورة الهيدر بمقاس التلفون الطولي"
+                  className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-amber-400 focus:outline-none"
+                  dir="ltr"
                 />
               </div>
             </div>
@@ -3535,15 +3548,28 @@ export function AdminView() {
                 />
               </div>
 
-              {/* Background Image URL */}
-              <div className="space-y-2 md:col-span-2">
-                <label className="font-mono text-xs text-bone block uppercase font-bold">رابط صورة خلفية البنر (Background Image URL - اختياري):</label>
+              {/* Background Image URLs (Desktop & Mobile) */}
+              <div className="space-y-2">
+                <label className="font-mono text-xs text-gold block uppercase font-bold">💻 صورة خلفية الهيدر للكمبيوتر (Desktop Image URL):</label>
                 <input
                   type="url"
                   value={stickersFormHero.bgImage || ''}
                   onChange={(e) => setStickersFormHero({ ...stickersFormHero, bgImage: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
                   className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-gold focus:outline-none"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs text-amber-400 block uppercase font-bold">📱 صورة خلفية الهيدر للموبايل (Mobile Image URL - اختياري):</label>
+                <input
+                  type="url"
+                  value={stickersFormHero.mobileBgImage || ''}
+                  onChange={(e) => setStickersFormHero({ ...stickersFormHero, mobileBgImage: e.target.value })}
+                  placeholder="رابط صورة الهيدر بمقاس التلفون الطولي"
+                  className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-amber-400 focus:outline-none"
+                  dir="ltr"
                 />
               </div>
             </div>

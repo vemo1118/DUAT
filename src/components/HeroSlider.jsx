@@ -67,6 +67,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';
 
   const bgImage = current?.imageUrl || current?.image_url || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
+  const mobileBgImage = current?.mobileImageUrl || current?.mobile_image_url || current?.mobileImage || '';
 
   const isRightAlign = current?.textAlign === 'right';
   const isCenterAlign = current?.textAlign === 'center';
@@ -99,12 +100,17 @@ export const HeroSlider = ({ setSelectedCategory }) => {
       {/* Full-Bleed Background Image Layer */}
       {bgImage ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src={bgImage}
-            alt="Hero Background"
-            className="w-full h-full object-cover transition-transform duration-700 brightness-110 contrast-110 saturate-105"
-            style={{ objectPosition: `${50 + posX}% ${posY}%` }}
-          />
+          <picture className="w-full h-full">
+            {mobileBgImage && (
+              <source media="(max-width: 767px)" srcSet={mobileBgImage} />
+            )}
+            <img
+              src={bgImage}
+              alt="Hero Background"
+              className="w-full h-full object-cover transition-transform duration-700 brightness-110 contrast-110 saturate-105"
+              style={{ objectPosition: `${50 + posX}% ${posY}%` }}
+            />
+          </picture>
           {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
           <div
             className={`absolute inset-0 pointer-events-none ${

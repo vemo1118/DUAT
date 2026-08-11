@@ -51,7 +51,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         subAr: slideToEdit.subAr || '',
         badgeEn: slideToEdit.badgeEn || '',
         badgeAr: slideToEdit.badgeAr || '',
-        imageUrl: slideToEdit.imageUrl || '',
+        imageUrl: slideToEdit.imageUrl || slideToEdit.image_url || '',
+        mobileImageUrl: slideToEdit.mobileImageUrl || slideToEdit.mobile_image_url || '',
         ctaPrimaryTextEn: slideToEdit.ctaPrimaryTextEn || '',
         ctaPrimaryTextAr: slideToEdit.ctaPrimaryTextAr || '',
         ctaPrimaryLink: slideToEdit.ctaPrimaryLink || '/customize',
@@ -83,6 +84,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         badgeEn: 'SPECIAL DROP',
         badgeAr: 'عرض محدود 30%',
         imageUrl: '',
+        mobileImageUrl: '',
         ctaPrimaryTextEn: 'SHOP NOW',
         ctaPrimaryTextAr: 'تسوق العرض الآن',
         ctaPrimaryLink: '/shop',
@@ -110,7 +112,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = (e, fieldName = 'imageUrl') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -121,7 +123,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
+      setFormData((prev) => ({ ...prev, [fieldName]: reader.result }));
     };
     reader.readAsDataURL(file);
   };
@@ -149,7 +151,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 {slideToEdit ? 'تعديل بنر العروض / السلايدر' : 'إضافة بنر / عرض جديد للشاشة الرئيسية'}
               </h2>
               <p className="font-mono text-xs text-ash mt-0.5">
-                يمكنك رفع صورة البنر وتعديل النصوص باللغتين العربية والإنجليزية.
+                يمكنك رفع صور البنر (للرئيسية والموبايل) وتعديل النصوص.
               </p>
             </div>
           </div>
@@ -163,48 +165,92 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         </div>
 
         {/* Scrollable Form Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 text-right">
-          
-          {/* Image Upload & URL Section */}
-          <div className="bg-stone/40 border border-grave p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-              <label className="block font-mono text-xs text-gold uppercase tracking-wider font-bold">
-                صورة خلفية البنر (رفع من الجهاز أو رابط)
-              </label>
-              <label className="cursor-pointer px-3.5 py-1.5 bg-gold text-[#0A0C16] hover:bg-gold-light transition-colors font-mono text-xs font-bold flex items-center gap-1.5 shadow">
-                <Upload size={14} />
-                <span>📁 رفع صورة من جهازك</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 text-right custom-scrollbar">
+
+          {/* DUAL IMAGE BANNER SECTION: DESKTOP & MOBILE */}
+          <div className="bg-stone/60 p-5 border border-grave space-y-5">
+            
+            {/* Desktop Banner Image */}
+            <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <label className="block font-mono text-xs text-gold uppercase tracking-wider font-bold">
+                  💻 1. صورة البنر للكمبيوتر والشاشات الكبيرة (Desktop Image)
+                </label>
+                <label className="cursor-pointer px-3.5 py-1.5 bg-gold text-[#0A0C16] hover:bg-gold-light transition-colors font-mono text-xs font-bold flex items-center gap-1.5 shadow">
+                  <Upload size={14} />
+                  <span>📁 رفع صورة الكمبيوتر</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e, 'imageUrl')}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <input
+                type="text"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                placeholder="رابط صورة الكمبيوتر (مثال: https://...)"
+                className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-xs"
+                dir="ltr"
+              />
             </div>
 
-            <input
-              type="text"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              placeholder="ضع رابط الصورة هنا (مثال: https://... أو استخدم زر الرفع من الجهاز)"
-              className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none font-mono text-xs"
-              dir="ltr"
-            />
+            {/* Mobile Banner Image */}
+            <div className="space-y-2 pt-3 border-t border-grave/40">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <label className="block font-mono text-xs text-amber-400 uppercase tracking-wider font-bold">
+                  📱 2. صورة البنر المخصصة للهواتف والتلفون (Mobile Image - اختياري)
+                </label>
+                <label className="cursor-pointer px-3.5 py-1.5 bg-amber-400 text-[#0A0C16] hover:bg-amber-300 transition-colors font-mono text-xs font-bold flex items-center gap-1.5 shadow">
+                  <Upload size={14} />
+                  <span>📁 رفع صورة التلفون</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e, 'mobileImageUrl')}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
-            {/* Live Image Preview */}
-            {formData.imageUrl && (
-              <div className="pt-2">
-                <span className="font-mono text-[11px] text-ash block mb-1">معاينة الصورة المرفوعة:</span>
-                <div className="w-full h-36 bg-void border border-gold/40 relative overflow-hidden">
-                  <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone/90 via-transparent to-transparent flex items-end p-3">
-                    <span className="font-mono text-xs text-gold font-bold">معاينة خلفية البنر ✓</span>
+              <input
+                type="text"
+                name="mobileImageUrl"
+                value={formData.mobileImageUrl || ''}
+                onChange={handleChange}
+                placeholder="ضع رابط صورة الموبايل هنا بمقاس طولي مناسب للتلفون"
+                className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-amber-400 focus:outline-none font-mono text-xs"
+                dir="ltr"
+              />
+              <p className="font-mono text-[11px] text-ash">
+                💡 إذا وضعت صورة للتلفون، سيتم عرضها تلقائياً للشاشات الصغيرة لتجنب القص وضمان ظهور التصميم كاملاً.
+              </p>
+            </div>
+
+            {/* Live Previews Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {formData.imageUrl && (
+                <div>
+                  <span className="font-mono text-[11px] text-gold block mb-1">💻 معاينة الكمبيوتر:</span>
+                  <div className="w-full h-32 bg-void border border-gold/40 relative overflow-hidden">
+                    <img src={formData.imageUrl} alt="Desktop Preview" className="w-full h-full object-cover" />
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+              {formData.mobileImageUrl && (
+                <div>
+                  <span className="font-mono text-[11px] text-amber-400 block mb-1">📱 معاينة التلفون:</span>
+                  <div className="w-full h-32 bg-void border border-amber-400/40 relative overflow-hidden">
+                    <img src={formData.mobileImageUrl} alt="Mobile Preview" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
 
           {/* Language Switcher Tabs for Editing Both Arabic and English */}
