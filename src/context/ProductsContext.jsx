@@ -106,7 +106,7 @@ function mapToDb(p) {
   };
 }
 
-const PRODUCTS_STORAGE_KEY = 'duat_products_v11';
+const PRODUCTS_STORAGE_KEY = 'duat_products_v12';
 const CUSTOM_EDITS_KEY = 'duat_product_custom_edits_v3';
 const ADDED_PRODUCTS_KEY = 'duat_custom_added_products_v3';
 const DELETED_PRODUCTS_KEY = 'duat_deleted_product_ids_v3';

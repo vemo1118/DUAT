@@ -181,11 +181,11 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v60';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v61';
 
 function cleanLegacyStorage() {
   try {
-    for (let i = 1; i < 60; i++) {
+    for (let i = 1; i < 61; i++) {
       localStorage.removeItem(`duat_hero_slides_v${i}`);
     }
     localStorage.removeItem('duat_hero_slides');
