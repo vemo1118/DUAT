@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { subscribeToLiveSync } from '../services/liveSyncService';
 
 const CategoryBannersContext = createContext();
 
@@ -122,6 +123,14 @@ export const CategoryBannersProvider = ({ children }) => {
     }
 
     loadFromSupabase();
+  }, []);
+
+  // Subscribe to Supabase Realtime broadcasts from admin
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync(() => {
+      loadFromSupabase();
+    });
+    return () => unsubscribe();
   }, []);
 
   // Sync categoryBanners to localStorage

@@ -322,11 +322,13 @@ export function HeroBannersProvider({ children }) {
   };
 
   useEffect(() => {
+    // 1. Initial load from Supabase
     fetchSlides();
 
+    // 2. Subscribe to Supabase Realtime broadcasts from admin
+    //    Re-fetch from Supabase when admin updates any hero slide
     const unsubscribe = subscribeToLiveSync(() => {
-      const local = loadLocalSlides();
-      if (local && local.length > 0) setSlides(local);
+      fetchSlides();
     });
 
     return () => unsubscribe();

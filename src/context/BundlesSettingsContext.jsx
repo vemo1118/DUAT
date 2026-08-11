@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
 import {
   fetchCloudEdits,
   publishCloudEdits,
   subscribeToLiveSync,
-  getLiveSyncState
+  getLiveSyncState,
+  isRemoteUpdate
 } from '../services/liveSyncService';
 
 const BundlesSettingsContext = createContext();
@@ -79,15 +80,41 @@ export const BundlesSettingsProvider = ({ children }) => {
   const [bundlesSettings, setBundlesSettings] = useState(() => getCombinedSettings());
   const [loading, setLoading] = useState(false);
 
+  // Fetch latest from Supabase (called on mount and on remote update)
+  const loadFromSupabase = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('store_settings')
+        .select('value')
+        .eq('key', 'bundles_page_settings')
+        .maybeSingle();
+      if (!error && data?.value && typeof data.value === 'object') {
+        setBundlesSettings({
+          hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...(data.value.hero || {}) },
+          cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...(data.value.cta || {}) },
+          grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...(data.value.grid || {}) }
+        });
+      }
+    } catch (err) {
+      console.warn('[BundlesSettings] Supabase fetch error:', err);
+    }
+  };
+
   useEffect(() => {
+    // Initial load from Supabase
+    loadFromSupabase();
+
+    // Subscribe to Supabase Realtime broadcasts from admin
     const unsubscribe = subscribeToLiveSync(() => {
-      setBundlesSettings(getCombinedSettings());
+      loadFromSupabase();
     });
     return () => unsubscribe();
   }, []);
 
   // Save to localStorage and publish to global cloud store whenever bundlesSettings changes
+  // Skip publish when the update came from a remote broadcast (prevents feedback loop)
   useEffect(() => {
+    if (isRemoteUpdate()) return;
     try {
       localStorage.setItem('duat_bundles_settings_v1', JSON.stringify(bundlesSettings));
       publishCloudEdits({ bundlesSettings });

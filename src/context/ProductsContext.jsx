@@ -360,28 +360,23 @@ export function ProductsProvider({ children }) {
   };
 
   useEffect(() => {
+    // 1. Initial load from Supabase (source of truth)
     fetchProducts();
 
-    // Initial fetch from global cloud store
+    // 2. Initial fetch from JSONBlob fallback (for product overrides / edits)
     fetchCloudEdits().then(() => {
       setProducts(loadLocalProducts());
     });
 
-    // Subscribe to real-time live sync broadcasts across all tabs/browsers/devices
+    // 3. Subscribe to Supabase Realtime broadcasts from admin
+    //    When admin saves any change, this fires and re-fetches fresh data from Supabase
     const unsubscribe = subscribeToLiveSync(() => {
-      setProducts(loadLocalProducts());
+      // Re-fetch from Supabase to get the absolute latest data
+      fetchProducts();
     });
-
-    // Poll global cloud store every 10 seconds for real-time customer updates
-    const interval = setInterval(() => {
-      fetchCloudEdits().then(() => {
-        setProducts(loadLocalProducts());
-      });
-    }, 10000);
 
     return () => {
       unsubscribe();
-      clearInterval(interval);
     };
   }, []);
 

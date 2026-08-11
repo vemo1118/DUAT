@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { CASE_TYPES as DEFAULT_CASE_TYPES, PHONE_MODELS as DEFAULT_PHONE_MODELS, STICKER_PRESETS as DEFAULT_STICKER_PRESETS } from '../data/products';
+import { subscribeToLiveSync } from '../services/liveSyncService';
 
 const CustomizerContext = createContext();
 
@@ -120,7 +121,16 @@ export const CustomizerProvider = ({ children }) => {
       }
     };
     fetchSupabaseSettings();
-    return () => { isMounted = false; };
+
+    // Subscribe to Supabase Realtime broadcasts from admin
+    const unsubscribe = subscribeToLiveSync(() => {
+      if (isMounted) fetchSupabaseSettings();
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const saveToSupabase = async (newPrice, newCaseTypes, newPhoneModels, newStickers, newCategories) => {

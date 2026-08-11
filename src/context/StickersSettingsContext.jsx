@@ -5,7 +5,8 @@ import {
   fetchCloudEdits,
   publishCloudEdits,
   subscribeToLiveSync,
-  getLiveSyncState
+  getLiveSyncState,
+  isRemoteUpdate
 } from '../services/liveSyncService';
 
 const StickersSettingsContext = createContext();
@@ -67,8 +68,9 @@ export const StickersSettingsProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Subscribe to Supabase Realtime broadcasts from admin → re-fetch from Supabase
     const unsubscribe = subscribeToLiveSync(() => {
-      setStickersSettings(getCombinedSettings());
+      loadFromSupabase();
     });
     return () => unsubscribe();
   }, []);
@@ -106,7 +108,9 @@ export const StickersSettingsProvider = ({ children }) => {
   }, []);
 
   // Save settings to localStorage and publish to global cloud store whenever changed
+  // Skip publish when the update came from a remote broadcast (prevents feedback loop)
   useEffect(() => {
+    if (isRemoteUpdate()) return;
     try {
       localStorage.setItem('duat_stickers_settings_v1', JSON.stringify(stickersSettings));
       publishCloudEdits({ stickersSettings });

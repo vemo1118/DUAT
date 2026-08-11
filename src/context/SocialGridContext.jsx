@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { subscribeToLiveSync } from '../services/liveSyncService';
 
 const SocialGridContext = createContext();
 
@@ -112,6 +113,14 @@ export const SocialGridProvider = ({ children }) => {
     }
 
     loadSocialFromSupabase();
+  }, []);
+
+  // Subscribe to Supabase Realtime broadcasts from admin
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync(() => {
+      loadSocialFromSupabase();
+    });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
