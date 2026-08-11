@@ -23,7 +23,7 @@ export const INITIAL_HERO_SLIDES = [
     ctaSecondaryTextEn: 'BUILD A CASE',
     ctaSecondaryTextAr: 'صمم درعك بنفسك',
     ctaSecondaryLink: '/customizer',
-    textAlign: 'left',
+    textAlign: '',
     headline1Color: '',
     headline2Color: '',
     subColor: '',
@@ -34,68 +34,6 @@ export const INITIAL_HERO_SLIDES = [
     fontSizeScale: 92,
     is_active: true,
     sort_order: 1
-  },
-  {
-    id: 'hero-slide-nineties',
-    eyebrowEn: 'DUAT / NINETIES VIBES',
-    eyebrowAr: 'دوات / فئة التسعيناتي',
-    headline1En: '90s NOSTALGIA & POP,',
-    headline1Ar: 'نوستالجيا التسعينات،',
-    headline2En: 'IN 3D EPOXY DOMES.',
-    headline2Ar: 'بلمسة مجسمة.',
-    subEn: 'Retro vintage Egyptian pop culture icons in raised 3D epoxy domes.',
-    subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.',
-    badgeEn: 'NINETIES 90S',
-    badgeAr: 'فئة التسعيناتي 90s',
-    imageUrl: '/banners/nineties.png',
-    ctaPrimaryTextEn: 'SHOP NINETIES',
-    ctaPrimaryTextAr: 'تسوق فئة التسعيناتي',
-    ctaPrimaryLink: '/shop',
-    ctaSecondaryTextEn: 'STICKER BUILDER',
-    ctaSecondaryTextAr: 'صمم استيكرك',
-    ctaSecondaryLink: '/sticker-builder',
-    textAlign: 'left',
-    headline1Color: '#00F0FF',
-    headline2Color: '#FF007A',
-    subColor: '#E2E8F0',
-    overlayStrength: 'medium',
-    posX: 0,
-    posY: 30,
-    maxWidth: 46,
-    fontSizeScale: 92,
-    is_active: true,
-    sort_order: 2
-  },
-  {
-    id: 'hero-slide-youth',
-    eyebrowEn: 'DUAT / YOUTH STREETWEAR',
-    eyebrowAr: 'دوات / الفئة الشبابية',
-    headline1En: 'BOLD & UNAPOLOGETIC,',
-    headline1Ar: 'عصري، جريء،',
-    headline2En: 'EXPRESS YOURSELF.',
-    headline2Ar: 'وبيعدّي الحدود.',
-    subEn: 'Vibrant neon street aesthetics & high-impact 3D epoxy dome badges.',
-    subAr: 'تشكيلة الجرابات والاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
-    badgeEn: 'YOUTH COLLECTION',
-    badgeAr: 'الفئة الشبابية YOUTH',
-    imageUrl: '/banners/youth.png',
-    ctaPrimaryTextEn: 'SHOP YOUTH',
-    ctaPrimaryTextAr: 'تسوق الفئة الشبابية',
-    ctaPrimaryLink: '/shop',
-    ctaSecondaryTextEn: 'CUSTOMIZER',
-    ctaSecondaryTextAr: 'افتح أداة التصميم',
-    ctaSecondaryLink: '/customizer',
-    textAlign: 'left',
-    headline1Color: '#38BDF8',
-    headline2Color: '#FACC15',
-    subColor: '#F3F4F6',
-    overlayStrength: 'medium',
-    posX: 0,
-    posY: 30,
-    maxWidth: 46,
-    fontSizeScale: 92,
-    is_active: true,
-    sort_order: 3
   }
 ];
 
@@ -178,16 +116,62 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v12';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v50';
+
+function cleanLegacyStorage() {
+  try {
+    for (let i = 1; i < 50; i++) {
+      localStorage.removeItem(`duat_hero_slides_v${i}`);
+    }
+    localStorage.removeItem('duat_hero_slides');
+  } catch (e) {}
+}
+
+function filterOutOldSampleSlides(slides) {
+  if (!Array.isArray(slides)) return slides;
+  return slides.filter((s) => {
+    if (!s || typeof s !== 'object') return false;
+    const sid = String(s.id || '');
+    return sid !== 'hero-slide-nineties' && sid !== 'hero-slide-youth' && sid !== 'hero-slide-2' && sid !== 'hero-slide-3';
+  });
+}
+
+function sanitizeSlideUrls(slides) {
+  if (!Array.isArray(slides)) return slides;
+  return slides.map((s) => {
+    if (!s || typeof s !== 'object') return s;
+    let url = s.imageUrl || s.image_url || s.image || '';
+    if (!url || url === '/banners/nineties.png' || url.includes('nineties.png') || url.includes('B1_DarkNight')) {
+      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
+    } else if (url === '/banners/youth.png' || url.includes('youth.png')) {
+      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg';
+    }
+    const h1Color = s.headline1Color === '#00F0FF' ? '#EDE4D3' : s.headline1Color;
+    const h2Color = s.headline2Color === '#FF007A' ? '#E8A33D' : s.headline2Color;
+    return {
+      ...s,
+      imageUrl: url,
+      image_url: url,
+      headline1Color: h1Color,
+      headline2Color: h2Color
+    };
+  });
+}
 
 function loadLocalSlides() {
   try {
+    cleanLegacyStorage();
     const saved = localStorage.getItem(HERO_SLIDES_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const valid = parsed.filter((item) => item && typeof item === 'object' && item.id);
-        if (valid.length > 0) return valid;
+        const filtered = filterOutOldSampleSlides(valid);
+        if (filtered.length > 0) {
+          const sanitized = sanitizeSlideUrls(filtered);
+          saveLocalSlides(sanitized);
+          return sanitized;
+        }
       }
     }
   } catch (e) {
@@ -210,43 +194,17 @@ async function saveSlideToSupabase(slide, index = 0) {
   try {
     const { error: fullErr } = await supabase.from('hero_slides').upsert(fullPayload, { onConflict: 'id' });
     if (fullErr) {
-      console.warn('Full hero slide upsert failed, attempting minimal payload upsert:', fullErr);
       const minimalPayload = {
         id: String(slide.id),
         is_active: slide.is_active !== undefined ? Boolean(slide.is_active) : true,
         sort_order: slide.sort_order ?? index + 1,
         data: slide
       };
-      const { error: minErr } = await supabase.from('hero_slides').upsert(minimalPayload, { onConflict: 'id' });
-      if (minErr) {
-        console.error('Minimal hero slide upsert also failed:', minErr);
-      }
+      await supabase.from('hero_slides').upsert(minimalPayload, { onConflict: 'id' });
     }
   } catch (err) {
-    console.error('Unexpected error saving hero slide to Supabase:', err);
+    // Ignore Supabase connection errors gracefully
   }
-}
-
-function mergeWithLocalSlides(fetchedFromDb) {
-  const local = loadLocalSlides();
-  if (!Array.isArray(local) || local.length === 0) return fetchedFromDb;
-  const localMap = new Map(local.map((s) => [String(s.id), s]));
-
-  const dbIds = new Set(fetchedFromDb.map((s) => String(s.id)));
-  const mergedDb = fetchedFromDb.map((dbSlide) => {
-    const loc = localMap.get(String(dbSlide.id));
-    if (!loc) return dbSlide;
-    const activeVal = loc.is_active !== undefined ? Boolean(loc.is_active) : (loc.isActive !== undefined ? Boolean(loc.isActive) : Boolean(dbSlide.is_active));
-    return {
-      ...dbSlide,
-      ...loc,
-      is_active: activeVal,
-      isActive: activeVal
-    };
-  });
-
-  const localOnly = local.filter((s) => !dbIds.has(String(s.id)));
-  return [...mergedDb, ...localOnly];
 }
 
 export function HeroBannersProvider({ children }) {
@@ -256,7 +214,13 @@ export function HeroBannersProvider({ children }) {
   const fetchSlides = async () => {
     setLoading(true);
     try {
-      // 1. Primary: Load from Supabase
+      // 1. Check local storage first for immediate user edits persistence
+      const local = loadLocalSlides();
+      if (local && Array.isArray(local) && local.length > 0) {
+        setSlides(local);
+      }
+
+      // 2. Load from Supabase if available
       let query = supabase.from('hero_slides').select('*');
       try {
         query = query.order('sort_order', { ascending: true });
@@ -266,35 +230,22 @@ export function HeroBannersProvider({ children }) {
       const { data, error } = await query;
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        // Exclude deleted slide 2 if it's the old promo slide
         const filtered = fetched.filter((s) => s.id !== 'hero-slide-2');
         if (filtered.length > 0) {
-          const merged = filtered.map((s) => {
-            if (s.id === 'hero-slide-1' && (s.headline1En === 'CRAFT YOUR OWN' || s.eyebrowEn === 'DUAT / THE FORGE')) {
-              return { ...s, ...INITIAL_HERO_SLIDES[0] };
-            }
-            return s;
-          });
-          setSlides(merged);
-          saveLocalSlides(merged);
+          setSlides(filtered);
+          saveLocalSlides(filtered);
           setLoading(false);
           return;
         }
       }
 
-      // 2. Fallback to localStorage
-      const local = loadLocalSlides();
-      if (local && local.length > 0) {
-        setSlides(local);
-        setLoading(false);
-        return;
+      // 3. Fallback to local or initial slides
+      if (!local || local.length === 0) {
+        setSlides(INITIAL_HERO_SLIDES);
+        saveLocalSlides(INITIAL_HERO_SLIDES);
       }
-
-      // 3. Fallback to INITIAL_HERO_SLIDES
-      setSlides(INITIAL_HERO_SLIDES);
-      saveLocalSlides(INITIAL_HERO_SLIDES);
     } catch (err) {
-      console.error('Unexpected error loading hero slides:', err);
+      console.warn('Hero slides load fallback:', err);
       const local = loadLocalSlides();
       setSlides(local && local.length > 0 ? local : INITIAL_HERO_SLIDES);
     } finally {
@@ -381,11 +332,13 @@ export function HeroBannersProvider({ children }) {
     }
   };
 
-  const resetSlides = () => {
+  const resetSlides = async () => {
     localStorage.removeItem(HERO_SLIDES_STORAGE_KEY);
     setSlides(INITIAL_HERO_SLIDES);
     saveLocalSlides(INITIAL_HERO_SLIDES);
-    fetchSlides();
+    for (let i = 0; i < INITIAL_HERO_SLIDES.length; i++) {
+      await saveSlideToSupabase(INITIAL_HERO_SLIDES[i], i);
+    }
   };
 
   return (

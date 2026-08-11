@@ -92,7 +92,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
 
               <div className="lg:col-span-5 relative z-10 flex items-center justify-center">
                 <img
-                  src="https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png"
+                  src={forge.imageUrl || "https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png"}
                   alt="Sticker Builder Preview"
                   className="w-full max-w-xs object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 rounded-xl"
                 />

@@ -456,7 +456,7 @@ export function AdminView() {
 
   // Product Modal Handlers
   const handleOpenAddProductModal = () => {
-    setEditingProduct(null);
+    setEditingProduct(selectedCategory === 'bundles' ? { category: 'bundles' } : null);
     setIsProductModalOpen(true);
   };
 
@@ -837,6 +837,17 @@ export function AdminView() {
               </button>
 
               <button
+                onClick={() => {
+                  setEditingProduct({ category: 'bundles' });
+                  setIsProductModalOpen(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 border border-gold/60 bg-gold/15 text-gold hover:bg-gold hover:text-[#050505] font-bold transition-all font-mono text-xs uppercase shadow-md"
+              >
+                <Gift size={16} />
+                <span>إضافة بندل / عرض جديد 🎁</span>
+              </button>
+
+              <button
                 onClick={handleOpenAddProductModal}
                 className="flex items-center gap-2 px-5 py-2 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
               >
@@ -893,19 +904,31 @@ export function AdminView() {
           {/* SEARCH & CATEGORY FILTERS */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-stone border border-grave p-4">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border ${
-                    selectedCategory === cat.id
-                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
-                      : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
-                  }`}
-                >
-                  {cat.id === 'all' ? 'جميع المنتجات' : cat.id.toUpperCase()}
-                </button>
-              ))}
+              {CATEGORIES.map((cat) => {
+                const getLabel = (id) => {
+                  switch (id) {
+                    case 'all': return 'جميع المنتجات 📦';
+                    case 'bundles': return 'البندلات والعروض 🎁';
+                    case 'stickers': return 'الاستيكرات 🎨';
+                    case 'letters': return 'الحروف 🔤';
+                    case 'badges': return 'الشارات 🏷️';
+                    default: return id.toUpperCase();
+                  }
+                };
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-all whitespace-nowrap border ${
+                      selectedCategory === cat.id
+                        ? 'bg-gold text-[#0A0C16] border-gold shadow-md shadow-gold/20'
+                        : 'bg-stone text-bone border-grave hover:border-gold hover:text-gold'
+                    }`}
+                  >
+                    {getLabel(cat.id)}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="relative w-full sm:w-72">
@@ -933,10 +956,10 @@ export function AdminView() {
                   <thead>
                     <tr className="border-b border-grave bg-stone/40 font-mono text-xs uppercase text-ash tracking-wider">
                       <th className="py-3.5 px-4 text-center">الترتيب</th>
-                      <th className="py-3.5 px-4">المنتج والصورة</th>
-                      <th className="py-3.5 px-4">التصنيف</th>
+                      <th className="py-3.5 px-4">المنتج / البندل والصورة</th>
+                      <th className="py-3.5 px-4">التصنيف والتوفير</th>
                       <th className="py-3.5 px-4 text-center">السعر والتعديل السريع</th>
-                      <th className="py-3.5 px-4">الوسم</th>
+                      <th className="py-3.5 px-4">الوسم والشارة</th>
                       <th className="py-3.5 px-4 text-left">الإجراءات</th>
                     </tr>
                   </thead>
@@ -944,6 +967,8 @@ export function AdminView() {
                     {filteredProducts.map((product) => {
                       const img = product.imageUrl || product.image;
                       const globalIndex = products.findIndex((p) => p.id === product.id);
+                      const savingsAmount = product.savings !== undefined ? product.savings : (product.originalPrice && product.originalPrice > product.price ? product.originalPrice - product.price : 0);
+
                       return (
                         <tr key={product.id} className="hover:bg-stone/30 transition-colors">
                           {/* ORDER CONTROL BUTTONS (UP / DOWN) */}
@@ -999,9 +1024,16 @@ export function AdminView() {
                           </td>
 
                           <td className="py-4 px-4">
-                            <span className="inline-block font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 border border-grave bg-stone/60 text-gold">
-                              {product.category}
-                            </span>
+                            <div className="space-y-1">
+                              <span className="inline-block font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 border border-grave bg-stone/60 text-gold font-bold">
+                                {product.category}
+                              </span>
+                              {savingsAmount > 0 && (
+                                <div className="font-mono text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                                  <span>توفير {savingsAmount} ج.م</span>
+                                </div>
+                              )}
+                            </div>
                           </td>
 
                           <td className="py-4 px-4">

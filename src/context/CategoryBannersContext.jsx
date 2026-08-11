@@ -103,7 +103,7 @@ export const CategoryBannersProvider = ({ children }) => {
             }));
 
             const dbMap = new Map(mappedFromDb.map((b) => [String(b.id), b]));
-            const updated = prev.map((b) => {
+            return prev.map((b) => {
               const match = dbMap.get(String(b.id));
               if (match) {
                 return {
@@ -114,11 +114,6 @@ export const CategoryBannersProvider = ({ children }) => {
               }
               return b;
             });
-
-            // Ensure initial category banners aren't lost
-            const updatedIds = new Set(updated.map((b) => b.id));
-            const missingInitials = INITIAL_CATEGORY_BANNERS.filter((b) => !updatedIds.has(b.id));
-            return [...updated, ...missingInitials];
           });
         }
       } catch (err) {
@@ -132,7 +127,7 @@ export const CategoryBannersProvider = ({ children }) => {
   // Sync categoryBanners to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_category_banners_v4', JSON.stringify(categoryBanners));
+      localStorage.setItem('duat_category_banners_v5', JSON.stringify(categoryBanners));
     } catch (e) {
       console.warn('Failed saving duat_category_banners to localStorage:', e);
     }

@@ -77,7 +77,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
       const fitClass = isSticker
-        ? 'w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out p-4 drop-shadow-md'
+        ? 'w-full h-full object-contain scale-[1.45] group-hover:scale-[1.55] transition-transform duration-500 ease-out drop-shadow-2xl'
         : 'w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out';
       return (
         <img
@@ -95,10 +95,10 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     const renderId = product.stickerRenderId || product.id;
     if (renderId && (renderId.startsWith('ar-letter-') || renderId.startsWith('en-letter-') || renderId.startsWith('month-') || renderId.startsWith('year-'))) {
       return (
-        <div className="w-full h-full flex items-center justify-center p-3">
+        <div className="w-full h-full flex items-center justify-center p-1">
           <StickerIcon
             stickerId={renderId}
-            size={72}
+            size={135}
             color="#182744"
             bgColor="#FFFFFF"
           />
@@ -141,7 +141,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     >
       
       {/* 3:4 Aspect Ratio Visual Canvas Area */}
-      <div className={`aspect-[3/4] w-full overflow-hidden relative border-b border-grave flex items-center justify-center p-6 ${isSticker ? 'bg-gradient-to-b from-stone/60 via-void to-void' : 'bg-void'}`}>
+      <div className={`aspect-[3/4] w-full overflow-hidden relative border-b border-grave flex items-center justify-center ${isSticker ? 'p-3 sm:p-4 bg-gradient-to-b from-stone/60 via-void to-void' : 'p-6 bg-void'}`}>
         {renderProductGraphic()}
         
         {/* Soft Contrast Overlay */}

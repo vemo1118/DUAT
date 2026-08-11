@@ -18,9 +18,17 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const activeSlides = Array.isArray(slides)
-    ? slides.filter((s) => s && s.is_active !== false && s.isActive !== false && String(s.is_active) !== 'false')
-    : [];
+  const activeSlides = (Array.isArray(slides) ? slides : [])
+    .filter((s) => s && s.is_active !== false && s.isActive !== false && String(s.is_active) !== 'false')
+    .filter((s) => {
+      const sid = String(s?.id || '');
+      const eyebrow = String(s?.eyebrowEn || s?.eyebrowAr || '').toUpperCase();
+      const headline = String(s?.headline1En || s?.headline1Ar || '').toUpperCase();
+      if (sid === 'hero-slide-nineties' || sid === 'hero-slide-youth' || sid === 'hero-slide-2' || sid === 'hero-slide-3') return false;
+      if (eyebrow.includes('NINETIES') || eyebrow.includes('YOUTH')) return false;
+      if (headline.includes('90S NOSTALGIA') || headline.includes('BOLD & UNAPOLOGETIC')) return false;
+      return true;
+    });
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -66,21 +74,20 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const secondaryBtnText = (isAr ? current?.ctaSecondaryTextAr : current?.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
   const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';
 
-  const bgImage = current?.imageUrl || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
+  const bgImage = current?.imageUrl || current?.image_url || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
 
-  const effectiveAlign = current?.textAlign
-    ? current.textAlign
-    : isAr ? 'right' : 'left';
+  const isRightAlign = current?.textAlign === 'right';
+  const isCenterAlign = current?.textAlign === 'center';
 
-  const alignClass = effectiveAlign === 'center'
+  const alignClass = isCenterAlign
     ? 'text-center items-center mx-auto'
-    : effectiveAlign === 'right'
-    ? 'text-right items-end ml-auto'
-    : 'text-left items-start mr-auto';
+    : isRightAlign
+    ? `${isAr ? 'text-right' : 'text-right'} items-end ml-auto`
+    : `${isAr ? 'text-right' : 'text-left'} items-start mr-auto`;
 
-  const flexJustifyClass = effectiveAlign === 'center'
+  const flexJustifyClass = isCenterAlign
     ? 'justify-center'
-    : effectiveAlign === 'right'
+    : isRightAlign
     ? 'justify-end'
     : 'justify-start';
 
@@ -103,19 +110,18 @@ export const HeroSlider = ({ setSelectedCategory }) => {
           <img
             src={bgImage}
             alt="Hero Background"
-            className={`w-full h-full object-cover object-center transition-transform duration-700 brightness-110 contrast-110 saturate-105 ${
-              effectiveAlign === 'right' ? 'scale-x-[-1]' : 'scale-x-1'
-            }`}
+            className="w-full h-full object-cover transition-transform duration-700 brightness-110 contrast-110 saturate-105"
+            style={{ objectPosition: `${50 + posX}% ${posY}%` }}
           />
           {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
           <div
-            className={`absolute inset-0 sm:w-2/3 ${
-              effectiveAlign === 'right'
-                ? 'bg-gradient-to-l from-void via-void/60 to-transparent right-0'
-                : 'bg-gradient-to-r from-void via-void/60 to-transparent left-0'
+            className={`absolute inset-0 pointer-events-none ${
+              isRightAlign
+                ? 'bg-gradient-to-l from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
+                : 'bg-gradient-to-r from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
             }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-void/30 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C16]/70 via-transparent to-transparent pointer-events-none" />
         </div>
       ) : (
         /* Fallback Egyptian Ancient Texture Pattern */

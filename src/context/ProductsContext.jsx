@@ -43,12 +43,18 @@ function mapFromDb(row) {
 
   const baseObj = initP ? { ...initP } : {};
 
+  const curPrice = row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || baseObj.price || 0);
+  const origPrice = data.originalPrice !== undefined ? Number(data.originalPrice) : (baseObj.originalPrice !== undefined ? Number(baseObj.originalPrice) : undefined);
+  const savingsVal = data.savings !== undefined ? Number(data.savings) : (baseObj.savings !== undefined ? Number(baseObj.savings) : (origPrice && origPrice > curPrice ? origPrice - curPrice : 0));
+
   return {
     ...baseObj,
     ...data,
     id: idStr,
     category: row.category || data.category || baseObj.category || (idStr.startsWith('ar-letter-') || idStr.startsWith('en-letter-') || idStr.startsWith('month-') || idStr.startsWith('year-') ? 'letters' : (idStr.startsWith('st-') || idStr.startsWith('pack-') || idStr.startsWith('sticker') ? 'stickers' : 'cases')),
-    price: row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || baseObj.price || 0),
+    price: curPrice,
+    originalPrice: origPrice,
+    savings: savingsVal,
     is_active: isActiveVal,
     isActive: isActiveVal,
     imageUrl: img,
@@ -74,16 +80,22 @@ function mapFromDb(row) {
 function mapToDb(p) {
   const isActiveVal = p.is_active !== undefined ? Boolean(p.is_active) : (p.isActive !== undefined ? Boolean(p.isActive) : true);
   const img = p.imageUrl || p.image || '';
+  const curPrice = Number(p.price) || 0;
+  const origPrice = p.originalPrice !== undefined ? Number(p.originalPrice) : undefined;
+  const savingsVal = p.savings !== undefined ? Number(p.savings) : (origPrice && origPrice > curPrice ? origPrice - curPrice : 0);
+
   return {
     id: p.id,
     category: p.category || 'cases',
     name_en: p.nameEn || p.name_en || '',
     name_ar: p.nameAr || p.name_ar || '',
-    price: Number(p.price) || 0,
+    price: curPrice,
     is_active: isActiveVal,
     image_url: img,
     data: {
       ...p,
+      originalPrice: origPrice,
+      savings: savingsVal,
       imageUrl: img,
       image: img,
       images: img ? [img] : (Array.isArray(p.images) ? p.images : []),
