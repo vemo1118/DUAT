@@ -40,7 +40,7 @@ export function BundlesView() {
 
   // Filter bundles from products list & only active products
   const bundleProducts = products.filter(
-    (p) => p && (p.category === 'bundles' || (p.id && p.id.startsWith('bundle-')))
+    (p) => p && (p.category === 'bundles' || (p.id && p.id.startsWith('bundle-'))) && p.is_active !== false && p.isActive !== false
   );
 
   const handleAddBundle = (bundle, e) => {
