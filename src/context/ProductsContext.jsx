@@ -106,6 +106,40 @@ function mapToDb(p) {
 }
 
 const PRODUCTS_STORAGE_KEY = 'duat_products_v11';
+const VISIBILITY_OVERRIDES_KEY = 'duat_visibility_overrides_v2';
+
+function getVisibilityOverrides() {
+  try {
+    const saved = localStorage.getItem(VISIBILITY_OVERRIDES_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveVisibilityOverride(id, isActive) {
+  try {
+    const current = getVisibilityOverrides();
+    current[id] = Boolean(isActive);
+    localStorage.setItem(VISIBILITY_OVERRIDES_KEY, JSON.stringify(current));
+  } catch (e) {
+    // ignore
+  }
+}
+
+function applyVisibilityOverrides(prods) {
+  if (!Array.isArray(prods)) return [];
+  const overrides = getVisibilityOverrides();
+  if (!overrides || Object.keys(overrides).length === 0) return prods;
+
+  return prods.map((p) => {
+    if (p && p.id && overrides[p.id] !== undefined) {
+      const status = Boolean(overrides[p.id]);
+      return { ...p, is_active: status, isActive: status };
+    }
+    return p;
+  });
+}
 
 const PREFERRED_BUNDLE_ORDER = [
   'bundle-clear',
@@ -138,16 +172,17 @@ function loadLocalProducts() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        const withOverrides = applyVisibilityOverrides(parsed);
         if (!isCustomOrder) {
-          return sortProductsByDefaultOrder(parsed);
+          return sortProductsByDefaultOrder(withOverrides);
         }
-        return parsed;
+        return withOverrides;
       }
     }
   } catch (e) {
     // ignore
   }
-  return sortProductsByDefaultOrder(INITIAL_PRODUCTS);
+  return sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS));
 }
 
 function saveLocalProducts(products) {
@@ -193,7 +228,8 @@ export function ProductsProvider({ children }) {
           ...INITIAL_PRODUCTS.filter((initP) => !dbMap.has(String(initP.id)))
         ];
 
-        const finalProducts = isCustomOrder ? merged : sortProductsByDefaultOrder(merged);
+        const withOverrides = applyVisibilityOverrides(merged);
+        const finalProducts = isCustomOrder ? withOverrides : sortProductsByDefaultOrder(withOverrides);
         setProducts(finalProducts);
         saveLocalProducts(finalProducts);
         setLoading(false);
@@ -209,13 +245,13 @@ export function ProductsProvider({ children }) {
       }
 
       // 3. Fallback to INITIAL_PRODUCTS
-      const initialSorted = sortProductsByDefaultOrder(INITIAL_PRODUCTS);
+      const initialSorted = sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS));
       setProducts(initialSorted);
       saveLocalProducts(initialSorted);
     } catch (err) {
       console.warn('Products fetch fallback to local/initial:', err);
       const local = loadLocalProducts();
-      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(INITIAL_PRODUCTS));
+      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(applyVisibilityOverrides(INITIAL_PRODUCTS)));
     } finally {
       setLoading(false);
     }
@@ -287,6 +323,12 @@ export function ProductsProvider({ children }) {
   };
 
   const updateProduct = async (id, updatedFields) => {
+    if (updatedFields.is_active !== undefined) {
+      saveVisibilityOverride(id, updatedFields.is_active);
+    } else if (updatedFields.isActive !== undefined) {
+      saveVisibilityOverride(id, updatedFields.isActive);
+    }
+
     let targetProduct = null;
     setProducts((prev) => {
       const updatedList = prev.map((prod) => {
@@ -345,6 +387,7 @@ export function ProductsProvider({ children }) {
         if (prod.id === id) {
           const currentStatus = prod.is_active !== undefined ? Boolean(prod.is_active) : (prod.isActive !== undefined ? Boolean(prod.isActive) : true);
           const newStatus = !currentStatus;
+          saveVisibilityOverride(id, newStatus);
           const updated = { ...prod, is_active: newStatus, isActive: newStatus };
           targetProduct = updated;
           return updated;
@@ -382,6 +425,11 @@ export function ProductsProvider({ children }) {
 
   // Reset products
   const resetProducts = async () => {
+    try {
+      localStorage.removeItem(VISIBILITY_OVERRIDES_KEY);
+    } catch (e) {
+      // ignore
+    }
     setProducts(INITIAL_PRODUCTS);
     saveLocalProducts(INITIAL_PRODUCTS);
   };
