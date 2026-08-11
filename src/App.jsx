@@ -15,6 +15,8 @@ import { ProductsProvider } from './context/ProductsContext';
 import { OrdersProvider } from './context/OrdersContext';
 import { HeroBannersProvider } from './context/HeroBannersContext';
 import { CategoryBannersProvider } from './context/CategoryBannersContext';
+import { BundlesSettingsProvider } from './context/BundlesSettingsContext';
+import { StickersSettingsProvider } from './context/StickersSettingsContext';
 import { CustomizerProvider } from './context/CustomizerContext';
 import { SocialGridProvider } from './context/SocialGridContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -94,95 +96,99 @@ export function App() {
           <OrdersProvider>
             <HeroBannersProvider>
               <CategoryBannersProvider>
-                <CustomizerProvider>
-                  <SocialGridProvider>
-                    <WishlistProvider>
-                      <CartProvider>
-                        <ToastProvider>
-                          {/* Main Container with Filmic Grain Texture Overlay */}
-                          <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
-                            <ScrollToTop />
+                <BundlesSettingsProvider>
+                  <StickersSettingsProvider>
+                    <CustomizerProvider>
+                    <SocialGridProvider>
+                      <WishlistProvider>
+                        <CartProvider>
+                          <ToastProvider>
+                            {/* Main Container with Filmic Grain Texture Overlay */}
+                            <div className="min-h-screen bg-transparent text-bone flex flex-col font-space selection:bg-gold selection:text-[#050505] relative bg-noise transition-colors duration-300">
+                              <ScrollToTop />
 
-                            {/* Top Announcement Marquee Strip */}
-                            <AnnouncementMarquee />
+                              {/* Top Announcement Marquee Strip */}
+                              <AnnouncementMarquee />
 
-                            {/* Top Navigation Header */}
-                            <Navbar onOpenTracker={() => setTrackerOpen(true)} />
+                              {/* Top Navigation Header */}
+                              <Navbar onOpenTracker={() => setTrackerOpen(true)} />
 
-                            {/* Main Content Router View */}
-                            <main className="flex-grow relative z-10">
-                              <Suspense fallback={<PageFallback />}>
-                                <Routes>
-                                  <Route
-                                    path="/"
-                                    element={
-                                      <HomeView
-                                        setSelectedCategory={handleSelectCategory}
-                                        onSelectProduct={handleSelectProduct}
-                                      />
-                                    }
-                                  />
-                                  <Route path="/bundles" element={<BundlesView />} />
-                                  <Route path="/stickers" element={<StickersView />} />
-                                  <Route path="/sticker-builder" element={<StickerBuilderView />} />
-                                  
-                                  <Route
-                                    path="/shop"
-                                    element={
-                                      <ShopView
-                                        selectedCategory={selectedCategory}
-                                        setSelectedCategory={setSelectedCategory}
-                                        onSelectProduct={handleSelectProduct}
-                                      />
-                                    }
-                                  />
-                                  <Route path="/product/:id" element={<ProductDetailView />} />
-                                  <Route path="/customize" element={<Navigate to="/sticker-builder" replace />} />
-                                  <Route path="/customizer" element={<Navigate to="/sticker-builder" replace />} />
-                                  
-                                  <Route path="/the-duat" element={<AboutView />} />
-                                  <Route path="/about" element={<Navigate to="/the-duat" replace />} />
-                                  
-                                  <Route path="/track-order" element={<OrderTrackerView />} />
-                                  <Route path="/checkout" element={<CheckoutView />} />
-                                  <Route path="/admin" element={<AdminView />} />
-                                  
-                                  {/* Fallback unknown routes to Home */}
-                                  <Route path="*" element={<Navigate to="/" replace />} />
-                                </Routes>
-                              </Suspense>
-                            </main>
+                              {/* Main Content Router View */}
+                              <main className="flex-grow relative z-10">
+                                <Suspense fallback={<PageFallback />}>
+                                  <Routes>
+                                    <Route
+                                      path="/"
+                                      element={
+                                        <HomeView
+                                          setSelectedCategory={handleSelectCategory}
+                                          onSelectProduct={handleSelectProduct}
+                                        />
+                                      }
+                                    />
+                                    <Route path="/bundles" element={<BundlesView />} />
+                                    <Route path="/stickers" element={<StickersView />} />
+                                    <Route path="/sticker-builder" element={<StickerBuilderView />} />
+                                    
+                                    <Route
+                                      path="/shop"
+                                      element={
+                                        <ShopView
+                                          selectedCategory={selectedCategory}
+                                          setSelectedCategory={setSelectedCategory}
+                                          onSelectProduct={handleSelectProduct}
+                                        />
+                                      }
+                                    />
+                                    <Route path="/product/:id" element={<ProductDetailView />} />
+                                    <Route path="/customize" element={<Navigate to="/sticker-builder" replace />} />
+                                    <Route path="/customizer" element={<Navigate to="/sticker-builder" replace />} />
+                                    
+                                    <Route path="/the-duat" element={<AboutView />} />
+                                    <Route path="/about" element={<Navigate to="/the-duat" replace />} />
+                                    
+                                    <Route path="/track-order" element={<OrderTrackerView />} />
+                                    <Route path="/checkout" element={<CheckoutView />} />
+                                    <Route path="/admin" element={<AdminView />} />
+                                    
+                                    {/* Fallback unknown routes to Home */}
+                                    <Route path="*" element={<Navigate to="/" replace />} />
+                                  </Routes>
+                                </Suspense>
+                              </main>
 
-                            {/* Global Footer */}
-                            <Footer />
+                              {/* Global Footer */}
+                              <Footer />
 
-                            {/* Cart Slide-out Drawer Overlay */}
-                            <CartDrawer />
+                              {/* Cart Slide-out Drawer Overlay */}
+                              <CartDrawer />
 
-                            {/* Wishlist Favorites Slide-out Drawer Overlay */}
-                            <WishlistDrawer />
+                              {/* Wishlist Favorites Slide-out Drawer Overlay */}
+                              <WishlistDrawer />
 
-                            {/* Quick View Options Slide-over Drawer */}
-                            <QuickViewDrawer
-                              product={selectedProduct}
-                              isOpen={!!selectedProduct}
-                              onClose={() => setSelectedProduct(null)}
-                            />
+                              {/* Quick View Options Slide-over Drawer */}
+                              <QuickViewDrawer
+                                product={selectedProduct}
+                                isOpen={!!selectedProduct}
+                                onClose={() => setSelectedProduct(null)}
+                              />
 
-                            {/* Order Shipment Tracker Modal */}
-                            <OrderTrackerModal
-                              isOpen={trackerOpen}
-                              onClose={() => setTrackerOpen(false)}
-                            />
+                              {/* Order Shipment Tracker Modal */}
+                              <OrderTrackerModal
+                                isOpen={trackerOpen}
+                                onClose={() => setTrackerOpen(false)}
+                              />
 
-                            {/* Toast Notification Floating Container */}
-                            <ToastContainer />
-                          </div>
-                        </ToastProvider>
-                      </CartProvider>
-                    </WishlistProvider>
-                  </SocialGridProvider>
-                </CustomizerProvider>
+                              {/* Toast Notification Floating Container */}
+                              <ToastContainer />
+                            </div>
+                          </ToastProvider>
+                        </CartProvider>
+                      </WishlistProvider>
+                    </SocialGridProvider>
+                  </CustomizerProvider>
+                </StickersSettingsProvider>
+              </BundlesSettingsProvider>
               </CategoryBannersProvider>
             </HeroBannersProvider>
           </OrdersProvider>

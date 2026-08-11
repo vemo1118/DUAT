@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts } from '../context/ProductsContext';
+import { useStickersSettings } from '../context/StickersSettingsContext';
 import { ProductCard } from '../components/ProductCard';
 import { SunDisc } from '../components/SunDisc';
 import { Search, Sparkles, SlidersHorizontal, ChevronRight, ChevronLeft, Palette, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -10,6 +11,8 @@ export function StickersView() {
   const { products = [] } = useProducts();
   const { lang, t } = useLanguage();
   const navigate = useNavigate();
+
+  const { heroSettings, promoSettings, gridSettings } = useStickersSettings();
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -21,7 +24,7 @@ export function StickersView() {
   const [sortBy, setSortBy] = useState('featured');
 
   // Filter individual stickers (exclude case bundles if any)
-  const stickerProducts = products.filter(p => p && p.category !== 'bundles' && !p.id.startsWith('bundle-'));
+  const stickerProducts = products.filter((p) => p && p.category !== 'bundles' && !(p.id && p.id.startsWith('bundle-')));
 
   const filteredStickers = stickerProducts.filter((product) => {
     if (!product) return false;
@@ -42,7 +45,8 @@ export function StickersView() {
 
     // Search query matching
     const query = (searchQuery || '').toLowerCase().trim();
-    const matchesSearch = !query ||
+    const matchesSearch =
+      !query ||
       (product.nameEn && product.nameEn.toLowerCase().includes(query)) ||
       (product.nameAr && product.nameAr.toLowerCase().includes(query)) ||
       (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
@@ -79,70 +83,85 @@ export function StickersView() {
       </div>
 
       {/* Header & Title Area */}
-      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-grave pb-8">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-ash">
-            <SunDisc size={14} variant="gold" />
-            <span>{t('stickersEyebrow')}</span>
-          </div>
-          <h1 className="font-clash text-4xl sm:text-6xl uppercase text-bone tracking-tight">
-            {isAr ? 'قسم الاستيكرات ✦' : 'Stickers Collection ✦'}
-          </h1>
-          <p className="font-space text-sm text-bone/70 max-w-2xl">
-            {isAr
-              ? 'تشكيلة ملصقات الإيبوكسي ثلاثية الأبعاد البارزة، عبارات العبور، الحروف العربية والإنجليزية وشارات الميلاد.'
-              : 'Browse our 3D epoxy dome stickers, slogans, letters, and badges.'}
-          </p>
-        </div>
-
-        {/* Count & Sort */}
-        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-          <span className="font-mono text-xs text-ash uppercase">
-            {filteredStickers.length} {isAr ? 'استيكر متوفر' : 'stickers'}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal size={15} className="text-ash flex-shrink-0" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-coal border border-grave text-bone px-3 py-2 text-xs font-mono focus:border-gold focus:outline-none cursor-pointer min-h-[44px]"
-            >
-              <option value="featured">{t('sortFeatured')}</option>
-              <option value="price-low">{t('sortPriceLow')}</option>
-              <option value="price-high">{t('sortPriceHigh')}</option>
-              <option value="name">{t('sortName')}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* STICKER BUILDER PROMPT BANNER */}
-      <div className="bg-coal border border-gold/40 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
-        <div className="flex items-center gap-4 text-center sm:text-left">
-          <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/40 flex items-center justify-center text-gold flex-shrink-0">
-            <Palette size={24} />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-clash text-lg sm:text-xl uppercase text-gold font-bold">
-              {isAr ? 'عايز استيكر بمواصفاتك الخاصة؟ 🎨' : 'Want a custom sticker? 🎨'}
-            </h3>
-            <p className="font-space text-xs text-bone/80">
-              {isAr
-                ? 'خش على بيلدر الاستيكرات واكتب النص اللي تحبه أو ارفع صورتك الخاصة ونعملها لك استيكر إيبوكسي مجسم 3D!'
-                : 'Use our Sticker Builder to write custom text or upload an image to turn into a 3D epoxy sticker!'}
+      {heroSettings?.isActive !== false && (
+        <div
+          className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-grave pb-8 relative overflow-hidden"
+          style={
+            heroSettings?.bgImage
+              ? {
+                  backgroundImage: `linear-gradient(to bottom, rgba(5,5,5,0.7), rgba(5,5,5,0.9)), url(${heroSettings.bgImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  padding: '2rem',
+                  borderRadius: '2px'
+                }
+              : {}
+          }
+        >
+          <div className="space-y-2 relative z-10 max-w-3xl">
+            {(heroSettings?.eyebrowAr || heroSettings?.eyebrowEn) && (
+              <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold">
+                <SunDisc size={14} variant="gold" />
+                <span>{isAr ? heroSettings.eyebrowAr : heroSettings.eyebrowEn}</span>
+              </div>
+            )}
+            <h1 className="font-clash text-4xl sm:text-6xl uppercase text-bone tracking-tight">
+              {isAr ? heroSettings?.titleAr : heroSettings?.titleEn}
+            </h1>
+            <p className="font-space text-sm text-bone/80 max-w-2xl leading-relaxed">
+              {isAr ? heroSettings?.descAr : heroSettings?.descEn}
             </p>
           </div>
-        </div>
 
-        <Link
-          to="/sticker-builder"
-          className="btn-primary py-3 px-6 font-mono text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 whitespace-nowrap"
-        >
-          <span>{isAr ? 'بيلدر الاستيكرز' : 'STICKER BUILDER'}</span>
-          <CtaArrow size={14} />
-        </Link>
-      </div>
+          {/* Count & Sort */}
+          <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end relative z-10">
+            <span className="font-mono text-xs text-ash uppercase">
+              {filteredStickers.length} {isAr ? 'استيكر متوفر' : 'stickers'}
+            </span>
+
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal size={15} className="text-ash flex-shrink-0" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-coal border border-grave text-bone px-3 py-2 text-xs font-mono focus:border-gold focus:outline-none cursor-pointer min-h-[44px]"
+              >
+                <option value="featured">{t('sortFeatured')}</option>
+                <option value="price-low">{t('sortPriceLow')}</option>
+                <option value="price-high">{t('sortPriceHigh')}</option>
+                <option value="name">{t('sortName')}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STICKER BUILDER PROMPT BANNER */}
+      {promoSettings?.isActive !== false && (
+        <div className="bg-coal border border-gold/40 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
+          <div className="flex items-center gap-4 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/40 flex items-center justify-center text-gold flex-shrink-0">
+              <Palette size={24} />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-clash text-lg sm:text-xl uppercase text-gold font-bold">
+                {isAr ? promoSettings?.titleAr : promoSettings?.titleEn}
+              </h3>
+              <p className="font-space text-xs text-bone/80">
+                {isAr ? promoSettings?.descAr : promoSettings?.descEn}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to={promoSettings?.buttonLink || '/sticker-builder'}
+            className="btn-primary py-3 px-6 font-mono text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 whitespace-nowrap"
+          >
+            <span>{isAr ? promoSettings?.buttonTextAr : promoSettings?.buttonTextEn}</span>
+            <CtaArrow size={14} />
+          </Link>
+        </div>
+      )}
 
       {/* Search Bar & Sub-Category Tabs */}
       <div className="space-y-6">
@@ -178,7 +197,9 @@ export function StickersView() {
       {/* Stickers Product Grid */}
       {filteredStickers.length === 0 ? (
         <div className="bg-stone border border-grave p-12 text-center space-y-4">
-          <p className="font-space text-sm text-ash">{t('noProductsFound')}</p>
+          <p className="font-space text-sm text-ash font-mono">
+            {isAr ? gridSettings?.emptyMessageAr : gridSettings?.emptyMessageEn}
+          </p>
           <button
             onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
             className="btn-secondary py-2.5 px-5 font-mono text-xs uppercase"
