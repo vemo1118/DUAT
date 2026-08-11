@@ -71,8 +71,10 @@ export const CategoryBannersProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
 
-  // Load saved banners from Supabase on mount
+  // Load saved banners from Supabase — also used by Realtime broadcast subscription
   useEffect(() => {
+    let isMounted = true;
+
     async function loadFromSupabase() {
       try {
         const { data: forgeData } = await supabase
@@ -81,7 +83,7 @@ export const CategoryBannersProvider = ({ children }) => {
           .eq('key', 'forge_banner')
           .maybeSingle();
 
-        if (forgeData?.value && typeof forgeData.value === 'object') {
+        if (isMounted && forgeData?.value && typeof forgeData.value === 'object') {
           setForgeBanner((prev) => ({ ...prev, ...forgeData.value }));
         }
 
@@ -89,7 +91,7 @@ export const CategoryBannersProvider = ({ children }) => {
           .from('category_banners')
           .select('*');
 
-        if (Array.isArray(catData) && catData.length > 0) {
+        if (isMounted && Array.isArray(catData) && catData.length > 0) {
           setCategoryBanners((prev) => {
             const mappedFromDb = catData.map((dbRow) => ({
               id: dbRow.id,
@@ -122,15 +124,18 @@ export const CategoryBannersProvider = ({ children }) => {
       }
     }
 
+    // Initial load
     loadFromSupabase();
-  }, []);
 
-  // Subscribe to Supabase Realtime broadcasts from admin
-  useEffect(() => {
+    // Subscribe to Supabase Realtime broadcasts from admin
     const unsubscribe = subscribeToLiveSync(() => {
-      loadFromSupabase();
+      if (isMounted) loadFromSupabase();
     });
-    return () => unsubscribe();
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // Sync categoryBanners to localStorage

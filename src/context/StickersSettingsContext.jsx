@@ -67,16 +67,10 @@ export const StickersSettingsProvider = ({ children }) => {
   const [stickersSettings, setStickersSettings] = useState(() => getCombinedSettings());
   const [loading, setLoading] = useState(false);
 
+  // Load settings from Supabase — also used by Realtime broadcast subscription
   useEffect(() => {
-    // Subscribe to Supabase Realtime broadcasts from admin → re-fetch from Supabase
-    const unsubscribe = subscribeToLiveSync(() => {
-      loadFromSupabase();
-    });
-    return () => unsubscribe();
-  }, []);
+    let isMounted = true;
 
-  // Load settings from Supabase on mount
-  useEffect(() => {
     async function loadFromSupabase() {
       try {
         setLoading(true);
@@ -90,7 +84,7 @@ export const StickersSettingsProvider = ({ children }) => {
           console.warn('Supabase fetch error for stickers_page_settings:', error.message);
         }
 
-        if (data?.value && typeof data.value === 'object') {
+        if (isMounted && data?.value && typeof data.value === 'object') {
           setStickersSettings((prev) => ({
             hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...(data.value.hero || {}) },
             promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...(data.value.promo || {}) },
@@ -100,11 +94,22 @@ export const StickersSettingsProvider = ({ children }) => {
       } catch (err) {
         console.warn('Error loading stickers_page_settings from Supabase:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
 
+    // Initial load
     loadFromSupabase();
+
+    // Subscribe to Supabase Realtime broadcasts from admin
+    const unsubscribe = subscribeToLiveSync(() => {
+      if (isMounted) loadFromSupabase();
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // Save settings to localStorage and publish to global cloud store whenever changed

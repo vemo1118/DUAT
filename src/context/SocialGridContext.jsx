@@ -84,8 +84,10 @@ export const SocialGridProvider = ({ children }) => {
     return INITIAL_SOCIAL_TILES;
   });
 
-  // Fetch from Supabase on mount
+  // Fetch from Supabase on mount — also used by Realtime broadcast subscription
   useEffect(() => {
+    let isMounted = true;
+
     async function loadSocialFromSupabase() {
       try {
         const { data: setRes } = await supabase
@@ -94,7 +96,7 @@ export const SocialGridProvider = ({ children }) => {
           .eq('key', 'social_grid_settings')
           .maybeSingle();
 
-        if (setRes?.value && typeof setRes.value === 'object') {
+        if (isMounted && setRes?.value && typeof setRes.value === 'object') {
           setSettings((prev) => ({ ...prev, ...setRes.value }));
         }
 
@@ -104,7 +106,7 @@ export const SocialGridProvider = ({ children }) => {
           .eq('key', 'social_grid_tiles')
           .maybeSingle();
 
-        if (Array.isArray(tileRes?.value) && tileRes.value.length > 0) {
+        if (isMounted && Array.isArray(tileRes?.value) && tileRes.value.length > 0) {
           setTiles(tileRes.value);
         }
       } catch (err) {
@@ -112,15 +114,18 @@ export const SocialGridProvider = ({ children }) => {
       }
     }
 
+    // Initial load
     loadSocialFromSupabase();
-  }, []);
 
-  // Subscribe to Supabase Realtime broadcasts from admin
-  useEffect(() => {
+    // Subscribe to Supabase Realtime broadcasts from admin
     const unsubscribe = subscribeToLiveSync(() => {
-      loadSocialFromSupabase();
+      if (isMounted) loadSocialFromSupabase();
     });
-    return () => unsubscribe();
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
