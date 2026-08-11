@@ -26,10 +26,12 @@ export const CategoryGrid = ({ onSelectCategory }) => {
   }));
 
   const handleClick = (cat) => {
-    const link = cat.categoryLink || (cat.id === 'bundles' ? '/bundles' : cat.id === 'builder' ? '/sticker-builder' : '/stickers');
     if (onSelectCategory) onSelectCategory(cat.id);
+    const link = cat.categoryLink || (cat.id === 'bundles' ? '/bundles' : cat.id === 'builder' ? '/sticker-builder' : cat.id === 'stickers' ? '/stickers' : '/shop');
     navigate(link);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      window.scrollTo(0, 0);
+    } catch (e) {}
   };
 
   return (

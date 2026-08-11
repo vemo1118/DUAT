@@ -49,8 +49,6 @@ export function App() {
 
   const handleSelectCategory = (catId) => {
     setSelectedCategory(catId);
-    navigate('/shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   React.useEffect(() => {
