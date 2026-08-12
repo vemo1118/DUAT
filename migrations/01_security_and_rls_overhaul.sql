@@ -387,7 +387,9 @@ begin
     execute format('grant insert, update, delete on table public.%I to authenticated', v_table);
     execute format('grant all on table public.%I to service_role', v_table);
     execute format('create policy %I on public.%I for select to anon, authenticated using (true)', v_table || '_public_select', v_table);
-    execute format('create policy %I on public.%I for all to authenticated using (public.is_admin()) with check (public.is_admin())', v_table || '_admin_write', v_table);
+    execute format('create policy %I on public.%I for insert to authenticated with check (public.is_admin())', v_table || '_admin_insert', v_table);
+    execute format('create policy %I on public.%I for update to authenticated using (public.is_admin()) with check (public.is_admin())', v_table || '_admin_update', v_table);
+    execute format('create policy %I on public.%I for delete to authenticated using (public.is_admin())', v_table || '_admin_delete', v_table);
   end loop;
 end
 $public_tables$;
