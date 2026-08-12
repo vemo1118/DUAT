@@ -7,9 +7,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies and generated build output
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.vite/
+.vercel/
+
+# Local backups and scratch files
+backups/
 *.local
 
 # Editor directories and files
@@ -25,8 +32,8 @@ dist-ssr
 
 # Environment variables
 .env
-.env.production
-.env.staging
+.env.*
+!.env.example
 
 # Agent artifacts
 .agents/
