@@ -1,52 +1,64 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { PRODUCTS } from '../src/data/products.js';
+import {
+  PRODUCTS,
+  ARABIC_LETTER_PRODUCTS,
+  ENGLISH_LETTER_PRODUCTS,
+  MONTH_STICKER_PRODUCTS,
+  YEAR_STICKER_PRODUCTS
+} from '../src/data/products.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const supabaseUrl = process.env.SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const envPath = path.resolve(__dirname, '../.env');
-const envContent = fs.readFileSync(envPath, 'utf8');
-const env = {};
-envContent.split('\n').forEach(line => {
-  const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
-  if (match) {
-    env[match[1]] = match[2] ? match[2].trim() : '';
-  }
-});
-
-const supabaseUrl = env.VITE_SUPABASE_URL;
-const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.');
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!process.argv.includes('--apply')) {
+  console.error('This script writes catalogue data. Re-run with --apply after reviewing the target project.');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { persistSession: false, autoRefreshToken: false }
+});
+
+const catalogue = [
+  ...PRODUCTS,
+  ...ARABIC_LETTER_PRODUCTS,
+  ...ENGLISH_LETTER_PRODUCTS,
+  ...MONTH_STICKER_PRODUCTS,
+  ...YEAR_STICKER_PRODUCTS
+];
 
 async function seed() {
-  console.log(`Seeding ${PRODUCTS.length} products into Supabase...`);
-  const productsToUpsert = PRODUCTS.map((product) => ({
+  console.info(`Seeding ${catalogue.length} products into Supabase...`);
+  const productsToUpsert = catalogue.map((product) => ({
     id: product.id,
     category: product.category || 'cases',
     price: Number(product.price) || 0,
-    is_active: true,
-    data: product
+    is_active: product.is_active !== false,
+    case_type_id: product.caseTypeId || null,
+    data: {
+      ...product,
+      nameEn: product.nameEn || '',
+      nameAr: product.nameAr || '',
+      imageUrl: product.imageUrl || product.image || ''
+    }
   }));
 
   const { data, error } = await supabase
     .from('products')
     .upsert(productsToUpsert, { onConflict: 'id' })
-    .select();
+    .select('id');
 
   if (error) {
-    console.error('Seeding error (Note: writes require authenticated admin if RLS is enforced):', error.message);
-  } else {
-    console.log('Seeding success! Products inserted/updated:', data?.length);
+    console.error('Seeding failed:', error.message);
+    process.exitCode = 1;
+    return;
   }
+  console.info(`Seed complete: ${data?.length || 0} products upserted.`);
 }
 
 seed();

@@ -10,6 +10,7 @@ import { useToast } from '../context/ToastContext';
 import { useBundlesSettings } from '../context/BundlesSettingsContext';
 import { useStickersSettings } from '../context/StickersSettingsContext';
 import { supabase } from '../lib/supabase';
+import { testOrderNotification } from '../services/orderApi';
 import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
@@ -64,11 +65,7 @@ import {
 import { SunDisc } from '../components/SunDisc';
 import {
   exportOrdersToCSV,
-  sendTestTelegramNotification,
   saveNotificationSettingsToSupabase,
-  wipeAllOrdersAndStorage,
-  TELEGRAM_TOKEN_KEY,
-  TELEGRAM_CHAT_ID_KEY,
   ADMIN_WHATSAPP_NUMBER_KEY
 } from '../utils/orderNotifier';
 
@@ -86,7 +83,7 @@ export function AdminView() {
     moveProductDown,
     setCasesFirstOrder
   } = useProducts();
-  const { orders, fetchOrders, updateOrderStatus, deleteOrder, resetOrders } = useOrders();
+  const { orders, fetchOrders, updateOrderStatus, deleteOrder } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
   const {
     categoryBanners,
@@ -210,54 +207,46 @@ export function AdminView() {
 
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero' | 'notifications'
 
-  const [telegramToken, setTelegramToken] = useState(() => localStorage.getItem(TELEGRAM_TOKEN_KEY) || '');
-  const [telegramChatId, setTelegramChatId] = useState(() => localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '');
   const [adminWhatsApp, setAdminWhatsApp] = useState(() => localStorage.getItem(ADMIN_WHATSAPP_NUMBER_KEY) || '201000000000');
 
   const handleSaveNotificationSettings = async (e) => {
     e.preventDefault();
-    await saveNotificationSettingsToSupabase(telegramToken, telegramChatId, adminWhatsApp);
-    showToast('تم حفظ إعدادات الإشعارات الفورية ومزامنتها عالمياً لجميع العملاء والموبايلات بنجاح!', 'success');
+    await saveNotificationSettingsToSupabase(null, null, adminWhatsApp);
+    showToast('تم حفظ رقم واتساب بنجاح.', 'success');
   };
 
   const handleTestNotification = async () => {
-    if (!telegramToken.trim() || !telegramChatId.trim()) {
-      showToast('يرجى إدخال الـ Bot Token والـ Chat ID أولاً لاختبار الإشعار!', 'error');
-      return;
-    }
-    await saveNotificationSettingsToSupabase(telegramToken, telegramChatId, adminWhatsApp);
     showToast('جاري إرسال إشعار تجريبي لموبايلك عبر تليجرام...', 'info');
-    const ok = await sendTestTelegramNotification();
-    if (ok) {
+    try {
+      await testOrderNotification();
       showToast('وصل الإشعار التجريبي بنجاح! تفقّد هاتفك المحمول 📱✨', 'success');
-    } else {
-      showToast('تعذر الإرسال! تأكد من الـ Token والـ Chat ID وأنك اضغطت /start للبوت في تليجرام.', 'error');
+    } catch {
+      showToast('تعذر الإرسال. تأكد من إضافة متغيرات Telegram في Vercel وأن الحساب Admin.', 'error');
     }
   };
 
   // Check initial session & listen for auth changes
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
+      const { data: isAdmin } = currentSession ? await supabase.rpc('is_admin') : { data: false };
+      setSession(isAdmin === true ? currentSession : null);
+      if (currentSession && isAdmin !== true) setAuthError('هذا الحساب غير مصرح له بإدارة المتجر.');
       setAuthLoading(false);
-      if (session && fetchOrders) fetchOrders();
+      if (currentSession && isAdmin === true && fetchOrders) fetchOrders();
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
-      if (currentSession && fetchOrders) fetchOrders();
+      if (!currentSession) setSession(null);
     });
 
     const syncNotifSettingsFromDb = async () => {
       try {
-        const { data } = await supabase.from('builder_settings').select('telegram_token, telegram_chat_id, admin_whatsapp').eq('id', 'global-builder-config').maybeSingle();
+        const { data } = await supabase.from('builder_settings').select('admin_whatsapp').eq('id', 'global-builder-config').maybeSingle();
         if (data) {
-          if (data.telegram_token) setTelegramToken(data.telegram_token);
-          if (data.telegram_chat_id) setTelegramChatId(data.telegram_chat_id);
           if (data.admin_whatsapp) setAdminWhatsApp(data.admin_whatsapp);
         }
       } catch (e) {
-        console.warn('Error loading telegram settings in AdminView:', e);
+        console.warn('Error loading notification settings in AdminView:', e);
       }
     };
     syncNotifSettingsFromDb();
@@ -324,35 +313,34 @@ export function AdminView() {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [signedProofUrl, setSignedProofUrl] = useState(null);
+  const [signedDesignUrls, setSignedDesignUrls] = useState({});
 
   // Coupons Tab State
-  const [adminCoupons, setAdminCoupons] = useState(() => {
-    try {
-      const saved = localStorage.getItem('duat_coupons_list_v1');
-      return saved ? JSON.parse(saved) : [
-        { code: 'DUAT10', type: 'percentage', value: 10, isActive: true, description: 'خصم ١٠٪ على جميع المنتجات' },
-        { code: 'DAWN100', type: 'fixed', value: 100, isActive: true, description: 'خصم ١٠٠ ج.م ثابت' },
-        { code: 'SUMMER20', type: 'percentage', value: 20, isActive: true, description: 'خصم الصيف ٢٠٪' }
-      ];
-    } catch (e) {
-      return [];
-    }
-  });
+  const [adminCoupons, setAdminCoupons] = useState([]);
   const [newCouponCode, setNewCouponCode] = useState('');
   const [newCouponType, setNewCouponType] = useState('percentage');
   const [newCouponValue, setNewCouponValue] = useState(10);
   const [newCouponDesc, setNewCouponDesc] = useState('');
 
-  const saveAdminCoupons = (updated) => {
-    setAdminCoupons(updated);
-    try {
-      localStorage.setItem('duat_coupons_list_v1', JSON.stringify(updated));
-    } catch (e) {
-      console.warn('Error saving admin coupons:', e);
-    }
-  };
+  useEffect(() => {
+    if (!session) return;
+    supabase
+      .from('coupons')
+      .select('code, type, value, is_active, expires_at')
+      .order('code')
+      .then(({ data, error }) => {
+        if (error) {
+          console.warn('Failed loading coupons:', error.message);
+          return;
+        }
+        setAdminCoupons((data || []).map((coupon) => ({
+          ...coupon,
+          isActive: coupon.is_active !== false
+        })));
+      });
+  }, [session]);
 
-  const handleAddCoupon = (e) => {
+  const handleAddCoupon = async (e) => {
     e.preventDefault();
     if (!newCouponCode.trim()) return;
     const codeClean = newCouponCode.trim().toUpperCase();
@@ -360,24 +348,42 @@ export function AdminView() {
       showToast('كود الخصم موجود بالفعل!', 'error');
       return;
     }
-    const updated = [
-      ...adminCoupons,
-      { code: codeClean, type: newCouponType, value: Number(newCouponValue), isActive: true, description: newCouponDesc.trim() || `خصم ${newCouponValue}${newCouponType === 'percentage' ? '%' : ' ج.م'}` }
-    ];
-    saveAdminCoupons(updated);
+    const newCoupon = {
+      code: codeClean,
+      type: newCouponType,
+      value: Number(newCouponValue),
+      is_active: true
+    };
+    const { data, error } = await supabase.from('coupons').insert(newCoupon).select('code, type, value, is_active, expires_at').single();
+    if (error) {
+      showToast('تعذر حفظ الكوبون في قاعدة البيانات.', 'error');
+      return;
+    }
+    setAdminCoupons((current) => [...current, { ...data, isActive: data.is_active !== false, description: newCouponDesc.trim() }]);
     setNewCouponCode('');
     setNewCouponDesc('');
     showToast('تمت إضافة كود الخصم بنجاح 🎉', 'success');
   };
 
-  const handleToggleCoupon = (code) => {
-    const updated = adminCoupons.map(c => c.code === code ? { ...c, isActive: !c.isActive } : c);
-    saveAdminCoupons(updated);
+  const handleToggleCoupon = async (code) => {
+    const coupon = adminCoupons.find((item) => item.code === code);
+    if (!coupon) return;
+    const nextActive = !coupon.isActive;
+    const { error } = await supabase.from('coupons').update({ is_active: nextActive }).eq('code', code);
+    if (error) {
+      showToast('تعذر تحديث الكوبون.', 'error');
+      return;
+    }
+    setAdminCoupons((current) => current.map((item) => item.code === code ? { ...item, isActive: nextActive, is_active: nextActive } : item));
   };
 
-  const handleDeleteCoupon = (code) => {
-    const updated = adminCoupons.filter(c => c.code !== code);
-    saveAdminCoupons(updated);
+  const handleDeleteCoupon = async (code) => {
+    const { error } = await supabase.from('coupons').delete().eq('code', code);
+    if (error) {
+      showToast('تعذر حذف الكوبون.', 'error');
+      return;
+    }
+    setAdminCoupons((current) => current.filter((item) => item.code !== code));
     showToast('تم حذف كود الخصم', 'info');
   };
 
@@ -388,22 +394,43 @@ export function AdminView() {
       const proofPath = selectedOrderDetails?.payment_proof_path || selectedOrderDetails?.paymentProofPath;
       if (proofPath) {
         try {
-          const { data: publicData } = supabase.storage.from('payment-proofs').getPublicUrl(proofPath);
-          if (active && publicData?.publicUrl) {
-            setSignedProofUrl(publicData.publicUrl);
-          }
-          const { data } = await supabase.storage.from('payment-proofs').createSignedUrl(proofPath, 3600);
-          if (active && data?.signedUrl) {
+          const { data, error } = await supabase.storage.from('payment-proofs').createSignedUrl(proofPath, 3600);
+          if (active && !error && data?.signedUrl) {
             setSignedProofUrl(data.signedUrl);
           }
         } catch (err) {
-          console.error('Error generating URL for payment proof:', err);
+          console.error('Error generating signed URL for payment proof:', err);
         }
       }
     };
     if (selectedOrderDetails) {
       fetchSignedProofUrl();
     }
+    return () => { active = false; };
+  }, [selectedOrderDetails]);
+
+  useEffect(() => {
+    let active = true;
+    const loadDesignUrls = async () => {
+      const items = selectedOrderDetails?.items || [];
+      const paths = [...new Set(items.map((item) => {
+        const details = item.customConfig || item.customDetails || {};
+        return item.design_image_path || details.design_image_path;
+      }).filter(Boolean))];
+
+      if (paths.length === 0) {
+        setSignedDesignUrls({});
+        return;
+      }
+
+      const entries = await Promise.all(paths.map(async (path) => {
+        const { data, error } = await supabase.storage.from('order-designs').createSignedUrl(path, 3600);
+        return [path, error ? null : data?.signedUrl || null];
+      }));
+      if (active) setSignedDesignUrls(Object.fromEntries(entries.filter(([, url]) => url)));
+    };
+
+    loadDesignUrls();
     return () => { active = false; };
   }, [selectedOrderDetails]);
 
@@ -441,9 +468,17 @@ export function AdminView() {
           showToast('فشل تسجيل الدخول: ' + error.message, 'error');
         }
       } else {
-        setSession(data.session);
-        showToast('تم تسجيل الدخول بنجاح!', 'success');
-        if (fetchOrders) fetchOrders();
+        const { data: isAdmin } = await supabase.rpc('is_admin');
+        if (isAdmin !== true) {
+          await supabase.auth.signOut();
+          setSession(null);
+          setAuthError('الحساب صحيح لكنه غير موجود ضمن مسؤولي المتجر.');
+          showToast('الحساب غير مصرح له بدخول لوحة التحكم', 'error');
+        } else {
+          setSession(data.session);
+          showToast('تم تسجيل الدخول بنجاح!', 'success');
+          if (fetchOrders) fetchOrders();
+        }
       }
     } catch (err) {
       setAuthError('تعذر الاتصال بالخادم. يرجى مراجعة الاتصال وإيقاف مانع الإعلانات.');
@@ -1295,24 +1330,6 @@ export function AdminView() {
                 <span>تصدير لشيت الشحن (CSV) 📊</span>
               </button>
 
-              <button
-                onClick={async () => {
-                  if (window.confirm('هل أنت متاكد من مسح جميع الأوردرات والصور المرفوعة وإعادة عداد الأوردرات للبدء من DUAT-0001؟')) {
-                    const ok = await wipeAllOrdersAndStorage();
-                    if (ok) {
-                      resetOrders();
-                      fetchOrders();
-                      showToast('تم مسح جميع الأوردرات بنجاح! الأوردر القادم سيكون DUAT-0001 🧹', 'success');
-                    } else {
-                      showToast('حدث خطأ أثناء المسح، يرجى المحاولة مرة أخرى', 'error');
-                    }
-                  }
-                }}
-                className="flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-mono text-xs uppercase font-bold transition-colors"
-              >
-                <Trash2 size={15} />
-                <span>مسح جميع الأوردرات (إعادة العداد لـ DUAT-0001) 🧹</span>
-              </button>
             </div>
           </div>
 
@@ -2210,34 +2227,6 @@ export function AdminView() {
           <form onSubmit={handleSaveNotificationSettings} className="space-y-5 font-mono text-xs">
             <div>
               <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
-                Telegram Bot Token (من @BotFather)
-              </label>
-              <input
-                type="text"
-                value={telegramToken}
-                onChange={(e) => setTelegramToken(e.target.value)}
-                placeholder="مثال: 7123456789:AAFx...XYZ"
-                className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
-                dir="ltr"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
-                Telegram Chat ID (من @userinfobot)
-              </label>
-              <input
-                type="text"
-                value={telegramChatId}
-                onChange={(e) => setTelegramChatId(e.target.value)}
-                placeholder="مثال: 123456789"
-                className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
-                dir="ltr"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
                 رقم الواتساب لاستلام طلبات الشات المباشرة
               </label>
               <input
@@ -2252,13 +2241,9 @@ export function AdminView() {
 
             <div className="bg-coal p-5 border border-grave/60 space-y-2 text-ash text-[12px] leading-relaxed">
               <p className="font-bold text-gold flex items-center gap-2">
-                <span>💡 طريقة التفعيل المجاني في 60 ثانية:</span>
+                <span>🔐 إعداد Telegram مؤمّن من السيرفر</span>
               </p>
-              <ol className="list-decimal list-inside space-y-1.5 font-sans">
-                <li>افتح تطبيق تليجرام وابحث عن <b>@BotFather</b> وارسل <code>/newbot</code> واحصل على الـ <b>Bot Token</b>.</li>
-                <li>ابحث عن <b>@userinfobot</b> وارسل أي كلمة لمعرفة الـ <b>Chat ID</b> الخاص بك.</li>
-                <li>ضع البيانات أعلاه واضغط حفظ الإعدادات، وستصلك كافة الأوردرات فوراً بصوت واهتزاز على هاتفك المحمول!</li>
-              </ol>
+              <p className="font-sans">الـBot Token والـChat ID محفوظان كـ Environment Variables داخل Vercel فقط، ولا يتم إرسالهما للمتصفح أو تخزينهما في قاعدة البيانات.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -3905,6 +3890,8 @@ export function AdminView() {
                 {selectedOrderDetails.items?.map((item, idx) => {
                   const name = item.nameAr || item.nameEn || item.name || 'منتج DUAT';
                   const cfg = item.customConfig || item.customDetails || item.product?.customConfig || item.product?.customDetails;
+                  const designPath = item.design_image_path || cfg?.design_image_path;
+                  const secureDesignUrl = designPath ? signedDesignUrls[designPath] : null;
                   const layers = cfg?.layers || item.layers || item.product?.layers || [];
                   const caseBgColor = getCaseFinishColor(cfg?.caseFinish || cfg?.caseType || cfg?.caseTypeId);
 
@@ -3912,7 +3899,8 @@ export function AdminView() {
                   const dynamicSnapshot = layers.length > 0 ? generateCaseMockupSnapshot(null, layers, caseBgColor, '#E8A33D', cfg) : null;
 
                   // Real Snapshot Image stored on item
-                  const rawSnapshot = item.designSnapshot ||
+                  const rawSnapshot = secureDesignUrl ||
+                                     item.designSnapshot ||
                                      cfg?.designSnapshot ||
                                      (typeof item.image === 'string' && item.image.startsWith('data:image') ? item.image : null) ||
                                      (typeof item.product?.image === 'string' && item.product.image.startsWith('data:image') ? item.product.image : null);
@@ -3974,7 +3962,7 @@ export function AdminView() {
                       <div className="flex items-center gap-3">
                         {/* Thumbnail Image Box */}
                         <div className="w-16 h-16 bg-stone border border-gold/40 rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1 shadow-md">
-                          <CustomStickerThumbnail item={item} />
+                          <CustomStickerThumbnail item={secureDesignUrl ? { ...item, image: secureDesignUrl, designSnapshot: secureDesignUrl } : item} />
                         </div>
 
                         {/* Title, Quantity & Price */}
@@ -4196,10 +4184,7 @@ export function AdminView() {
             {/* Payment Method & Proof Section */}
             {(() => {
               const proofPath = selectedOrderDetails.payment_proof_path || selectedOrderDetails.paymentProofPath;
-              const directPublicUrl = proofPath
-                ? (proofPath.startsWith('http') ? proofPath : `https://pgqgmrfvsvrvbddafrcf.supabase.co/storage/v1/object/public/payment-proofs/${proofPath}`)
-                : null;
-              const displayProofUrl = signedProofUrl || directPublicUrl;
+              const displayProofUrl = proofPath ? signedProofUrl : null;
               const isInstaPay = selectedOrderDetails.paymentMethod === 'instapay' || selectedOrderDetails.payment_method === 'instapay';
 
               return (

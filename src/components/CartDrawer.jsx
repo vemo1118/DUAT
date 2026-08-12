@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
 import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag, MessageSquare } from 'lucide-react';
-import { sendTelegramOrderNotification, generateWhatsAppOrderLink } from '../utils/orderNotifier';
+import { generateWhatsAppOrderLink } from '../utils/orderNotifier';
 
 import { CustomStickerThumbnail } from './CustomStickerThumbnail';
 
@@ -38,9 +38,9 @@ export const CartDrawer = () => {
 
   if (!isOpen) return null;
 
-  const handleApplyPromo = () => {
+  const handleApplyPromo = async () => {
     if (!inputPromo.trim()) return;
-    const success = applyPromoCode(inputPromo.trim());
+    const success = await applyPromoCode(inputPromo.trim());
     if (success) {
       showToast(t('promoSuccessToast'), 'success');
     } else {
@@ -61,7 +61,6 @@ export const CartDrawer = () => {
       totalPrice: calculatedTotal,
       customerName: 'طلب مباشر عبر واتساب'
     };
-    sendTelegramOrderNotification(tempOrder);
     const waUrl = generateWhatsAppOrderLink(tempOrder);
     window.open(waUrl, '_blank');
   };

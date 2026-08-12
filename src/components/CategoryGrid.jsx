@@ -31,7 +31,9 @@ export const CategoryGrid = ({ onSelectCategory }) => {
     navigate(link);
     try {
       window.scrollTo(0, 0);
-    } catch (e) {}
+    } catch {
+      // Scrolling is a progressive enhancement and can be unavailable in tests.
+    }
   };
 
   return (

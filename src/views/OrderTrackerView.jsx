@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { useOrders } from '../context/OrdersContext';
-import { supabase } from '../lib/supabase';
 import { SunDisc } from '../components/SunDisc';
-import { OrderInvoiceModal } from '../components/OrderInvoiceModal';
+import { trackOrder } from '../services/orderApi';
 import { Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2 } from 'lucide-react';
 
 export const OrderTrackerView = () => {
   const { lang, t } = useLanguage();
-  const { getOrderByCode } = useOrders();
   const [orderId, setOrderId] = useState('');
+  const [phoneLast4, setPhoneLast4] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   const statusToStep = (status) => {
     switch (status) {
       case 'placed': return 0;
-      case 'forge': return 1;
+      case 'forge':
+      case 'in_production': return 1;
       case 'shipped': return 2;
       case 'delivered': return 3;
       default: return 0;
@@ -27,77 +25,29 @@ export const OrderTrackerView = () => {
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (!orderId.trim()) return;
+    if (!orderId.trim() || !/^\d{4}$/.test(phoneLast4)) {
+      setErrorMsg(lang === 'ar' ? 'اكتب رقم الطلب وآخر ٤ أرقام من رقم الموبايل' : 'Enter the order number and the last 4 phone digits');
+      return;
+    }
 
     setIsLoading(true);
     setErrorMsg('');
-    const rawQuery = orderId.trim().toUpperCase();
-    const cleanCode = rawQuery.startsWith('DUAT-') ? rawQuery : `DUAT-${rawQuery}`;
-
-    // 1. Check local copy in localStorage
-    let localOrder = null;
     try {
-      const savedLocal = JSON.parse(localStorage.getItem('duat_customer_orders') || '[]');
-      localOrder = savedLocal.find(
-        (item) =>
-          (item.ref && item.ref.toUpperCase() === cleanCode) ||
-          (item.id && item.id.toUpperCase() === cleanCode)
-      );
-    } catch (e) {
-      console.error('Failed reading local tracking orders:', e);
-    }
-
-    if (!localOrder) {
-      localOrder = getOrderByCode(cleanCode);
-    }
-
-    // 2. Query Supabase directly by id or ref
-    try {
-      const { data: dbData, error: dbError } = await supabase
-        .from('orders')
-        .select('*')
-        .or(`id.eq.${cleanCode},ref.eq.${cleanCode}`)
-        .maybeSingle();
-
-      const matchedOrder = dbData || localOrder;
-
-      if (matchedOrder && matchedOrder.status) {
-        const custName = matchedOrder.customer?.fullName || matchedOrder.customer?.name || localOrder?.customer?.fullName || localOrder?.customer?.name;
-        const itemsList = Array.isArray(matchedOrder.items) && matchedOrder.items.length > 0 ? matchedOrder.items : (localOrder?.items || []);
-        const totalAmount = matchedOrder.total || localOrder?.total || 0;
-        const orderDate = matchedOrder.created_at || matchedOrder.createdAt;
-
+      const finalTrack = await trackOrder(orderId, phoneLast4);
+      if (finalTrack?.status) {
         setTrackedResult({
-          code: matchedOrder.id || matchedOrder.ref || cleanCode,
-          currentStep: statusToStep(matchedOrder.status),
-          status: matchedOrder.status,
-          customerName: custName,
-          items: itemsList,
-          total: totalAmount,
-          updatedAt: orderDate
-            ? new Date(orderDate).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
+          code: finalTrack.code,
+          currentStep: statusToStep(finalTrack.status),
+          status: finalTrack.status,
+          items: finalTrack.items || [],
+          updatedAt: (finalTrack.updatedAt || finalTrack.createdAt)
+            ? new Date(finalTrack.updatedAt || finalTrack.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
             : 'الآن'
         });
-      } else {
-        setTrackedResult(null);
-        setErrorMsg(t('trackerNotFound'));
       }
-    } catch (err) {
-      console.error('Order tracking exception:', err);
-      if (localOrder) {
-        setTrackedResult({
-          code: localOrder.ref || localOrder.id,
-          currentStep: statusToStep(localOrder.status),
-          status: localOrder.status,
-          customerName: localOrder.customer?.fullName || localOrder.customer?.name,
-          items: localOrder.items || [],
-          total: localOrder.total,
-          updatedAt: localOrder.createdAt ? new Date(localOrder.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : 'الآن'
-        });
-      } else {
-        setTrackedResult(null);
-        setErrorMsg(t('trackerNotFound'));
-      }
+    } catch {
+      setTrackedResult(null);
+      setErrorMsg(t('trackerNotFound'));
     } finally {
       setIsLoading(false);
     }
@@ -129,13 +79,22 @@ export const OrderTrackerView = () => {
 
       {/* Track Form Card */}
       <div className="bg-stone border border-grave p-6 sm:p-10 space-y-6 shadow-2xl card-depth-highlight">
-        <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_180px_auto] gap-3">
           <input
             type="text"
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder={t('trackerInputPlaceholder')}
             className="flex-1 bg-coal border border-grave text-bone p-4 text-sm font-mono uppercase focus:border-gold focus:outline-none min-h-[44px]"
+          />
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={4}
+            value={phoneLast4}
+            onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder={lang === 'ar' ? 'آخر ٤ أرقام من الموبايل' : 'Last 4 phone digits'}
+            className="bg-coal border border-grave text-bone p-4 text-sm font-mono focus:border-gold focus:outline-none min-h-[44px]"
           />
           <button
             type="submit"
@@ -158,13 +117,6 @@ export const OrderTrackerView = () => {
               <span className="font-mono text-xs text-ash">ORDER REFERENCE:</span>
               <span className="font-mono text-base font-bold text-gold tracking-widest">{trackedResult.code}</span>
             </div>
-
-            {trackedResult.customerName && (
-              <div className="font-mono text-xs text-bone/80">
-                <span className="text-ash">CUSTOMER: </span>
-                <span>{trackedResult.customerName}</span>
-              </div>
-            )}
 
             {Array.isArray(trackedResult.items) && trackedResult.items.length > 0 && (
               <div className="font-mono text-xs text-bone/80 border-b border-grave/40 pb-3 space-y-1">
@@ -216,17 +168,8 @@ export const OrderTrackerView = () => {
               })}
             </div>
 
-            {/* Action Buttons: Invoice View & WhatsApp Customer Support */}
+            {/* Action Buttons */}
             <div className="pt-6 border-t border-grave flex flex-col sm:flex-row gap-3">
-              <button
-                type="button"
-                onClick={() => setIsInvoiceOpen(true)}
-                className="btn-primary py-3 px-6 text-xs font-mono flex items-center justify-center gap-2 flex-1"
-              >
-                <ShieldCheck size={16} />
-                <span>{lang === 'ar' ? 'عرض وطباعة الفاتورة الرسمية' : 'View & Print Invoice'}</span>
-              </button>
-
               <a
                 href={`https://wa.me/201012345678?text=${encodeURIComponent(`أهلاً خدمة عملاء دوات، أود الاستفسار عن طلبي رقم: ${trackedResult.code}`)}`}
                 target="_blank"
@@ -240,12 +183,8 @@ export const OrderTrackerView = () => {
         )}
       </div>
 
-      {/* Invoice Receipt Modal */}
-      <OrderInvoiceModal
-        isOpen={isInvoiceOpen}
-        onClose={() => setIsInvoiceOpen(false)}
-        order={trackedResult?.rawOrder || { id: trackedResult?.code, ref: trackedResult?.code, customer: { fullName: trackedResult?.customerName }, items: trackedResult?.items, total: 0 }}
-      />
     </div>
   );
 };
+
+export default OrderTrackerView;

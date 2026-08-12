@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { quoteOrder } from '../services/orderApi';
 
 const CartContext = createContext();
 
@@ -126,50 +127,19 @@ export const CartProvider = ({ children }) => {
   const total = Math.max(0, subtotal - discountAmount);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const applyPromoCode = (code) => {
+  const applyPromoCode = async (code) => {
     if (!code) return false;
     const clean = code.trim().toUpperCase();
-    
-    // Dynamic promo code evaluation rules
-    if (clean === 'DUAT10' || clean.endsWith('10')) {
-      const discount = Math.round(subtotal * 0.10);
-      setPromoCode(clean);
-      setDiscountAmount(discount);
-      return true;
-    } else if (clean === 'SUMMER20' || clean.endsWith('20')) {
-      const discount = Math.round(subtotal * 0.20);
-      setPromoCode(clean);
-      setDiscountAmount(discount);
-      return true;
-    } else if (clean === 'DAWN100' || clean.endsWith('100')) {
-      const discount = Math.min(100, subtotal);
-      setPromoCode(clean);
-      setDiscountAmount(discount);
-      return true;
-    } else if (clean === 'FREESHIP' || clean === 'DUAT50') {
-      const discount = Math.min(50, subtotal);
-      setPromoCode(clean);
-      setDiscountAmount(discount);
-      return true;
-    }
-    
-    // Fallback: If user created custom coupon code in localStorage
+
     try {
-      const savedCoupons = JSON.parse(localStorage.getItem('duat_coupons_list_v1') || '[]');
-      const match = savedCoupons.find(c => c.code.toUpperCase() === clean && c.isActive !== false);
-      if (match) {
-        let disc = 0;
-        if (match.type === 'percentage') {
-          disc = Math.round((subtotal * match.value) / 100);
-        } else {
-          disc = Math.min(match.value, subtotal);
-        }
+      const quote = await quoteOrder({ items: cartItems, couponCode: clean });
+      if (quote.couponCode === clean && Number(quote.discount) > 0) {
         setPromoCode(clean);
-        setDiscountAmount(disc);
+        setDiscountAmount(Number(quote.discount));
         return true;
       }
-    } catch (e) {
-      console.warn('Error reading dynamic coupons in cart:', e);
+    } catch (error) {
+      console.warn('Coupon verification failed:', error.message);
     }
 
     return false;

@@ -7,7 +7,7 @@ export const LanguageProvider = ({ children }) => {
   const [lang, setLangState] = useState(() => {
     // 1. Check URL query params (?lang=ar or ?lang=en)
     if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
+      const params = new window.URLSearchParams(window.location.search);
       const urlLang = params.get('lang');
       if (urlLang === 'ar' || urlLang === 'en') {
         return urlLang;

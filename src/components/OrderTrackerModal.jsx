@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { X, Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { useOrders } from '../context/OrdersContext';
-import { supabase } from '../lib/supabase';
+import { trackOrder } from '../services/orderApi';
 import { SunDisc } from './SunDisc';
 
 export const OrderTrackerModal = ({ isOpen, onClose }) => {
   const { lang, t } = useLanguage();
-  const { getOrderByCode } = useOrders();
   const [orderId, setOrderId] = useState('');
+  const [phoneLast4, setPhoneLast4] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -28,74 +27,26 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (!orderId.trim()) return;
+    if (!orderId.trim() || !/^\d{4}$/.test(phoneLast4)) {
+      setErrorMsg(lang === 'ar' ? 'اكتب رقم الطلب وآخر ٤ أرقام من الموبايل' : 'Enter the order number and last 4 phone digits');
+      return;
+    }
 
     setIsLoading(true);
     setErrorMsg('');
-    const rawQuery = orderId.trim().toUpperCase();
-    const cleanCode = rawQuery.startsWith('DUAT-') ? rawQuery : `DUAT-${rawQuery}`;
-
-    // 1. Check local storage
-    let localOrder = null;
     try {
-      const savedLocal = JSON.parse(localStorage.getItem('duat_customer_orders') || '[]');
-      localOrder = savedLocal.find(
-        (item) =>
-          (item.ref && item.ref.toUpperCase() === cleanCode) ||
-          (item.id && item.id.toUpperCase() === cleanCode)
-      );
-    } catch (e) {
-      console.error('Failed reading local tracking orders:', e);
-    }
-
-    if (!localOrder && getOrderByCode) {
-      localOrder = getOrderByCode(cleanCode);
-    }
-
-    // 2. Query Supabase
-    try {
-      const { data: dbData } = await supabase
-        .from('orders')
-        .select('*')
-        .or(`id.eq.${cleanCode},ref.eq.${cleanCode}`)
-        .maybeSingle();
-
-      const matchedOrder = dbData || localOrder;
-
-      if (matchedOrder && matchedOrder.status) {
-        const custName = matchedOrder.customer?.fullName || matchedOrder.customer?.name || localOrder?.customer?.fullName || localOrder?.customer?.name;
-        const itemsList = Array.isArray(matchedOrder.items) && matchedOrder.items.length > 0 ? matchedOrder.items : (localOrder?.items || []);
-        const totalAmount = matchedOrder.total || localOrder?.total || 0;
-
+      const finalTrack = await trackOrder(orderId, phoneLast4);
+      if (finalTrack?.status) {
         setTrackedResult({
-          code: matchedOrder.id || matchedOrder.ref || cleanCode,
-          currentStep: statusToStep(matchedOrder.status),
-          status: matchedOrder.status,
-          customerName: custName,
-          items: itemsList,
-          total: totalAmount
+          code: finalTrack.code,
+          currentStep: statusToStep(finalTrack.status),
+          status: finalTrack.status,
+          items: finalTrack.items || []
         });
-      } else if (cleanCode.length >= 4) {
-        // Fallback for demonstration when cleanCode is typed
-        setTrackedResult({
-          code: cleanCode,
-          currentStep: 1,
-          status: 'forge',
-          customerName: 'عميل DUAT',
-          items: [{ nameAr: 'جراب هاتف مخصص', quantity: 1 }],
-          total: 850
-        });
-      } else {
-        setTrackedResult(null);
-        setErrorMsg(t('trackerNotFound'));
       }
-    } catch (err) {
-      console.error('Order tracking error:', err);
-      setTrackedResult({
-        code: cleanCode,
-        currentStep: 1,
-        status: 'forge'
-      });
+    } catch {
+      setTrackedResult(null);
+      setErrorMsg(t('trackerNotFound'));
     } finally {
       setIsLoading(false);
     }
@@ -134,13 +85,22 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
         </p>
 
         {/* Input Form */}
-        <form onSubmit={handleTrack} className="flex gap-2">
+        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-2">
           <input
             type="text"
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder={t('trackerInputPlaceholder')}
             className="flex-1 bg-coal border border-grave text-bone p-3 text-xs font-mono uppercase focus:border-gold focus:outline-none min-h-[44px]"
+          />
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={4}
+            value={phoneLast4}
+            onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder={lang === 'ar' ? 'آخر ٤ أرقام' : 'Last 4 digits'}
+            className="bg-coal border border-grave text-bone p-3 text-xs font-mono focus:border-gold focus:outline-none min-h-[44px]"
           />
           <button
             type="submit"
@@ -164,10 +124,14 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
               <span className="font-bold text-gold tracking-widest">{trackedResult.code}</span>
             </div>
 
-            {trackedResult.customerName && (
-              <div className="font-mono text-xs text-bone/90 flex justify-between items-center border-b border-grave/40 pb-2">
-                <span className="text-ash">اسم العميل:</span>
-                <span className="font-bold text-gold">{trackedResult.customerName}</span>
+            {Array.isArray(trackedResult.items) && trackedResult.items.length > 0 && (
+              <div className="font-mono text-xs text-bone/80 border-b border-grave/40 pb-2 space-y-1">
+                <span className="text-ash block font-bold">محتويات الطلب:</span>
+                {trackedResult.items.map((it, i) => (
+                  <div key={i} className="text-gold font-medium">
+                    • {it.nameAr || it.nameEn} (x{it.quantity || 1})
+                  </div>
+                ))}
               </div>
             )}
 

@@ -4,8 +4,9 @@ import { toPng } from 'html-to-image';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { uploadDesignDataUrl } from '../services/orderApi';
 import { SunDisc } from '../components/SunDisc';
-import { Type, Image as ImageIcon, Sparkles, ShoppingBag, RotateCcw, Upload, Check, Info, ChevronLeft, ChevronRight, Layers, Palette, Eye, Shield, Tag } from 'lucide-react';
+import { Type, Image as ImageIcon, Sparkles, ShoppingBag, RotateCcw, Upload, Check, Info, ChevronLeft, ChevronRight, Layers, Palette, Eye, Shield, Tag, Loader2 } from 'lucide-react';
 
 export function StickerBuilderView() {
   const { lang, t, formatPrice } = useLanguage();
@@ -17,21 +18,23 @@ export function StickerBuilderView() {
   const isRtl = isAr;
   const ArrowIcon = isRtl ? ChevronLeft : ChevronRight;
 
+  const [isUploading, setIsUploading] = useState(false);
+
   // Builder Mode: 'text' or 'image'
   const [mode, setMode] = useState('text');
 
   // Text Sticker State
   const [customText, setCustomText] = useState('طالع نور');
-  const [selectedFont, setSelectedFont] = useState('camel'); // 'camel', 'ruqaa', 'kufi', 'amiri', 'rakkas', 'cairo', 'changa', 'katibeh'
-  const [textColor, setTextColor] = useState('#E0A93B'); // Gold default
-  const [bgFinish, setBgFinish] = useState('obsidian'); // 'clear', 'obsidian', 'gold-foil', 'ivory', 'amber'
-  const [cutShape, setCutShape] = useState('pill'); // 'pill', 'badge', 'circle', 'shield'
+  const [selectedFont, setSelectedFont] = useState('camel');
+  const [textColor, setTextColor] = useState('#E0A93B');
+  const [bgFinish, setBgFinish] = useState('obsidian');
+  const [cutShape, setCutShape] = useState('pill');
 
   // Image Sticker State
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imageScale, setImageScale] = useState(100);
-  const [borderStyle, setBorderStyle] = useState('gold'); // 'gold', 'white', 'black', 'none'
-  const [imgCutShape, setImgCutShape] = useState('diecut'); // 'diecut', 'circle', 'rectangle', 'oval'
+  const [borderStyle, setBorderStyle] = useState('gold');
+  const [imgCutShape, setImgCutShape] = useState('diecut');
 
   // Common Options
   const [quantity, setQuantity] = useState(1);
@@ -39,7 +42,6 @@ export function StickerBuilderView() {
 
   const stickerCanvasRef = useRef(null);
 
-  // 8 Distinct Arabic Calligraphy & Modern Fonts Options
   const FONTS = [
     { id: 'camel', nameAr: 'خط دوات الملكي', nameEn: 'DUAT Royal Camel', fontClass: 'font-arabic-camel', sample: 'دوات' },
     { id: 'ruqaa', nameAr: 'خط رقعة ديواني', nameEn: 'Traditional Ruqaa', fontClass: 'font-arabic-ruqaa', sample: 'رقعة' },
@@ -51,7 +53,6 @@ export function StickerBuilderView() {
     { id: 'katibeh', nameAr: 'خط كتيبة ديواني', nameEn: 'Katibeh Script', fontClass: 'font-arabic-katibeh', sample: 'كتيبة' }
   ];
 
-  // Text Colors
   const TEXT_COLORS = [
     { id: 'gold', color: '#E0A93B', nameAr: 'ذهب ١٨ قيراط', nameEn: '18k Gold' },
     { id: 'white', color: '#FFFFFF', nameAr: 'أبيض ناصع', nameEn: 'Pure White' },
@@ -61,7 +62,6 @@ export function StickerBuilderView() {
     { id: 'emerald', color: '#38A169', nameAr: 'أخضر مرامي', nameEn: 'Emerald Sage' }
   ];
 
-  // Background Finishes
   const BG_FINISHES = [
     { id: 'obsidian', nameAr: 'أسود فحم لامع', nameEn: 'Obsidian Gloss', bg: 'bg-[#121214]', border: 'border-gold/40' },
     { id: 'clear', nameAr: 'شفاف أكريليك', nameEn: 'Clear Acrylic', bg: 'bg-void/40 backdrop-blur-md', border: 'border-bone/30' },
@@ -70,7 +70,6 @@ export function StickerBuilderView() {
     { id: 'amber', nameAr: 'صمغ عنبري شفاف', nameEn: 'Translucent Amber', bg: 'bg-[#D97706]/20', border: 'border-[#D97706]/60' }
   ];
 
-  // Cut Shapes
   const CUT_SHAPES = [
     { id: 'pill', nameAr: 'قرص بيضاوي (Pill)', nameEn: 'Oval Pill', class: 'rounded-full px-8 py-4' },
     { id: 'badge', nameAr: 'شارة مستطيلة (Badge)', nameEn: 'Rectangular Badge', class: 'rounded-md px-6 py-4' },
@@ -78,10 +77,13 @@ export function StickerBuilderView() {
     { id: 'shield', nameAr: 'درع العبور (Shield)', nameEn: 'Shield Cut', class: 'rounded-b-2xl rounded-t-sm px-6 py-4' }
   ];
 
-  // Handle Image Upload
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        addToast(isAr ? 'حجم الصورة يجب ألا يتجاوز ٥ ميجابايت' : 'Image size must be less than 5MB', 'error');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         setUploadedImage(event.target?.result);
@@ -90,11 +92,8 @@ export function StickerBuilderView() {
     }
   };
 
-  // Calculate Price per unit
   const basePrice = 100;
-  const totalPrice = basePrice * quantity;
 
-  // Handle Add Custom Sticker to Cart
   const handleAddToCart = async () => {
     if (mode === 'text' && !customText.trim()) {
       addToast(isAr ? 'برجاء كتابة النص الخاص بالاستيكر أولاً' : 'Please enter custom sticker text first', 'error');
@@ -105,6 +104,7 @@ export function StickerBuilderView() {
       return;
     }
 
+    setIsUploading(true);
     let stickerSnapshot = uploadedImage;
     if (mode === 'text' && stickerCanvasRef.current) {
       try {
@@ -112,6 +112,22 @@ export function StickerBuilderView() {
       } catch (err) {
         console.warn('Canvas snapshot capture fallback:', err);
       }
+    }
+
+    if (!stickerSnapshot) {
+      setIsUploading(false);
+      addToast(isAr ? 'تعذر تجهيز التصميم، حاول مرة أخرى' : 'Could not prepare the design. Please retry.', 'error');
+      return;
+    }
+
+    let uploadResult;
+    try {
+      uploadResult = await uploadDesignDataUrl(stickerSnapshot);
+    } catch (error) {
+      console.error('Design upload failed:', error.message);
+      setIsUploading(false);
+      addToast(isAr ? 'تعذر رفع التصميم بأمان، حاول مرة أخرى' : 'Secure design upload failed. Please retry.', 'error');
+      return;
     }
 
     const customItem = {
@@ -124,8 +140,9 @@ export function StickerBuilderView() {
       tagEn: 'Custom 3D Epoxy Dome Sticker',
       craftTagAr: 'تصنيع خاص حسب الطلب • مصر',
       craftTagEn: 'Custom Made to Order • Egypt',
-      image: stickerSnapshot || null,
-      designSnapshot: stickerSnapshot || null,
+      designSnapshot: stickerSnapshot,
+      design_image_path: uploadResult.path,
+      design_upload_token: uploadResult.claimToken,
       specsAr: [
         mode === 'text' ? `النص: ${customText}` : `استيكر صورة مرفقة`,
         `القص والتشكيل: ${cutShape}`,
@@ -143,13 +160,16 @@ export function StickerBuilderView() {
         textColor,
         bgFinish,
         cutShape,
-        uploadedImage,
-        designNotes
+        designNotes,
+        design_image_path: uploadResult.path,
+        design_upload_token: uploadResult.claimToken
       },
+      quantity,
       is_active: true
     };
 
-    addToCart(customItem, quantity, {});
+    addToCart(customItem);
+    setIsUploading(false);
     addToast(isAr ? 'تمت إضافة الاستيكر المخصص إلى سلة الشراء! 🎨' : 'Custom sticker added to cart! 🎨', 'success');
     navigate('/stickers');
   };
@@ -157,6 +177,7 @@ export function StickerBuilderView() {
   const activeFontObj = FONTS.find(f => f.id === selectedFont) || FONTS[0];
   const activeBgObj = BG_FINISHES.find(b => b.id === bgFinish) || BG_FINISHES[0];
   const activeShapeObj = CUT_SHAPES.find(s => s.id === cutShape) || CUT_SHAPES[0];
+  const totalPrice = basePrice * quantity;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 min-h-screen">
@@ -626,9 +647,10 @@ export function StickerBuilderView() {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
+              disabled={isUploading}
               className="w-full btn-primary py-4 px-6 font-mono text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl"
             >
-              <ShoppingBag size={18} />
+              {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ShoppingBag size={18} />}
               <span>
                 {isAr
                   ? `أضف الاستيكر المخصص للسلة — ${formatPrice(totalPrice)}`

@@ -131,13 +131,17 @@ export const SocialGridProvider = ({ children }) => {
   useEffect(() => {
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    } catch (e) {}
+    } catch {
+      // Local storage is optional in privacy-restricted browsers.
+    }
   }, [settings]);
 
   useEffect(() => {
     try {
       localStorage.setItem(TILES_KEY, JSON.stringify(tiles));
-    } catch (e) {}
+    } catch {
+      // Local storage is optional in privacy-restricted browsers.
+    }
   }, [tiles]);
 
   const updateSettings = async (newFields) => {

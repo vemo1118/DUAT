@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.env.*
+.DS_Store
+node_modules
+dist
+backups
+migrations
+scripts
+src/tests
+SECURITY_DEPLOYMENT.md
+*.log

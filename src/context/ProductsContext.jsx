@@ -94,13 +94,13 @@ function mapToDb(p) {
   return {
     id: p.id,
     category: p.category || 'cases',
-    name_en: p.nameEn || p.name_en || '',
-    name_ar: p.nameAr || p.name_ar || '',
     price: curPrice,
     is_active: isActiveVal,
-    image_url: img,
+    case_type_id: p.caseTypeId || p.case_type_id || null,
     data: {
       ...p,
+      nameEn: p.nameEn || p.name_en || '',
+      nameAr: p.nameAr || p.name_ar || '',
       originalPrice: origPrice,
       savings: savingsVal,
       imageUrl: img,

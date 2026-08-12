@@ -1,120 +1,71 @@
-// Real-Time Global Cloud Sync Engine for DUAT Store
-// Architecture: Supabase Realtime Broadcast (primary) + Supabase Database (persistence)
+const listenersByResource = new Map();
+let inMemoryState = {};
 
-import liveCustomEditsLocal from '../data/live_custom_edits.json';
-import { supabase } from '../lib/supabase';
+/**
+ * Subscribe to scoped Realtime events ('products-updated', 'hero-updated', 'settings-updated', 'coupons-updated')
+ */
+export function subscribeToLiveSync(resourceType, callback) {
+  let resType = resourceType;
+  let cb = callback;
 
-const LOCAL_STORAGE_CACHE_KEY = 'duat_live_cloud_edits_cache_v1';
-const REALTIME_CHANNEL_NAME = 'duat-admin-updates';
-
-// Unique ID per browser session — used to ignore self-broadcasts
-const CLIENT_ID = `${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
-
-let inMemoryState = {
-  ...liveCustomEditsLocal
-};
-
-// Try loading cached state from localStorage first (for instant initial render)
-try {
-  const cached = localStorage.getItem(LOCAL_STORAGE_CACHE_KEY);
-  if (cached) {
-    const parsed = JSON.parse(cached);
-    inMemoryState = { ...inMemoryState, ...parsed };
+  if (typeof resourceType === 'function') {
+    cb = resourceType;
+    resType = '*';
   }
-} catch (e) {
-  // ignore
-}
 
-const listeners = new Set();
+  if (!listenersByResource.has(resType)) {
+    listenersByResource.set(resType, new Set());
+  }
 
-export function subscribeToLiveSync(listener) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
+  const set = listenersByResource.get(resType);
+  set.add(cb);
 
-function notifyListeners() {
-  listeners.forEach((fn) => {
-    try {
-      fn(inMemoryState);
-    } catch (e) {
-      console.error('[LiveSync] Error notifying listener:', e);
+  return () => {
+    set.delete(cb);
+    if (set.size === 0) {
+      listenersByResource.delete(resType);
     }
-  });
+  };
 }
 
-// ─────────────────────────────────────────────────────
-// Supabase Realtime Broadcast Channel
-// Admin publishes → all OTHER client browsers receive instantly
-// Self-broadcasts are filtered via CLIENT_ID
-// ─────────────────────────────────────────────────────
-let realtimeChannel = null;
-
-function setupRealtimeChannel() {
-  if (realtimeChannel) return;
-
-  realtimeChannel = supabase
-    .channel(REALTIME_CHANNEL_NAME)
-    .on('broadcast', { event: 'data-updated' }, async (payload) => {
-      // Ignore broadcasts sent by this same browser tab/window
-      if (payload?.payload?.senderId === CLIENT_ID) {
-        return;
-      }
-
-      console.log('⚡ [LiveSync] Admin update broadcast received!');
-      notifyListeners();
-    })
-    .subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('✅ [LiveSync] Connected to Supabase Realtime channel.');
-      }
+function notifyListeners(resourceType, payload) {
+  const genericSet = listenersByResource.get('*');
+  if (genericSet) {
+    genericSet.forEach((fn) => {
+      try { fn(resourceType, payload); } catch (e) { console.error('[LiveSync] Generic listener error:', e); }
     });
+  }
+
+  const specificSet = listenersByResource.get(resourceType);
+  if (specificSet) {
+    specificSet.forEach((fn) => {
+      try { fn(payload); } catch (e) { console.error(`[LiveSync] Listener error for ${resourceType}:`, e); }
+    });
+  }
 }
 
-// Initialise the channel immediately on module load
-setupRealtimeChannel();
+/**
+ * Notify this browser session after a successful database write.
+ * Cross-client anonymous broadcasts are intentionally disabled; each page loads
+ * authoritative data from Supabase on navigation/refresh.
+ */
+export async function broadcastResourceEvent(resource, action = 'update', data = null) {
+  // Never update another provider while the current provider is rendering.
+  await Promise.resolve();
+  notifyListeners(resource, { action, data });
+}
 
+// Backward-compatibility exports for context subscribers
 export async function fetchCloudEdits() {
   return inMemoryState;
 }
 
-// ─────────────────────────────────────────────────────
-// Publish updated edits
-// Saves to localStorage AND broadcasts via Supabase Realtime
-// ─────────────────────────────────────────────────────
 export async function publishCloudEdits(partialState) {
-  try {
-    inMemoryState = {
-      ...inMemoryState,
-      ...partialState,
-      updatedAt: Date.now()
-    };
-
-    // Always save to localStorage immediately
-    try {
-      localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(inMemoryState));
-    } catch (e) {}
-
-    // Broadcast to all OTHER connected clients via Supabase Realtime (instant)
-    if (realtimeChannel) {
-      realtimeChannel.send({
-        type: 'broadcast',
-        event: 'data-updated',
-        payload: { updatedAt: inMemoryState.updatedAt, senderId: CLIENT_ID }
-      }).catch((err) => {
-        console.warn('[LiveSync] Realtime broadcast failed (non-critical):', err?.message);
-      });
-    }
-
-    return { success: true, state: inMemoryState };
-  } catch (err) {
-    console.warn('[LiveSync] publishCloudEdits error (non-critical):', err?.message);
-  }
-  return { success: false, state: inMemoryState };
+  inMemoryState = { ...inMemoryState, ...partialState, updatedAt: Date.now() };
+  await broadcastResourceEvent('settings-updated', 'update', partialState);
+  return { success: true, state: inMemoryState };
 }
 
-/**
- * Get current in-memory cloud sync state
- */
 export function getLiveSyncState() {
   return inMemoryState;
 }

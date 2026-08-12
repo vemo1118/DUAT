@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useCustomizerConfig } from '../context/CustomizerContext';
+import { uploadDesignDataUrl } from '../services/orderApi';
 import { StickerIcon } from '../components/StickerIcon';
 import { useTheme } from '../context/ThemeContext';
 import { PHONE_MODELS as DEFAULT_PHONE_MODELS, CASE_TYPES as DEFAULT_CASE_TYPES, STICKER_PRESETS, PRESET_TEMPLATES } from '../data/products';
@@ -311,10 +312,11 @@ export const CustomizerContent = () => {
   const { lang, t } = useLanguage();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const isNight = theme === 'night';
   const { activeCaseTypes, activePhoneModels, activeBuilderStickers, activeBuilderCategories, builderPrice } = useCustomizerConfig();
   const location = useLocation();
+  const [isSavingDesign, setIsSavingDesign] = useState(false);
 
   const CASE_TYPES = Array.isArray(activeCaseTypes) && activeCaseTypes.length > 0 ? activeCaseTypes : DEFAULT_CASE_TYPES;
   const PHONE_MODELS = Array.isArray(activePhoneModels) && activePhoneModels.length > 0 ? activePhoneModels : DEFAULT_PHONE_MODELS;
@@ -964,6 +966,8 @@ export const CustomizerContent = () => {
     : (lang === 'ar' ? 'اختر التعديل' : 'Select Tool');
 
   const handleAddToCart = async () => {
+    if (isSavingDesign) return;
+    setIsSavingDesign(true);
     let mockupSnapshotUrl = null;
     if (canvasRef.current) {
       try {
@@ -982,6 +986,22 @@ export const CustomizerContent = () => {
       mockupSnapshotUrl = generateCaseMockupSnapshot(canvasRef.current, layers, caseBgColor, caseRingColor, selectedCaseType);
     }
 
+    if (!mockupSnapshotUrl) {
+      setIsSavingDesign(false);
+      showToast(lang === 'ar' ? 'تعذر تجهيز التصميم، حاول مرة أخرى' : 'Could not prepare the design. Please retry.', 'error');
+      return;
+    }
+
+    let uploadResult;
+    try {
+      uploadResult = await uploadDesignDataUrl(mockupSnapshotUrl);
+    } catch (error) {
+      console.error('Custom case upload failed:', error.message);
+      setIsSavingDesign(false);
+      showToast(lang === 'ar' ? 'تعذر رفع التصميم بأمان، حاول مرة أخرى' : 'Secure design upload failed. Please retry.', 'error');
+      return;
+    }
+
     const priceNum = Number(builderPrice) || 850;
 
     const customConfigObj = {
@@ -990,6 +1010,8 @@ export const CustomizerContent = () => {
       caseType: selectedCaseType?.nameAr || selectedCaseType?.nameEn,
       caseFinish: selectedCaseType?.caseFinish || selectedCaseType?.nameEn || 'Matte',
       designSnapshot: mockupSnapshotUrl,
+      design_image_path: uploadResult.path,
+      design_upload_token: uploadResult.claimToken,
       layers: layers,
       caseBgColor: caseBgColor,
       caseRingColor: caseRingColor
@@ -1003,6 +1025,8 @@ export const CustomizerContent = () => {
       price: priceNum,
       image: mockupSnapshotUrl || 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=600&q=80',
       designSnapshot: mockupSnapshotUrl,
+      design_image_path: uploadResult.path,
+      design_upload_token: uploadResult.claimToken,
       category: 'customizer',
       isCustom: true,
       selectedModel: currentModelName,
@@ -1014,6 +1038,7 @@ export const CustomizerContent = () => {
     };
 
     addToCart(customizerItem, customConfigObj);
+    setIsSavingDesign(false);
     showToast(lang === 'ar' ? 'تمت إضافة تصميم الجراب للسلة بنجاح! 📱✨' : 'Custom case design added to cart! 📱✨');
     navigate('/checkout');
   };
@@ -1246,7 +1271,7 @@ export const CustomizerContent = () => {
           <div className="w-10 flex justify-end">
             <button
               type="button"
-              onClick={() => setIsNight((prev) => !prev)}
+              onClick={toggleTheme}
               className={`p-2 rounded-full transition-colors ${isNight ? 'text-gold hover:bg-stone-800' : 'text-stone-700 hover:bg-stone-200'}`}
               title={lang === 'ar' ? 'تغيير الوضع' : 'Toggle Theme'}
             >
@@ -1286,6 +1311,7 @@ export const CustomizerContent = () => {
             <button
               type="button"
               onClick={activeCategory === 'presets' || layers.length > 0 ? handleAddToCart : handleNextPill}
+              disabled={isSavingDesign}
               className={`px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all transform active:scale-95 cursor-pointer ${isNight ? 'bg-gold text-[#0A0C16] hover:bg-amber-400 font-bold' : 'bg-[#18181B] hover:bg-black text-white'}`}
             >
               <span>{lang === 'ar' ? (layers.length > 0 ? 'أضف إلى السلة' : 'التالي') : (layers.length > 0 ? 'ADD TO CART' : 'Next')}</span>
@@ -2067,6 +2093,7 @@ export const CustomizerContent = () => {
               <button
                 type="button"
                 onClick={handleAddToCart}
+                disabled={isSavingDesign}
                 className="bg-[#18181B] hover:bg-black text-white py-4 px-8 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-3 shadow-lg hover:shadow-xl transition-all transform active:scale-95 cursor-pointer"
               >
                 <span>{lang === 'ar' ? 'أضف إلى السلة الآن' : 'ADD TO CART NOW'}</span>

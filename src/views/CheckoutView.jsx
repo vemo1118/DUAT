@@ -3,13 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { useOrders } from '../context/OrdersContext';
-import { supabase } from '../lib/supabase';
 import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
-import { ShieldCheck, Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
-
-import { sendTelegramOrderNotification, generateSequentialOrderRef } from '../utils/orderNotifier';
+import { Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
+import { createOrder, uploadOrderFile } from '../services/orderApi';
 
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
 
@@ -18,9 +15,8 @@ const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 export const CheckoutView = ({ setView }) => {
   const navigate = useNavigate();
   const { lang, t, formatPrice } = useLanguage();
-  const { cartItems, subtotal, discount, clearCart } = useCart();
+  const { cartItems, subtotal, discount, promoCode, clearCart } = useCart();
   const { showToast } = useToast();
-  const { addOrder, orders } = useOrders();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
 
@@ -33,6 +29,7 @@ export const CheckoutView = ({ setView }) => {
   const [paymentProofFile, setPaymentProofFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderReference, setOrderReference] = useState(null);
+  const [requestId] = useState(() => crypto.randomUUID());
 
   // Free shipping threshold >= 800 EGP
   const isFreeShipping = subtotal >= 800;
@@ -67,78 +64,83 @@ export const CheckoutView = ({ setView }) => {
       return;
     }
 
-    let uploadedPath = null;
+    if (cartItems.length === 0) {
+      showToast(isRtl ? 'السلة فارغة' : 'Your cart is empty', 'error');
+      return;
+    }
+
     if (paymentMethod === 'instapay') {
       if (!paymentProofFile) {
         showToast(isRtl ? 'يرجى رفع اسكرين شوت التحويل عبر إنستاباي لتأكيد الطلب' : 'Please upload payment screenshot to confirm InstaPay order', 'error');
         return;
       }
 
-      setIsSubmitting(true);
-      try {
-        const fileExt = paymentProofFile.name.split('.').pop() || 'png';
-        const tempRef = `DUAT-${Math.floor(1000 + Math.random() * 9000)}`;
-        const filePath = `orders/${tempRef}-${crypto.randomUUID()}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProofFile);
-        if (uploadError) {
-          console.error('Failed to upload payment proof to Supabase Storage:', uploadError);
-          showToast(isRtl ? 'فشل رفع صورة التحويل. يرجى إيقاف مانع الإعلانات أو إعادة المحاولة.' : 'Failed to upload screenshot. Please retry.', 'error');
-          setIsSubmitting(false);
-          return;
-        }
-        uploadedPath = filePath;
-      } catch (uploadErr) {
-        console.error('Storage upload exception:', uploadErr);
-        showToast(isRtl ? 'حدث خطأ أثناء رفع الصورة' : 'Error uploading payment screenshot', 'error');
-        setIsSubmitting(false);
+      // Validate image size (max 5MB) and type
+      if (paymentProofFile.size > 5 * 1024 * 1024) {
+        showToast(isRtl ? 'حجم الصورة كبير جداً! الحد الأقصى المسموح ٥ ميجابايت.' : 'File too large! Maximum allowed size is 5MB.', 'error');
         return;
       }
-    } else {
-      setIsSubmitting(true);
+
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+      if (!validTypes.includes(paymentProofFile.type)) {
+        showToast(isRtl ? 'صيغة الصورة غير مدعومة. اختر ملف PNG أو JPEG أو WebP.' : 'Unsupported image format. Please select PNG, JPEG, or WebP.', 'error');
+        return;
+      }
+
     }
 
-    const ref = await generateSequentialOrderRef(orders);
-    const orderData = {
-      id: ref,
-      ref: ref,
-      customer: { name: fullName, fullName, phone: phone.trim(), address, governorate },
-      items: cartItems,
-      total: finalTotal,
-      paymentMethod: paymentMethod,
-      payment_method: paymentMethod,
-      payment_proof_path: uploadedPath,
-      paymentProofPath: uploadedPath,
-      status: 'placed',
-      createdAt: new Date().toISOString()
-    };
-
-    // Guarantee Telegram Notification fires instantly to store owner's mobile phone
+    setIsSubmitting(true);
     try {
-      sendTelegramOrderNotification(orderData);
-    } catch (notifErr) {
-      console.error('Notification dispatch exception:', notifErr);
-    }
+      const paymentProof = paymentMethod === 'instapay'
+        ? await uploadOrderFile(paymentProofFile, 'payment-proof')
+        : null;
+      const savedOrder = await createOrder({
+        requestId,
+        customer: { fullName, phone: phone.trim(), address },
+        items: cartItems,
+        couponCode: promoCode,
+        governorateId: governorate.id,
+        paymentMethod,
+        paymentProof
+      });
 
-    try {
-      await addOrder(orderData);
-    } catch (err) {
-      console.error('Error adding order to database:', err);
-    }
+      const ref = savedOrder.ref;
+      try {
+        const LOCAL_TRACKING_KEY = 'duat_customer_orders';
+        const parsed = JSON.parse(localStorage.getItem(LOCAL_TRACKING_KEY) || '[]');
+        const existing = Array.isArray(parsed) ? parsed : [];
+        const safeExisting = existing.map((item) => ({
+          ref: item.ref || item.id,
+          phoneLast4: item.phoneLast4 || String(item.customer?.phone || '').slice(-4),
+          createdAt: item.createdAt || item.created_at,
+          total: item.total
+        })).filter((item) => item.ref);
+        const localRecord = {
+          ref,
+          phoneLast4: phone.trim().slice(-4),
+          createdAt: savedOrder.created_at,
+          total: savedOrder.total
+        };
+        localStorage.setItem(LOCAL_TRACKING_KEY, JSON.stringify([
+          localRecord,
+          ...safeExisting.filter((item) => item.ref !== ref)
+        ].slice(0, 10)));
+        localStorage.setItem('duat_latest_order_ref', ref);
+      } catch (storageError) {
+        console.warn('Could not save the local tracking shortcut:', storageError.message);
+      }
 
-    try {
-      const LOCAL_TRACKING_KEY = 'duat_customer_orders';
-      const existing = JSON.parse(localStorage.getItem(LOCAL_TRACKING_KEY) || '[]');
-      const updatedList = [orderData, ...existing.filter((item) => item.ref !== ref && item.id !== ref)];
-      localStorage.setItem(LOCAL_TRACKING_KEY, JSON.stringify(updatedList));
-      localStorage.setItem('duat_latest_order_ref', ref);
-    } catch (err) {
-      console.error('Failed to save order to localStorage:', err);
+      setOrderReference(ref);
+      clearCart();
+    } catch (error) {
+      console.error('Order submission failed:', error.message);
+      showToast(
+        isRtl ? 'تعذر تسجيل الطلب. السلة محفوظة؛ حاول مرة أخرى.' : 'Could not place the order. Your cart is still saved; please retry.',
+        'error'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setOrderReference(ref);
-    setIsSubmitting(false);
-    clearCart();
   };
 
   if (orderReference) {
@@ -413,7 +415,6 @@ export const CheckoutView = ({ setView }) => {
           <div className="space-y-3 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
             {cartItems.map((item) => {
               const name = isRtl ? (item.nameAr || item.nameEn || item.name) : (item.nameEn || item.nameAr || item.name);
-              const thumb = item.designSnapshot || item.customConfig?.designSnapshot || item.image || item.images?.[0];
               const cDetails = item.customDetails || item.customConfig || {};
 
               const isCustomSticker = item.id?.startsWith('custom-sticker-') || item.category === 'stickers' || cDetails?.mode === 'text' || cDetails?.mode === 'image';

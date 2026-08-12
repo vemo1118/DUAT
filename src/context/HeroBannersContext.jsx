@@ -195,7 +195,9 @@ function cleanLegacyStorage() {
       localStorage.removeItem(`duat_hero_slides_v${i}`);
     }
     localStorage.removeItem('duat_hero_slides');
-  } catch (e) {}
+  } catch {
+    // Legacy storage cleanup must not block storefront rendering.
+  }
 }
 
 function sanitizeSlideUrls(slides) {
