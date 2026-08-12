@@ -216,10 +216,6 @@ function sanitizeSlideUrls(slides) {
 }
 
 function loadLocalSlides() {
-  const syncState = getLiveSyncState();
-  if (Array.isArray(syncState?.heroSlides) && syncState.heroSlides.length > 0) {
-    return sanitizeSlideUrls(syncState.heroSlides);
-  }
   try {
     cleanLegacyStorage();
     const saved = localStorage.getItem(HERO_SLIDES_STORAGE_KEY);
@@ -228,8 +224,7 @@ function loadLocalSlides() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         const valid = parsed.filter((item) => item && typeof item === 'object' && item.id);
         if (valid.length > 0) {
-          const sanitized = sanitizeSlideUrls(valid);
-          return sanitized;
+          return sanitizeSlideUrls(valid);
         }
       }
     }
@@ -239,7 +234,7 @@ function loadLocalSlides() {
   if (Array.isArray(liveCustomEdits?.heroSlides) && liveCustomEdits.heroSlides.length > 0) {
     return sanitizeSlideUrls(liveCustomEdits.heroSlides);
   }
-  return null;
+  return INITIAL_HERO_SLIDES;
 }
 
 function saveLocalSlides(slides) {
