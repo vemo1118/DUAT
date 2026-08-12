@@ -1,12 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
 import {
-  fetchCloudEdits,
   publishCloudEdits,
   subscribeToLiveSync,
-  getLiveSyncState,
-  isRemoteUpdate
+  getLiveSyncState
 } from '../services/liveSyncService';
 
 const BundlesSettingsContext = createContext();
@@ -112,9 +110,7 @@ export const BundlesSettingsProvider = ({ children }) => {
   }, []);
 
   // Save to localStorage and publish to global cloud store whenever bundlesSettings changes
-  // Skip publish when the update came from a remote broadcast (prevents feedback loop)
   useEffect(() => {
-    if (isRemoteUpdate()) return;
     try {
       localStorage.setItem('duat_bundles_settings_v1', JSON.stringify(bundlesSettings));
       publishCloudEdits({ bundlesSettings });
@@ -122,6 +118,7 @@ export const BundlesSettingsProvider = ({ children }) => {
       console.warn('Failed saving duat_bundles_settings to localStorage:', e);
     }
   }, [bundlesSettings]);
+
 
   const saveSettingsToSupabase = async (newSettings) => {
     try {

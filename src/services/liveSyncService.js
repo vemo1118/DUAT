@@ -9,6 +9,9 @@ const BLOB_URL = 'https://jsonblob.com/api/jsonBlob/019ff173-6ef5-71cd-8244-8904
 const LOCAL_STORAGE_CACHE_KEY = 'duat_live_cloud_edits_cache_v1';
 const REALTIME_CHANNEL_NAME = 'duat-admin-updates';
 
+// Unique ID per browser session — used to ignore self-broadcasts
+const CLIENT_ID = `${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+
 let inMemoryState = {
   ...liveCustomEditsLocal
 };
@@ -25,17 +28,10 @@ try {
 }
 
 const listeners = new Set();
-// Tracks whether a state change originated from a remote broadcast (not local admin save)
-// Used to prevent BundlesSettings/StickersSettings from re-publishing on receive
-let _isRemoteUpdate = false;
 
 export function subscribeToLiveSync(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
-}
-
-export function isRemoteUpdate() {
-  return _isRemoteUpdate;
 }
 
 function notifyListeners() {
@@ -43,14 +39,15 @@ function notifyListeners() {
     try {
       fn(inMemoryState);
     } catch (e) {
-      console.error('Error notifying live sync listener:', e);
+      console.error('[LiveSync] Error notifying listener:', e);
     }
   });
 }
 
 // ─────────────────────────────────────────────────────
 // Supabase Realtime Broadcast Channel
-// Admin → publishes → all customer browsers receive instantly
+// Admin publishes → all OTHER client browsers receive instantly
+// Self-broadcasts are filtered via CLIENT_ID
 // ─────────────────────────────────────────────────────
 let realtimeChannel = null;
 
@@ -60,14 +57,18 @@ function setupRealtimeChannel() {
   realtimeChannel = supabase
     .channel(REALTIME_CHANNEL_NAME)
     .on('broadcast', { event: 'data-updated' }, async (payload) => {
-      // Received a real-time update from admin — re-fetch from cloud
-      console.log('⚡ [LiveSync] Admin update received via Supabase Realtime!', payload?.payload?.updatedAt);
-      try {
-        _isRemoteUpdate = true;
-        await fetchCloudEdits();
-      } finally {
-        _isRemoteUpdate = false;
+      // Ignore broadcasts sent by this same browser tab/window
+      if (payload?.payload?.senderId === CLIENT_ID) {
+        console.log('[LiveSync] Ignoring self-broadcast.');
+        return;
       }
+
+      console.log('⚡ [LiveSync] Admin update received from another client!');
+
+      // Re-fetch from JSONBlob for product/hero data
+      await fetchCloudEdits();
+
+      // Notify all context subscribers to re-fetch from Supabase
       notifyListeners();
     })
     .subscribe((status) => {
@@ -117,7 +118,6 @@ export async function fetchCloudEdits() {
       }
     }
   } catch (err) {
-    // Silent fail — Supabase Realtime is the primary channel
     if (!err?.name?.includes('Abort')) {
       console.warn('[LiveSync] JSONBlob fetch failed (non-critical):', err?.message);
     }
@@ -126,8 +126,9 @@ export async function fetchCloudEdits() {
 }
 
 // ─────────────────────────────────────────────────────
-// Publish updated edits — saves to JSONBlob AND broadcasts
-// via Supabase Realtime to all connected clients instantly
+// Publish updated edits
+// Saves to localStorage + JSONBlob AND broadcasts via
+// Supabase Realtime to all OTHER connected clients instantly
 // ─────────────────────────────────────────────────────
 export async function publishCloudEdits(partialState) {
   try {
@@ -137,19 +138,20 @@ export async function publishCloudEdits(partialState) {
       updatedAt: Date.now()
     };
 
+    // Always save to localStorage immediately
     try {
       localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(inMemoryState));
     } catch (e) {}
 
-    notifyListeners();
-
-    // 1. Broadcast to all connected clients via Supabase Realtime (instant)
+    // 1. Broadcast to all OTHER connected clients via Supabase Realtime (instant)
+    //    senderId is included so the sender ignores its own broadcast
     if (realtimeChannel) {
       realtimeChannel.send({
         type: 'broadcast',
         event: 'data-updated',
-        payload: { updatedAt: inMemoryState.updatedAt }
+        payload: { updatedAt: inMemoryState.updatedAt, senderId: CLIENT_ID }
       }).catch((err) => {
+        // Non-critical — customers will still get data via Supabase fetch on next interaction
         console.warn('[LiveSync] Realtime broadcast failed (non-critical):', err?.message);
       });
     }
@@ -170,7 +172,7 @@ export async function publishCloudEdits(partialState) {
     clearTimeout(timeoutId);
 
     if (res.ok) {
-      console.log('⚡ [LiveSync] Published to cloud store + broadcast to all clients!');
+      console.log('⚡ [LiveSync] Published to cloud store + broadcast to other clients!');
       return { success: true, state: inMemoryState };
     }
   } catch (err) {

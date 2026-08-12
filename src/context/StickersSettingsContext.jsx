@@ -2,11 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
 import {
-  fetchCloudEdits,
   publishCloudEdits,
   subscribeToLiveSync,
-  getLiveSyncState,
-  isRemoteUpdate
+  getLiveSyncState
 } from '../services/liveSyncService';
 
 const StickersSettingsContext = createContext();
@@ -113,9 +111,7 @@ export const StickersSettingsProvider = ({ children }) => {
   }, []);
 
   // Save settings to localStorage and publish to global cloud store whenever changed
-  // Skip publish when the update came from a remote broadcast (prevents feedback loop)
   useEffect(() => {
-    if (isRemoteUpdate()) return;
     try {
       localStorage.setItem('duat_stickers_settings_v1', JSON.stringify(stickersSettings));
       publishCloudEdits({ stickersSettings });
@@ -123,6 +119,7 @@ export const StickersSettingsProvider = ({ children }) => {
       console.warn('Failed saving duat_stickers_settings to localStorage:', e);
     }
   }, [stickersSettings]);
+
 
   const saveSettingsToSupabase = async (newSettings) => {
     try {
