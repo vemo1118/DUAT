@@ -12,7 +12,7 @@ const HeroBannersContext = createContext();
 
 export const INITIAL_HERO_SLIDES = [
   {
-    id: 'hero-slide-luxe',
+    id: '00000000-0000-0000-0000-000000000001',
     eyebrowEn: 'DUAT / LUXE COLLECTION',
     eyebrowAr: 'دوات / الفئة الفاخرة',
     headline1En: 'THROUGH THE NIGHT,',
@@ -43,7 +43,7 @@ export const INITIAL_HERO_SLIDES = [
     sort_order: 1
   },
   {
-    id: 'hero-slide-nineties',
+    id: '00000000-0000-0000-0000-000000000002',
     eyebrowEn: 'DUAT / NINETIES VIBES',
     eyebrowAr: 'دوات / فئة التسعيناتي',
     headline1En: '90s NOSTALGIA & POP,',
@@ -74,7 +74,7 @@ export const INITIAL_HERO_SLIDES = [
     sort_order: 2
   },
   {
-    id: 'hero-slide-youth',
+    id: '00000000-0000-0000-0000-000000000003',
     eyebrowEn: 'DUAT / YOUTH STREETWEAR',
     eyebrowAr: 'دوات / الفئة الشبابية',
     headline1En: 'BOLD & UNAPOLOGETIC,',
@@ -202,18 +202,13 @@ function sanitizeSlideUrls(slides) {
   if (!Array.isArray(slides)) return slides;
   return slides.map((s) => {
     if (!s || typeof s !== 'object') return s;
-    let url = s.imageUrl || s.image_url || s.image || '';
-    if (!url || url === '/banners/nineties.png' || url.includes('nineties.png') || url.includes('B1_DarkNight')) {
-      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
-    } else if (url === '/banners/youth.png' || url.includes('youth.png')) {
-      url = 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
-    }
-    const h1Color = s.headline1Color === '#00F0FF' ? '#EDE4D3' : s.headline1Color;
-    const h2Color = s.headline2Color === '#FF007A' ? '#E8A33D' : s.headline2Color;
+    const url = s.imageUrl || s.image_url || s.image || '';
+    const h1Color = s.headline1Color === '#00F0FF' ? '#EDE4D3' : (s.headline1Color || '#EDE4D3');
+    const h2Color = s.headline2Color === '#FF007A' ? '#E8A33D' : (s.headline2Color || '#E8A33D');
     return {
       ...s,
-      imageUrl: url,
-      image_url: url,
+      imageUrl: url || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
+      image_url: url || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
       headline1Color: h1Color,
       headline2Color: h2Color
     };
@@ -298,10 +293,9 @@ export function HeroBannersProvider({ children }) {
       const { data, error } = await query;
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        const filtered = fetched.filter((s) => s.id !== 'hero-slide-2');
-        if (filtered.length > 0) {
-          setSlides(filtered);
-          saveLocalSlides(filtered);
+        if (fetched.length > 0) {
+          setSlides(fetched);
+          saveLocalSlides(fetched);
           setLoading(false);
           return;
         }
@@ -337,7 +331,7 @@ export function HeroBannersProvider({ children }) {
   const addSlide = async (slideData) => {
     const newSlide = {
       ...slideData,
-      id: slideData.id || `hero-slide-${Date.now()}`
+      id: slideData.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `00000000-0000-4000-8000-${Date.now().toString().padStart(12, '0')}`)
     };
     setSlides((prev) => {
       const updated = [newSlide, ...prev];
