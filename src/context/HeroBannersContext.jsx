@@ -294,8 +294,13 @@ export function HeroBannersProvider({ children }) {
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetched = data.map(mapFromDb).filter(Boolean);
         if (fetched.length > 0) {
-          setSlides(fetched);
-          saveLocalSlides(fetched);
+          setSlides((prev) => {
+            if (JSON.stringify(prev) === JSON.stringify(fetched)) {
+              return prev;
+            }
+            saveLocalSlides(fetched);
+            return fetched;
+          });
           setLoading(false);
           return;
         }

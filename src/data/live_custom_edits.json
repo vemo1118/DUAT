@@ -46,7 +46,7 @@
   "deletedProductIds": [],
   "heroSlides": [
     {
-      "id": "hero-slide-luxe",
+      "id": "a0000000-0000-0000-0000-000000000001",
       "eyebrowEn": "DUAT / LUXE COLLECTION",
       "eyebrowAr": "دوات / الفئة الفاخرة",
       "headline1En": "THROUGH THE NIGHT,",
@@ -77,7 +77,7 @@
       "sort_order": 1
     },
     {
-      "id": "hero-slide-nineties",
+      "id": "a0000000-0000-0000-0000-000000000002",
       "eyebrowEn": "DUAT / NINETIES VIBES",
       "eyebrowAr": "دوات / فئة التسعيناتي",
       "headline1En": "90s NOSTALGIA & POP,",
@@ -88,7 +88,7 @@
       "subAr": "أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.",
       "badgeEn": "NINETIES 90S",
       "badgeAr": "فئة التسعيناتي 90s",
-      "imageUrl": "https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg",
+      "imageUrl": "https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png",
       "ctaPrimaryTextEn": "SHOP NINETIES",
       "ctaPrimaryTextAr": "تسوق فئة التسعيناتي",
       "ctaPrimaryLink": "/shop",
@@ -108,7 +108,7 @@
       "sort_order": 2
     },
     {
-      "id": "hero-slide-youth",
+      "id": "a0000000-0000-0000-0000-000000000003",
       "eyebrowEn": "DUAT / YOUTH STREETWEAR",
       "eyebrowAr": "دوات / الفئة الشبابية",
       "headline1En": "BOLD & UNAPOLOGETIC,",
