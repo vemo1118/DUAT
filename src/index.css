@@ -389,9 +389,9 @@ button, a.btn, select, input[type="submit"] {
 
 /* Primary CTA hover transition gold -> ember (critical hover state) */
 .btn-primary {
-  background-color: var(--gold);
-  color: var(--void);
-  font-weight: 700;
+  background-color: var(--gold) !important;
+  color: var(--void) !important;
+  font-weight: 700 !important;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 0.875rem 1.75rem;
@@ -399,14 +399,17 @@ button, a.btn, select, input[type="submit"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
+  border: 1px solid var(--gold) !important;
   cursor: pointer;
-  min-height: 44px;
+  min-height: 48px;
+  box-shadow: 0 4px 20px rgba(232, 163, 61, 0.35) !important;
 }
 
 .btn-primary:hover {
-  background-color: var(--ember);
-  color: #F0EBE0;
+  background-color: var(--ember) !important;
+  color: #FFFFFF !important;
+  border-color: var(--ember) !important;
+  box-shadow: 0 4px 25px rgba(217, 67, 46, 0.5) !important;
 }
 
 .btn-ghost {

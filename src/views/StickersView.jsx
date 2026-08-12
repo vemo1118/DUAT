@@ -155,9 +155,9 @@ export function StickersView() {
 
           <Link
             to={promoSettings?.buttonLink || '/sticker-builder'}
-            className="btn-primary py-3 px-6 font-mono text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 whitespace-nowrap"
+            className="py-4 px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-xs font-mono tracking-widest uppercase rounded-sm min-h-[48px] relative z-20 whitespace-nowrap"
           >
-            <span>{isAr ? promoSettings?.buttonTextAr : promoSettings?.buttonTextEn}</span>
+            <span>{isAr ? (promoSettings?.buttonTextAr || 'بيلدر الاستيكرز') : (promoSettings?.buttonTextEn || 'STICKER BUILDER')}</span>
             <CtaArrow size={14} />
           </Link>
         </div>

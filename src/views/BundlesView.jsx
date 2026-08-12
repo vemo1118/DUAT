@@ -271,9 +271,9 @@ export function BundlesView() {
 
           <Link
             to={ctaSettings?.buttonLink || '/sticker-builder'}
-            className="btn-primary py-4 px-8 font-mono text-xs font-bold uppercase tracking-widest inline-flex items-center gap-3 whitespace-nowrap shadow-xl"
+            className="py-4 px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-3 text-xs font-mono tracking-widest uppercase rounded-sm min-h-[48px] relative z-20 whitespace-nowrap"
           >
-            <span>{isAr ? ctaSettings?.buttonTextAr : ctaSettings?.buttonTextEn}</span>
+            <span>{isAr ? (ctaSettings?.buttonTextAr || 'افتح بيلدر الاستيكرز') : (ctaSettings?.buttonTextEn || 'OPEN STICKER BUILDER')}</span>
             <CtaArrow size={16} />
           </Link>
         </div>
