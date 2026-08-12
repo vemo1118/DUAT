@@ -25,6 +25,18 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const isAr = lang === 'ar';
   const isRtl = isAr;
 
+  // Preload all active slide images on mount to eliminate image load flashes completely
+  useEffect(() => {
+    if (!Array.isArray(activeSlides)) return;
+    activeSlides.forEach((slide) => {
+      const url = slide?.imageUrl || slide?.image_url || slide?.image;
+      if (url) {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [activeSlides]);
+
   // Auto-advance slide every 6 seconds
   useEffect(() => {
     if (isPaused || activeSlides.length <= 1) return;
@@ -66,9 +78,6 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const secondaryBtnText = (isAr ? current?.ctaSecondaryTextAr : current?.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
   const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';
 
-  const bgImage = current?.imageUrl || current?.image_url || current?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
-  const mobileBgImage = current?.mobileImageUrl || current?.mobile_image_url || current?.mobileImage || '';
-
   const isRightAlign = current?.textAlign === 'right';
   const isCenterAlign = current?.textAlign === 'center';
 
@@ -84,47 +93,51 @@ export const HeroSlider = ({ setSelectedCategory }) => {
     ? 'justify-end'
     : 'justify-start';
 
-  const overlayStrength = current?.overlayStrength || 'medium';
-
-  const posX = safeNum(current?.posX, 0);
-  const posY = safeNum(current?.posY, 30);
-  const maxWidth = safeNum(current?.maxWidth, 46);
-  const fontSizeScale = safeNum(current?.fontSizeScale, 92) / 100;
-
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-bone transition-colors"
     >
-      {/* Full-Bleed Background Image Layer */}
-      {bgImage ? (
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <picture className="w-full h-full">
-            {mobileBgImage && (
-              <source media="(max-width: 767px)" srcSet={mobileBgImage} />
-            )}
-            <img
-              src={bgImage}
-              alt="Hero Background"
-              className="w-full h-full object-cover transition-transform duration-700 brightness-110 contrast-110 saturate-105"
-              style={{ objectPosition: `${50 + posX}% ${posY}%` }}
-            />
-          </picture>
-          {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
+      {/* Stacked Cross-Fading Slide Background Layers (Zero Flicker) */}
+      {activeSlides.map((slide, idx) => {
+        const slideBg = slide?.imageUrl || slide?.image_url || slide?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
+        const slideMobileBg = slide?.mobileImageUrl || slide?.mobile_image_url || slide?.mobileImage || '';
+        const slidePosX = safeNum(slide?.posX, 0);
+        const slidePosY = safeNum(slide?.posY, 30);
+        const slideRightAlign = slide?.textAlign === 'right';
+        const isActive = currentSlide === idx;
+
+        return (
           <div
-            className={`absolute inset-0 pointer-events-none ${
-              isRightAlign
-                ? 'bg-gradient-to-l from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
-                : 'bg-gradient-to-r from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
+            key={slide.id || idx}
+            className={`absolute inset-0 z-0 overflow-hidden transition-opacity duration-1000 ease-in-out ${
+              isActive ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C16]/70 via-transparent to-transparent pointer-events-none" />
-        </div>
-      ) : (
-        /* Fallback Egyptian Ancient Texture Pattern */
-        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#E0A93B_1px,transparent_1px)] [background-size:24px_24px]" />
-      )}
+          >
+            <picture className="w-full h-full">
+              {slideMobileBg && (
+                <source media="(max-width: 767px)" srcSet={slideMobileBg} />
+              )}
+              <img
+                src={slideBg}
+                alt="Hero Background"
+                className="w-full h-full object-cover brightness-110 contrast-110 saturate-105"
+                style={{ objectPosition: `${50 + slidePosX}% ${slidePosY}%` }}
+              />
+            </picture>
+            {/* Dynamic Theme Background Overlay Vignette (RTL & LTR Aware) */}
+            <div
+              className={`absolute inset-0 pointer-events-none ${
+                slideRightAlign
+                  ? 'bg-gradient-to-l from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
+                  : 'bg-gradient-to-r from-[#0A0C16]/90 via-[#0A0C16]/60 via-50% to-transparent'
+              }`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C16]/70 via-transparent to-transparent pointer-events-none" />
+          </div>
+        );
+      })}
 
       {/* Full Bleed Content Container */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-16 sm:py-24 relative z-10">
