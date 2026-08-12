@@ -1728,10 +1728,15 @@ export function AdminView() {
                 </button>
 
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (window.confirm('هل أنت تأكد من إعادة ضبط كروت الأقسام للوضع الافتراضي؟')) {
-                      resetCategoryBanners();
-                      showToast('تمت إعادة ضبط كروت الأقسام الافتراضية 🔄', 'success');
+                      try {
+                        await resetCategoryBanners();
+                        showToast('تمت إعادة ضبط كروت الأقسام الافتراضية 🔄', 'success');
+                      } catch (error) {
+                        console.error('Category banners reset failed:', error?.message || error);
+                        showToast('تعذر حفظ إعادة الضبط على الموقع.', 'error');
+                      }
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
@@ -1790,7 +1795,14 @@ export function AdminView() {
                     {/* Action Buttons */}
                     <div className="p-4 bg-stone/40 border-t border-grave flex items-center justify-between gap-2">
                       <button
-                        onClick={() => toggleCategoryBannerVisibility(cat.id)}
+                        onClick={async () => {
+                          try {
+                            await toggleCategoryBannerVisibility(cat.id);
+                          } catch (error) {
+                            console.error('Category visibility update failed:', error?.message || error);
+                            showToast('تعذر تحديث ظهور القسم على الموقع.', 'error');
+                          }
+                        }}
                         className={`flex items-center gap-1.5 px-3 py-1.5 border font-mono text-xs font-bold transition-all rounded ${
                           isActive
                             ? 'border-ash/40 bg-coal text-ash hover:text-gold'
@@ -1814,10 +1826,15 @@ export function AdminView() {
                         </button>
 
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (window.confirm(`هل أنت تأكد من حذف كارت القسم "${cat.nameAr || cat.nameEn}"؟`)) {
-                              deleteCategoryBanner(cat.id);
-                              showToast('تم حذف كارت القسم بنجاح 🗑️', 'success');
+                              try {
+                                await deleteCategoryBanner(cat.id);
+                                showToast('تم حذف كارت القسم بنجاح 🗑️', 'success');
+                              } catch (error) {
+                                console.error('Category banner delete failed:', error?.message || error);
+                                showToast('تعذر حذف كارت القسم من الموقع.', 'error');
+                              }
                             }
                           }}
                           className="flex items-center gap-1 p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white font-mono text-xs transition-all rounded"
@@ -3813,11 +3830,11 @@ export function AdminView() {
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}
         banner={editingCategoryBanner}
-        onSave={(bannerId, updatedFields) => {
+        onSave={async (bannerId, updatedFields) => {
           if (bannerId) {
-            updateCategoryBanner(bannerId, updatedFields);
+            return updateCategoryBanner(bannerId, updatedFields);
           } else {
-            addCategoryBanner(updatedFields);
+            return addCategoryBanner(updatedFields);
           }
         }}
       />

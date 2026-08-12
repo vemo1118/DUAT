@@ -1,8 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { subscribeToLiveSync } from '../services/liveSyncService';
+import {
+  isInlineStoreImage,
+  removeStoreImage,
+  uploadStoreImageDataUrl
+} from '../services/storeAssetService';
 
 const CategoryBannersContext = createContext();
+const CATEGORY_COLUMNS = 'id, name_en, name_ar, subtitle_en, subtitle_ar, image_url, badge, category_link, is_active, updated_at';
+const CATEGORY_STORAGE_KEY = 'duat_category_banners_v5';
+const FORGE_STORAGE_KEY = 'duat_forge_banner_v1';
 
 export const INITIAL_CATEGORY_BANNERS = [
   {
@@ -13,7 +20,8 @@ export const INITIAL_CATEGORY_BANNERS = [
     subtitleAr: 'باكدجات مجمعة جاهزة من الاستيكرات بخصم وتوفير خاص',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     badge: '01',
-    categoryLink: '/bundles'
+    categoryLink: '/bundles',
+    is_active: true
   },
   {
     id: 'stickers',
@@ -23,7 +31,8 @@ export const INITIAL_CATEGORY_BANNERS = [
     subtitleAr: 'استيكرات إيبوكسي 3D، تشكيلة العبارات والحروف والشارات',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
     badge: '02',
-    categoryLink: '/stickers'
+    categoryLink: '/stickers',
+    is_active: true
   }
 ];
 
@@ -41,230 +50,242 @@ export const DEFAULT_FORGE_BANNER = {
   isActive: true
 };
 
+function readLocalCategories() {
+  try {
+    const saved = localStorage.getItem(CATEGORY_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : null;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const valid = parsed.filter((banner) => banner?.id);
+      if (valid.length > 0) return valid;
+    }
+  } catch (error) {
+    console.warn('Failed parsing category banners from localStorage:', error);
+  }
+  return INITIAL_CATEGORY_BANNERS;
+}
+
+function readLocalForgeBanner() {
+  try {
+    const saved = localStorage.getItem(FORGE_STORAGE_KEY);
+    return saved ? { ...DEFAULT_FORGE_BANNER, ...JSON.parse(saved) } : DEFAULT_FORGE_BANNER;
+  } catch {
+    return DEFAULT_FORGE_BANNER;
+  }
+}
+
+function mapCategoryRow(row) {
+  return {
+    id: row.id,
+    nameEn: row.name_en || '',
+    nameAr: row.name_ar || '',
+    subtitleEn: row.subtitle_en || '',
+    subtitleAr: row.subtitle_ar || '',
+    imageUrl: row.image_url || '',
+    badge: row.badge || '01',
+    categoryLink: row.category_link || '/shop',
+    is_active: row.is_active !== false
+  };
+}
+
+function toCategoryRow(banner) {
+  return {
+    id: String(banner.id),
+    name_en: banner.nameEn || '',
+    name_ar: banner.nameAr || '',
+    subtitle_en: banner.subtitleEn || '',
+    subtitle_ar: banner.subtitleAr || '',
+    image_url: banner.imageUrl || '',
+    badge: banner.badge || '01',
+    category_link: banner.categoryLink || '/shop',
+    is_active: banner.is_active !== false && banner.isActive !== false,
+    updated_at: new Date().toISOString()
+  };
+}
+
+async function prepareBannerImage(banner) {
+  if (!isInlineStoreImage(banner.imageUrl)) return { banner, uploadedPath: null };
+  const upload = await uploadStoreImageDataUrl(banner.imageUrl, {
+    folder: 'category-banners',
+    assetId: banner.id
+  });
+  return {
+    banner: { ...banner, imageUrl: upload.publicUrl },
+    uploadedPath: upload.created ? upload.path : null
+  };
+}
+
+async function saveCategoryBannerRecord(banner) {
+  const prepared = await prepareBannerImage(banner);
+  try {
+    const { data, error } = await supabase
+      .from('category_banners')
+      .upsert(toCategoryRow(prepared.banner))
+      .select(CATEGORY_COLUMNS)
+      .single();
+    if (error || !data) throw error || new Error('CATEGORY_SAVE_FAILED');
+    return mapCategoryRow(data);
+  } catch (error) {
+    if (prepared.uploadedPath) await removeStoreImage(prepared.uploadedPath);
+    throw error;
+  }
+}
+
+async function migrateLegacyCategoriesIfAdmin(banners) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) return null;
+  const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+  if (adminError || isAdmin !== true) return null;
+
+  const prepared = [];
+  try {
+    for (const banner of banners) {
+      prepared.push(await prepareBannerImage(banner));
+    }
+    const { data, error } = await supabase
+      .from('category_banners')
+      .upsert(prepared.map(({ banner }) => toCategoryRow(banner)))
+      .select(CATEGORY_COLUMNS);
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(mapCategoryRow) : null;
+  } catch (error) {
+    await Promise.all(prepared.map(({ uploadedPath }) => removeStoreImage(uploadedPath)));
+    throw error;
+  }
+}
+
 export const CategoryBannersProvider = ({ children }) => {
-  const [categoryBanners, setCategoryBanners] = useState(() => {
-    try {
-      const saved = localStorage.getItem('duat_category_banners_v5');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Filter out legacy luxe/cases banners
-          const valid = parsed.filter(b => b.id === 'bundles' || b.id === 'stickers' || b.id === 'builder');
-          if (valid.length > 0) return valid;
-        }
-      }
-    } catch (e) {
-      console.warn('Failed parsing duat_category_banners from localStorage:', e);
-    }
-    return INITIAL_CATEGORY_BANNERS;
-  });
+  const [categoryBanners, setCategoryBanners] = useState(readLocalCategories);
+  const [forgeBanner, setForgeBanner] = useState(readLocalForgeBanner);
+  const [loading, setLoading] = useState(true);
 
-  // Forge Feature Banner State
-  const [forgeBanner, setForgeBanner] = useState(() => {
-    try {
-      const saved = localStorage.getItem('duat_forge_banner_v1');
-      return saved ? JSON.parse(saved) : DEFAULT_FORGE_BANNER;
-    } catch (e) {
-      return DEFAULT_FORGE_BANNER;
-    }
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  // Load saved banners from Supabase — also used by Realtime broadcast subscription
   useEffect(() => {
     let isMounted = true;
+    const legacyBanners = categoryBanners;
 
     async function loadFromSupabase() {
+      setLoading(true);
       try {
-        const { data: forgeData } = await supabase
-          .from('store_settings')
-          .select('value')
-          .eq('key', 'forge_banner')
-          .maybeSingle();
+        const [forgeResult, categoryResult] = await Promise.all([
+          supabase.from('store_settings').select('value').eq('key', 'forge_banner').maybeSingle(),
+          supabase.from('category_banners').select(CATEGORY_COLUMNS).order('id')
+        ]);
+        if (forgeResult.error) throw forgeResult.error;
+        if (categoryResult.error) throw categoryResult.error;
+        if (!isMounted) return;
 
-        if (isMounted && forgeData?.value && typeof forgeData.value === 'object') {
-          setForgeBanner((prev) => ({ ...prev, ...forgeData.value }));
+        if (forgeResult.data?.value && typeof forgeResult.data.value === 'object') {
+          setForgeBanner({ ...DEFAULT_FORGE_BANNER, ...forgeResult.data.value });
         }
 
-        const { data: catData } = await supabase
-          .from('category_banners')
-          .select('*');
-
-        if (isMounted && Array.isArray(catData) && catData.length > 0) {
-          setCategoryBanners((prev) => {
-            const mappedFromDb = catData.map((dbRow) => ({
-              id: dbRow.id,
-              nameEn: dbRow.name_en || '',
-              nameAr: dbRow.name_ar || '',
-              subtitleEn: dbRow.subtitle_en || '',
-              subtitleAr: dbRow.subtitle_ar || '',
-              imageUrl: dbRow.image_url || '',
-              badge: dbRow.badge || `01`,
-              categoryLink: dbRow.category_link || '/shop',
-              is_active: dbRow.is_active !== undefined ? dbRow.is_active : true
-            }));
-
-            const dbMap = new Map(mappedFromDb.map((b) => [String(b.id), b]));
-            return prev.map((b) => {
-              const match = dbMap.get(String(b.id));
-              if (match) {
-                return {
-                  ...b,
-                  ...match,
-                  imageUrl: match.imageUrl || b.imageUrl
-                };
-              }
-              return b;
-            });
-          });
+        if (Array.isArray(categoryResult.data) && categoryResult.data.length > 0) {
+          setCategoryBanners(categoryResult.data.map(mapCategoryRow));
+        } else {
+          const migrated = await migrateLegacyCategoriesIfAdmin(legacyBanners);
+          if (isMounted && Array.isArray(migrated) && migrated.length > 0) {
+            setCategoryBanners(migrated);
+          }
         }
-      } catch (err) {
-        console.warn('Error loading banners from Supabase:', err);
+      } catch (error) {
+        console.warn('Error loading category banners from Supabase:', error?.message || error);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     }
 
-    // Initial load
     loadFromSupabase();
 
-    // Subscribe to Supabase Realtime broadcasts from admin
-    const unsubscribe = subscribeToLiveSync(() => {
-      if (isMounted) loadFromSupabase();
-    });
+    const channel = supabase
+      .channel('duat-storefront-settings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'category_banners' }, loadFromSupabase)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, loadFromSupabase)
+      .subscribe();
 
     return () => {
       isMounted = false;
-      unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 
-  // Sync categoryBanners to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_category_banners_v5', JSON.stringify(categoryBanners));
-    } catch (e) {
-      console.warn('Failed saving duat_category_banners to localStorage:', e);
+      localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(categoryBanners));
+    } catch (error) {
+      console.warn('Failed saving category banners to localStorage:', error);
     }
   }, [categoryBanners]);
 
-  // Sync forgeBanner to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('duat_forge_banner_v1', JSON.stringify(forgeBanner));
-    } catch (e) {
-      console.warn('Failed saving duat_forge_banner to localStorage:', e);
+      localStorage.setItem(FORGE_STORAGE_KEY, JSON.stringify(forgeBanner));
+    } catch (error) {
+      console.warn('Failed saving forge banner to localStorage:', error);
     }
   }, [forgeBanner]);
 
   const addCategoryBanner = async (newBanner) => {
-    const id = newBanner.id || `cat-${Date.now()}`;
-    const formatted = {
+    const banner = {
       ...newBanner,
-      id,
-      is_active: newBanner.is_active !== undefined ? newBanner.is_active : true,
+      id: newBanner.id || `cat-${Date.now()}`,
+      is_active: newBanner.is_active !== false,
       badge: newBanner.badge || `0${categoryBanners.length + 1}`
     };
-    setCategoryBanners((prev) => [...prev, formatted]);
-
-    try {
-      await supabase.from('category_banners').upsert({
-        id,
-        name_en: formatted.nameEn || '',
-        name_ar: formatted.nameAr || '',
-        subtitle_en: formatted.subtitleEn || '',
-        subtitle_ar: formatted.subtitleAr || '',
-        image_url: formatted.imageUrl || '',
-        is_active: formatted.is_active,
-        updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Supabase add category banner error:', err);
-    }
+    const saved = await saveCategoryBannerRecord(banner);
+    setCategoryBanners((current) => [...current.filter((item) => item.id !== saved.id), saved]);
+    return saved;
   };
 
   const updateCategoryBanner = async (bannerId, updatedFields) => {
-    let fullTarget = null;
-    setCategoryBanners((prev) =>
-      prev.map((b) => {
-        if (b.id === bannerId) {
-          fullTarget = { ...b, ...updatedFields };
-          return fullTarget;
-        }
-        return b;
-      })
-    );
-
-    if (fullTarget) {
-      try {
-        await supabase.from('category_banners').upsert({
-          id: bannerId,
-          name_en: fullTarget.nameEn || '',
-          name_ar: fullTarget.nameAr || '',
-          subtitle_en: fullTarget.subtitleEn || '',
-          subtitle_ar: fullTarget.subtitleAr || '',
-          image_url: fullTarget.imageUrl || '',
-          is_active: fullTarget.is_active !== undefined ? fullTarget.is_active : true,
-          updated_at: new Date().toISOString()
-        });
-      } catch (err) {
-        console.warn('Supabase category banner upsert error:', err);
-      }
-    }
+    const current = categoryBanners.find((banner) => banner.id === bannerId);
+    if (!current) throw new Error('CATEGORY_NOT_FOUND');
+    const saved = await saveCategoryBannerRecord({ ...current, ...updatedFields, id: bannerId });
+    setCategoryBanners((banners) => banners.map((banner) => (banner.id === bannerId ? saved : banner)));
+    return saved;
   };
 
   const toggleCategoryBannerVisibility = async (bannerId) => {
-    let newStatus = true;
-    setCategoryBanners((prev) =>
-      prev.map((b) => {
-        if (b.id === bannerId) {
-          const current = b.is_active !== false && b.isActive !== false;
-          newStatus = !current;
-          return { ...b, is_active: newStatus, isActive: newStatus };
-        }
-        return b;
-      })
-    );
-
-    try {
-      await supabase
-        .from('category_banners')
-        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
-        .eq('id', bannerId);
-    } catch (err) {
-      console.warn('Supabase toggle category banner visibility error:', err);
-    }
+    const current = categoryBanners.find((banner) => banner.id === bannerId);
+    if (!current) throw new Error('CATEGORY_NOT_FOUND');
+    return updateCategoryBanner(bannerId, {
+      is_active: !(current.is_active !== false && current.isActive !== false)
+    });
   };
 
   const deleteCategoryBanner = async (bannerId) => {
-    setCategoryBanners((prev) => prev.filter((b) => b.id !== bannerId));
-
-    try {
-      await supabase.from('category_banners').delete().eq('id', bannerId);
-    } catch (err) {
-      console.warn('Supabase delete category banner error:', err);
-    }
+    const { error } = await supabase.from('category_banners').delete().eq('id', bannerId);
+    if (error) throw error;
+    setCategoryBanners((banners) => banners.filter((banner) => banner.id !== bannerId));
   };
 
   const updateForgeBanner = async (updatedFields) => {
     const updated = { ...forgeBanner, ...updatedFields };
+    const { error } = await supabase.from('store_settings').upsert({
+      key: 'forge_banner',
+      value: updated,
+      updated_at: new Date().toISOString()
+    });
+    if (error) throw error;
     setForgeBanner(updated);
-
-    try {
-      await supabase.from('store_settings').upsert({
-        key: 'forge_banner',
-        value: updated,
-        updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Supabase update forge banner error:', err);
-    }
+    return updated;
   };
 
-  const resetCategoryBanners = () => {
-    setCategoryBanners(INITIAL_CATEGORY_BANNERS);
+  const resetCategoryBanners = async () => {
+    const { data, error } = await supabase
+      .from('category_banners')
+      .upsert(INITIAL_CATEGORY_BANNERS.map(toCategoryRow))
+      .select(CATEGORY_COLUMNS);
+    if (error) throw error;
+
+    const { error: forgeError } = await supabase.from('store_settings').upsert({
+      key: 'forge_banner',
+      value: DEFAULT_FORGE_BANNER,
+      updated_at: new Date().toISOString()
+    });
+    if (forgeError) throw forgeError;
+
+    setCategoryBanners(data.map(mapCategoryRow));
     setForgeBanner(DEFAULT_FORGE_BANNER);
-    localStorage.removeItem('duat_category_banners');
-    localStorage.removeItem('duat_forge_banner_v1');
+    localStorage.removeItem(CATEGORY_STORAGE_KEY);
+    localStorage.removeItem(FORGE_STORAGE_KEY);
   };
 
   return (
@@ -288,8 +309,6 @@ export const CategoryBannersProvider = ({ children }) => {
 
 export const useCategoryBanners = () => {
   const context = useContext(CategoryBannersContext);
-  if (!context) {
-    throw new Error('useCategoryBanners must be used within CategoryBannersProvider');
-  }
+  if (!context) throw new Error('useCategoryBanners must be used within CategoryBannersProvider');
   return context;
 };

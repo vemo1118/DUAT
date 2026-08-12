@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { removeStoreImage, uploadStoreImage } from '../services/storeAssetService';
 
 export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) => {
   const { showToast } = useToast();
@@ -16,7 +17,9 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
     is_active: true
   });
 
-  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (banner) {
@@ -31,36 +34,41 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
         categoryLink: banner.categoryLink || '/shop',
         is_active: banner.is_active !== undefined ? banner.is_active : true
       });
+      setSelectedFile(null);
     }
   }, [banner]);
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl('');
+      return undefined;
+    }
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
 
   if (!isOpen || !banner) return null;
 
   const isEditing = Boolean(banner && banner.id);
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
-        setUploading(false);
-        showToast('تم تحميل الصورة بنجاح 🖼️', 'success');
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('File upload error:', err);
-      showToast('حدث خطأ أثناء رفع الصورة', 'error');
-      setUploading(false);
+    const allowedTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+    if (!allowedTypes.has(file.type) || file.size < 1 || file.size > 8 * 1024 * 1024) {
+      showToast('الصورة لازم تكون PNG أو JPG أو WebP وأقل من 8MB', 'error');
+      e.target.value = '';
+      return;
     }
+    setSelectedFile(file);
+    showToast('تم اختيار الصورة. سيتم رفعها عند الحفظ.', 'info');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.imageUrl) {
+    if (!selectedFile && !formData.imageUrl) {
       showToast('يرجى اختيار صورة للقسم', 'error');
       return;
     }
@@ -68,9 +76,30 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
       showToast('يرجى كتابة اسم للقسم', 'error');
       return;
     }
-    onSave(banner.id, formData);
-    showToast(isEditing ? 'تم تحديث كارت القسم بنجاح ✨' : 'تم إضافة كارت القسم الجديد بنجاح ✨', 'success');
-    onClose();
+
+    setSaving(true);
+    let uploadedPath = null;
+    try {
+      let payload = formData;
+      if (selectedFile) {
+        const upload = await uploadStoreImage(selectedFile, {
+          folder: 'category-banners',
+          assetId: banner.id || formData.id || 'new-category'
+        });
+        uploadedPath = upload.created ? upload.path : null;
+        payload = { ...formData, imageUrl: upload.publicUrl };
+      }
+
+      await onSave(banner.id, payload);
+      showToast(isEditing ? 'تم تحديث كارت القسم وحفظه على الموقع ✨' : 'تم إضافة كارت القسم وحفظه على الموقع ✨', 'success');
+      onClose();
+    } catch (error) {
+      if (uploadedPath) await removeStoreImage(uploadedPath);
+      console.error('Category banner save error:', error?.message || error);
+      showToast('تعذر حفظ الصورة على الموقع. لم يتم اعتماد التغيير.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -86,6 +115,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
           </div>
           <button
             onClick={onClose}
+            disabled={saving}
             className="text-ash hover:text-bone p-1 transition-colors"
           >
             <X size={20} />
@@ -100,10 +130,10 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
               صورة القسم (Category Banner Image)
             </label>
             <div className="relative h-48 bg-coal border-2 border-dashed border-grave hover:border-gold rounded-lg flex flex-col items-center justify-center overflow-hidden group transition-colors">
-              {formData.imageUrl ? (
+              {previewUrl || formData.imageUrl ? (
                 <>
                   <img
-                    src={formData.imageUrl}
+                    src={previewUrl || formData.imageUrl}
                     alt="Category Banner Preview"
                     className="w-full h-full object-cover"
                   />
@@ -133,10 +163,10 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                   />
                 </label>
               )}
-              {uploading && (
+              {saving && (
                 <div className="absolute inset-0 bg-void/80 flex items-center justify-center gap-2 text-gold font-mono text-xs">
                   <Loader2 size={24} className="animate-spin" />
-                  <span>جاري المعالجة...</span>
+                  <span>جاري الرفع والحفظ...</span>
                 </div>
               )}
             </div>
@@ -148,7 +178,10 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
             <input
               type="text"
               value={formData.imageUrl}
-              onChange={(e) => setFormData((prev) => ({ ...prev, imageUrl: e.target.value }))}
+              onChange={(e) => {
+                setSelectedFile(null);
+                setFormData((prev) => ({ ...prev, imageUrl: e.target.value }));
+              }}
               placeholder="https://..."
               className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
             />
@@ -245,16 +278,18 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
             <button
               type="button"
               onClick={onClose}
+              disabled={saving}
               className="px-5 py-2.5 bg-coal text-ash hover:text-bone border border-grave font-mono text-xs uppercase"
             >
               إلغاء
             </button>
             <button
               type="submit"
+              disabled={saving}
               className="btn-primary px-6 py-2.5 font-mono text-xs uppercase font-bold flex items-center gap-2"
             >
-              <Save size={16} />
-              <span>حفظ التغييرات 💾</span>
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات 💾'}</span>
             </button>
           </div>
         </form>
