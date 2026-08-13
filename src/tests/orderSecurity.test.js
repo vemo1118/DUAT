@@ -55,6 +55,26 @@ describe('server-authoritative order pricing', () => {
     expect(quote.subtotal).toBe(725);
   });
 
+  it('stores trusted product artwork metadata for admin order previews', () => {
+    const quote = calculateTrustedQuote({
+      items: [{ id: 'db-product-with-art', quantity: 1 }]
+    }, {
+      dbProducts: [{
+        id: 'db-product-with-art',
+        category: 'stickers',
+        price: 100,
+        is_active: true,
+        data: {
+          nameAr: 'منتج بصورة',
+          nameEn: 'Product With Art',
+          imageUrl: 'https://res.cloudinary.com/demo/image/upload/sticker.png'
+        }
+      }]
+    });
+
+    expect(quote.items[0].image).toBe('https://res.cloudinary.com/demo/image/upload/sticker.png');
+  });
+
   it('rejects the retired custom case flow', () => {
     expect(() => calculateTrustedQuote({
       items: [{ id: 'custom-case-1', quantity: 1, customConfig: { phoneModel: 'iPhone 15' } }]

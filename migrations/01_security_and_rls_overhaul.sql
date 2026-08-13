@@ -253,7 +253,7 @@ where (ref is null or btrim(ref) = '') and id like 'DUAT-%';
 create unique index if not exists orders_request_id_unique_idx
 on public.orders (request_id) where request_id is not null;
 
-create sequence if not exists public.order_ref_seq start with 1000;
+create sequence if not exists public.order_ref_seq start with 1;
 
 do $sequence$
 declare v_max bigint;
@@ -264,9 +264,9 @@ begin
   where ref ~ '^DUAT-[0-9]+$';
 
   if v_max is null then
-    perform setval('public.order_ref_seq', 1000, false);
+    perform setval('public.order_ref_seq', 1, false);
   else
-    perform setval('public.order_ref_seq', greatest(v_max, 1000), true);
+    perform setval('public.order_ref_seq', v_max, true);
   end if;
 end
 $sequence$;

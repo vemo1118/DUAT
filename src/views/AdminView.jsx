@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useOrders } from '../context/OrdersContext';
@@ -74,6 +74,10 @@ export function AdminView() {
     moveProductUp,
     moveProductDown
   } = useProducts();
+  const productLookup = useMemo(
+    () => new Map(products.map((product) => [String(product.id), product])),
+    [products]
+  );
   const { orders, fetchOrders, updateOrderStatus, deleteOrder } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
   const {
@@ -463,6 +467,7 @@ export function AdminView() {
     const matchesSearch =
       !query ||
       (ord.id && ord.id.toLowerCase().includes(query)) ||
+      (ord.ref && ord.ref.toLowerCase().includes(query)) ||
       (ord.customer?.fullName && ord.customer.fullName.toLowerCase().includes(query)) ||
       (ord.customer?.phone && ord.customer.phone.includes(query));
 
@@ -1375,7 +1380,7 @@ export function AdminView() {
                       <tr key={ord.id} className="hover:bg-stone/30 transition-colors">
                         <td className="py-4 px-4">
                           <div className="font-mono text-base font-bold text-gold tracking-widest flex items-center gap-2">
-                            <span>{ord.id}</span>
+                            <span>{ord.ref || ord.id}</span>
                             {ord.items?.some(i => i.designSnapshot || i.customConfig?.designSnapshot) && (
                               <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded">
                                 🎨 تصميم مخصص
@@ -1435,7 +1440,7 @@ export function AdminView() {
 
                             <button
                               onClick={() => {
-                                if (window.confirm(`هل أنت تأكد من حذف الطلب #${ord.id}؟`)) {
+                                if (window.confirm(`هل أنت تأكد من حذف الطلب #${ord.ref || ord.id}؟`)) {
                                   deleteOrder(ord.id);
                                   showToast('تم حذف الطلب!', 'warning');
                                 }
@@ -3293,7 +3298,7 @@ export function AdminView() {
             <div className="flex items-center justify-between border-b border-grave pb-4">
               <div>
                 <span className="font-mono text-xs text-ash uppercase">تفاصيل الطلب الكاملة</span>
-                <h3 className="font-mono text-2xl font-bold text-gold tracking-widest">{selectedOrderDetails.id}</h3>
+                <h3 className="font-mono text-2xl font-bold text-gold tracking-widest">{selectedOrderDetails.ref || selectedOrderDetails.id}</h3>
               </div>
               <button
                 onClick={() => setSelectedOrderDetails(null)}
@@ -3328,24 +3333,25 @@ export function AdminView() {
                   const cfg = item.customConfig || item.customDetails || item.product?.customConfig || item.product?.customDetails;
                   const designPath = item.design_image_path || cfg?.design_image_path;
                   const secureDesignUrl = designPath ? signedDesignUrls[designPath] : null;
-                  // Real Snapshot Image stored on item
-                  const rawSnapshot = secureDesignUrl ||
-                                     item.designSnapshot ||
-                                     cfg?.designSnapshot ||
-                                     (typeof item.image === 'string' && item.image.startsWith('data:image') ? item.image : null) ||
-                                     (typeof item.product?.image === 'string' && item.product.image.startsWith('data:image') ? item.product.image : null);
-
-                  const mockupImg = rawSnapshot || (typeof item.image === 'string' && item.image.length > 15 ? item.image : null);
-                  const thumbImage = mockupImg || (item.images && item.images[0]) || item.product?.image;
+                  const catalogProduct = productLookup.get(String(item.id || item.productId || item.product_id));
+                  const thumbnailItem = {
+                    ...item,
+                    product: item.product || catalogProduct,
+                    stickerRenderId: item.stickerRenderId || catalogProduct?.stickerRenderId,
+                    image: secureDesignUrl || item.image || item.imageUrl || catalogProduct?.image || catalogProduct?.imageUrl || catalogProduct?.images?.[0],
+                    designSnapshot: secureDesignUrl || item.designSnapshot || cfg?.designSnapshot
+                  };
+                  const customPreviewImage = secureDesignUrl || item.designSnapshot || cfg?.designSnapshot || item.image || cfg?.uploadedImage;
                   const cDetails = item.customDetails || item.customizerConfig || {};
                   const itemNameLower = String(name || '').toLowerCase();
 
                   const isCustomSticker = (item.id && item.id.startsWith('custom-sticker-')) ||
-                                          item.category === 'stickers' ||
+                                          item.isCustom === true ||
+                                          Boolean(designPath) ||
                                           cDetails.mode === 'text' ||
                                           cDetails.mode === 'image' ||
-                                          itemNameLower.includes('sticker') ||
-                                          itemNameLower.includes('استيكر');
+                                          itemNameLower.includes('custom sticker') ||
+                                          itemNameLower.includes('استيكر مخصص');
 
                   const isCustomBundle = item.category === 'bundles' ||
                                         (item.id && item.id.startsWith('bundle-')) ||
@@ -3359,7 +3365,7 @@ export function AdminView() {
                       <div className="flex items-center gap-3">
                         {/* Thumbnail Image Box */}
                         <div className="w-16 h-16 bg-stone border border-gold/40 rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1 shadow-md">
-                          <CustomStickerThumbnail item={secureDesignUrl ? { ...item, image: secureDesignUrl, designSnapshot: secureDesignUrl } : item} />
+                          <CustomStickerThumbnail item={thumbnailItem} />
                         </div>
 
                         {/* Title, Quantity & Price */}
@@ -3413,12 +3419,12 @@ export function AdminView() {
                           )}
 
                           {/* Image download for custom sticker */}
-                          {(mockupImg || cDetails.uploadedImage) && (
+                          {customPreviewImage && (
                             <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2">
-                              <img src={mockupImg || cDetails.uploadedImage} alt="Sticker Preview" className="w-12 h-12 object-contain bg-stone border border-gold/40 rounded p-1" />
+                              <img src={customPreviewImage} alt="Sticker Preview" className="w-12 h-12 object-contain bg-stone border border-gold/40 rounded p-1" />
                               <a
-                                href={mockupImg || cDetails.uploadedImage}
-                                download={`custom-sticker-${selectedOrderDetails.id || 'order'}.png`}
+                                href={customPreviewImage}
+                                download={`custom-sticker-${selectedOrderDetails.ref || selectedOrderDetails.id || 'order'}.png`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-3 py-1.5 bg-gold text-void font-bold text-[10px] rounded hover:bg-amber-400 transition-colors flex items-center gap-1"

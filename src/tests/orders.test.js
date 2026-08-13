@@ -45,9 +45,9 @@ describe('Order Creation & Data Integrity Tests', () => {
   });
 
   it('should format order references with DUAT- prefix and 4 digits', () => {
-    const refNum = 1005;
+    const refNum = 9;
     const formattedRef = `DUAT-${String(refNum).padStart(4, '0')}`;
-    expect(formattedRef).toBe('DUAT-1005');
+    expect(formattedRef).toBe('DUAT-0009');
   });
 
 });

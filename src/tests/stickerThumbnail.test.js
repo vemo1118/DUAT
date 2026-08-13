@@ -1,0 +1,19 @@
+import { describe, expect, it } from 'vitest';
+import {
+  resolveStickerImage,
+  resolveStickerRenderId
+} from '../components/CustomStickerThumbnail';
+
+describe('order sticker thumbnail resolution', () => {
+  it('recognizes generated sticker artwork from stored order item IDs', () => {
+    expect(resolveStickerRenderId({ id: 'ar-letter-ج' })).toBe('ar-letter-ج');
+    expect(resolveStickerRenderId({ id: 'year-2005' })).toBe('year-2005');
+  });
+
+  it('uses the catalog product image when compact order data has no image', () => {
+    expect(resolveStickerImage({
+      id: 'st-n90-1-04-cassette',
+      product: { image: 'https://res.cloudinary.com/demo/image/upload/cassette.png' }
+    })).toBe('https://res.cloudinary.com/demo/image/upload/cassette.png');
+  });
+});

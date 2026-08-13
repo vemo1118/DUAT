@@ -1,19 +1,56 @@
 import React from 'react';
 import { StickerIcon } from './StickerIcon';
 
+const GENERATED_STICKER_PREFIXES = ['month-', 'year-', 'ar-letter-', 'en-letter-'];
+
+export function resolveStickerRenderId(item) {
+  if (!item) return null;
+
+  const candidates = [
+    item.stickerRenderId,
+    item.sticker_render_id,
+    item.id,
+    item.productId,
+    item.product_id,
+    item.product?.stickerRenderId,
+    item.product?.sticker_render_id,
+    item.product?.id
+  ];
+
+  return candidates.find((candidate) => (
+    typeof candidate === 'string' &&
+    GENERATED_STICKER_PREFIXES.some((prefix) => candidate.startsWith(prefix))
+  )) || null;
+}
+
+export function resolveStickerImage(item) {
+  if (!item) return null;
+
+  const candidates = [
+    item.image,
+    item.imageUrl,
+    item.designSnapshot,
+    item.images?.[0],
+    item.product?.image,
+    item.product?.imageUrl,
+    item.product?.designSnapshot,
+    item.product?.images?.[0]
+  ];
+
+  return candidates.find((candidate) => (
+    typeof candidate === 'string' &&
+    (candidate.startsWith('data:image') || candidate.startsWith('http://') || candidate.startsWith('https://'))
+  )) || null;
+}
+
 export function CustomStickerThumbnail({ item, size = 'normal' }) {
   if (!item) return null;
 
   const cDetails = item.customDetails || item.customConfig || {};
   const customText = cDetails.customText || (typeof item.nameAr === 'string' && item.nameAr.includes('"') ? item.nameAr.split('"')[1] : null);
-  const image = item.image || item.designSnapshot;
-  const renderId = item.stickerRenderId || item.product?.stickerRenderId || item.id;
-  const usesGeneratedStickerArtwork = typeof renderId === 'string' && (
-    renderId.startsWith('month-') ||
-    renderId.startsWith('year-') ||
-    renderId.startsWith('ar-letter-') ||
-    renderId.startsWith('en-letter-')
-  );
+  const image = resolveStickerImage(item);
+  const renderId = resolveStickerRenderId(item);
+  const usesGeneratedStickerArtwork = Boolean(renderId);
 
   if (usesGeneratedStickerArtwork) {
     const previewSize = size === 'small' ? 38 : 48;
@@ -30,7 +67,7 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
   }
 
   // If we have an uploaded image or generated snapshot image, use it!
-  const isDataOrRealImage = image && (image.startsWith('data:image') || image.startsWith('http')) && !image.includes('born_at_dawn');
+  const isDataOrRealImage = Boolean(image);
 
   if (isDataOrRealImage && cDetails.mode !== 'text') {
     return (

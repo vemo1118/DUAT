@@ -63,12 +63,20 @@ function normalizeCatalogProduct(product) {
   const isActive = product.is_active !== undefined && product.is_active !== null
     ? product.is_active !== false
     : data.is_active !== false && data.isActive !== false;
+  const id = String(product.id || data.id);
+  const stickerRenderId = product.stickerRenderId || data.stickerRenderId || (
+    ['month-', 'year-', 'ar-letter-', 'en-letter-'].some((prefix) => id.startsWith(prefix)) ? id : null
+  );
+  const image = product.image_url || product.imageUrl || product.image || data.imageUrl || data.image || data.images?.[0] || null;
+
   return {
-    id: String(product.id || data.id),
+    id,
     category: product.category || data.category || 'stickers',
     nameEn: product.name_en || product.nameEn || data.nameEn || product.name || data.name || 'DUAT Product',
     nameAr: product.name_ar || product.nameAr || data.nameAr || product.name || data.name || 'منتج دوات',
     price: cleanNumber(product.price ?? data.price),
+    image: typeof image === 'string' && /^https?:\/\//.test(image) ? image : null,
+    stickerRenderId: cleanText(stickerRenderId, 100) || null,
     isActive
   };
 }
@@ -126,6 +134,9 @@ function normalizeCatalogItem(item, quantity, catalog) {
     quantity,
     price: product.price
   };
+
+  if (product.image) normalized.image = product.image;
+  if (product.stickerRenderId) normalized.stickerRenderId = product.stickerRenderId;
 
   const selectedItems = sanitizeSelectedItems(item.customDetails?.selectedItems);
   if (selectedItems.length > 0) {
