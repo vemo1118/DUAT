@@ -7,7 +7,6 @@ import { Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2 } from 'lucide-
 export const OrderTrackerView = () => {
   const { lang, t } = useLanguage();
   const [orderId, setOrderId] = useState('');
-  const [phoneLast4, setPhoneLast4] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -25,21 +24,20 @@ export const OrderTrackerView = () => {
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (!orderId.trim() || !/^\d{4}$/.test(phoneLast4)) {
-      setErrorMsg(lang === 'ar' ? 'اكتب رقم الطلب وآخر ٤ أرقام من رقم الموبايل' : 'Enter the order number and the last 4 phone digits');
+    if (!orderId.trim()) {
+      setErrorMsg(t('trackerRequired'));
       return;
     }
 
     setIsLoading(true);
     setErrorMsg('');
     try {
-      const finalTrack = await trackOrder(orderId, phoneLast4);
+      const finalTrack = await trackOrder(orderId);
       if (finalTrack?.status) {
         setTrackedResult({
           code: finalTrack.code,
           currentStep: statusToStep(finalTrack.status),
           status: finalTrack.status,
-          items: finalTrack.items || [],
           updatedAt: (finalTrack.updatedAt || finalTrack.createdAt)
             ? new Date(finalTrack.updatedAt || finalTrack.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')
             : 'الآن'
@@ -79,22 +77,16 @@ export const OrderTrackerView = () => {
 
       {/* Track Form Card */}
       <div className="bg-stone border border-grave p-6 sm:p-10 space-y-6 shadow-2xl card-depth-highlight">
-        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_180px_auto] gap-3">
+        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
           <input
             type="text"
+            inputMode="text"
+            autoComplete="off"
+            maxLength={15}
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder={t('trackerInputPlaceholder')}
             className="flex-1 bg-coal border border-grave text-bone p-4 text-sm font-mono uppercase focus:border-gold focus:outline-none min-h-[44px]"
-          />
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={4}
-            value={phoneLast4}
-            onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, '').slice(0, 4))}
-            placeholder={lang === 'ar' ? 'آخر ٤ أرقام من الموبايل' : 'Last 4 phone digits'}
-            className="bg-coal border border-grave text-bone p-4 text-sm font-mono focus:border-gold focus:outline-none min-h-[44px]"
           />
           <button
             type="submit"
@@ -117,17 +109,6 @@ export const OrderTrackerView = () => {
               <span className="font-mono text-xs text-ash">ORDER REFERENCE:</span>
               <span className="font-mono text-base font-bold text-gold tracking-widest">{trackedResult.code}</span>
             </div>
-
-            {Array.isArray(trackedResult.items) && trackedResult.items.length > 0 && (
-              <div className="font-mono text-xs text-bone/80 border-b border-grave/40 pb-3 space-y-1">
-                <span className="text-ash block font-bold">المنتجات في هذا الطلب:</span>
-                {trackedResult.items.map((it, i) => (
-                  <div key={i} className="text-gold font-medium">
-                    • {it.nameAr || it.nameEn} (x{it.quantity || 1})
-                  </div>
-                ))}
-              </div>
-            )}
 
             <div className="space-y-6">
               {steps.map((step, idx) => {

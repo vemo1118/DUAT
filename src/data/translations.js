@@ -134,9 +134,10 @@ export const TRANSLATIONS = {
 
     // Order Tracker Modal / Page (Part 1 Keys Fix)
     trackerTitle: 'Track your order',
-    trackerSubtitle: 'Enter your order reference to see where it is in the passage.',
-    trackerInputPlaceholder: 'Order number (e.g. DUAT-12345)',
+    trackerSubtitle: 'Enter the full order code from your confirmation message.',
+    trackerInputPlaceholder: 'Full order code (e.g. DUAT-0001)',
     trackerBtn: 'Track',
+    trackerRequired: 'Enter the full order code (e.g. DUAT-0001).',
     trackerNotFound: 'No order found with this reference. Check your WhatsApp confirmation.',
     stepPlaced: 'Order placed',
     stepPlacedDesc: 'WhatsApp confirmed',
@@ -149,7 +150,7 @@ export const TRANSLATIONS = {
 
     // Uppercase key aliases for Track Order
     TRACKERTITLE: 'Track your order',
-    TRACKERINPUTPLACEHOLDER: 'Order number (e.g. DUAT-12345)',
+    TRACKERINPUTPLACEHOLDER: 'Full order code (e.g. DUAT-0001)',
     TRACKERBTN: 'Track',
     STEPPLACED: 'Order placed',
     STEPFORGE: 'In production',
@@ -340,9 +341,10 @@ export const TRANSLATIONS = {
 
     // Order Tracker Modal / Page (Part 1 Keys Fix)
     trackerTitle: 'تتبّع طلبك',
-    trackerSubtitle: 'اكتب رقم طلبك عشان تشوف هو فين في الرحلة.',
-    trackerInputPlaceholder: 'رقم الطلب (مثال: DUAT-12345)',
+    trackerSubtitle: 'اكتب كود الطلب كامل زي ما وصلك في رسالة التأكيد.',
+    trackerInputPlaceholder: 'كود الطلب كامل (مثال: DUAT-0001)',
     trackerBtn: 'تتبّع',
+    trackerRequired: 'اكتب كود الطلب كامل (مثال: DUAT-0001).',
     trackerNotFound: 'لم نجد طلباً بهذا الرقم. تحقق من رسالة الواتساب.',
     stepPlaced: 'تم الطلب',
     stepPlacedDesc: 'تأكيد واتساب',
@@ -355,7 +357,7 @@ export const TRANSLATIONS = {
 
     // Uppercase key aliases for Track Order
     TRACKERTITLE: 'تتبّع طلبك',
-    TRACKERINPUTPLACEHOLDER: 'رقم الطلب (مثال: DUAT-12345)',
+    TRACKERINPUTPLACEHOLDER: 'كود الطلب كامل (مثال: DUAT-0001)',
     TRACKERBTN: 'تتبّع',
     STEPPLACED: 'تم الطلب',
     STEPFORGE: 'بيتصنّع',

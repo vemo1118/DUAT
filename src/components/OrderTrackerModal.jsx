@@ -5,9 +5,8 @@ import { trackOrder } from '../services/orderApi';
 import { SunDisc } from './SunDisc';
 
 export const OrderTrackerModal = ({ isOpen, onClose }) => {
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const [orderId, setOrderId] = useState('');
-  const [phoneLast4, setPhoneLast4] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -27,21 +26,20 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (!orderId.trim() || !/^\d{4}$/.test(phoneLast4)) {
-      setErrorMsg(lang === 'ar' ? 'اكتب رقم الطلب وآخر ٤ أرقام من الموبايل' : 'Enter the order number and last 4 phone digits');
+    if (!orderId.trim()) {
+      setErrorMsg(t('trackerRequired'));
       return;
     }
 
     setIsLoading(true);
     setErrorMsg('');
     try {
-      const finalTrack = await trackOrder(orderId, phoneLast4);
+      const finalTrack = await trackOrder(orderId);
       if (finalTrack?.status) {
         setTrackedResult({
           code: finalTrack.code,
           currentStep: statusToStep(finalTrack.status),
-          status: finalTrack.status,
-          items: finalTrack.items || []
+          status: finalTrack.status
         });
       }
     } catch {
@@ -85,22 +83,16 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
         </p>
 
         {/* Input Form */}
-        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-2">
+        <form onSubmit={handleTrack} className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
           <input
             type="text"
+            inputMode="text"
+            autoComplete="off"
+            maxLength={15}
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder={t('trackerInputPlaceholder')}
             className="flex-1 bg-coal border border-grave text-bone p-3 text-xs font-mono uppercase focus:border-gold focus:outline-none min-h-[44px]"
-          />
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={4}
-            value={phoneLast4}
-            onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, '').slice(0, 4))}
-            placeholder={lang === 'ar' ? 'آخر ٤ أرقام' : 'Last 4 digits'}
-            className="bg-coal border border-grave text-bone p-3 text-xs font-mono focus:border-gold focus:outline-none min-h-[44px]"
           />
           <button
             type="submit"
@@ -123,17 +115,6 @@ export const OrderTrackerModal = ({ isOpen, onClose }) => {
               <span className="text-ash uppercase">رقم الطلب (REF):</span>
               <span className="font-bold text-gold tracking-widest">{trackedResult.code}</span>
             </div>
-
-            {Array.isArray(trackedResult.items) && trackedResult.items.length > 0 && (
-              <div className="font-mono text-xs text-bone/80 border-b border-grave/40 pb-2 space-y-1">
-                <span className="text-ash block font-bold">محتويات الطلب:</span>
-                {trackedResult.items.map((it, i) => (
-                  <div key={i} className="text-gold font-medium">
-                    • {it.nameAr || it.nameEn} (x{it.quantity || 1})
-                  </div>
-                ))}
-              </div>
-            )}
 
             <div className="space-y-4 relative">
               {steps.map((step, idx) => {

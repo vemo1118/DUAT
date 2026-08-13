@@ -82,8 +82,8 @@ export async function createOrder(payload) {
   return result.order;
 }
 
-export async function trackOrder(reference, phoneLast4) {
-  const result = await apiRequest('/api/track-order', { reference, phoneLast4 });
+export async function trackOrder(reference) {
+  const result = await apiRequest('/api/track-order', { reference });
   return result.order;
 }
 

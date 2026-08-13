@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { calculateTrustedQuote, containsDataUrl } from '../../api/_lib/order-service';
 import { compactCartItems } from '../services/orderApi';
+import { normalizeOrderReference } from '../../api/track-order';
 import {
   broadcastResourceEvent,
   publishCloudEdits,
@@ -103,6 +104,19 @@ describe('browser payload compaction', () => {
     expect(compact[0].designSnapshot).toBeUndefined();
     expect(compact[0].customConfig).toBeUndefined();
     expect(containsDataUrl(compact)).toBe(false);
+  });
+});
+
+describe('single-field order tracking', () => {
+  it('accepts the full reference or its numeric part', () => {
+    expect(normalizeOrderReference('DUAT-0001')).toBe('DUAT-0001');
+    expect(normalizeOrderReference('duat0001')).toBe('DUAT-0001');
+    expect(normalizeOrderReference('0001')).toBe('DUAT-0001');
+  });
+
+  it('rejects incomplete or non-numeric references', () => {
+    expect(() => normalizeOrderReference('DUAT')).toThrow('TRACKING_NOT_FOUND');
+    expect(() => normalizeOrderReference('DUAT-ABCD')).toThrow('TRACKING_NOT_FOUND');
   });
 });
 
