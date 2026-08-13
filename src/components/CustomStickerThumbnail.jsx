@@ -1,4 +1,5 @@
 import React from 'react';
+import { StickerIcon } from './StickerIcon';
 
 export function CustomStickerThumbnail({ item, size = 'normal' }) {
   if (!item) return null;
@@ -6,6 +7,27 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
   const cDetails = item.customDetails || item.customConfig || {};
   const customText = cDetails.customText || (typeof item.nameAr === 'string' && item.nameAr.includes('"') ? item.nameAr.split('"')[1] : null);
   const image = item.image || item.designSnapshot;
+  const renderId = item.stickerRenderId || item.product?.stickerRenderId || item.id;
+  const usesGeneratedStickerArtwork = typeof renderId === 'string' && (
+    renderId.startsWith('month-') ||
+    renderId.startsWith('year-') ||
+    renderId.startsWith('ar-letter-') ||
+    renderId.startsWith('en-letter-')
+  );
+
+  if (usesGeneratedStickerArtwork) {
+    const previewSize = size === 'small' ? 38 : 48;
+    return (
+      <div className="w-full h-full flex items-center justify-center overflow-hidden select-none">
+        <StickerIcon
+          stickerId={renderId}
+          size={previewSize}
+          color="#182744"
+          bgColor="#FFFFFF"
+        />
+      </div>
+    );
+  }
 
   // If we have an uploaded image or generated snapshot image, use it!
   const isDataOrRealImage = image && (image.startsWith('data:image') || image.startsWith('http')) && !image.includes('born_at_dawn');

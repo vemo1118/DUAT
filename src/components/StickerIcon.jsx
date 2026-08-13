@@ -12,7 +12,7 @@ const CANVAS_DIMS = {
 };
 
 const MadeInBadge = ({ label, size, forCanvas, variant }) => {
-  const badgeSize = forCanvas ? 76 : Math.max(64, size);
+  const badgeSize = forCanvas ? 76 : Math.max(38, size);
   const isYear = variant === 'year';
   const labelLength = String(label).length;
   const labelScale = labelLength >= 8 ? 0.118 : labelLength >= 7 ? 0.135 : labelLength >= 6 ? 0.15 : 0.17;
@@ -61,7 +61,7 @@ const MadeInBadge = ({ label, size, forCanvas, variant }) => {
       <span
         style={{
           color: '#E0A93B',
-          fontSize: Math.max(7, Math.round(badgeSize * 0.085)),
+          fontSize: Math.max(4, Math.round(badgeSize * 0.085)),
           letterSpacing: `${Math.max(1, badgeSize * 0.018)}px`
         }}
         className="relative z-10 font-mono font-black uppercase leading-none"
@@ -72,7 +72,7 @@ const MadeInBadge = ({ label, size, forCanvas, variant }) => {
       <span
         style={{
           color: mainColor,
-          fontSize: Math.max(11, Math.round(badgeSize * labelScale)),
+          fontSize: Math.max(6, Math.round(badgeSize * labelScale)),
           whiteSpace: 'nowrap',
           textShadow: isYear ? '0 2px 3px rgba(0,0,0,0.42)' : '0 1px 1px rgba(255,255,255,0.75)'
         }}
@@ -89,7 +89,7 @@ const MadeInBadge = ({ label, size, forCanvas, variant }) => {
       <span
         style={{
           color: isYear ? 'rgba(255,248,237,0.62)' : 'rgba(24,39,68,0.58)',
-          fontSize: Math.max(5, Math.round(badgeSize * 0.052)),
+          fontSize: Math.max(3, Math.round(badgeSize * 0.052)),
           letterSpacing: `${Math.max(0.7, badgeSize * 0.009)}px`,
           marginTop: Math.round(badgeSize * 0.055)
         }}
