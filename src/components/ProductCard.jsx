@@ -53,7 +53,9 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
-      const fitClass = isSticker
+      const fitClass = isSticker && product.cardImageFit === 'contain'
+        ? 'w-full h-full object-contain scale-100 group-hover:scale-105 transition-transform duration-500 ease-out drop-shadow-xl'
+        : isSticker
         ? 'w-full h-full object-contain scale-[1.45] group-hover:scale-[1.55] transition-transform duration-500 ease-out drop-shadow-2xl'
         : 'w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out';
       return (

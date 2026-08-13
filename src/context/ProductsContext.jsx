@@ -32,6 +32,14 @@ const LEGACY_FAKE_PRODUCT_IDS = new Set([
   'sticker-disc', 'sticker-tale3-noor', 'sticker-3addi-lel', 'sticker-born-dawn'
 ]);
 
+function normalizeProductImages(primaryImage, ...imageLists) {
+  const images = [primaryImage, ...imageLists.flat()]
+    .filter((image) => typeof image === 'string' && image.trim())
+    .map((image) => image.trim());
+
+  return Array.from(new Set(images));
+}
+
 function mapFromDb(row) {
   if (!row) return null;
   if (row.category === 'cases') return null;
@@ -48,6 +56,7 @@ function mapFromDb(row) {
   }
 
   const baseObj = initP ? { ...initP } : {};
+  const images = normalizeProductImages(img, data.images || [], baseObj.images || []);
 
   const curPrice = row.price !== undefined && row.price !== null ? Number(row.price) : Number(data.price || baseObj.price || 0);
   const origPrice = data.originalPrice !== undefined ? Number(data.originalPrice) : (baseObj.originalPrice !== undefined ? Number(baseObj.originalPrice) : undefined);
@@ -65,7 +74,7 @@ function mapFromDb(row) {
     isActive: isActiveVal,
     imageUrl: img,
     image: img,
-    images: img ? [img] : (Array.isArray(baseObj.images) && baseObj.images.length > 0 ? baseObj.images : (Array.isArray(data.images) ? data.images : [])),
+    images,
     nameEn: data.nameEn || row.name_en || baseObj.nameEn || '',
     nameAr: data.nameAr || row.name_ar || baseObj.nameAr || '',
     tagEn: data.tagEn || row.tag_en || baseObj.tagEn || '',
@@ -88,6 +97,7 @@ function mapToDb(p) {
   const curPrice = Number(p.price) || 0;
   const origPrice = p.originalPrice !== undefined ? Number(p.originalPrice) : undefined;
   const savingsVal = p.savings !== undefined ? Number(p.savings) : (origPrice && origPrice > curPrice ? origPrice - curPrice : 0);
+  const images = normalizeProductImages(img, Array.isArray(p.images) ? p.images : []);
 
   return {
     id: p.id,
@@ -102,7 +112,7 @@ function mapToDb(p) {
       savings: savingsVal,
       imageUrl: img,
       image: img,
-      images: img ? [img] : (Array.isArray(p.images) ? p.images : []),
+      images,
       is_active: isActiveVal,
       isActive: isActiveVal
     }
@@ -233,7 +243,11 @@ function applyOverridesAndMergedProducts(prods) {
         ...custom,
         imageUrl: img,
         image: img,
-        images: img ? [img] : (Array.isArray(p.images) ? p.images : [])
+        images: normalizeProductImages(
+          img,
+          Array.isArray(custom.images) ? custom.images : [],
+          Array.isArray(p.images) ? p.images : []
+        )
       };
     }
     return p;
@@ -423,7 +437,7 @@ export function ProductsProvider({ children }) {
       id: prodData.id || `prod-${Date.now()}`,
       imageUrl: img,
       image: img,
-      images: img ? [img] : (Array.isArray(prodData.images) ? prodData.images : [])
+      images: normalizeProductImages(img, Array.isArray(prodData.images) ? prodData.images : [])
     };
     saveAddedProduct(newProduct);
     saveCustomEdit(newProduct.id, newProduct);
@@ -450,7 +464,11 @@ export function ProductsProvider({ children }) {
             ...updatedFields,
             imageUrl: img,
             image: img,
-            images: img ? [img] : (Array.isArray(prod.images) ? prod.images : [])
+            images: normalizeProductImages(
+              img,
+              Array.isArray(updatedFields.images) ? updatedFields.images : [],
+              Array.isArray(prod.images) ? prod.images : []
+            )
           };
           targetProduct = updated;
           return updated;
