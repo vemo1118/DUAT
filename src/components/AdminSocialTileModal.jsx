@@ -153,7 +153,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-              placeholder="PASSAGE CASE"
+              placeholder="STICKER SHEET"
               className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
             />
           </div>

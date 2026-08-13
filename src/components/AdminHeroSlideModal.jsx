@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Upload, Sparkles, Languages, Link as LinkIcon } from 'lucide-react';
+import { X, Save, Upload, Sparkles, Languages } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
 
 export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = null }) {
@@ -8,20 +8,20 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
 
   const [formData, setFormData] = useState({
     id: '',
-    eyebrowEn: 'DUAT / THE FORGE',
-    eyebrowAr: 'دوات / كور الفن والتشطيب',
+    eyebrowEn: 'DUAT / STICKER BUILDER',
+    eyebrowAr: 'دوات / مصمم الاستيكرات',
     headline1En: 'CRAFT YOUR OWN',
-    headline1Ar: 'صمم جرابك الخاص',
-    headline2En: 'CUSTOM LUXURY CASE.',
+    headline1Ar: 'صمم استيكرك الخاص',
+    headline2En: '3D EPOXY STICKER.',
     headline2Ar: 'بلمسة مصرية فاخرة.',
-    subEn: 'Interactive 3D dome builder. Select phone model, case finish, raised slogan pills, Arabic motifs, and custom engravings.',
-    subAr: 'أداة التصميم التفاعلية ثلاثية الأبعاد. اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة.',
+    subEn: 'Create a custom raised 3D epoxy sticker from your text or uploaded artwork.',
+    subAr: 'صمّم استيكر إيبوكسي مجسم من نصك أو ارفع تصميمك الخاص.',
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
     imageUrl: '',
     ctaPrimaryTextEn: 'START BUILDING',
     ctaPrimaryTextAr: 'ابدأ التصميم الآن',
-    ctaPrimaryLink: '/customize',
+    ctaPrimaryLink: '/sticker-builder',
     ctaSecondaryTextEn: 'VIEW GALLERY',
     ctaSecondaryTextAr: 'معرض الكتالوج',
     ctaSecondaryLink: '/shop',
@@ -55,7 +55,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         mobileImageUrl: slideToEdit.mobileImageUrl || slideToEdit.mobile_image_url || '',
         ctaPrimaryTextEn: slideToEdit.ctaPrimaryTextEn || '',
         ctaPrimaryTextAr: slideToEdit.ctaPrimaryTextAr || '',
-        ctaPrimaryLink: slideToEdit.ctaPrimaryLink || '/customize',
+        ctaPrimaryLink: ['/customize', '/customizer'].includes(slideToEdit.ctaPrimaryLink) ? '/sticker-builder' : (slideToEdit.ctaPrimaryLink || '/sticker-builder'),
         ctaSecondaryTextEn: slideToEdit.ctaSecondaryTextEn || '',
         ctaSecondaryTextAr: slideToEdit.ctaSecondaryTextAr || '',
         ctaSecondaryLink: slideToEdit.ctaSecondaryLink || '/shop',
@@ -80,7 +80,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         headline2En: 'LIMITED TIME ONLY',
         headline2Ar: 'لفترة محدودة فقط',
         subEn: 'Check out our new luxury arrivals with premium hand craftsmanship in Egypt.',
-        subAr: 'اكتشف جديد تشكيلة الجرابات والملصقات الفاخرة المصنوعة يدوياً في مصر.',
+        subAr: 'اكتشف جديد تشكيلة الاستيكرات الفاخرة المصنوعة يدوياً في مصر.',
         badgeEn: 'SPECIAL DROP',
         badgeAr: 'عرض محدود 30%',
         imageUrl: '',
@@ -88,9 +88,9 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         ctaPrimaryTextEn: 'SHOP NOW',
         ctaPrimaryTextAr: 'تسوق العرض الآن',
         ctaPrimaryLink: '/shop',
-        ctaSecondaryTextEn: 'CUSTOMIZE',
-        ctaSecondaryTextAr: 'تخصيص بنفسك',
-        ctaSecondaryLink: '/customize',
+        ctaSecondaryTextEn: 'STICKER BUILDER',
+        ctaSecondaryTextAr: 'صمم استيكرك',
+        ctaSecondaryLink: '/sticker-builder',
         textAlign: 'left',
         headline1Color: '#EDE4D3',
         headline2Color: '#E8A33D',
@@ -331,7 +331,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                       name="headline1Ar"
                       value={formData.headline1Ar}
                       onChange={handleChange}
-                      placeholder="مثال: صمم درعك الخاص"
+                      placeholder="مثال: صمم استيكرك الخاص"
                       required
                       className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none text-sm font-bold"
                     />
@@ -412,7 +412,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                       name="eyebrowEn"
                       value={formData.eyebrowEn}
                       onChange={handleChange}
-                      placeholder="e.g. DUAT / THE FORGE"
+                      placeholder="e.g. DUAT / STICKER BUILDER"
                       required
                       className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none text-sm"
                     />
@@ -458,7 +458,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                       name="headline2En"
                       value={formData.headline2En}
                       onChange={handleChange}
-                      placeholder="e.g. CUSTOM ARMOR."
+                      placeholder="e.g. CUSTOM 3D STICKER."
                       required
                       className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-gold focus:outline-none text-sm font-bold"
                     />
@@ -527,7 +527,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 dir="ltr"
               >
                 <optgroup label="🌐 الصفحات الرئيسية (Main Pages)">
-                  <option value="/customize">/customize (صفحة التخصيص والـ 3D)</option>
+                  <option value="/sticker-builder">/sticker-builder (مصمم الاستيكرات)</option>
                   <option value="/shop">/shop (المتجر والكتالوج)</option>
                   <option value="/track-order">/track-order (تتبع الطلب)</option>
                   <option value="/the-duat">/the-duat (عن دوات)</option>
@@ -565,7 +565,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
               >
                 <optgroup label="🌐 الصفحات الرئيسية (Main Pages)">
                   <option value="/shop">/shop (المتجر والكتالوج)</option>
-                  <option value="/customize">/customize (صفحة التخصيص والـ 3D)</option>
+                  <option value="/sticker-builder">/sticker-builder (مصمم الاستيكرات)</option>
                   <option value="/track-order">/track-order (تتبع الطلب)</option>
                   <option value="/the-duat">/the-duat (عن دوات)</option>
                 </optgroup>

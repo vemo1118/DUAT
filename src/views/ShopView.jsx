@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CATEGORIES, CASE_TYPES, PHONE_MODELS } from '../data/products';
+import { CATEGORIES } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts } from '../context/ProductsContext';
 import { SunDisc } from '../components/SunDisc';
-import { Search, SlidersHorizontal, Filter, X, ChevronRight, ChevronLeft, Smartphone } from 'lucide-react';
+import { Search, SlidersHorizontal, Filter, X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSelectProduct }) => {
   const { products = [] } = useProducts();
@@ -16,14 +16,9 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-  const [selectedCaseType, setSelectedCaseType] = useState('all');
-  const [selectedPhoneModel, setSelectedPhoneModel] = useState('all');
   const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [maxPrice, setMaxPrice] = useState(5000);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-
-  // Filter list of popular phone models for the quick filter pills
-  const popularPhoneModels = PHONE_MODELS.filter(m => m.id !== 'other-custom').slice(0, 8);
 
   // Safe Filter Logic with defensive null checks
   const safeProducts = Array.isArray(products) ? products : [];
@@ -31,7 +26,6 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
     if (!product) return false;
     const isVisible = product.is_active !== false && product.isActive !== false;
     const matchesCategory = !selectedCategory || selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesCaseType = !selectedCaseType || selectedCaseType === 'all' || product.caseTypeId === selectedCaseType;
     const matchesPrice = (product.price || 0) <= maxPrice;
 
     // Sub-category matching (for letters & badges)
@@ -44,21 +38,6 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
       else if (selectedSubCategory === 'years') matchesSubCategory = pid.startsWith('year-');
     }
 
-    // Phone model matching logic
-    let matchesPhoneModel = true;
-    if (selectedPhoneModel !== 'all') {
-      const modelObj = PHONE_MODELS.find(m => m.id === selectedPhoneModel);
-      const modelName = modelObj ? modelObj.name.toLowerCase() : selectedPhoneModel.toLowerCase();
-      
-      // If product specifies compatible models or is a custom case
-      if (product.compatibleModels && Array.isArray(product.compatibleModels)) {
-        matchesPhoneModel = product.compatibleModels.some(m => m.toLowerCase().includes(modelName));
-      } else {
-        // Universal case / bundle / sticker / charm products are compatible with all models
-        matchesPhoneModel = true;
-      }
-    }
-
     const query = (searchQuery || '').toLowerCase().trim();
     const matchesSearch = !query ||
       (product.nameEn && product.nameEn.toLowerCase().includes(query)) ||
@@ -66,7 +45,7 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
       (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
       (product.tagAr && product.tagAr.toLowerCase().includes(query));
 
-    return isVisible && matchesCategory && matchesSubCategory && matchesCaseType && matchesPrice && matchesSearch && matchesPhoneModel;
+    return isVisible && product.category !== 'cases' && matchesCategory && matchesSubCategory && matchesPrice && matchesSearch;
   });
 
   // Sort Logic with defensive checks
@@ -78,12 +57,10 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
     filteredProducts.sort((a, b) => (a.nameEn || '').localeCompare(b.nameEn || ''));
   }
 
-  const activeFilterCount = (selectedCategory !== 'all' ? 1 : 0) + (selectedCaseType !== 'all' ? 1 : 0) + (selectedPhoneModel !== 'all' ? 1 : 0) + (maxPrice < 5000 ? 1 : 0);
+  const activeFilterCount = (selectedCategory !== 'all' ? 1 : 0) + (maxPrice < 5000 ? 1 : 0);
 
   const resetFilters = () => {
     setSelectedCategory('all');
-    setSelectedCaseType('all');
-    setSelectedPhoneModel('all');
     setSelectedSubCategory('all');
     setMaxPrice(5000);
     setSearchQuery('');
@@ -204,7 +181,6 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                   >
                     <span>
                       {cat.id === 'all' && t('allProducts')}
-                      {cat.id === 'cases' && t('catCases')}
                       {cat.id === 'stickers' && t('catStickers')}
                       {cat.id === 'letters' && t('catLetters')}
                       {cat.id === 'charms' && t('catCharms')}
@@ -217,60 +193,6 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                 );
               })}
             </div>
-          </div>
-
-          {/* Case Armor Finish Filter */}
-          <div className="space-y-3 pt-4 border-t border-grave">
-            <label className="font-mono text-[10px] text-ash uppercase tracking-widest block">
-              {isAr ? 'نوع الجراب والإنهاء' : 'Case Armor Finish'}
-            </label>
-            <div className="space-y-1 font-mono text-xs">
-              <button
-                onClick={() => setSelectedCaseType('all')}
-                className={`w-full text-left rtl:text-right py-1.5 px-2 transition-colors ${
-                  selectedCaseType === 'all' ? 'text-gold font-bold' : 'text-bone/70 hover:text-bone'
-                }`}
-              >
-                {isAr ? 'جميع الإنهاءات' : 'All Finishes'}
-              </button>
-              {CASE_TYPES.map((type) => {
-                const active = selectedCaseType === type.id;
-                return (
-                  <button
-                    key={type.id}
-                    onClick={() => setSelectedCaseType(type.id)}
-                    className={`w-full text-left rtl:text-right py-1.5 px-2 transition-colors flex items-center justify-between ${
-                      active ? 'text-gold font-bold' : 'text-bone/70 hover:text-bone'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full border border-grave" style={{ backgroundColor: type.color }} />
-                      <span>{isAr ? type.nameAr : type.nameEn}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Phone Model Compatibility Filter */}
-          <div className="space-y-3 pt-4 border-t border-grave">
-            <label className="font-mono text-[10px] text-ash uppercase tracking-widest block flex items-center justify-between">
-              <span>{isAr ? 'موديل الهاتف' : 'Phone Model'}</span>
-              <Smartphone size={12} className="text-gold" />
-            </label>
-            <select
-              value={selectedPhoneModel}
-              onChange={(e) => setSelectedPhoneModel(e.target.value)}
-              className="w-full bg-coal border border-grave text-bone text-xs font-mono py-2 px-2.5 focus:border-gold focus:outline-none cursor-pointer"
-            >
-              <option value="all">{isAr ? 'جميع الموديلات (متوافق مع الكل)' : 'All Models (Universal)'}</option>
-              {PHONE_MODELS.filter(m => m.id !== 'other-custom').map((model) => (
-                <option key={model.id} value={model.id}>
-                  {model.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Price Range Filter */}
@@ -369,7 +291,6 @@ export const ShopView = ({ selectedCategory = 'all', setSelectedCategory, onSele
                     }`}
                   >
                     {cat.id === 'all' && t('allProducts')}
-                    {cat.id === 'cases' && t('catCases')}
                     {cat.id === 'stickers' && t('catStickers')}
                     {cat.id === 'letters' && t('catLetters')}
                     {cat.id === 'charms' && t('catCharms')}

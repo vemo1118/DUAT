@@ -22,8 +22,6 @@ export const CartProvider = ({ children }) => {
                                 cfg?.mode === 'text' ||
                                 cfg?.mode === 'image';
 
-      const isCustomCase = !isStickerOrBundle && (product.isCustom || product.category === 'customizer' || product.category === 'cases');
-
       if (isStickerOrBundle) {
         const newItem = {
           cartItemId: `sticker-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -40,36 +38,6 @@ export const CartProvider = ({ children }) => {
           category: product.category || 'stickers',
           customDetails: product.customDetails || cfg,
           isCustom: false
-        };
-        return [...prevItems, newItem];
-      }
-
-      if (isCustomCase) {
-        const snapshot = product.designSnapshot || cfg?.designSnapshot || product.image;
-        const phoneModel = cfg?.phoneModel || product.selectedModel || product.phoneModel || 'iPhone';
-        const newItem = {
-          cartItemId: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-          id: product.id || `custom-case-${Date.now()}`,
-          name: product.name || product.nameAr || `جراب مخصص — ${phoneModel}`,
-          nameEn: product.nameEn || `Custom Case — ${phoneModel}`,
-          nameAr: product.nameAr || `جراب مخصص — ${phoneModel}`,
-          price: product.price || 850,
-          tagEn: product.tagEn || phoneModel || 'Custom',
-          tagAr: product.tagAr || phoneModel || 'مخصص',
-          image: snapshot,
-          designSnapshot: snapshot,
-          quantity: product.quantity || 1,
-          isCustom: true,
-          category: 'cases',
-          customConfig: {
-            ...(cfg || {}),
-            phoneModel: phoneModel,
-            customModelInput: cfg?.customModelInput || product.customModelInput,
-            caseType: cfg?.caseType || product.caseType,
-            caseFinish: cfg?.caseFinish || product.caseFinish,
-            designSnapshot: snapshot,
-            layers: cfg?.layers || product.layers || []
-          }
         };
         return [...prevItems, newItem];
       }

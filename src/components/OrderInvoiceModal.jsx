@@ -55,7 +55,7 @@ export const OrderInvoiceModal = ({ order, isOpen, onClose }) => {
               <div>
                 <h1 className="font-clash text-2xl font-bold tracking-wider text-bone print:text-black">DUAT STORE</h1>
                 <p className="font-mono text-[10px] text-ash uppercase tracking-widest print:text-gray-600">
-                  {isAr ? 'صُنع وتسطيح يدوي في مصر' : 'Egyptian Hand-Crafted Luxury Armor'}
+                  {isAr ? 'استيكرات إيبوكسي مصنوعة يدويًا في مصر' : 'Hand-Crafted 3D Epoxy Stickers in Egypt'}
                 </p>
               </div>
             </div>

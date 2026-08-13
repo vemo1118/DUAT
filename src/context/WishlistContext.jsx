@@ -8,7 +8,8 @@ export const WishlistProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState(() => {
     try {
       const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed.filter((item) => item?.category !== 'cases') : [];
     } catch (e) {
       console.warn('Error reading wishlist from localStorage:', e);
       return [];
@@ -35,7 +36,7 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const toggleWishlistItem = (product) => {
-    if (!product) return;
+    if (!product || product?.category === 'cases') return;
     const targetId = product.id || product;
     setWishlistItems(prev => {
       const exists = prev.some(item => item.id === targetId);

@@ -419,10 +419,6 @@ export const CheckoutView = ({ setView }) => {
 
               const isCustomSticker = item.id?.startsWith('custom-sticker-') || item.category === 'stickers' || cDetails?.mode === 'text' || cDetails?.mode === 'image';
               const isCustomBundle = item.category === 'bundles' || item.id?.startsWith('bundle-') || !!cDetails?.selectedItems;
-              const isCustomCase = !isCustomSticker && !isCustomBundle && (item.category === 'cases' || !!item.customConfig);
-
-              const model = cDetails?.phoneModel || cDetails?.model;
-              const caseFinish = cDetails?.caseFinish || cDetails?.caseType;
 
               return (
                 <div
@@ -451,13 +447,6 @@ export const CheckoutView = ({ setView }) => {
                     {isCustomBundle && cDetails?.selectedNames && (
                       <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
                         <p className="text-gold font-bold">🎁 {cDetails.selectedNames}</p>
-                      </div>
-                    )}
-
-                    {isCustomCase && (
-                      <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
-                        {model && <p className="text-gold font-bold">📱 {model}</p>}
-                        {caseFinish && <p>🎨 {caseFinish}</p>}
                       </div>
                     )}
 

@@ -5,7 +5,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { ProductCard } from '../components/ProductCard';
-import { CaseGraphic } from '../components/CaseGraphic';
 import { StickerIcon } from '../components/StickerIcon';
 import { SunDisc } from '../components/SunDisc';
 import {
@@ -94,8 +93,6 @@ export function ProductDetailView() {
   // Options list
   const options = Array.isArray(product?.options) && product.options.length > 0
     ? product.options
-    : product?.category === 'cases'
-    ? ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 14 Pro Max', 'iPhone 13']
     : ['Size 6', 'Size 7', 'Size 8', 'Size 9'];
 
   useEffect(() => {
@@ -202,7 +199,9 @@ export function ProductDetailView() {
                 <StickerIcon stickerId={product.stickerRenderId || product.id} size={140} color="#182744" bgColor="#FFFFFF" />
               </div>
             ) : (
-              <CaseGraphic finish={product.caseTypeId || 'clear'} size="lg" showLabel={true} />
+              <div className="w-full h-full flex items-center justify-center bg-void/40">
+                <span className="font-mono text-xs text-ash uppercase tracking-widest">3D Epoxy Sticker</span>
+              </div>
             )}
 
             {/* Discount Badge */}
@@ -259,7 +258,7 @@ export function ProductDetailView() {
           {/* Option Selector Pills */}
           <div className="space-y-3 pt-2">
             <label className="font-mono text-xs text-ash uppercase tracking-widest block">
-              {product.category === 'cases' ? (isAr ? 'موديل الهاتف:' : 'Phone Model:') : (isAr ? 'المقاس / الخيار:' : 'Size / Option:')}
+              {isAr ? 'المقاس / الخيار:' : 'Size / Option:'}
               <span className="text-gold font-bold mr-2 ml-2">{selectedOption}</span>
             </label>
 

@@ -4,7 +4,6 @@ import { HeroSlider } from '../components/HeroSlider';
 import { TrustNumbersBar } from '../components/TrustNumbersBar';
 import { CategoryGrid } from '../components/CategoryGrid';
 import { ProductRow } from '../components/ProductRow';
-import { SocialStrip } from '../components/SocialStrip';
 import { REVIEWS, FAQS } from '../data/products';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -12,7 +11,7 @@ import { useProducts } from '../context/ProductsContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
 import { Star, ChevronDown, ChevronUp, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 
-export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
+export const HomeView = ({ setSelectedCategory }) => {
   const { products } = useProducts();
   const { forgeBanner } = useCategoryBanners();
   const { lang, t } = useLanguage();
@@ -33,10 +32,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
     : [];
   const activeProducts = filteredProducts.length > 0 ? filteredProducts : (Array.isArray(products) ? products : []);
   const stickersOnly = activeProducts.filter((p) => p?.category === 'stickers');
-  const casesOnly = activeProducts.filter((p) => p?.category === 'cases');
-
   const latestDrops = stickersOnly.length > 0 ? stickersOnly.slice(0, 6) : activeProducts.slice(0, 6);
-  const bestSellers = casesOnly.concat(stickersOnly).slice(0, 8);
 
   return (
     <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">
@@ -161,10 +157,7 @@ export const HomeView = ({ setSelectedCategory, onSelectProduct }) => {
         </div>
       )}
 
-      {/* 8. SOCIAL STRIP */}
-      <SocialStrip />
-
-      {/* 9. FAQ ACCORDION SECTION */}
+      {/* 8. FAQ ACCORDION SECTION */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
         <div className="text-center space-y-2 border-b border-grave pb-6">
           <span className="font-mono text-xs text-gold font-bold uppercase tracking-[0.25em] block">

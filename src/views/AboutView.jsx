@@ -178,7 +178,7 @@ export const AboutView = () => {
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <button
-            onClick={() => navigate('/customize')}
+            onClick={() => navigate('/sticker-builder')}
             className="btn-primary w-full sm:w-auto py-4 px-8 text-xs font-mono font-bold tracking-widest flex items-center justify-center gap-3 min-h-[48px]"
           >
             <Sparkles size={16} />

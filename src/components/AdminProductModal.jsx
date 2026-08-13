@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Plus, Sparkles, Tag, Gift, Check, Eye } from 'lucide-react';
-import { CATEGORIES, CASE_TYPES } from '../data/products';
+import { X, Save, Sparkles, Tag, Gift, Check, Eye } from 'lucide-react';
+import { CATEGORIES } from '../data/products';
 
 export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = null }) {
   const [formData, setFormData] = useState({
@@ -19,7 +19,6 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
     craftTagAr: 'علبة هدايا خاصة • صنع في مصر',
     descriptionEn: '',
     descriptionAr: '',
-    caseTypeId: 'clear',
     specsEnText: '',
     specsArText: ''
   });
@@ -49,7 +48,6 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         craftTagAr: p.craftTagAr || (p.category === 'bundles' ? 'علبة هدايا خاصة • صنع في مصر' : 'يُشحن خلال ٣-٥ أيام • تشطيب مصري'),
         descriptionEn: p.descriptionEn || '',
         descriptionAr: p.descriptionAr || '',
-        caseTypeId: p.caseTypeId || 'clear',
         specsEnText: Array.isArray(p.specsEn) ? p.specsEn.join('\n') : '',
         specsArText: Array.isArray(p.specsAr) ? p.specsAr.join('\n') : ''
       });
@@ -70,7 +68,6 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         craftTagAr: 'علبة هدايا خاصة • صنع في مصر',
         descriptionEn: '',
         descriptionAr: '',
-        caseTypeId: 'clear',
         specsEnText: 'Includes: 3D Epoxy Stickers Set\nSave 150 EGP vs Individual Purchase\nCollector Gift Packaging Included',
         specsArText: 'تتضمن: طقم استيكرات إيبوكسي مجسمة\nتوفير ١٥٠ ج.م عن الشراء المنفرد\nتأتي داخل علبة هدايا فاخرة'
       });

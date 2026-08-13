@@ -21,20 +21,20 @@ const INITIAL_PRODUCTS = [
   ...ENGLISH_LETTER_PRODUCTS,
   ...MONTH_STICKER_PRODUCTS,
   ...YEAR_STICKER_PRODUCTS,
-];
+].filter((product) => product?.category !== 'cases');
 
 const ProductsContext = createContext();
 
 const INITIAL_PRODUCTS_MAP = new Map(INITIAL_PRODUCTS.map((p) => [String(p.id), p]));
 
 const LEGACY_FAKE_PRODUCT_IDS = new Set([
-  'case-ember', 'case-void', 'case-frost', 'case-solar', 'case-bone', 'case-sage',
-  'case-carbon', 'case-gold-ring', 'case-tide', 'charm-gold-ring', 'charm-ember-bead',
+  'charm-gold-ring', 'charm-ember-bead',
   'sticker-disc', 'sticker-tale3-noor', 'sticker-3addi-lel', 'sticker-born-dawn'
 ]);
 
 function mapFromDb(row) {
   if (!row) return null;
+  if (row.category === 'cases') return null;
   const idStr = String(row.id || (row.data && row.data.id) || '');
   if (LEGACY_FAKE_PRODUCT_IDS.has(idStr)) return null;
 
@@ -57,7 +57,7 @@ function mapFromDb(row) {
     ...baseObj,
     ...data,
     id: idStr,
-    category: row.category || data.category || baseObj.category || (idStr.startsWith('ar-letter-') || idStr.startsWith('en-letter-') || idStr.startsWith('month-') || idStr.startsWith('year-') ? 'letters' : (idStr.startsWith('st-') || idStr.startsWith('pack-') || idStr.startsWith('sticker') ? 'stickers' : 'cases')),
+    category: row.category || data.category || baseObj.category || (idStr.startsWith('ar-letter-') || idStr.startsWith('en-letter-') || idStr.startsWith('month-') || idStr.startsWith('year-') ? 'letters' : 'stickers'),
     price: curPrice,
     originalPrice: origPrice,
     savings: savingsVal,
@@ -76,7 +76,6 @@ function mapFromDb(row) {
     descriptionAr: data.descriptionAr || row.description_ar || baseObj.descriptionAr || '',
     specsEn: Array.isArray(data.specsEn) && data.specsEn.length > 0 ? data.specsEn : (Array.isArray(baseObj.specsEn) ? baseObj.specsEn : []),
     specsAr: Array.isArray(data.specsAr) && data.specsAr.length > 0 ? data.specsAr : (Array.isArray(baseObj.specsAr) ? baseObj.specsAr : []),
-    caseTypeId: data.caseTypeId || row.case_type_id || baseObj.caseTypeId || 'clear',
     rating: Number(data.rating || row.rating || baseObj.rating || 5.0),
     reviewCount: Number(data.reviewCount || row.review_count || baseObj.reviewCount || 0),
     reviews: Array.isArray(data.reviews) ? data.reviews : (Array.isArray(baseObj.reviews) ? baseObj.reviews : [])
@@ -92,10 +91,9 @@ function mapToDb(p) {
 
   return {
     id: p.id,
-    category: p.category || 'cases',
+    category: p.category || 'stickers',
     price: curPrice,
     is_active: isActiveVal,
-    case_type_id: p.caseTypeId || p.case_type_id || null,
     data: {
       ...p,
       nameEn: p.nameEn || p.name_en || '',
@@ -216,7 +214,7 @@ function applyOverridesAndMergedProducts(prods) {
   const deletedIds = new Set(getDeletedProductIds());
 
   // Filter out deleted
-  let list = prods.filter((p) => p && p.id && !deletedIds.has(String(p.id)));
+  let list = prods.filter((p) => p && p.id && p.category !== 'cases' && !deletedIds.has(String(p.id)));
 
   // Merge added prods if missing
   const prodMap = new Map(list.map((p) => [String(p.id), p]));
@@ -260,8 +258,8 @@ function sortProductsByDefaultOrder(prods) {
   return [...prods].sort((a, b) => {
     const idxA = PREFERRED_BUNDLE_ORDER.indexOf(a?.id);
     const idxB = PREFERRED_BUNDLE_ORDER.indexOf(b?.id);
-    const posA = idxA !== -1 ? idxA : (a?.category === 'cases' ? 10 : 99);
-    const posB = idxB !== -1 ? idxB : (b?.category === 'cases' ? 10 : 99);
+    const posA = idxA !== -1 ? idxA : 99;
+    const posB = idxB !== -1 ? idxB : 99;
     return posA - posB;
   });
 }
@@ -318,7 +316,10 @@ export function ProductsProvider({ children }) {
       const isCustomOrder = localStorage.getItem('duat_custom_product_order') === 'true';
 
       // 1. Primary: Attempt to load from Supabase
-      const { data, error } = await supabase.from('products').select('*');
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .neq('category', 'cases');
       if (!error && Array.isArray(data) && data.length > 0) {
         const fetchedProds = data.map(mapFromDb).filter(Boolean);
 
@@ -404,15 +405,6 @@ export function ProductsProvider({ children }) {
       const temp = updated[idx];
       updated[idx] = updated[idx + 1];
       updated[idx + 1] = temp;
-      saveLocalProducts(updated);
-      return updated;
-    });
-  };
-
-  const setCasesFirstOrder = () => {
-    localStorage.removeItem('duat_custom_product_order');
-    setProducts((prev) => {
-      const updated = sortProductsByDefaultOrder(prev);
       saveLocalProducts(updated);
       return updated;
     });
@@ -571,7 +563,6 @@ export function ProductsProvider({ children }) {
         resetProducts,
         moveProductUp,
         moveProductDown,
-        setCasesFirstOrder,
         reorderProducts
       }}
     >

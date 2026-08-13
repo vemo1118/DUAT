@@ -6,7 +6,6 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
-import { CaseGraphic } from './CaseGraphic';
 
 export function QuickViewDrawer({ product, isOpen, onClose }) {
   const { lang, t, formatPrice } = useLanguage();
@@ -24,8 +23,6 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
 
   const options = Array.isArray(product?.options) && product.options.length > 0
     ? product.options
-    : product?.category === 'cases'
-    ? ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 14 Pro Max', 'iPhone 13']
     : ['Size 6', 'Size 7', 'Size 8', 'Size 9'];
 
   useEffect(() => {
@@ -99,7 +96,7 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
                 {mainImage ? (
                   <img src={mainImage} alt={name} className="w-full h-full object-cover" />
                 ) : (
-                  <CaseGraphic finish={product.caseTypeId || 'clear'} size="sm" showLabel={false} />
+                  <span className="font-mono text-[10px] text-ash uppercase tracking-wider">3D Epoxy Sticker</span>
                 )}
               </div>
 
@@ -126,7 +123,7 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
             {/* Option Selector Pills */}
             <div className="space-y-3">
               <label className={`font-mono text-xs uppercase tracking-widest block ${isDawn ? 'text-[#524C44]' : 'text-[#8E98BF]'}`}>
-                {product.category === 'cases' ? (isAr ? 'موديل الهاتف:' : 'PHONE MODEL:') : (isAr ? 'المقاس / الخيار:' : 'OPTION / SIZE:')}
+                {isAr ? 'المقاس / الخيار:' : 'OPTION / SIZE:'}
                 <span className="font-bold ml-2 mr-2">{selectedOption}</span>
               </label>
 

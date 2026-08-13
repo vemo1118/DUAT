@@ -10,8 +10,8 @@ function safeNum(val, fallback) {
   return isNaN(n) ? fallback : n;
 }
 
-export const HeroSlider = ({ setSelectedCategory }) => {
-  const { lang, t } = useLanguage();
+export const HeroSlider = () => {
+  const { lang } = useLanguage();
   const { slides } = useHeroBanners();
   const navigate = useNavigate();
   
@@ -73,7 +73,7 @@ export const HeroSlider = ({ setSelectedCategory }) => {
   const badge = isAr ? current?.badgeAr || current?.badgeEn || '' : current?.badgeEn || current?.badgeAr || '';
 
   const primaryBtnText = (isAr ? current?.ctaPrimaryTextAr : current?.ctaPrimaryTextEn) || (isAr ? 'تسوق الآن' : 'START BUILDING');
-  const primaryBtnLink = current?.ctaPrimaryLink || '/customize';
+  const primaryBtnLink = current?.ctaPrimaryLink || '/sticker-builder';
 
   const secondaryBtnText = (isAr ? current?.ctaSecondaryTextAr : current?.ctaSecondaryTextEn) || (isAr ? 'معرض الكتالوج' : 'VIEW GALLERY');
   const secondaryBtnLink = current?.ctaSecondaryLink || '/shop';

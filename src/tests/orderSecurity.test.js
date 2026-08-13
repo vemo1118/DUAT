@@ -40,7 +40,7 @@ describe('server-authoritative order pricing', () => {
     }, {
       dbProducts: [{
         id: 'db-only-product',
-        category: 'cases',
+        category: 'stickers',
         price: 725,
         is_active: true,
         data: { nameAr: 'منتج قاعدة البيانات', nameEn: 'Database Product' }
@@ -55,33 +55,33 @@ describe('server-authoritative order pricing', () => {
     expect(quote.subtotal).toBe(725);
   });
 
-  it('requires a signed upload claim for custom designs', () => {
+  it('rejects the retired custom case flow', () => {
     expect(() => calculateTrustedQuote({
       items: [{ id: 'custom-case-1', quantity: 1, customConfig: { phoneModel: 'iPhone 15' } }]
-    })).toThrow('INVALID_UPLOAD');
+    })).toThrow('INVALID_PRODUCT');
   });
 });
 
 describe('browser payload compaction', () => {
   it('removes Base64 previews and untrusted pricing before submission', () => {
     const compact = compactCartItems([{
-      id: 'custom-case-1',
+      id: 'custom-sticker-1',
       quantity: 1,
       price: 1,
       image: 'data:image/png;base64,AAAA',
       designSnapshot: 'data:image/png;base64,BBBB',
-      customConfig: {
-        phoneModel: 'iPhone 15',
+      customDetails: {
+        mode: 'image',
         design_image_path: 'pending/design.png',
         design_upload_token: 'claim-token',
-        layers: [{ type: 'image', src: 'data:image/png;base64,CCCC', x: 2, y: 3 }]
+        selectedItems: []
       }
     }]);
 
     expect(compact[0].price).toBeUndefined();
     expect(compact[0].image).toBeUndefined();
     expect(compact[0].designSnapshot).toBeUndefined();
-    expect(compact[0].customConfig.layers[0].src).toBeUndefined();
+    expect(compact[0].customConfig).toBeUndefined();
     expect(containsDataUrl(compact)).toBe(false);
   });
 });

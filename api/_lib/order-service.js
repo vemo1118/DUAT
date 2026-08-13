@@ -46,19 +46,6 @@ export function containsDataUrl(value, depth = 0) {
   return false;
 }
 
-function sanitizeLayers(layers) {
-  if (!Array.isArray(layers)) return [];
-  return layers.slice(0, 30).map((layer) => ({
-    type: cleanText(layer?.type, 20),
-    stickerId: cleanText(layer?.stickerId, 80),
-    text: cleanText(layer?.text, 80),
-    x: cleanNumber(layer?.x),
-    y: cleanNumber(layer?.y),
-    scale: Math.min(5, Math.max(0.1, cleanNumber(layer?.scale, 1))),
-    rotation: Math.min(360, Math.max(-360, cleanNumber(layer?.rotation)))
-  }));
-}
-
 function sanitizeSelectedItems(items) {
   if (!Array.isArray(items)) return [];
   return items.slice(0, 12).map((item) => ({
@@ -90,11 +77,11 @@ function buildCatalog(dbProducts = []) {
   const catalog = new Map();
   for (const product of STATIC_CATALOG.values()) {
     const normalized = normalizeCatalogProduct(product);
-    catalog.set(normalized.id, normalized);
+    if (normalized.category !== 'cases') catalog.set(normalized.id, normalized);
   }
   for (const product of dbProducts) {
     const normalized = normalizeCatalogProduct(product);
-    catalog.set(normalized.id, normalized);
+    if (normalized.category !== 'cases') catalog.set(normalized.id, normalized);
   }
   return catalog;
 }
@@ -122,36 +109,6 @@ function normalizeCustomSticker(item, quantity) {
       bgFinish: cleanText(details.bgFinish, 40),
       cutShape: cleanText(details.cutShape, 40),
       designNotes: cleanText(details.designNotes, 500)
-    }
-  };
-}
-
-function normalizeCustomCase(item, quantity, builderPrice) {
-  const config = item.customConfig || {};
-  const path = cleanText(item.design_image_path || config.design_image_path, 500);
-  const uploadToken = cleanText(item.design_upload_token || config.design_upload_token, 80);
-  if (!path || !uploadToken) throw new Error('INVALID_UPLOAD');
-
-  const phoneModel = cleanText(config.phoneModel || item.selectedModel, 100);
-  if (!phoneModel) throw new Error('INVALID_ITEMS');
-
-  return {
-    id: cleanText(item.id, 100),
-    category: 'cases',
-    nameAr: `جراب مخصص — ${phoneModel}`,
-    nameEn: `Custom Case — ${phoneModel}`,
-    quantity,
-    price: builderPrice,
-    design_image_path: path,
-    design_upload_token: uploadToken,
-    customConfig: {
-      phoneModel,
-      customModelInput: cleanText(config.customModelInput, 100),
-      caseType: cleanText(config.caseType, 100),
-      caseFinish: cleanText(config.caseFinish, 100),
-      caseBgColor: cleanText(config.caseBgColor, 20),
-      caseRingColor: cleanText(config.caseRingColor, 20),
-      layers: sanitizeLayers(config.layers || item.layers)
     }
   };
 }
@@ -188,12 +145,11 @@ export function calculateTrustedQuote(payload, sources = {}) {
   if (containsDataUrl(items)) throw new Error('INVALID_ITEMS');
 
   const catalog = buildCatalog(sources.dbProducts);
-  const builderPrice = Math.max(0, cleanNumber(sources.builderPrice, 850));
   const safeItems = items.map((item) => {
     const id = cleanText(item?.id, 100);
     const quantity = cleanQuantity(item?.quantity);
     if (id.startsWith('custom-sticker-')) return normalizeCustomSticker(item, quantity);
-    if (id.startsWith('custom-case-')) return normalizeCustomCase(item, quantity, builderPrice);
+    if (id.startsWith('custom-case-') || item?.category === 'cases' || item?.customConfig) throw new Error('INVALID_PRODUCT');
     return normalizeCatalogItem(item, quantity, catalog);
   });
 
@@ -234,24 +190,18 @@ export function calculateTrustedQuote(payload, sources = {}) {
 export async function loadQuote(admin, payload) {
   const standardIds = Array.from(new Set((payload.items || [])
     .map((item) => cleanText(item?.id, 100))
-    .filter((id) => id && !id.startsWith('custom-sticker-') && !id.startsWith('custom-case-'))));
+    .filter((id) => id && !id.startsWith('custom-sticker-'))));
 
   const productPromise = standardIds.length > 0
     ? admin.from('products').select('id, category, price, is_active, data').in('id', standardIds)
     : Promise.resolve({ data: [], error: null });
-  const builderPromise = admin
-    .from('builder_settings')
-    .select('price')
-    .eq('id', 'global-builder-config')
-    .maybeSingle();
   const couponCode = cleanText(payload.couponCode, 80).toUpperCase();
   const couponPromise = couponCode
     ? admin.from('coupons').select('code, type, value, is_active, expires_at').eq('code', couponCode).maybeSingle()
     : Promise.resolve({ data: null, error: null });
 
-  const [productsResult, builderResult, couponResult] = await Promise.all([
+  const [productsResult, couponResult] = await Promise.all([
     productPromise,
-    builderPromise,
     couponPromise
   ]);
 
@@ -260,7 +210,6 @@ export async function loadQuote(admin, payload) {
 
   return calculateTrustedQuote(payload, {
     dbProducts: productsResult.data || [],
-    builderPrice: builderResult.data?.price || 850,
     coupon: couponResult.data || null
   });
 }

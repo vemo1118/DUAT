@@ -195,7 +195,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.nameEn}
                 onChange={(e) => setFormData((prev) => ({ ...prev, nameEn: e.target.value }))}
-                placeholder="LUXURY CASES"
+                placeholder="STICKER BUNDLES"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -205,7 +205,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.nameAr}
                 onChange={(e) => setFormData((prev) => ({ ...prev, nameAr: e.target.value }))}
-                placeholder="الجرابات الفاخرة"
+                placeholder="بندلات الاستيكرات"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -219,7 +219,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.subtitleEn}
                 onChange={(e) => setFormData((prev) => ({ ...prev, subtitleEn: e.target.value }))}
-                placeholder="Case + 6 DUAT stickers, made to order"
+                placeholder="Six 3D DUAT stickers, made to order"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>
@@ -229,7 +229,7 @@ export const AdminCategoryBannerModal = ({ isOpen, onClose, banner, onSave }) =>
                 type="text"
                 value={formData.subtitleAr}
                 onChange={(e) => setFormData((prev) => ({ ...prev, subtitleAr: e.target.value }))}
-                placeholder="جراب + ٦ استيكرات دوات، حسب الطلب"
+                placeholder="٦ استيكرات دوات مجسمة، حسب الطلب"
                 className="w-full bg-coal border border-grave text-bone p-3 font-space text-xs focus:border-gold outline-none rounded"
               />
             </div>

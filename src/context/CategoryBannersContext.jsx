@@ -67,7 +67,14 @@ function readLocalCategories() {
 function readLocalForgeBanner() {
   try {
     const saved = localStorage.getItem(FORGE_STORAGE_KEY);
-    return saved ? { ...DEFAULT_FORGE_BANNER, ...JSON.parse(saved) } : DEFAULT_FORGE_BANNER;
+    const parsed = saved ? JSON.parse(saved) : {};
+    const legacyLink = ['/customize', '/customizer'].includes(parsed.buttonLink);
+    return {
+      ...DEFAULT_FORGE_BANNER,
+      ...parsed,
+      ...(legacyLink ? DEFAULT_FORGE_BANNER : {}),
+      buttonLink: legacyLink ? '/sticker-builder' : (parsed.buttonLink || DEFAULT_FORGE_BANNER.buttonLink)
+    };
   } catch {
     return DEFAULT_FORGE_BANNER;
   }
@@ -174,7 +181,10 @@ export const CategoryBannersProvider = ({ children }) => {
         if (!isMounted) return;
 
         if (forgeResult.data?.value && typeof forgeResult.data.value === 'object') {
-          setForgeBanner({ ...DEFAULT_FORGE_BANNER, ...forgeResult.data.value });
+          const cloudForge = forgeResult.data.value;
+          setForgeBanner(['/customize', '/customizer'].includes(cloudForge.buttonLink)
+            ? DEFAULT_FORGE_BANNER
+            : { ...DEFAULT_FORGE_BANNER, ...cloudForge });
         }
 
         if (Array.isArray(categoryResult.data) && categoryResult.data.length > 0) {

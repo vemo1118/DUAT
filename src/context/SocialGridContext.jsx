@@ -50,7 +50,7 @@ export const INITIAL_SOCIAL_TILES = [
   {
     id: 'tile-6',
     image: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785764123/B1_DarkNight_dzbmmn.jpg',
-    title: 'PASSAGE CASE',
+    title: 'STICKER SHEET',
     linkUrl: 'https://instagram.com/duat.wear',
     is_active: true
   }

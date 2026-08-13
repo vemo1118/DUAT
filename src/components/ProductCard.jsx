@@ -4,8 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
-import { ShoppingBag, Check, Sparkles, Star, Heart } from 'lucide-react';
-import { CaseGraphic } from './CaseGraphic';
+import { ShoppingBag, Check, Star, Heart } from 'lucide-react';
 import { StickerIcon } from './StickerIcon';
 
 export const ProductCard = ({ product, onSelectProduct }) => {
@@ -34,27 +33,6 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const handleCustomize = (e) => {
-    e?.stopPropagation();
-    const caseTypeId = product.caseTypeId || (
-      product.id?.includes('bone') ? 'bone' :
-      product.id?.includes('midnight') ? 'midnight' :
-      'clear'
-    );
-    const isBundle = Boolean(
-      product.id?.includes('bundle') ||
-      product.id?.includes('pack') ||
-      product.category === 'cases'
-    );
-    navigate('/customize', {
-      state: {
-        preselectedCaseTypeId: caseTypeId,
-        preselectedProductId: product.id,
-        loadBundlePreset: isBundle
-      }
-    });
-  };
-
   const handleCardClick = () => {
     if (onSelectProduct) {
       onSelectProduct(product);
@@ -67,12 +45,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
   const id = String(product.id || '');
   const isSticker = product.category === 'stickers' || id.startsWith('st-') || id.startsWith('pack-') || id.startsWith('sticker') || id.startsWith('ar-letter-') || id.startsWith('en-letter-') || id.startsWith('month-') || id.startsWith('year-');
-  const isCaseCategory = (product.category === 'cases' || id.startsWith('bundle-') || id.startsWith('case-')) && !isSticker;
   const name = (lang === 'ar' ? product.nameAr : product.nameEn) || product.nameEn || product.nameAr || 'Product';
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
 
-  // Render graphic using CaseGraphic, StickerIcon, or images
+  // Render sticker artwork, uploaded product images, or a neutral epoxy placeholder.
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
@@ -103,16 +80,6 @@ export const ProductCard = ({ product, onSelectProduct }) => {
             bgColor="#FFFFFF"
           />
         </div>
-      );
-    }
-
-    if (product.category === 'cases') {
-      return (
-        <CaseGraphic
-          finish={product.caseTypeId || 'matte-black'}
-          size="md"
-          showLabel={false}
-        />
       );
     }
 
@@ -208,8 +175,8 @@ export const ProductCard = ({ product, onSelectProduct }) => {
           )}
         </div>
 
-        {/* Action Buttons: Add to Cart & Customize (Customize ONLY for cases) */}
-        <div className={`pt-1 ${isCaseCategory ? 'grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2' : 'flex'}`}>
+        {/* Add to Cart */}
+        <div className="pt-1 flex">
           <button
             onClick={handleAdd}
             className={`w-full min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border transition-all duration-300 flex items-center justify-center gap-1 ${
@@ -230,17 +197,6 @@ export const ProductCard = ({ product, onSelectProduct }) => {
               </>
             )}
           </button>
-
-          {/* Customize Navigation Button (ONLY for cases/bundles) */}
-          {isCaseCategory && (
-            <button
-              onClick={handleCustomize}
-              className="min-h-[40px] sm:min-h-[44px] py-2 sm:py-3 px-1 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all duration-300 flex items-center justify-center gap-1"
-            >
-              <Sparkles size={13} />
-              <span>CUSTOMIZE</span>
-            </button>
-          )}
         </div>
 
       </div>

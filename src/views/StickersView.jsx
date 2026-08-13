@@ -23,7 +23,7 @@ export function StickersView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
 
-  // Filter individual stickers (exclude case bundles if any)
+  // Keep this page focused on individual stickers.
   const stickerProducts = products.filter((p) => p && p.category !== 'bundles' && !(p.id && p.id.startsWith('bundle-')));
 
   const filteredStickers = stickerProducts.filter((product) => {

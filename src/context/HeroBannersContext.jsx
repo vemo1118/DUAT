@@ -18,17 +18,17 @@ export const INITIAL_HERO_SLIDES = [
     headline1Ar: 'نعدّي الليل،',
     headline2En: 'BORN AT DAWN.',
     headline2Ar: 'ونطلع نور.',
-    subEn: 'Luxury Phone Cases + 3D Epoxy Dome Motifs. Made to order in Egypt.',
-    subAr: 'جرابات الفئة الفاخرة + ملصقات إيبوكسي مجسّمة. الجراب هو الكانفس — وإنت اللي بتحكي.',
+    subEn: 'Custom 3D epoxy dome stickers and ready-made collections. Made to order in Egypt.',
+    subAr: 'استيكرات إيبوكسي مجسّمة مخصصة وتشكيلات جاهزة، مصنوعة حسب الطلب في مصر.',
     badgeEn: 'LUXE CATEGORY',
     badgeAr: 'فئة LUXE الفاخرة',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
     ctaPrimaryTextEn: 'SHOP LUXE',
     ctaPrimaryTextAr: 'تسوق الفئة الفاخرة',
     ctaPrimaryLink: '/shop',
-    ctaSecondaryTextEn: 'BUILD A CASE',
-    ctaSecondaryTextAr: 'صمم درعك بنفسك',
-    ctaSecondaryLink: '/customizer',
+    ctaSecondaryTextEn: 'STICKER BUILDER',
+    ctaSecondaryTextAr: 'صمم استيكرك',
+    ctaSecondaryLink: '/sticker-builder',
     textAlign: 'left',
     headline1Color: '#EDE4D3',
     headline2Color: '#E8A33D',
@@ -81,16 +81,16 @@ export const INITIAL_HERO_SLIDES = [
     headline2En: 'EXPRESS YOURSELF.',
     headline2Ar: 'وبيعدّي الحدود.',
     subEn: 'Vibrant neon street aesthetics & high-impact 3D epoxy dome badges.',
-    subAr: 'تشكيلة الجرابات والاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
+    subAr: 'تشكيلة الاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
     badgeEn: 'YOUTH COLLECTION',
     badgeAr: 'الفئة الشبابية YOUTH',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785825222/SH1_ST_j1z2h3.png',
     ctaPrimaryTextEn: 'SHOP YOUTH',
     ctaPrimaryTextAr: 'تسوق الفئة الشبابية',
     ctaPrimaryLink: '/shop',
-    ctaSecondaryTextEn: 'CUSTOMIZER',
-    ctaSecondaryTextAr: 'افتح أداة التصميم',
-    ctaSecondaryLink: '/customizer',
+    ctaSecondaryTextEn: 'STICKER BUILDER',
+    ctaSecondaryTextAr: 'صمم استيكرك',
+    ctaSecondaryLink: '/sticker-builder',
     textAlign: 'left',
     headline1Color: '#EDE4D3',
     headline2Color: '#E8A33D',
@@ -186,11 +186,11 @@ function mapToDb(slide, index = 0) {
   };
 }
 
-const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v61';
+const HERO_SLIDES_STORAGE_KEY = 'duat_hero_slides_v62';
 
 function cleanLegacyStorage() {
   try {
-    for (let i = 1; i < 61; i++) {
+    for (let i = 1; i < 62; i++) {
       localStorage.removeItem(`duat_hero_slides_v${i}`);
     }
     localStorage.removeItem('duat_hero_slides');
@@ -204,6 +204,9 @@ function sanitizeSlideUrls(slides) {
   return slides.map((s) => {
     if (!s || typeof s !== 'object') return s;
     const url = s.imageUrl || s.image_url || s.image || '';
+    const primaryLink = ['/customize', '/customizer'].includes(s.ctaPrimaryLink) ? '/sticker-builder' : s.ctaPrimaryLink;
+    const hasLegacySecondaryLink = ['/customize', '/customizer'].includes(s.ctaSecondaryLink);
+    const secondaryLink = hasLegacySecondaryLink ? '/sticker-builder' : s.ctaSecondaryLink;
     const h1Color = s.headline1Color === '#00F0FF' ? '#EDE4D3' : (s.headline1Color || '#EDE4D3');
     const h2Color = s.headline2Color === '#FF007A' ? '#E8A33D' : (s.headline2Color || '#E8A33D');
     return {
@@ -211,7 +214,11 @@ function sanitizeSlideUrls(slides) {
       imageUrl: url || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
       image_url: url || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
       headline1Color: h1Color,
-      headline2Color: h2Color
+      headline2Color: h2Color,
+      ctaPrimaryLink: primaryLink,
+      ctaSecondaryLink: secondaryLink,
+      ctaSecondaryTextEn: hasLegacySecondaryLink ? 'STICKER BUILDER' : s.ctaSecondaryTextEn,
+      ctaSecondaryTextAr: hasLegacySecondaryLink ? 'صمم استيكرك' : s.ctaSecondaryTextAr
     };
   });
 }

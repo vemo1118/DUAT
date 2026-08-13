@@ -18,29 +18,14 @@ function cleanText(value, maxLength = 500) {
   return typeof value === 'string' ? value.slice(0, maxLength) : value;
 }
 
-function safeLayers(layers) {
-  if (!Array.isArray(layers)) return [];
-  return layers.slice(0, 30).map((layer) => ({
-    type: cleanText(layer?.type, 20),
-    stickerId: cleanText(layer?.stickerId, 80),
-    text: cleanText(layer?.text, 80),
-    x: Number(layer?.x) || 0,
-    y: Number(layer?.y) || 0,
-    scale: Number(layer?.scale) || 1,
-    rotation: Number(layer?.rotation) || 0
-  }));
-}
-
 export function compactCartItems(items) {
   return (Array.isArray(items) ? items : []).map((item) => {
     const customDetails = item.customDetails || {};
-    const customConfig = item.customConfig || {};
     return {
       id: cleanText(item.id, 100),
       quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
-      design_image_path: cleanText(item.design_image_path || customDetails.design_image_path || customConfig.design_image_path),
-      design_upload_token: cleanText(item.design_upload_token || customDetails.design_upload_token || customConfig.design_upload_token, 80),
-      selectedModel: cleanText(item.selectedModel, 100),
+      design_image_path: cleanText(item.design_image_path || customDetails.design_image_path),
+      design_upload_token: cleanText(item.design_upload_token || customDetails.design_upload_token, 80),
       customDetails: {
         mode: customDetails.mode,
         customText: cleanText(customDetails.customText, 120),
@@ -56,15 +41,6 @@ export function compactCartItems(items) {
               nameEn: cleanText(selected?.nameEn, 120)
             }))
           : []
-      },
-      customConfig: {
-        phoneModel: cleanText(customConfig.phoneModel, 100),
-        customModelInput: cleanText(customConfig.customModelInput, 100),
-        caseType: cleanText(customConfig.caseType, 100),
-        caseFinish: cleanText(customConfig.caseFinish, 100),
-        caseBgColor: cleanText(customConfig.caseBgColor, 20),
-        caseRingColor: cleanText(customConfig.caseRingColor, 20),
-        layers: safeLayers(customConfig.layers || item.layers)
       }
     };
   });

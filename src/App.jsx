@@ -16,7 +16,6 @@ import { HeroBannersProvider } from './context/HeroBannersContext';
 import { CategoryBannersProvider } from './context/CategoryBannersContext';
 import { BundlesSettingsProvider } from './context/BundlesSettingsContext';
 import { StickersSettingsProvider } from './context/StickersSettingsContext';
-import { CustomizerProvider } from './context/CustomizerContext';
 import { SocialGridProvider } from './context/SocialGridContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { WishlistDrawer } from './components/WishlistDrawer';
@@ -35,7 +34,6 @@ import { AboutView } from './views/AboutView';
 const AdminView = lazy(() => import('./views/AdminView').then(m => ({ default: m.AdminView })));
 const CheckoutView = lazy(() => import('./views/CheckoutView').then(m => ({ default: m.CheckoutView })));
 const StickerBuilderView = lazy(() => import('./views/StickerBuilderView').then(m => ({ default: m.StickerBuilderView })));
-const CustomizerView = lazy(() => import('./views/CustomizerView').then(m => ({ default: m.CustomizerView })));
 const ProductDetailView = lazy(() => import('./views/ProductDetailView').then(m => ({ default: m.ProductDetailView })));
 const OrderTrackerView = lazy(() => import('./views/OrderTrackerView').then(m => ({ default: m.OrderTrackerView })));
 
@@ -91,9 +89,7 @@ export function App() {
             <CategoryBannersProvider>
               <BundlesSettingsProvider>
                 <StickersSettingsProvider>
-                  <CustomizerProvider>
-                    <SocialGridProvider>
-                      <WishlistProvider>
+                    <WishlistProvider>
                         <CartProvider>
                           <ToastProvider>
                             {/* Main Container with Filmic Grain Texture Overlay */}
@@ -113,10 +109,7 @@ export function App() {
                                     <Route
                                       path="/"
                                       element={
-                                        <HomeView
-                                          setSelectedCategory={handleSelectCategory}
-                                          onSelectProduct={handleSelectProduct}
-                                        />
+                                        <HomeView setSelectedCategory={handleSelectCategory} />
                                       }
                                     />
                                     <Route path="/bundles" element={<BundlesView />} />
@@ -134,8 +127,8 @@ export function App() {
                                       }
                                     />
                                     <Route path="/product/:id" element={<ProductDetailView />} />
-                                    <Route path="/customize" element={<CustomizerView />} />
-                                    <Route path="/customizer" element={<CustomizerView />} />
+                                    <Route path="/customize" element={<Navigate to="/sticker-builder" replace />} />
+                                    <Route path="/customizer" element={<Navigate to="/sticker-builder" replace />} />
 
                                     <Route path="/the-duat" element={<AboutView />} />
                                     <Route path="/about" element={<Navigate to="/the-duat" replace />} />
@@ -146,7 +139,9 @@ export function App() {
                                       path="/admin"
                                       element={
                                         <OrdersProvider>
-                                          <AdminView />
+                                          <SocialGridProvider>
+                                            <AdminView />
+                                          </SocialGridProvider>
                                         </OrdersProvider>
                                       }
                                     />
@@ -184,9 +179,7 @@ export function App() {
                             </div>
                           </ToastProvider>
                         </CartProvider>
-                      </WishlistProvider>
-                    </SocialGridProvider>
-                  </CustomizerProvider>
+                    </WishlistProvider>
                 </StickersSettingsProvider>
               </BundlesSettingsProvider>
             </CategoryBannersProvider>

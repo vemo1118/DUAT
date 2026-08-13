@@ -4,7 +4,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useOrders } from '../context/OrdersContext';
 import { useHeroBanners } from '../context/HeroBannersContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
-import { useCustomizerConfig } from '../context/CustomizerContext';
 import { useSocialGrid } from '../context/SocialGridContext';
 import { useToast } from '../context/ToastContext';
 import { useBundlesSettings } from '../context/BundlesSettingsContext';
@@ -15,11 +14,8 @@ import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
 import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
-import { AdminBuilderStickerModal } from '../components/AdminBuilderStickerModal';
 import { CATEGORIES } from '../data/products';
-import { generateCaseMockupSnapshot, getCaseFinishColor } from './CustomizerView';
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
-import { StickerIcon } from '../components/StickerIcon';
 import {
   ArrowUp,
   ArrowDown,
@@ -53,16 +49,12 @@ import {
   FileSpreadsheet,
   Bell,
   Save,
-  Download,
   TrendingUp,
-  BarChart2,
   CheckCircle2,
   Clock,
-  Palette,
   Gift,
   Zap
 } from 'lucide-react';
-import { SunDisc } from '../components/SunDisc';
 import {
   exportOrdersToCSV,
   saveNotificationSettingsToSupabase,
@@ -80,8 +72,7 @@ export function AdminView() {
     deleteProduct,
     resetProducts,
     moveProductUp,
-    moveProductDown,
-    setCasesFirstOrder
+    moveProductDown
   } = useProducts();
   const { orders, fetchOrders, updateOrderStatus, deleteOrder } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
@@ -108,35 +99,6 @@ export function AdminView() {
 
   const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
   const [editingSocialTile, setEditingSocialTile] = useState(null);
-  const {
-    builderPrice,
-    caseTypes,
-    phoneModels,
-    builderStickers,
-    builderCategories,
-    addCaseType,
-    updateCaseType,
-    toggleCaseTypeVisibility,
-    deleteCaseType,
-    addPhoneModel,
-    updatePhoneModel,
-    deletePhoneModel,
-    addBuilderSticker,
-    updateBuilderSticker,
-    toggleBuilderStickerVisibility,
-    deleteBuilderSticker,
-    resetBuilderStickers,
-    addBuilderCategory,
-    updateBuilderCategory,
-    moveBuilderCategory,
-    toggleBuilderCategoryVisibility,
-    deleteBuilderCategory,
-    resetBuilderCategories,
-    setCategoryStickersVisibility,
-    updatePrice,
-    resetCustomizerConfig
-  } = useCustomizerConfig();
-
   const {
     bundlesSettings,
     updateBundlesHero,
@@ -177,25 +139,7 @@ export function AdminView() {
     }
   }, [stickersSettings]);
 
-  const [adminStickerFilter, setAdminStickerFilter] = useState('all');
-
-  const [isBuilderStickerModalOpen, setIsBuilderStickerModalOpen] = useState(false);
-  const [editingBuilderSticker, setEditingBuilderSticker] = useState(null);
-
-  const [isCategoryEditModalOpen, setIsCategoryEditModalOpen] = useState(false);
-  const [editingCatData, setEditingCatData] = useState({ id: '', labelAr: '', labelEn: '', icon: '🏷️' });
-
   const { showToast } = useToast();
-
-  // Builder Engine Tab Form States
-  const [newPriceInput, setNewPriceInput] = useState(builderPrice || 850);
-  const [newFinishEn, setNewFinishEn] = useState('');
-  const [newFinishAr, setNewFinishAr] = useState('');
-  const [newFinishColor, setNewFinishColor] = useState('#FAF9F6');
-  const [newFinishRing, setNewFinishRing] = useState('#E8A33D');
-
-  const [newModelName, setNewModelName] = useState('');
-  const [newModelCategory, setNewModelCategory] = useState('Apple');
 
   // Supabase Auth State
   const [session, setSession] = useState(null);
@@ -271,15 +215,15 @@ export function AdminView() {
 
   // Forge Feature Banner Edit State
   const [forgeEdit, setForgeEdit] = useState({
-    eyebrowEn: forgeBanner?.eyebrowEn || 'THE FORGE',
-    eyebrowAr: forgeBanner?.eyebrowAr || 'دوات / كور الفن',
-    titleEn: forgeBanner?.titleEn || 'BUILD A CASE FOR YOURSELF.',
-    titleAr: forgeBanner?.titleAr || 'صمم درعك الخاص بنفسك.',
-    descEn: forgeBanner?.descEn || 'Select your phone model, choose your armor finish, and stack 3D epoxy domes or custom text on canvas. Made to order. Shipped in 5 days.',
-    descAr: forgeBanner?.descAr || 'اختر موديل هاتفك، التقفيل الفاخر، والملصقات المجسمة ثلاثية الأبعاد. يُصنع حسب الطلب ويُشحن في ٥ أيام.',
-    buttonTextEn: forgeBanner?.buttonTextEn || 'OPEN THE BUILDER →',
-    buttonTextAr: forgeBanner?.buttonTextAr || 'افتح أداة التصميم ←',
-    buttonLink: forgeBanner?.buttonLink || '/customizer',
+    eyebrowEn: forgeBanner?.eyebrowEn || 'DUAT / STICKER BUILDER',
+    eyebrowAr: forgeBanner?.eyebrowAr || 'دوات / مصمم الاستيكرات',
+    titleEn: forgeBanner?.titleEn || 'BUILD YOUR OWN STICKER.',
+    titleAr: forgeBanner?.titleAr || 'صمّم استيكرك الخاص بنفسك.',
+    descEn: forgeBanner?.descEn || 'Write custom text or upload your artwork to create a raised 3D epoxy sticker. Made to order in Egypt.',
+    descAr: forgeBanner?.descAr || 'اكتب نصك أو ارفع تصميمك لنحوّله إلى استيكر إيبوكسي مجسم، مصنوع حسب الطلب في مصر.',
+    buttonTextEn: forgeBanner?.buttonTextEn || 'OPEN STICKER BUILDER →',
+    buttonTextAr: forgeBanner?.buttonTextAr || 'افتح بيلدر الاستيكرز ←',
+    buttonLink: forgeBanner?.buttonLink || '/sticker-builder',
     imageUrl: forgeBanner?.imageUrl || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785768478/B1_TB_w1zemr.jpg',
     isActive: forgeBanner?.isActive !== false
   });
@@ -295,7 +239,7 @@ export function AdminView() {
         descAr: forgeBanner.descAr || '',
         buttonTextEn: forgeBanner.buttonTextEn || '',
         buttonTextAr: forgeBanner.buttonTextAr || '',
-        buttonLink: forgeBanner.buttonLink || '/customizer',
+        buttonLink: ['/customize', '/customizer'].includes(forgeBanner.buttonLink) ? '/sticker-builder' : (forgeBanner.buttonLink || '/sticker-builder'),
         imageUrl: forgeBanner.imageUrl || '',
         isActive: forgeBanner.isActive !== false
       });
@@ -305,7 +249,7 @@ export function AdminView() {
   const handleSaveForgeBanner = (e) => {
     e.preventDefault();
     updateForgeBanner(forgeEdit);
-    showToast('تم حفظ بنر "صمم درعك بنفسك" (The Forge Banner) بنجاح ✨', 'success');
+    showToast('تم حفظ بنر مصمم الاستيكرات بنجاح ✨', 'success');
   };
 
   // Orders Tab State
@@ -847,21 +791,6 @@ export function AdminView() {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab('builder')}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
-                    activeTab === 'builder'
-                      ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]'
-                      : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Sliders size={16} />
-                    <span>4. محرك البلدر (/builder)</span>
-                  </div>
-                  <span className="text-[10px] px-1.5 py-0.5 text-amber-400 font-mono">محرك</span>
-                </button>
-
-                <button
                   onClick={() => setActiveTab('forge_banner')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
                     activeTab === 'forge_banner'
@@ -871,7 +800,7 @@ export function AdminView() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Zap size={16} />
-                    <span>5. بنر صمم درعك (Forge)</span>
+                    <span>4. بنر مصمم الاستيكرات</span>
                   </div>
                 </button>
               </div>
@@ -1000,18 +929,6 @@ export function AdminView() {
               <p className="font-mono text-xs text-ash mt-0.5">يمكنك تقديم أو تأخير أي منتج باستخدام أزرار الترتيب (▲/▼)</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => {
-                  setCasesFirstOrder();
-                  showToast('تم ترتيب القائمة: الجرابات أولاً!', 'success');
-                }}
-                className="flex items-center gap-2 px-4 py-2 border border-gold/40 bg-gold/10 hover:bg-gold hover:text-[#050505] text-gold font-bold transition-all font-mono text-xs uppercase"
-                title="جعل كافة الجرابات والباندلات تظهر في البداية قبل الاستيكرات"
-              >
-                <Layers size={15} />
-                <span>ترتيب: الجرابات أولاً 📱</span>
-              </button>
-
               <button
                 onClick={handleResetCatalog}
                 className="flex items-center gap-2 px-4 py-2 border border-grave bg-stone/50 hover:border-gold/50 text-ash hover:text-bone transition-colors font-mono text-xs uppercase"
@@ -1461,7 +1378,7 @@ export function AdminView() {
                             <span>{ord.id}</span>
                             {ord.items?.some(i => i.designSnapshot || i.customConfig?.designSnapshot) && (
                               <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded">
-                                🖼️ جراب مخصص
+                                🎨 تصميم مخصص
                               </span>
                             )}
                           </div>
@@ -2040,7 +1957,7 @@ export function AdminView() {
       )}
 
       {/* ============================================================ */}
-      {/* TAB 3.5: THE FORGE FEATURE PROMO BANNER EDITOR */}
+      {/* TAB 3.5: STICKER BUILDER FEATURE PROMO BANNER EDITOR */}
       {/* ============================================================ */}
       {activeTab === 'forge_banner' && (
         <div className="space-y-8 animate-fade-in max-w-5xl mx-auto">
@@ -2049,7 +1966,7 @@ export function AdminView() {
             <div className="flex items-center gap-3 border-b border-grave pb-4">
               <Sparkles className="text-gold" size={26} />
               <div>
-                <h2 className="font-clash text-xl font-bold text-bone">إدارة بنر "صمم درعك بنفسك" (The Forge Banner Control Panel)</h2>
+                <h2 className="font-clash text-xl font-bold text-bone">إدارة بنر مصمم الاستيكرات</h2>
                 <p className="font-mono text-xs text-ash">تعديل كافة نصوص، شارة، صورة، ورابط التوجيه للبنر الترويجي الفاخر بمنتصف الصفحة الرئيسية.</p>
               </div>
             </div>
@@ -2059,10 +1976,10 @@ export function AdminView() {
               <span className="font-mono text-xs text-gold uppercase tracking-widest block font-bold">معاينة حية للبنر في الصفحة الرئيسية (Live Banner Preview)</span>
               <div className="p-6 bg-stone border border-gold/30 rounded flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="space-y-2 flex-1">
-                  <span className="font-mono text-[10px] text-gold uppercase tracking-widest font-bold block">{forgeEdit.eyebrowEn || 'THE FORGE'}</span>
-                  <h3 className="font-clash text-2xl font-bold text-bone uppercase tracking-tight">{forgeEdit.titleEn || 'BUILD A CASE FOR YOURSELF.'}</h3>
+                  <span className="font-mono text-[10px] text-gold uppercase tracking-widest font-bold block">{forgeEdit.eyebrowEn || 'STICKER BUILDER'}</span>
+                  <h3 className="font-clash text-2xl font-bold text-bone uppercase tracking-tight">{forgeEdit.titleEn || 'BUILD YOUR OWN STICKER.'}</h3>
                   <p className="font-space text-xs text-ash leading-relaxed max-w-lg">{forgeEdit.descEn}</p>
-                  <span className="inline-block mt-2 px-5 py-2.5 bg-gold text-[#0A0C16] font-mono text-xs font-bold uppercase rounded shadow-lg">{forgeEdit.buttonTextEn || 'OPEN THE BUILDER →'}</span>
+                  <span className="inline-block mt-2 px-5 py-2.5 bg-gold text-[#0A0C16] font-mono text-xs font-bold uppercase rounded shadow-lg">{forgeEdit.buttonTextEn || 'OPEN STICKER BUILDER →'}</span>
                 </div>
                 {forgeEdit.imageUrl && (
                   <div className="w-36 h-36 flex-shrink-0 flex items-center justify-center p-2 bg-void border border-grave rounded shadow-md">
@@ -2206,7 +2123,7 @@ export function AdminView() {
                     type="text"
                     value={forgeEdit.buttonLink}
                     onChange={(e) => setForgeEdit({ ...forgeEdit, buttonLink: e.target.value })}
-                    placeholder="/customizer"
+                    placeholder="/sticker-builder"
                     className="w-full bg-coal border border-grave px-3 py-2.5 text-bone font-mono focus:border-gold outline-none"
                     required
                   />
@@ -2387,490 +2304,6 @@ export function AdminView() {
               ))}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* TAB 5: CASE BUILDER ENGINE & ASSETS CONTROL PANEL */}
-      {/* ============================================================ */}
-      {activeTab === 'builder' && (
-        <div className="space-y-8 animate-fade-in">
-          
-          {/* Header Card */}
-          <div className="bg-stone border border-gold/40 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
-            <div>
-              <span className="font-mono text-xs text-gold font-bold uppercase tracking-widest block">
-                DUAT / BUILDER ENGINE & ASSETS CONTROL
-              </span>
-              <h2 className="font-clash text-2xl uppercase text-bone font-bold mt-1">
-                محرر بيلدر الاستيكرات التفاعلي (Sticker Builder Engine)
-              </h2>
-              <p className="font-mono text-xs text-ash mt-1">
-                التحكم الكامل في استيكرات وموتيفات البيلدر، أشكال الحروف، أسعار الاستيكرات المخصصة، الترتيب، والإظهار/الإخفاء الفوري.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                if (window.confirm('هل أنت تأكد من إعادة ضبط استيكرات وأقسام البلدر إلى الإعدادات الافتراضية؟')) {
-                  resetBuilderStickers();
-                  resetBuilderCategories();
-                  showToast('تمت إعادة ضبط إعدادات بيلدر الاستيكرات بنجاح! 🎨', 'info');
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2 border border-grave bg-coal hover:border-gold text-ash hover:text-bone font-mono text-xs uppercase transition-colors"
-            >
-              <RotateCcw size={15} />
-              <span>إعادة ضبط البيلدر الافتراضي 🔄</span>
-            </button>
-          </div>
-
-          {/* 1. BUILDER PRICE CONTROL CARD */}
-          <div className="bg-stone border border-grave p-6 space-y-4">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-              <DollarSign size={16} />
-              <span>سعر الاستيكر المخصص الافتراضي في البيلدر (Default Custom Sticker Price)</span>
-            </h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                updatePrice(newPriceInput);
-                showToast(`تم تغيير سعر التصميم إلى ${newPriceInput} ج.م بنجاح! 💰`, 'success');
-              }}
-              className="flex flex-col sm:flex-row items-center gap-3 max-w-xl"
-            >
-              <div className="relative flex-1 w-full">
-                <input
-                  type="number"
-                  value={newPriceInput}
-                  onChange={(e) => setNewPriceInput(e.target.value)}
-                  className="w-full bg-coal border border-grave px-4 py-2.5 text-bone font-mono font-bold text-sm focus:border-gold outline-none"
-                  placeholder="850"
-                />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-gold">EGP</span>
-              </div>
-              <button
-                type="submit"
-                className="btn-primary w-full sm:w-auto px-6 py-2.5 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
-              >
-                <Save size={16} />
-                <span>حفظ السعر الجديد</span>
-              </button>
-            </form>
-          </div>
-
-          {/* 2. STICKER BASE FINISHES OVERVIEW */}
-          <div className="bg-stone border border-grave p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-grave pb-4">
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-                  <Palette size={16} />
-                  <span>خامات خلفيات الاستيكرات المتاحة ف البيلدر (Sticker Base Finishes)</span>
-                </h3>
-                <p className="font-mono text-xs text-ash mt-1">
-                  الخامات الفاخرة المتاحة للزبون عند تصميم استيكره المخصص في البيلدر (3D Polyurethane Epoxy).
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {[
-                { nameAr: 'أسود فحم لامع', nameEn: 'Obsidian Gloss', bg: 'bg-[#121214]', border: 'border-gold/40' },
-                { nameAr: 'شفاف أكريليك', nameEn: 'Clear Acrylic', bg: 'bg-void/40', border: 'border-bone/30' },
-                { nameAr: 'رقائق الذهب', nameEn: 'Gold Foil', bg: 'bg-amber-600/40', border: 'border-gold' },
-                { nameAr: 'عاجي ألباستر', nameEn: 'Alabaster Ivory', bg: 'bg-[#EFEAE0]', border: 'border-[#D8CFBC]' },
-                { nameAr: 'صمغ عنبري شفاف', nameEn: 'Translucent Amber', bg: 'bg-amber-500/20', border: 'border-amber-500/60' }
-              ].map((finish, fIdx) => (
-                <div key={fIdx} className="p-3 bg-coal border border-grave rounded flex items-center gap-3">
-                  <div className={`w-7 h-7 rounded border shadow ${finish.bg} ${finish.border}`} />
-                  <div className="min-w-0">
-                    <p className="font-mono text-xs font-bold text-bone truncate">{finish.nameAr}</p>
-                    <p className="font-mono text-[10px] text-ash truncate">{finish.nameEn}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3.5. STICKER CATEGORIES MANAGEMENT (REORDER & RENAME) */}
-          <div className="bg-stone border border-gold/40 p-6 space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-                  <Layers size={16} />
-                  <span>إدارة أقسام وتصنيفات الاستيكرات وترتيبها (Sticker Categories & Sort Order — {builderCategories.length})</span>
-                </h3>
-                <p className="font-mono text-xs text-ash mt-1">
-                  تغيير ترتيب ظهور الأقسام (للأعلى وللأسفل)، تعديل أسمائها بالعربي والإنجليزي والأيقونة، وإضافة أقسام جديدة.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingCatData({ id: '', labelAr: '', labelEn: '', icon: '🏷️' });
-                    setIsCategoryEditModalOpen(true);
-                  }}
-                  className="btn-primary py-2 px-4 text-xs font-mono font-bold flex items-center gap-2"
-                >
-                  <Plus size={16} />
-                  <span>إضافة قسم/تصنيف جديد +</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm('إعادة ضبط أقسام الاستيكرات للوضع الافتراضي وترتيبها الأولي؟')) {
-                      resetBuilderCategories();
-                      showToast('تمت إعادة ضبط الأقسام للترتيب الافتراضي 🔄', 'success');
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
-                >
-                  <RotateCcw size={14} />
-                  <span>إعادة ضبط الأقسام 🔄</span>
-                </button>
-              </div>
-            </div>
-
-            {/* List / Table of Categories */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {builderCategories.map((cat, catIdx) => {
-                const isActive = cat.is_active !== false;
-                const stickerCount = builderStickers.filter((s) => {
-                  if (cat.id === 'letters') return s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters';
-                  if (cat.id === 'letters-en') return s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en';
-                  if (cat.id === 'years') return s.id?.startsWith('year-') || s.category === 'years';
-                  if (cat.id === 'months') return s.id?.startsWith('month-') || s.category === 'months';
-                  if (cat.id === 'quotes-ar') return s.category === 'quotes-ar' || s.id === 'st-born-dawn' || s.id === 'st-through-night';
-                  if (cat.id === 'quotes-en') return s.category === 'quotes-en' || s.id === 'st-duat';
-                  if (cat.id === 'motifs') return s.category === 'motifs' || s.id === 'st-crescent' || s.id === 'st-starry' || s.id === 'st-sun';
-                  return s.category === cat.id;
-                }).length;
-
-                return (
-                  <div
-                    key={cat.id}
-                    className={`p-4 bg-coal border rounded flex flex-col justify-between space-y-3 transition-colors ${
-                      isActive ? 'border-grave hover:border-gold/60' : 'border-red-900/50 opacity-60'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-xl p-2 bg-stone rounded border border-grave flex items-center justify-center">
-                          {cat.icon || '🏷️'}
-                        </span>
-                        <div>
-                          <p className="font-space text-sm font-bold text-bone flex items-center gap-1.5">
-                            <span>{cat.labelAr}</span>
-                            <span className="text-[10px] font-mono text-gold bg-gold/10 px-1.5 py-0.5 rounded border border-gold/30">
-                              #{catIdx + 1}
-                            </span>
-                          </p>
-                          <p className="font-mono text-xs text-ash">{cat.labelEn}</p>
-                          <p className="font-mono text-[10px] text-ash/80 mt-0.5">
-                            {stickerCount} استيكر مرتبط
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Move Up / Move Down Buttons */}
-                      <div className="flex flex-col items-center gap-1 font-mono text-xs">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            moveBuilderCategory(cat.id, 'up');
-                            showToast(`تم تقديم القسم "${cat.labelAr}" للأمام ⬆️`, 'info');
-                          }}
-                          disabled={catIdx === 0}
-                          className="p-1 border border-grave bg-stone hover:border-gold text-ash hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded"
-                          title="تحريك للأعلى (تقديم الترتيب)"
-                        >
-                          <ArrowUp size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            moveBuilderCategory(cat.id, 'down');
-                            showToast(`تم تأخير القسم "${cat.labelAr}" للخلف ⬇️`, 'info');
-                          }}
-                          disabled={catIdx === builderCategories.length - 1}
-                          className="p-1 border border-grave bg-stone hover:border-gold text-ash hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded"
-                          title="تحريك لأسفل (تأخير الترتيب)"
-                        >
-                          <ArrowDown size={14} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2 font-mono text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toggleBuilderCategoryVisibility(cat.id);
-                          showToast(isActive ? `تم إخفاء القسم "${cat.labelAr}"` : `تم إظهار القسم "${cat.labelAr}"`, 'info');
-                        }}
-                        className={`flex items-center gap-1 px-2.5 py-1 font-bold border transition-colors ${
-                          isActive
-                            ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
-                            : 'border-amber-500/40 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20'
-                        }`}
-                      >
-                        {isActive ? <Eye size={12} /> : <EyeOff size={12} />}
-                        <span>{isActive ? 'ظاهر' : 'مخفي'}</span>
-                      </button>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingCatData(cat);
-                            setIsCategoryEditModalOpen(true);
-                          }}
-                          className="flex items-center gap-1 px-2.5 py-1 border border-gold/60 text-gold hover:bg-gold hover:text-void font-bold transition-all rounded"
-                        >
-                          <Edit2 size={12} />
-                          <span>تعديل</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (window.confirm(`هل أنت تأكد من حذف القسم "${cat.labelAr}"؟`)) {
-                              deleteBuilderCategory(cat.id);
-                              showToast('تم حذف القسم بنجاح', 'warning');
-                            }
-                          }}
-                          className="p-1 text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 rounded transition-colors"
-                          title="حذف القسم"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 4. BUILDER STICKERS CONTROL SECTION */}
-          <div className="bg-stone border border-grave p-6 space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-grave pb-4">
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2">
-                  <Sparkles size={16} />
-                  <span>إدارة ملصقات واستيكرات البلدر (Builder Stickers — {builderStickers.length})</span>
-                </h3>
-                <p className="font-mono text-xs text-ash mt-1">
-                  التحكم الكامل في الاستيكرات التفاعلية داخل مصمم الجرابات: تعديل الأسماء، الصور، الرموز، وإخفاء أو إظهار أي استيكر.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingBuilderSticker({
-                      id: '',
-                      nameEn: '',
-                      nameAr: '',
-                      tagEn: '3D EPOXY DOME SLOGAN',
-                      tagAr: 'شعار إيبوكسي بارز',
-                      image: '',
-                      is_active: true
-                    });
-                    setIsBuilderStickerModalOpen(true);
-                  }}
-                  className="btn-primary py-2 px-4 text-xs font-mono font-bold flex items-center gap-2"
-                >
-                  <Plus size={16} />
-                  <span>إضافة استيكر جديد للبلدر +</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm('إعادة ضبط جميع استيكرات البلدر للوضع الافتراضي؟')) {
-                      resetBuilderStickers();
-                      showToast('تمت إعادة ضبط استيكرات البلدر للوضع الافتراضي 🔄', 'success');
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
-                >
-                  <RotateCcw size={14} />
-                  <span>إعادة ضبط الاستيكرات 🔄</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Dynamic Category Filter & Batch Visibility Controls Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-coal p-4 border border-grave rounded">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAdminStickerFilter('all')}
-                  className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
-                    adminStickerFilter === 'all' ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
-                  }`}
-                >
-                  الكل ({builderStickers.length})
-                </button>
-
-                {builderCategories.map((cat) => {
-                  const stickerCount = builderStickers.filter((s) => {
-                    if (cat.id === 'letters') return s.id?.startsWith('ar-letter-') || s.id?.startsWith('st-letter-') || s.category === 'letters';
-                    if (cat.id === 'letters-en') return s.id?.startsWith('en-letter-') || s.id?.startsWith('st-en-letter-') || s.category === 'letters-en';
-                    if (cat.id === 'years') return s.id?.startsWith('year-') || s.category === 'years';
-                    if (cat.id === 'months') return s.id?.startsWith('month-') || s.category === 'months';
-                    if (cat.id === 'quotes-ar') return s.category === 'quotes-ar' || s.id === 'st-born-dawn' || s.id === 'st-through-night';
-                    if (cat.id === 'quotes-en') return s.category === 'quotes-en' || s.id === 'st-duat';
-                    if (cat.id === 'motifs') return s.category === 'motifs' || s.id === 'st-crescent' || s.id === 'st-starry' || s.id === 'st-sun';
-                    return s.category === cat.id;
-                  }).length;
-
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setAdminStickerFilter(cat.id)}
-                      className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 ${
-                        adminStickerFilter === cat.id ? 'bg-gold text-void shadow' : 'bg-stone text-ash hover:text-bone border border-grave'
-                      }`}
-                    >
-                      <span>{cat.icon || '🏷️'} {cat.labelAr} ({stickerCount})</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Batch Action Buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCategoryStickersVisibility(adminStickerFilter, true);
-                    showToast('تم تفعيل كافة استيكرات المجموعة بنجاح 👁️', 'success');
-                  }}
-                  className="px-3 py-1.5 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold transition-all rounded flex items-center gap-1.5"
-                  title="إظهار جميع استيكرات هذه المجموعة في البلدر"
-                >
-                  <Eye size={14} />
-                  <span>تفعيل المجموعة 👁️</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCategoryStickersVisibility(adminStickerFilter, false);
-                    showToast('تم إخفاء كافة استيكرات المجموعة بنجاح 🚫', 'info');
-                  }}
-                  className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 border border-red-500/40 text-red-300 font-mono text-xs font-bold transition-all rounded flex items-center gap-1.5"
-                  title="إخفاء جميع استيكرات هذه المجموعة من البلدر"
-                >
-                  <EyeOff size={14} />
-                  <span>تعطيل المجموعة 🚫</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Grid of Builder Stickers */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-              {builderStickers.filter((st) => {
-                if (adminStickerFilter === 'all') return true;
-                if (adminStickerFilter === 'letters-ar' || adminStickerFilter === 'letters') return st.id?.startsWith('ar-letter-') || st.id?.startsWith('st-letter-') || st.category === 'letters';
-                if (adminStickerFilter === 'letters-en') return st.id?.startsWith('en-letter-') || st.id?.startsWith('st-en-letter-') || st.category === 'letters-en';
-                if (adminStickerFilter === 'years') return st.id?.startsWith('year-') || st.category === 'years';
-                if (adminStickerFilter === 'months') return st.id?.startsWith('month-') || st.category === 'months';
-                if (adminStickerFilter === 'quotes-ar') return st.category === 'quotes-ar' || st.id === 'st-born-dawn' || st.id === 'st-through-night';
-                if (adminStickerFilter === 'quotes-en') return st.category === 'quotes-en' || st.id === 'st-duat';
-                if (adminStickerFilter === 'motifs') return st.category === 'motifs' || st.id === 'st-crescent' || st.id === 'st-starry' || st.id === 'st-sun';
-                return st.category === adminStickerFilter;
-              }).map((st) => {
-                const isActive = st.is_active !== false && st.isActive !== false;
-                return (
-                  <div
-                    key={st.id}
-                    className={`bg-stone border overflow-hidden shadow-lg flex flex-col justify-between rounded transition-all ${
-                      isActive ? 'border-grave' : 'border-red-900/40 opacity-60'
-                    }`}
-                  >
-                    {/* Preview Box */}
-                    <div className="aspect-square bg-coal relative border-b border-grave overflow-hidden flex flex-col items-center justify-center p-2">
-                      <StickerIcon stickerId={st.id} image={st.image || st.imageUrl} size={48} color="#E8A33D" bgColor="#14110F" />
-                      <div className="absolute top-2 left-2">
-                        <span
-                          className={`font-mono text-[9px] uppercase font-bold px-1.5 py-0.5 border ${
-                            isActive
-                              ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
-                              : 'bg-red-950/80 text-red-400 border-red-500/40'
-                          }`}
-                        >
-                          {isActive ? 'ظاهر' : 'مخفي'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Details */}
-                    <div className="p-3 space-y-1 flex-1">
-                      <h5 className="font-mono text-xs font-bold text-bone truncate">
-                        {st.nameAr || st.nameEn || st.id}
-                      </h5>
-                      <p className="font-mono text-[9px] text-gold truncate">
-                        {st.tagAr || st.tagEn || '3D EPOXY'}
-                      </p>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="p-2 bg-stone/40 border-t border-grave flex items-center justify-between gap-1">
-                      <button
-                        type="button"
-                        onClick={() => toggleBuilderStickerVisibility(st.id)}
-                        className={`p-1.5 border font-mono text-xs transition-all rounded ${
-                          isActive
-                            ? 'border-ash/40 bg-coal text-ash hover:text-gold'
-                            : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-400'
-                        }`}
-                        title={isActive ? 'إخفاء الاستيكر' : 'إظهار الاستيكر'}
-                      >
-                        {isActive ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingBuilderSticker(st);
-                            setIsBuilderStickerModalOpen(true);
-                          }}
-                          className="p-1.5 border border-gold/60 bg-gold/15 hover:bg-gold hover:text-void text-gold font-mono text-xs font-bold transition-all rounded"
-                          title="تعديل الاستيكر"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (window.confirm(`حذف هذا الاستيكر "${st.nameAr || st.nameEn}" من البلدر؟`)) {
-                              deleteBuilderSticker(st.id);
-                              showToast('تم حذف الاستيكر من البلدر 🗑️', 'success');
-                            }
-                          }}
-                          className="p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-all rounded"
-                          title="حذف الاستيكر"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
         </div>
       )}
 
@@ -3853,20 +3286,6 @@ export function AdminView() {
         }}
       />
 
-      {/* ADMIN BUILDER STICKER MODAL */}
-      <AdminBuilderStickerModal
-        isOpen={isBuilderStickerModalOpen}
-        onClose={() => setIsBuilderStickerModalOpen(false)}
-        stickerToEdit={editingBuilderSticker}
-        onSave={(stickerId, updatedFields) => {
-          if (stickerId) {
-            updateBuilderSticker(stickerId, updatedFields);
-          } else {
-            addBuilderSticker(updatedFields);
-          }
-        }}
-      />
-
       {/* ORDER DETAILS MODAL */}
       {selectedOrderDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/85 backdrop-blur-md overflow-y-auto">
@@ -3909,12 +3328,6 @@ export function AdminView() {
                   const cfg = item.customConfig || item.customDetails || item.product?.customConfig || item.product?.customDetails;
                   const designPath = item.design_image_path || cfg?.design_image_path;
                   const secureDesignUrl = designPath ? signedDesignUrls[designPath] : null;
-                  const layers = cfg?.layers || item.layers || item.product?.layers || [];
-                  const caseBgColor = getCaseFinishColor(cfg?.caseFinish || cfg?.caseType || cfg?.caseTypeId);
-
-                  // Only generate dynamic snapshot if we actually have layer motifs!
-                  const dynamicSnapshot = layers.length > 0 ? generateCaseMockupSnapshot(null, layers, caseBgColor, '#E8A33D', cfg) : null;
-
                   // Real Snapshot Image stored on item
                   const rawSnapshot = secureDesignUrl ||
                                      item.designSnapshot ||
@@ -3922,10 +3335,8 @@ export function AdminView() {
                                      (typeof item.image === 'string' && item.image.startsWith('data:image') ? item.image : null) ||
                                      (typeof item.product?.image === 'string' && item.product.image.startsWith('data:image') ? item.product.image : null);
 
-                  const mockupImg = rawSnapshot || dynamicSnapshot || (typeof item.image === 'string' && item.image.length > 15 ? item.image : null);
+                  const mockupImg = rawSnapshot || (typeof item.image === 'string' && item.image.length > 15 ? item.image : null);
                   const thumbImage = mockupImg || (item.images && item.images[0]) || item.product?.image;
-                  const uploadedImages = layers.filter((l) => l.type === 'image' && l.src);
-
                   const cDetails = item.customDetails || item.customizerConfig || {};
                   const itemNameLower = String(name || '').toLowerCase();
 
@@ -3941,37 +3352,6 @@ export function AdminView() {
                                         !!cDetails.selectedItems ||
                                         itemNameLower.includes('bundle') ||
                                         itemNameLower.includes('بندل');
-
-                  const isCustomCase = !isCustomSticker && !isCustomBundle && (
-                    item.category === 'cases' ||
-                    itemNameLower.includes('case') ||
-                    itemNameLower.includes('جراب')
-                  );
-
-                  const extractedModel = cfg?.phoneModel ||
-                                         cfg?.model ||
-                                         item.tagAr ||
-                                         item.tagEn ||
-                                         (typeof name === 'string' && name.includes('—') ? name.split('—')[1]?.trim() : null) ||
-                                         (typeof name === 'string' && name.includes('-') ? name.split('-')[1]?.trim() : 'غير محدد');
-
-                  const STICKER_NAME_MAP = {
-                    'st-born-dawn': 'طالع نور (Born at Dawn)',
-                    'st-through-night': 'عدّي الليل (Through the Night)',
-                    'st-crescent': 'الهلال (Crescent Moon)',
-                    'st-starry': 'سماء الليل (Starry Night)',
-                    'st-sun': 'شمس دوات (DUAT Sun)',
-                    'st-duat': 'دوات (DUAT)'
-                  };
-
-                  const getStickerDisplayName = (stickerId) => {
-                    if (!stickerId) return 'قرص مجسم';
-                    if (STICKER_NAME_MAP[stickerId]) return STICKER_NAME_MAP[stickerId];
-                    if (stickerId.startsWith('ar-letter-')) return `حرف عربي: ${stickerId.replace('ar-letter-', '')}`;
-                    if (stickerId.startsWith('en-letter-')) return `حرف إنجليزي: ${stickerId.replace('en-letter-', '').toUpperCase()}`;
-                    if (stickerId.startsWith('num-')) return `رقم: ${stickerId.replace('num-', '')}`;
-                    return stickerId;
-                  };
 
                   return (
                     <div key={idx} className="p-4 space-y-3 font-sans text-xs bg-coal/40 rounded border border-grave/60">
@@ -4000,11 +3380,6 @@ export function AdminView() {
                             {isCustomBundle && (
                               <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
                                 🎁 بندل مخصص
-                              </span>
-                            )}
-                            {isCustomCase && (
-                              <span className="px-2 py-0.5 bg-gold/20 text-gold border border-gold/40 rounded font-bold text-[10px]">
-                                🖼️ جراب مخصص
                               </span>
                             )}
                           </div>
@@ -4070,125 +3445,6 @@ export function AdminView() {
                                 • {sItem.nameAr || sItem.nameEn}
                               </span>
                             ))}
-                          </div>
-                        </div>
-                      )}
-                      {/* Render Visual Case Mockup Card */}
-                      {isCustomCase && (
-                        <div className="pt-3 border-t border-grave/40 space-y-2">
-                          <span className="text-gold font-bold block flex items-center gap-1.5 text-xs">
-                            <ImageIcon size={14} />
-                            <span>معاينة صورة تصميم الجراب المخصص (Mockup Preview):</span>
-                          </span>
-                          <div className="flex flex-col md:flex-row items-center gap-6 bg-void p-4 border border-gold/40 rounded-lg shadow-xl overflow-x-auto">
-                            {/* Single High-Res Mockup Image Frame */}
-                            {mockupImg ? (
-                              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                                <span className="font-mono text-[10px] text-gold uppercase font-bold">صورة تصميم الجراب المخصص</span>
-                                <img
-                                  src={mockupImg}
-                                  alt="Case Design Mockup"
-                                  className="w-40 h-64 object-contain border border-grave bg-coal rounded-lg shadow-2xl"
-                                />
-                              </div>
-                            ) : (
-                              /* Fallback 2D Phone Case Canvas Frame if Base64 Image is missing */
-                              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                                <span className="font-mono text-[10px] text-gold uppercase font-bold">معاينة الاستيكرات المباشرة 2D</span>
-                                <div
-                                  style={{ backgroundColor: caseBgColor }}
-                                  className="w-[170px] h-[280px] rounded-[28px] border-2 border-grave relative overflow-hidden shadow-2xl p-2 select-none flex-shrink-0"
-                                >
-                                  {/* Camera Island (Top Left) */}
-                                  <div className="absolute top-2 left-2 w-10 h-10 rounded-lg border border-[#E8A33D] bg-black flex items-center justify-center gap-1 z-20">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
-                                    <div className="w-2.5 h-2.5 rounded-full bg-ash/40" />
-                                  </div>
-
-                                  {/* MagSafe Ring */}
-                                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-gold/40 pointer-events-none" />
-
-                                  {/* Render All Customer Dragged Layers */}
-                                  <div className="absolute inset-0 pointer-events-none">
-                                    {layers.map((l) => (
-                                      <div
-                                        key={l.id || l.stickerId}
-                                        style={{
-                                          left: `${l.x}%`,
-                                          top: `${l.y}%`,
-                                          transform: `translate(-50%, -50%) scale(${l.scale || 1.0}) rotate(${l.rotation || 0}deg)`
-                                        }}
-                                        className="absolute z-10"
-                                      >
-                                        {l.type === 'text' && (
-                                          <div
-                                            style={{
-                                              color: l.color || '#E8A33D',
-                                              backgroundColor: l.bgColor === 'transparent' ? 'transparent' : (l.bgColor || '#14110F')
-                                            }}
-                                            className="whitespace-nowrap font-bold text-[10px] px-2 py-0.5 rounded-full border border-gold/50 shadow-md"
-                                          >
-                                            {l.text}
-                                          </div>
-                                        )}
-
-                                        {l.type === 'sticker' && (
-                                          <StickerIcon
-                                            stickerId={l.stickerId}
-                                            size={28}
-                                            color={l.color}
-                                            bgColor={l.bgColor}
-                                          />
-                                        )}
-
-                                        {l.type === 'image' && l.src && (
-                                          <img
-                                            src={l.src}
-                                            alt="Custom Sticker"
-                                            className="w-10 h-10 object-contain shadow-md rounded"
-                                          />
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-
-                                  {/* DUAT Bottom Branding Pill */}
-                                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#12162B] px-2 py-0.5 rounded-full border border-gold/60 text-[#E8A33D] font-mono text-[7px] font-bold tracking-widest z-20">
-                                    DUAT
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* 3. Specifications & Download Action */}
-                            <div className="space-y-2.5 font-mono text-xs text-ash flex-1 min-w-[200px]">
-                              <p className="text-bone font-bold text-sm">التصميم النهائي كما صممه العميل على المتجر.</p>
-                              <div className="text-[11px] space-y-1 text-gold bg-stone/40 p-2.5 rounded border border-grave/40">
-                                <p>📱 الموديل: {cfg?.phoneModel || cfg?.model || 'غير محدد'}</p>
-                                {cfg?.customModelInput && (
-                                  <p className="text-bone font-bold">📱 اسم الجهاز المكتوب: {cfg.customModelInput}</p>
-                                )}
-                                <p>🎨 التقفيل: {cfg?.caseFinish || cfg?.caseType || 'جراب شفاف'}</p>
-                                <p>🏷️ عدد الاستيكرات: {layers.length}</p>
-                                {cfg?.designNotes && (
-                                  <p className="text-amber-300 font-bold border-t border-grave/40 pt-1 mt-1">
-                                    📝 ملاحظات الورشة: "{cfg.designNotes}"
-                                  </p>
-                                )}
-                              </div>
-                              {mockupImg && (
-                                <a
-                                  href={mockupImg}
-                                  download={`case-design-${selectedOrderDetails.id}-${idx + 1}.png`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-4 py-2 bg-gold/15 hover:bg-gold hover:text-void text-gold border border-gold text-[11px] inline-flex items-center gap-1.5 font-bold uppercase tracking-wider transition-colors shadow-md rounded"
-                                >
-                                  <Download size={14} />
-                                  <span>تحميل صورة تصميم الجراب الكامل 🖼️</span>
-                                </a>
-                              )}
-                            </div>
                           </div>
                         </div>
                       )}
@@ -4282,113 +3538,6 @@ export function AdminView() {
       )}
 
       {/* ============================================================ */}
-      {/* MODAL: ADD / EDIT STICKER CATEGORY */}
-      {/* ============================================================ */}
-      {isCategoryEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-stone border border-gold p-6 sm:p-8 rounded-lg max-w-lg w-full space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-grave pb-4">
-              <h3 className="font-clash text-xl font-bold text-bone flex items-center gap-2">
-                <Layers className="text-gold" size={22} />
-                <span>{editingCatData.id ? 'تعديل قسم الاستيكرات' : 'إضافة قسم استيكرات جديد'}</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsCategoryEditModalOpen(false)}
-                className="text-ash hover:text-bone font-mono font-bold text-lg"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!editingCatData.labelAr.trim() || !editingCatData.labelEn.trim()) {
-                  showToast('يرجى إدخال اسم القسم بالعربية والإنجليزي', 'error');
-                  return;
-                }
-                if (editingCatData.id) {
-                  updateBuilderCategory(editingCatData.id, editingCatData);
-                  showToast(`تم تعديل القسم "${editingCatData.labelAr}" بنجاح! 🎨`, 'success');
-                } else {
-                  addBuilderCategory(editingCatData);
-                  showToast(`تمت إضافة القسم الجديد "${editingCatData.labelAr}" بنجاح! 🎉`, 'success');
-                }
-                setIsCategoryEditModalOpen(false);
-              }}
-              className="space-y-4 font-mono text-xs"
-            >
-              <div>
-                <label className="block text-gold font-bold mb-1">اسم القسم بالعربية (AR Label):</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="مثال: عبارات وتوقيعات"
-                  value={editingCatData.labelAr}
-                  onChange={(e) => setEditingCatData({ ...editingCatData, labelAr: e.target.value })}
-                  className="w-full bg-coal border border-grave p-3 text-bone focus:border-gold outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gold font-bold mb-1">اسم القسم بالإنجليزي (EN Label):</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Slogans & Quotes"
-                  value={editingCatData.labelEn}
-                  onChange={(e) => setEditingCatData({ ...editingCatData, labelEn: e.target.value })}
-                  className="w-full bg-coal border border-grave p-3 text-bone focus:border-gold outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-ash mb-1">رمز / أيقونة القسم (Emoji):</label>
-                  <input
-                    type="text"
-                    placeholder="✨"
-                    value={editingCatData.icon}
-                    onChange={(e) => setEditingCatData({ ...editingCatData, icon: e.target.value })}
-                    className="w-full bg-coal border border-grave p-3 text-bone text-center text-lg focus:border-gold outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-ash mb-1">معرّف القسم (ID Unique):</label>
-                  <input
-                    type="text"
-                    disabled={Boolean(editingCatData.id)}
-                    placeholder="custom-category"
-                    value={editingCatData.id || ''}
-                    onChange={(e) => setEditingCatData({ ...editingCatData, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
-                    className="w-full bg-coal border border-grave p-3 text-bone font-mono focus:border-gold outline-none disabled:opacity-50"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-grave flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsCategoryEditModalOpen(false)}
-                  className="px-4 py-2.5 border border-grave text-ash hover:text-bone"
-                >
-                  إلغاء
-                </button>
-
-                <button
-                  type="submit"
-                  className="btn-primary py-2.5 px-6 font-bold uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Save size={16} />
-                  <span>حفظ القسم</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
