@@ -309,18 +309,18 @@ export const ENGLISH_LETTER_PRODUCTS = ENGLISH_LETTERS_CHARS.map((char) => ({
 
 // ── Month Sticker Products ───────────────────────────────────────────────────
 const MONTHS_PRODUCT_LIST = [
-  { id:'month-jan', en:'Made In January',   ar:'شارة يناير' },
-  { id:'month-feb', en:'Made In February',  ar:'شارة فبراير' },
-  { id:'month-mar', en:'Made In March',     ar:'شارة مارس' },
-  { id:'month-apr', en:'Made In April',     ar:'شارة أبريل' },
-  { id:'month-may', en:'Made In May',       ar:'شارة مايو' },
-  { id:'month-jun', en:'Made In June',      ar:'شارة يونيو' },
-  { id:'month-jul', en:'Made In July',      ar:'شارة يوليو' },
-  { id:'month-aug', en:'Made In August',    ar:'شارة أغسطس' },
-  { id:'month-sep', en:'Made In September', ar:'شارة سبتمبر' },
-  { id:'month-oct', en:'Made In October',   ar:'شارة أكتوبر' },
-  { id:'month-nov', en:'Made In November',  ar:'شارة نوفمبر' },
-  { id:'month-dec', en:'Made In December',  ar:'شارة ديسمبر' },
+  { id:'month-jan', en:'Made In January',   ar:'صُنع في يناير' },
+  { id:'month-feb', en:'Made In February',  ar:'صُنع في فبراير' },
+  { id:'month-mar', en:'Made In March',     ar:'صُنع في مارس' },
+  { id:'month-apr', en:'Made In April',     ar:'صُنع في أبريل' },
+  { id:'month-may', en:'Made In May',       ar:'صُنع في مايو' },
+  { id:'month-jun', en:'Made In June',      ar:'صُنع في يونيو' },
+  { id:'month-jul', en:'Made In July',      ar:'صُنع في يوليو' },
+  { id:'month-aug', en:'Made In August',    ar:'صُنع في أغسطس' },
+  { id:'month-sep', en:'Made In September', ar:'صُنع في سبتمبر' },
+  { id:'month-oct', en:'Made In October',   ar:'صُنع في أكتوبر' },
+  { id:'month-nov', en:'Made In November',  ar:'صُنع في نوفمبر' },
+  { id:'month-dec', en:'Made In December',  ar:'صُنع في ديسمبر' },
 ];
 export const MONTH_STICKER_PRODUCTS = MONTHS_PRODUCT_LIST.map((m) => ({
   id: m.id,
@@ -344,16 +344,16 @@ export const MONTH_STICKER_PRODUCTS = MONTHS_PRODUCT_LIST.map((m) => ({
 
 // ── Year Sticker Products ────────────────────────────────────────────────────
 const YEARS_PRODUCT_LIST = [
-  { id:'year-199x', en:'Made In 199x',  ar:'شارة التسعينات' },
-  { id:'year-2000', en:"2000's Badge",  ar:'شارة عام 2000' },
-  { id:'year-2001', en:"2001's Badge",  ar:'شارة عام 2001' },
-  { id:'year-2002', en:"2002's Badge",  ar:'شارة عام 2002' },
-  { id:'year-2003', en:"2003's Badge",  ar:'شارة عام 2003' },
-  { id:'year-2004', en:"2004's Badge",  ar:'شارة عام 2004' },
-  { id:'year-2005', en:"2005's Badge",  ar:'شارة عام 2005' },
-  { id:'year-2006', en:"2006's Badge",  ar:'شارة عام 2006' },
-  { id:'year-2007', en:"2007's Badge",  ar:'شارة عام 2007' },
-  { id:'year-2008', en:"2008's Badge",  ar:'شارة عام 2008' },
+  { id:'year-199x', en:'Made In 199X', ar:'صُنع في التسعينات' },
+  { id:'year-2000', en:'Made In 2000', ar:'صُنع في عام 2000' },
+  { id:'year-2001', en:'Made In 2001', ar:'صُنع في عام 2001' },
+  { id:'year-2002', en:'Made In 2002', ar:'صُنع في عام 2002' },
+  { id:'year-2003', en:'Made In 2003', ar:'صُنع في عام 2003' },
+  { id:'year-2004', en:'Made In 2004', ar:'صُنع في عام 2004' },
+  { id:'year-2005', en:'Made In 2005', ar:'صُنع في عام 2005' },
+  { id:'year-2006', en:'Made In 2006', ar:'صُنع في عام 2006' },
+  { id:'year-2007', en:'Made In 2007', ar:'صُنع في عام 2007' },
+  { id:'year-2008', en:'Made In 2008', ar:'صُنع في عام 2008' },
 ];
 export const YEAR_STICKER_PRODUCTS = YEARS_PRODUCT_LIST.map((y) => ({
   id: y.id,

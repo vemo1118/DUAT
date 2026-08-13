@@ -11,6 +11,96 @@ const CANVAS_DIMS = {
   'st-duat':          { w: 110, h: 46 },
 };
 
+const MadeInBadge = ({ label, size, forCanvas, variant }) => {
+  const badgeSize = forCanvas ? 76 : Math.max(64, size);
+  const isYear = variant === 'year';
+  const labelLength = String(label).length;
+  const labelScale = labelLength >= 8 ? 0.118 : labelLength >= 7 ? 0.135 : labelLength >= 6 ? 0.15 : 0.17;
+  const background = isYear
+    ? 'linear-gradient(145deg, #1A2747 0%, #0A1020 72%, #050810 100%)'
+    : 'linear-gradient(145deg, #FFFDF7 0%, #F2EBDD 58%, #DDD1BC 100%)';
+  const mainColor = isYear ? '#FFF8ED' : '#182744';
+  const frameColor = isYear ? 'rgba(224,169,59,0.7)' : 'rgba(24,39,68,0.38)';
+
+  return (
+    <div
+      style={{
+        width: badgeSize,
+        height: badgeSize,
+        minWidth: badgeSize,
+        minHeight: badgeSize,
+        padding: Math.round(badgeSize * 0.12),
+        borderRadius: Math.round(badgeSize * 0.22),
+        background,
+        borderColor: isYear ? 'rgba(224,169,59,0.78)' : 'rgba(255,255,255,0.95)',
+        boxShadow: isYear
+          ? '0 12px 28px rgba(0,0,0,0.42), inset 0 2px 5px rgba(255,255,255,0.2), inset 0 -3px 7px rgba(0,0,0,0.32)'
+          : '0 12px 28px rgba(0,0,0,0.3), inset 0 3px 6px rgba(255,255,255,0.95), inset 0 -3px 7px rgba(67,48,25,0.16)'
+      }}
+      className="relative border-2 flex flex-col items-center justify-center overflow-hidden select-none shrink-0 pointer-events-none"
+    >
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          inset: Math.round(badgeSize * 0.07),
+          border: `1px solid ${frameColor}`,
+          borderRadius: Math.round(badgeSize * 0.15)
+        }}
+      />
+
+      <div
+        className="absolute left-[12%] right-[12%] top-[5%] h-[38%] rounded-[45%] pointer-events-none"
+        style={{
+          background: isYear
+            ? 'linear-gradient(180deg, rgba(255,255,255,0.22), transparent)'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.05))',
+          filter: 'blur(0.4px)'
+        }}
+      />
+
+      <span
+        style={{
+          color: '#E0A93B',
+          fontSize: Math.max(7, Math.round(badgeSize * 0.085)),
+          letterSpacing: `${Math.max(1, badgeSize * 0.018)}px`
+        }}
+        className="relative z-10 font-mono font-black uppercase leading-none"
+      >
+        MADE IN
+      </span>
+
+      <span
+        style={{
+          color: mainColor,
+          fontSize: Math.max(11, Math.round(badgeSize * labelScale)),
+          whiteSpace: 'nowrap',
+          textShadow: isYear ? '0 2px 3px rgba(0,0,0,0.42)' : '0 1px 1px rgba(255,255,255,0.75)'
+        }}
+        className="relative z-10 mt-[8%] max-w-full text-center font-clash font-black uppercase leading-[0.9] tracking-tight"
+      >
+        {label}
+      </span>
+
+      <div
+        style={{ width: Math.round(badgeSize * 0.3), marginTop: Math.round(badgeSize * 0.08) }}
+        className="relative z-10 h-[2px] bg-[#E0A93B] rounded-full"
+      />
+
+      <span
+        style={{
+          color: isYear ? 'rgba(255,248,237,0.62)' : 'rgba(24,39,68,0.58)',
+          fontSize: Math.max(5, Math.round(badgeSize * 0.052)),
+          letterSpacing: `${Math.max(0.7, badgeSize * 0.009)}px`,
+          marginTop: Math.round(badgeSize * 0.055)
+        }}
+        className="relative z-10 font-mono font-bold uppercase leading-none"
+      >
+        DUAT · EGYPT
+      </span>
+    </div>
+  );
+};
+
 export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgColor, forCanvas = false }) => {
   const isArabicLetter = stickerId && (stickerId.startsWith('ar-letter-') || stickerId.startsWith('st-letter-'));
   const customImg = image || imageUrl;
@@ -115,38 +205,13 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
   const isYearBadge = stickerId && stickerId.startsWith('year-');
   if (isYearBadge) {
     const yearKey = stickerId.replace('year-', '');
-    const is199x = yearKey === '199x';
-
-    const pillBg = is199x
-      ? 'linear-gradient(145deg, #4A152E 0%, #2A0B1A 100%)'
-      : 'linear-gradient(145deg, #FFFFFF 0%, #F0EDEA 100%)';
-    const pillTextColor = is199x ? '#F9B8D0' : '#182744';
-    const pillBorderColor = is199x ? 'rgba(219,39,119,0.5)' : 'rgba(24,39,68,0.25)';
-    const badgeAccentColor = is199x ? '#F472B6' : '#E0A93B';
-
     return (
-      <div
-        style={{
-          background: pillBg,
-          borderColor: pillBorderColor,
-          boxShadow: '0 4px 14px rgba(0,0,0,0.28), inset 0 1px 3px rgba(255,255,255,0.4)',
-          minWidth: forCanvas ? 100 : 84,
-        }}
-        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full transition-transform"
-      >
-        <span
-          className="text-[7px] font-mono font-bold uppercase tracking-widest leading-none mb-0.5 opacity-90"
-          style={{ color: badgeAccentColor }}
-        >
-          MADE IN
-        </span>
-        <span
-          className="font-serif italic font-bold text-[11px] leading-tight tracking-tight"
-          style={{ color: pillTextColor }}
-        >
-          {is199x ? '199X' : `${yearKey}'s`}
-        </span>
-      </div>
+      <MadeInBadge
+        label={yearKey === '199x' ? '199X' : yearKey}
+        size={size}
+        forCanvas={forCanvas}
+        variant="year"
+      />
     );
   }
 
@@ -184,24 +249,13 @@ export const StickerIcon = ({ stickerId, image, imageUrl, size = 48, color, bgCo
     const monthCode = stickerId.replace('month-', '');
     const monthFullName = monthMap[monthCode] || monthCode;
 
-    // Single unified style — white base with navy text, gold accent (matches the panel)
     return (
-      <div
-        style={{
-          background: 'linear-gradient(145deg, #FFFFFF 0%, #F0EDEA 100%)',
-          borderColor: 'rgba(24,39,68,0.22)',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.22), inset 0 1px 3px rgba(255,255,255,0.8)',
-          minWidth: forCanvas ? 100 : 84,
-        }}
-        className="rounded-xl px-2 py-1.5 border flex flex-col items-center justify-center select-none pointer-events-none w-full transition-transform"
-      >
-        <span className="text-[7px] font-mono font-bold uppercase tracking-widest text-[#E0A93B] leading-none mb-0.5 opacity-90">
-          MADE IN
-        </span>
-        <span className="font-serif italic font-bold text-[11px] text-[#182744] leading-tight tracking-tight truncate max-w-full text-center">
-          {monthFullName}
-        </span>
-      </div>
+      <MadeInBadge
+        label={monthFullName}
+        size={size}
+        forCanvas={forCanvas}
+        variant="month"
+      />
     );
   }
 
