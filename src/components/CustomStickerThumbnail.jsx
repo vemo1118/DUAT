@@ -69,12 +69,14 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
   // If we have an uploaded image or generated snapshot image, use it!
   const isDataOrRealImage = Boolean(image);
 
-  if (isDataOrRealImage && cDetails.mode !== 'text') {
+  if (isDataOrRealImage) {
     return (
       <img
         src={image}
         alt={item.nameAr || item.nameEn || 'Sticker'}
         className="w-full h-full object-contain"
+        loading="lazy"
+        decoding="async"
       />
     );
   }
@@ -84,6 +86,10 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
   const textColor = cDetails.textColor || '#E0A93B';
   const bgFinish = cDetails.bgFinish || 'obsidian';
   const cutShape = cDetails.cutShape || 'pill';
+  const textLength = Math.max(1, Array.from(text).length);
+  const fallbackFontSize = size === 'small'
+    ? Math.max(7, Math.min(10, 54 / textLength))
+    : Math.max(8, Math.min(12, 66 / textLength));
 
   const getBgStyle = () => {
     switch (bgFinish) {
@@ -143,8 +149,9 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
 
         {/* Sticker Custom Text */}
         <span
-          className={`font-bold text-[10px] sm:text-xs truncate relative z-10 drop-shadow-sm px-1 ${getFontClass(cDetails.selectedFont)}`}
-          style={{ color: textColor }}
+          dir="auto"
+          className={`font-bold relative z-10 drop-shadow-sm px-1 whitespace-nowrap leading-[1.55] ${getFontClass(cDetails.selectedFont)}`}
+          style={{ color: textColor, fontSize: `${fallbackFontSize}px` }}
         >
           {text}
         </span>

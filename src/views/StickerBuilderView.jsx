@@ -8,6 +8,35 @@ import { uploadDesignDataUrl } from '../services/orderApi';
 import { SunDisc } from '../components/SunDisc';
 import { Type, Image as ImageIcon, Sparkles, ShoppingBag, RotateCcw, Upload, Check, Info, ChevronLeft, ChevronRight, Layers, Palette, Eye, Shield, Tag, Loader2 } from 'lucide-react';
 
+const EXPORT_LAYOUTS = {
+  pill: { width: 1200, height: 480, borderRadius: 240, paddingX: 120, paddingY: 70 },
+  badge: { width: 1200, height: 560, borderRadius: 48, paddingX: 110, paddingY: 80 },
+  circle: { width: 800, height: 800, borderRadius: 400, paddingX: 100, paddingY: 100 },
+  shield: { width: 1000, height: 700, borderRadius: 60, paddingX: 110, paddingY: 100 }
+};
+
+const EXPORT_BACKGROUNDS = {
+  obsidian: { background: '#121214', borderColor: 'rgba(224, 169, 59, 0.45)' },
+  clear: { background: 'rgba(10, 12, 22, 0.35)', borderColor: 'rgba(239, 234, 224, 0.45)' },
+  'gold-foil': { background: 'linear-gradient(90deg, #8f5d12 0%, #e0a93b 50%, #8f5d12 100%)', borderColor: '#e0a93b' },
+  ivory: { background: '#efeae0', borderColor: '#d8cfbc' },
+  amber: { background: 'rgba(217, 119, 6, 0.38)', borderColor: 'rgba(217, 119, 6, 0.75)' }
+};
+
+export function getStickerExportLayout(cutShape, text) {
+  const layout = EXPORT_LAYOUTS[cutShape] || EXPORT_LAYOUTS.pill;
+  const characterCount = Math.max(1, Array.from(String(text || '').trim()).length);
+  const availableWidth = layout.width - (layout.paddingX * 2);
+  const estimatedCharacterWidth = cutShape === 'circle' ? 0.72 : 0.66;
+  const maxByWidth = availableWidth / (characterCount * estimatedCharacterWidth);
+  const shapeMaximum = cutShape === 'circle' ? 112 : 128;
+
+  return {
+    ...layout,
+    fontSize: Math.max(38, Math.min(shapeMaximum, Math.floor(maxByWidth)))
+  };
+}
+
 export function StickerBuilderView() {
   const { lang, t, formatPrice } = useLanguage();
   const { addToCart } = useCart();
@@ -40,7 +69,7 @@ export function StickerBuilderView() {
   const [quantity, setQuantity] = useState(1);
   const [designNotes, setDesignNotes] = useState('');
 
-  const stickerCanvasRef = useRef(null);
+  const stickerExportRef = useRef(null);
 
   const FONTS = [
     { id: 'camel', nameAr: 'خط دوات الملكي', nameEn: 'DUAT Royal Camel', fontClass: 'font-arabic-camel', sample: 'دوات' },
@@ -106,9 +135,17 @@ export function StickerBuilderView() {
 
     setIsUploading(true);
     let stickerSnapshot = uploadedImage;
-    if (mode === 'text' && stickerCanvasRef.current) {
+    if (mode === 'text' && stickerExportRef.current) {
       try {
-        stickerSnapshot = await toPng(stickerCanvasRef.current, { cacheBust: true, pixelRatio: 2 });
+        if (document.fonts?.ready) await document.fonts.ready;
+        const exportLayout = getStickerExportLayout(cutShape, customText);
+        stickerSnapshot = await toPng(stickerExportRef.current, {
+          cacheBust: true,
+          backgroundColor: 'transparent',
+          pixelRatio: 2,
+          width: exportLayout.width,
+          height: exportLayout.height
+        });
       } catch (err) {
         console.warn('Canvas snapshot capture fallback:', err);
       }
@@ -177,10 +214,52 @@ export function StickerBuilderView() {
   const activeFontObj = FONTS.find(f => f.id === selectedFont) || FONTS[0];
   const activeBgObj = BG_FINISHES.find(b => b.id === bgFinish) || BG_FINISHES[0];
   const activeShapeObj = CUT_SHAPES.find(s => s.id === cutShape) || CUT_SHAPES[0];
+  const exportLayout = getStickerExportLayout(cutShape, customText);
+  const exportBackground = EXPORT_BACKGROUNDS[bgFinish] || EXPORT_BACKGROUNDS.obsidian;
   const totalPrice = basePrice * quantity;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 min-h-screen">
+      {/* Fixed-size print artwork. It stays off-screen so responsive preview styles never crop order files. */}
+      {mode === 'text' && (
+        <div aria-hidden="true" className="fixed -left-[10000px] top-0 pointer-events-none">
+          <div
+            ref={stickerExportRef}
+            dir="auto"
+            className="relative flex items-center justify-center text-center overflow-hidden border-[8px]"
+            style={{
+              width: `${exportLayout.width}px`,
+              height: `${exportLayout.height}px`,
+              padding: `${exportLayout.paddingY}px ${exportLayout.paddingX}px`,
+              borderRadius: cutShape === 'shield'
+                ? `48px 48px ${exportLayout.borderRadius}px ${exportLayout.borderRadius}px`
+                : `${exportLayout.borderRadius}px`,
+              borderColor: exportBackground.borderColor,
+              background: exportBackground.background,
+              boxShadow: 'inset 0 12px 24px rgba(255,255,255,0.3), inset 0 -18px 36px rgba(0,0,0,0.42)',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{ background: 'linear-gradient(35deg, transparent 18%, rgba(255,255,255,0.2) 52%, transparent 78%)' }}
+            />
+            <span
+              className={`relative z-10 block w-full font-bold drop-shadow-md ${activeFontObj.fontClass}`}
+              style={{
+                color: textColor,
+                fontSize: `${exportLayout.fontSize}px`,
+                lineHeight: 1.7,
+                padding: '0.28em 0.12em 0.38em',
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box'
+              }}
+            >
+              {customText.trim() || (isAr ? 'اكتب كلمتك' : 'Your Text')}
+            </span>
+          </div>
+        </div>
+      )}
       
       {/* Breadcrumb Navigation */}
       <div className="flex items-center gap-2 font-mono text-xs text-ash uppercase tracking-wider">
@@ -271,7 +350,6 @@ export function StickerBuilderView() {
               {/* Mode A: TEXT STICKER DOME */}
               {mode === 'text' && (
                 <div
-                  ref={stickerCanvasRef}
                   className={`relative z-10 transition-all duration-300 border shadow-2xl flex items-center justify-center text-center overflow-hidden ${activeBgObj.bg} ${activeBgObj.border} ${activeShapeObj.class}`}
                   style={{
                     boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
@@ -282,7 +360,8 @@ export function StickerBuilderView() {
 
                   {/* Sticker Text */}
                   <span
-                    className={`text-xl sm:text-3xl font-bold tracking-wide relative z-10 drop-shadow-md ${activeFontObj.fontClass}`}
+                    dir="auto"
+                    className={`text-xl sm:text-3xl font-bold tracking-wide relative z-10 drop-shadow-md leading-[1.7] py-2 ${activeFontObj.fontClass}`}
                     style={{ color: textColor }}
                   >
                     {customText.trim() || (isAr ? 'اكتب كلمتك' : 'Your Text')}
@@ -293,7 +372,6 @@ export function StickerBuilderView() {
               {/* Mode B: IMAGE STICKER DOME */}
               {mode === 'image' && (
                 <div
-                  ref={stickerCanvasRef}
                   className={`relative z-10 transition-all duration-300 border shadow-2xl overflow-hidden flex items-center justify-center p-4 ${
                     imgCutShape === 'circle' ? 'rounded-full w-44 h-44' :
                     imgCutShape === 'oval' ? 'rounded-[40%] w-52 h-36' : 'rounded-xl w-48 h-48'

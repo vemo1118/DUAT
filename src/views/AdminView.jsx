@@ -3420,14 +3420,22 @@ export function AdminView() {
 
                           {/* Image download for custom sticker */}
                           {customPreviewImage && (
-                            <div className="pt-2 border-t border-grave/40 flex items-center justify-between gap-2">
-                              <img src={customPreviewImage} alt="Sticker Preview" className="w-12 h-12 object-contain bg-stone border border-gold/40 rounded p-1" />
+                            <div className="pt-3 border-t border-grave/40 space-y-3">
+                              <div className="bg-void/80 border border-gold/40 rounded p-3 min-h-48 flex items-center justify-center">
+                                <img
+                                  src={customPreviewImage}
+                                  alt="معاينة ملف طباعة الاستيكر"
+                                  className="w-full max-h-72 object-contain"
+                                  loading="eager"
+                                  decoding="async"
+                                />
+                              </div>
                               <a
                                 href={customPreviewImage}
                                 download={`custom-sticker-${selectedOrderDetails.ref || selectedOrderDetails.id || 'order'}.png`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-3 py-1.5 bg-gold text-void font-bold text-[10px] rounded hover:bg-amber-400 transition-colors flex items-center gap-1"
+                                className="w-full px-3 py-2.5 bg-gold text-void font-bold text-[11px] rounded hover:bg-amber-400 transition-colors flex items-center justify-center gap-1"
                               >
                                 <span>تحميل صورة الاستيكر عالية الجودة 📥</span>
                               </a>
