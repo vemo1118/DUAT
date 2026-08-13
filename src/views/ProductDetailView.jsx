@@ -39,11 +39,10 @@ export function ProductDetailView() {
 
   // Images Gallery
   const primaryImg = product?.imageUrl || product?.image;
-  const images = primaryImg
-    ? [primaryImg]
-    : Array.isArray(product?.images) && product.images.length > 0
-    ? product.images
-    : [];
+  const images = Array.from(new Set([
+    primaryImg,
+    ...(Array.isArray(product?.images) ? product.images : [])
+  ].filter(Boolean)));
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState('');
