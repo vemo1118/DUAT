@@ -345,15 +345,14 @@ export const MONTH_STICKER_PRODUCTS = MONTHS_PRODUCT_LIST.map((m) => ({
 // ── Year Sticker Products ────────────────────────────────────────────────────
 const YEARS_PRODUCT_LIST = [
   { id:'year-199x', en:'Made In 199X', ar:'صُنع في التسعينات' },
-  { id:'year-2000', en:'Made In 2000', ar:'صُنع في عام 2000' },
-  { id:'year-2001', en:'Made In 2001', ar:'صُنع في عام 2001' },
-  { id:'year-2002', en:'Made In 2002', ar:'صُنع في عام 2002' },
-  { id:'year-2003', en:'Made In 2003', ar:'صُنع في عام 2003' },
-  { id:'year-2004', en:'Made In 2004', ar:'صُنع في عام 2004' },
-  { id:'year-2005', en:'Made In 2005', ar:'صُنع في عام 2005' },
-  { id:'year-2006', en:'Made In 2006', ar:'صُنع في عام 2006' },
-  { id:'year-2007', en:'Made In 2007', ar:'صُنع في عام 2007' },
-  { id:'year-2008', en:'Made In 2008', ar:'صُنع في عام 2008' },
+  ...Array.from({ length: 27 }, (_, index) => {
+    const year = 2000 + index;
+    return {
+      id: `year-${year}`,
+      en: `Made In ${year}`,
+      ar: `صُنع في عام ${year}`
+    };
+  }),
 ];
 export const YEAR_STICKER_PRODUCTS = YEARS_PRODUCT_LIST.map((y) => ({
   id: y.id,
