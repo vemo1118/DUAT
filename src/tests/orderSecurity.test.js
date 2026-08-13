@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { calculateTrustedQuote, containsDataUrl } from '../../api/_lib/order-service';
 import { compactCartItems } from '../services/orderApi';
-import { broadcastResourceEvent, subscribeToLiveSync } from '../services/liveSyncService';
+import {
+  broadcastResourceEvent,
+  publishCloudEdits,
+  subscribeToLiveSync
+} from '../services/liveSyncService';
 
 describe('server-authoritative order pricing', () => {
   it('ignores browser-provided names and prices', () => {
@@ -91,6 +95,16 @@ describe('local provider synchronization', () => {
     expect(calls).toBe(0);
     await pending;
     expect(calls).toBe(1);
+    unsubscribe();
+  });
+
+  it('does not turn local cache persistence into a global refresh event', async () => {
+    let calls = 0;
+    const unsubscribe = subscribeToLiveSync('settings-updated', () => { calls += 1; });
+
+    await publishCloudEdits({ bundlesSettings: { hero: {} } });
+
+    expect(calls).toBe(0);
     unsubscribe();
   });
 });

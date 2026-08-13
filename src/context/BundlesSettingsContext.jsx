@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
-import {
-  publishCloudEdits,
-  subscribeToLiveSync,
-  getLiveSyncState
-} from '../services/liveSyncService';
+import { getLiveSyncState } from '../services/liveSyncService';
 
 const BundlesSettingsContext = createContext();
 
@@ -102,18 +98,29 @@ export const BundlesSettingsProvider = ({ children }) => {
     // Initial load from Supabase
     loadFromSupabase();
 
-    // Subscribe to Supabase Realtime broadcasts from admin
-    const unsubscribe = subscribeToLiveSync(() => {
-      loadFromSupabase();
-    });
-    return () => unsubscribe();
+    const channel = supabase
+      .channel('duat-bundles-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'store_settings',
+          filter: 'key=eq.bundles_page_settings'
+        },
+        loadFromSupabase
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  // Save to localStorage and publish to global cloud store whenever bundlesSettings changes
+  // Keep a local fallback without emitting another data-refresh event.
   useEffect(() => {
     try {
       localStorage.setItem('duat_bundles_settings_v1', JSON.stringify(bundlesSettings));
-      publishCloudEdits({ bundlesSettings });
     } catch (e) {
       console.warn('Failed saving duat_bundles_settings to localStorage:', e);
     }

@@ -11,7 +11,6 @@ import liveCustomEdits from '../data/live_custom_edits.json';
 import {
   fetchCloudEdits,
   publishCloudEdits,
-  subscribeToLiveSync,
   getLiveSyncState
 } from '../services/liveSyncService';
 
@@ -368,15 +367,17 @@ export function ProductsProvider({ children }) {
       setProducts(loadLocalProducts());
     });
 
-    // 3. Subscribe to Supabase Realtime broadcasts from admin
-    //    When admin saves any change, this fires and re-fetches fresh data from Supabase
-    const unsubscribe = subscribeToLiveSync(() => {
-      // Re-fetch from Supabase to get the absolute latest data
-      fetchProducts();
-    });
+    const channel = supabase
+      .channel('duat-products')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        fetchProducts
+      )
+      .subscribe();
 
     return () => {
-      unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 

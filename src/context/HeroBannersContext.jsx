@@ -4,7 +4,6 @@ import liveCustomEdits from '../data/live_custom_edits.json';
 import {
   fetchCloudEdits,
   publishCloudEdits,
-  subscribeToLiveSync,
   getLiveSyncState
 } from '../services/liveSyncService';
 
@@ -321,13 +320,18 @@ export function HeroBannersProvider({ children }) {
     // 1. Initial load from Supabase
     fetchSlides();
 
-    // 2. Subscribe to Supabase Realtime broadcasts from admin
-    //    Re-fetch from Supabase when admin updates any hero slide
-    const unsubscribe = subscribeToLiveSync(() => {
-      fetchSlides();
-    });
+    const channel = supabase
+      .channel('duat-hero-slides')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'hero_slides' },
+        fetchSlides
+      )
+      .subscribe();
 
-    return () => unsubscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const addSlide = async (slideData) => {

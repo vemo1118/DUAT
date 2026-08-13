@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
-import {
-  publishCloudEdits,
-  subscribeToLiveSync,
-  getLiveSyncState
-} from '../services/liveSyncService';
+import { getLiveSyncState } from '../services/liveSyncService';
 
 const StickersSettingsContext = createContext();
 
@@ -99,22 +95,32 @@ export const StickersSettingsProvider = ({ children }) => {
     // Initial load
     loadFromSupabase();
 
-    // Subscribe to Supabase Realtime broadcasts from admin
-    const unsubscribe = subscribeToLiveSync(() => {
-      if (isMounted) loadFromSupabase();
-    });
+    const channel = supabase
+      .channel('duat-stickers-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'store_settings',
+          filter: 'key=eq.stickers_page_settings'
+        },
+        () => {
+          if (isMounted) loadFromSupabase();
+        }
+      )
+      .subscribe();
 
     return () => {
       isMounted = false;
-      unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 
-  // Save settings to localStorage and publish to global cloud store whenever changed
+  // Keep a local fallback without emitting another data-refresh event.
   useEffect(() => {
     try {
       localStorage.setItem('duat_stickers_settings_v1', JSON.stringify(stickersSettings));
-      publishCloudEdits({ stickersSettings });
     } catch (e) {
       console.warn('Failed saving duat_stickers_settings to localStorage:', e);
     }

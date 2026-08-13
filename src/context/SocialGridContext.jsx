@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { subscribeToLiveSync } from '../services/liveSyncService';
 
 const SocialGridContext = createContext();
 
@@ -117,14 +116,36 @@ export const SocialGridProvider = ({ children }) => {
     // Initial load
     loadSocialFromSupabase();
 
-    // Subscribe to Supabase Realtime broadcasts from admin
-    const unsubscribe = subscribeToLiveSync(() => {
+    const reloadSocial = () => {
       if (isMounted) loadSocialFromSupabase();
-    });
+    };
+    const channel = supabase
+      .channel('duat-social-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'store_settings',
+          filter: 'key=eq.social_grid_settings'
+        },
+        reloadSocial
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'store_settings',
+          filter: 'key=eq.social_grid_tiles'
+        },
+        reloadSocial
+      )
+      .subscribe();
 
     return () => {
       isMounted = false;
-      unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 

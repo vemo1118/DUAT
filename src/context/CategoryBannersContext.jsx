@@ -195,9 +195,18 @@ export const CategoryBannersProvider = ({ children }) => {
     loadFromSupabase();
 
     const channel = supabase
-      .channel('duat-storefront-settings')
+      .channel('duat-category-settings')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'category_banners' }, loadFromSupabase)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'store_settings' }, loadFromSupabase)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'store_settings',
+          filter: 'key=eq.forge_banner'
+        },
+        loadFromSupabase
+      )
       .subscribe();
 
     return () => {

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { CASE_TYPES as DEFAULT_CASE_TYPES, PHONE_MODELS as DEFAULT_PHONE_MODELS, STICKER_PRESETS as DEFAULT_STICKER_PRESETS } from '../data/products';
-import { subscribeToLiveSync } from '../services/liveSyncService';
 
 const CustomizerContext = createContext();
 
@@ -101,7 +100,11 @@ export const CustomizerProvider = ({ children }) => {
     let isMounted = true;
     const fetchSupabaseSettings = async () => {
       try {
-        const { data, error } = await supabase.from('builder_settings').select('*').single();
+        const { data, error } = await supabase
+          .from('builder_settings')
+          .select('*')
+          .eq('id', 'global-builder-config')
+          .maybeSingle();
         if (!error && data && isMounted) {
           if (data.price) setBuilderPrice(data.price);
           if (data.case_types) setCaseTypes(data.case_types);
@@ -122,14 +125,25 @@ export const CustomizerProvider = ({ children }) => {
     };
     fetchSupabaseSettings();
 
-    // Subscribe to Supabase Realtime broadcasts from admin
-    const unsubscribe = subscribeToLiveSync(() => {
-      if (isMounted) fetchSupabaseSettings();
-    });
+    const channel = supabase
+      .channel('duat-builder-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'builder_settings',
+          filter: 'id=eq.global-builder-config'
+        },
+        () => {
+          if (isMounted) fetchSupabaseSettings();
+        }
+      )
+      .subscribe();
 
     return () => {
       isMounted = false;
-      unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 

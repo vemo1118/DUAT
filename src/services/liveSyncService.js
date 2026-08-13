@@ -62,7 +62,6 @@ export async function fetchCloudEdits() {
 
 export async function publishCloudEdits(partialState) {
   inMemoryState = { ...inMemoryState, ...partialState, updatedAt: Date.now() };
-  await broadcastResourceEvent('settings-updated', 'update', partialState);
   return { success: true, state: inMemoryState };
 }
 
