@@ -217,7 +217,7 @@ export function StickerBuilderView() {
       ],
       customDetails: {
         mode,
-        customText,
+        customText: mode === 'text' ? customText : '',
         selectedFont,
         textColor,
         bgFinish,

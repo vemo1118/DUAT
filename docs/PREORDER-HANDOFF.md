@@ -6,7 +6,7 @@
 - Removed remaining unsupported launch claims from visible fallback content: 1-year warranty, 14-day returns, 1,000 delivered orders, and unconditional secure/fast-shipping language. Replaced them with verifiable price, size, design and timing facts.
 - Expired/draft custom drops no longer keep advertising EGP45 or 4=180. The price and minimum render only while the fixed campaign is open.
 - Verified `store_settings` writes are admin-only; `pending_uploads` is service-role-only; `order-designs` and `payment-proofs` are private buckets with image MIME and size limits.
-- Activated one fixed campaign window in `src/domain/preorderWindow.js`: opens 2026-10-26 22:30 Cairo, closes 2026-11-02 22:30 Cairo, production starts at close, shipping window 2026-11-05 through 2026-11-07 22:30 Cairo.
+- Activated one fixed seven-day campaign window in `src/domain/preorderWindow.js`. The storefront's `Africa/Cairo` formatter shows booking closing 2026-11-02 at 21:30; production starts at close, followed by the agreed 3–5 day production/shipping window.
 - Final local verification after activation: 63/63 tests pass, production build passes, ESLint has zero errors (legacy warnings only), and `git diff --check` passes.
 - Next release steps: commit to a preview branch, verify the Vercel preview including live quote/upload without creating a real order or Telegram message, fast-forward `main`, verify the public aliases and deep links.
 
