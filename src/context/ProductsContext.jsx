@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { storefrontProduct } from '../domain/commerce';
 import {
   PRODUCTS as INITIAL_PRODUCTS_BASE,
   ARABIC_LETTER_PRODUCTS,
@@ -270,6 +271,7 @@ const PREFERRED_BUNDLE_ORDER = [
 function sortProductsByDefaultOrder(prods) {
   if (!Array.isArray(prods)) return [];
   return [...prods].sort((a, b) => {
+    if (Number.isFinite(a?.sortOrder) || Number.isFinite(b?.sortOrder)) return (a.sortOrder ?? 99999) - (b.sortOrder ?? 99999);
     const idxA = PREFERRED_BUNDLE_ORDER.indexOf(a?.id);
     const idxB = PREFERRED_BUNDLE_ORDER.indexOf(b?.id);
     const posA = idxA !== -1 ? idxA : 99;
@@ -306,17 +308,9 @@ function saveLocalProducts(products) {
   }
 }
 
-async function saveProductToSupabase(p) {
-  if (!p || !p.id) return;
-  try {
-    const payload = mapToDb(p);
-    const { error } = await supabase.from('products').upsert(payload, { onConflict: 'id' });
-    if (error) {
-      console.warn('Supabase product upsert notice (persisted in local storage):', error.message);
-    }
-  } catch (err) {
-    // ignore
-  }
+async function saveProductToSupabase(product) {
+  const { data, error } = await supabase.from('products').upsert(mapToDb(product), { onConflict: 'id' }).select('id').single();
+  if (error || !data?.id) throw error || new Error('Cloud save was not confirmed');
 }
 
 export function ProductsProvider({ children }) {
@@ -334,18 +328,11 @@ export function ProductsProvider({ children }) {
         .from('products')
         .select('*')
         .neq('category', 'cases');
-      if (!error && Array.isArray(data) && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         const fetchedProds = data.map(mapFromDb).filter(Boolean);
 
-        // Merge DB prods with INITIAL_PRODUCTS to ensure any missing default product exists
-        const dbMap = new Map(fetchedProds.map((p) => [String(p.id), p]));
-        const merged = [
-          ...fetchedProds,
-          ...INITIAL_PRODUCTS.filter((initP) => !dbMap.has(String(initP.id)))
-        ];
-
-        const withOverrides = applyOverridesAndMergedProducts(merged);
-        const finalProducts = isCustomOrder ? withOverrides : sortProductsByDefaultOrder(withOverrides);
+        // Cloud rows are authoritative. Device-only overrides must not mask edits from another device.
+        const finalProducts = sortProductsByDefaultOrder(fetchedProds);
         setProducts(finalProducts);
         saveLocalProducts(finalProducts);
         setLoading(false);
@@ -396,39 +383,22 @@ export function ProductsProvider({ children }) {
     };
   }, []);
 
-  const moveProductUp = (id) => {
-    localStorage.setItem('duat_custom_product_order', 'true');
-    setProducts((prev) => {
-      const idx = prev.findIndex((p) => p.id === id);
-      if (idx <= 0) return prev;
-      const updated = [...prev];
-      const temp = updated[idx];
-      updated[idx] = updated[idx - 1];
-      updated[idx - 1] = temp;
-      saveLocalProducts(updated);
-      return updated;
-    });
+  const reorderProducts = async (list) => {
+    const ordered = list.map((item, index) => ({ ...item, sortOrder: index }));
+    const { data, error } = await supabase.from('products').upsert(ordered.map(mapToDb), { onConflict: 'id' }).select('id');
+    if (error || data?.length !== ordered.length) throw error || new Error('Order save was not confirmed');
+    setProducts(ordered);
+    saveLocalProducts(ordered);
   };
-
-  const moveProductDown = (id) => {
-    localStorage.setItem('duat_custom_product_order', 'true');
-    setProducts((prev) => {
-      const idx = prev.findIndex((p) => p.id === id);
-      if (idx === -1 || idx >= prev.length - 1) return prev;
-      const updated = [...prev];
-      const temp = updated[idx];
-      updated[idx] = updated[idx + 1];
-      updated[idx + 1] = temp;
-      saveLocalProducts(updated);
-      return updated;
-    });
+  const moveProduct = async (id, step) => {
+    const index = products.findIndex(item => item.id === id);
+    if (index < 0 || index + step < 0 || index + step >= products.length) return;
+    const list = [...products];
+    [list[index], list[index + step]] = [list[index + step], list[index]];
+    await reorderProducts(list);
   };
-
-  const reorderProducts = (newList) => {
-    localStorage.setItem('duat_custom_product_order', 'true');
-    setProducts(newList);
-    saveLocalProducts(newList);
-  };
+  const moveProductUp = id => moveProduct(id, -1);
+  const moveProductDown = id => moveProduct(id, 1);
 
   const addProduct = async (prodData) => {
     const img = prodData.imageUrl || prodData.image || '';
@@ -439,119 +409,45 @@ export function ProductsProvider({ children }) {
       image: img,
       images: normalizeProductImages(img, Array.isArray(prodData.images) ? prodData.images : [])
     };
-    saveAddedProduct(newProduct);
-    saveCustomEdit(newProduct.id, newProduct);
-
-    setProducts((prev) => {
-      const updated = [newProduct, ...prev];
-      saveLocalProducts(updated);
-      return updated;
-    });
     await saveProductToSupabase(newProduct);
+    setProducts(prev => { const next = [newProduct, ...prev]; saveLocalProducts(next); return next; });
     return newProduct;
   };
 
-  const updateProduct = async (id, updatedFields) => {
-    saveCustomEdit(id, updatedFields);
-
-    let targetProduct = null;
-    setProducts((prev) => {
-      const updatedList = prev.map((prod) => {
-        if (prod.id === id) {
-          const img = updatedFields.imageUrl !== undefined ? updatedFields.imageUrl : (updatedFields.image !== undefined ? updatedFields.image : (prod.imageUrl || prod.image || ''));
-          const updated = {
-            ...prod,
-            ...updatedFields,
-            imageUrl: img,
-            image: img,
-            images: normalizeProductImages(
-              img,
-              Array.isArray(updatedFields.images) ? updatedFields.images : [],
-              Array.isArray(prod.images) ? prod.images : []
-            )
-          };
-          targetProduct = updated;
-          return updated;
-        }
-        return prod;
-      });
-      saveLocalProducts(updatedList);
-      return updatedList;
-    });
-
-    if (targetProduct) {
-      await saveProductToSupabase(targetProduct);
-    }
+  const updateProduct = async (id, fields) => {
+    const product = products.find(item => item.id === id);
+    if (!product) throw new Error('Product not found');
+    const img = fields.imageUrl ?? fields.image ?? product.imageUrl ?? product.image ?? '';
+    const updated = { ...product, ...fields, imageUrl: img, image: img,
+      images: normalizeProductImages(img, fields.images || [], product.images || []) };
+    await saveProductToSupabase(updated);
+    setProducts(prev => { const next = prev.map(item => item.id === id ? updated : item); saveLocalProducts(next); return next; });
   };
 
-  // Quick price adjustment
   const adjustPrice = async (id, delta) => {
-    let targetProduct = null;
-    setProducts((prev) =>
-      prev.map((prod) => {
-        if (prod.id === id) {
-          const newPrice = Math.max(0, prod.price + delta);
-          saveCustomEdit(id, { price: newPrice });
-          const updated = { ...prod, price: newPrice };
-          targetProduct = updated;
-          return updated;
-        }
-        return prod;
-      })
-    );
-
-    if (targetProduct) {
-      try {
-        const { error } = await supabase.from('products').upsert(mapToDb(targetProduct), { onConflict: 'id' });
-        if (error) console.error('Supabase adjust price error:', error);
-      } catch (err) {
-        console.error('Supabase adjust price error:', err);
-      }
-    }
+    const product = products.find(item => item.id === id);
+    if (!product) throw new Error('Product not found');
+    await updateProduct(id, { price: Math.max(0, product.price + delta) });
   };
 
   const toggleProductVisibility = async (id) => {
-    let targetProduct = null;
-    setProducts((prev) => {
-      const updatedList = prev.map((prod) => {
-        if (prod.id === id) {
-          const currentStatus = prod.is_active !== undefined ? Boolean(prod.is_active) : (prod.isActive !== undefined ? Boolean(prod.isActive) : true);
-          const newStatus = !currentStatus;
-          saveCustomEdit(id, { is_active: newStatus, isActive: newStatus });
-          const updated = { ...prod, is_active: newStatus, isActive: newStatus };
-          targetProduct = updated;
-          return updated;
-        }
-        return prod;
-      });
-      saveLocalProducts(updatedList);
-      return updatedList;
-    });
-
-    if (targetProduct) {
-      await saveProductToSupabase(targetProduct);
-    }
+    const product = products.find(item => item.id === id);
+    if (!product) throw new Error('Product not found');
+    const active = !(product.is_active ?? product.isActive ?? true);
+    await updateProduct(id, { is_active: active, isActive: active });
   };
 
   const deleteProduct = async (id) => {
-    saveDeletedProductId(id);
-    setProducts((prev) => {
-      const updatedList = prev.filter((prod) => prod.id !== id);
-      saveLocalProducts(updatedList);
-      return updatedList;
-    });
-    try {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (error) console.error('Supabase delete product error:', error);
-    } catch (err) {
-      console.error('Supabase delete product error:', err);
-    }
+    const { data, error } = await supabase.from('products').delete().eq('id', id).select('id');
+    if (error || !data?.length) throw error || new Error('Delete was not confirmed');
+    setProducts(prev => { const next = prev.filter(item => item.id !== id); saveLocalProducts(next); return next; });
   };
 
   // Get single product by ID
   const getProductById = (id) => {
     if (!id) return null;
-    return products.find((prod) => prod.id === id);
+    const product = products.find((prod) => prod.id === id);
+    return product ? storefrontProduct(product) : product;
   };
 
   // Reset products
@@ -570,7 +466,8 @@ export function ProductsProvider({ children }) {
   return (
     <ProductsContext.Provider
       value={{
-        products,
+        products: products.map(storefrontProduct),
+        catalogProducts: products,
         loading,
         addProduct,
         updateProduct,

@@ -95,25 +95,25 @@ html[data-theme="night"],
 html:not([data-theme]) {
   color-scheme: dark;
   --night: #0A0C16;
-  --twilight: #232A55;
+  --twilight: #161A32;
   --amber: #E8A33D;
   --amber-deep: #C97B22;
   --rose: #E0917A;
 
   --void: #0A0C16;
   --void-rgb: 10 12 22;
-  --stone: #12162B;
-  --stone-rgb: 18 22 43;
-  --coal: #181E3B;
-  --coal-rgb: 24 30 59;
+  --stone: #161A32;
+  --stone-rgb: 22 26 50;
+  --coal: #232A55;
+  --coal-rgb: 35 42 85;
   --grave: #28305F;
   --grave-rgb: 40 48 95;
   --gold: #E8A33D;
   --gold-rgb: 232 163 61;
   --bone: #EDE4D3;
   --bone-rgb: 237 228 211;
-  --ash: #8E98BF;
-  --ash-rgb: 142 152 191;
+  --ash: #9A9384;
+  --ash-rgb: 154 147 132;
   --ember: #D9432E;
   --ember-rgb: 217 67 46;
 }
@@ -284,11 +284,12 @@ button, a.btn, select, input[type="submit"] {
 
 /* Display Headings with Clean Word Spacing & Tight Tracking for English */
 .font-clash {
-  font-family: 'Clash Display', 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  word-spacing: 0.12em;
-  line-height: 0.95;
+  font-family: 'Anton', 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.02em;
+  word-spacing: normal;
+  line-height: 1.08;
 }
 
 .font-space {
@@ -323,7 +324,7 @@ button, a.btn, select, input[type="submit"] {
 [dir="rtl"] select,
 [dir="rtl"] textarea,
 [dir="rtl"] div {
-  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+  font-family: 'Cairo', sans-serif !important;
   font-weight: 500 !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
@@ -336,11 +337,21 @@ button, a.btn, select, input[type="submit"] {
 [dir="rtl"] h4,
 [dir="rtl"] .font-clash,
 [dir="rtl"] .font-display {
-  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+  font-family: 'Cairo', sans-serif !important;
   font-weight: 700 !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
   line-height: 1.4 !important;
+}
+
+.brand-wordmark,
+[dir="rtl"] .brand-wordmark {
+  font-family: 'Anton', sans-serif !important;
+  font-weight: 400 !important;
+  font-synthesis: none;
+  letter-spacing: 0.14em !important;
+  line-height: 1 !important;
+  direction: ltr;
 }
 
 /* Marquee Infinite Horizontal Scroll Keyframes */
@@ -475,4 +486,19 @@ button, a.btn, select, input[type="submit"] {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--ember);
+}
+
+/* The workbench stays light independently of the storefront theme. */
+.sticker-builder {
+  --void: #faf6f0; --void-rgb: 250 246 240;
+  --stone: #fffdf9; --stone-rgb: 255 253 249;
+  --coal: #f1ece2; --coal-rgb: 241 236 226;
+  --grave: #d9d1c3; --grave-rgb: 217 209 195;
+  --bone: #232a55; --bone-rgb: 35 42 85;
+  --ash: #666052; --ash-rgb: 102 96 82;
+  --gold: #986016; --gold-rgb: 152 96 22;
+  background: #faf6f0;
+  border-radius: 24px;
+  margin-top: 24px;
+  margin-bottom: 24px;
 }

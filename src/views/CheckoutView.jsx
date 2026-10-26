@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
@@ -6,7 +6,8 @@ import { useToast } from '../context/ToastContext';
 import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
 import { Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
-import { createOrder, uploadOrderFile } from '../services/orderApi';
+import { createOrder, uploadOrderFile, quoteOrder, compactCartItems } from '../services/orderApi';
+import { PREORDER, checkoutMessage, isCustomSticker as isCustomPreorder } from '../domain/commerce';
 
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
 
@@ -15,7 +16,7 @@ const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 export const CheckoutView = ({ setView }) => {
   const navigate = useNavigate();
   const { lang, t, formatPrice } = useLanguage();
-  const { cartItems, subtotal, discount, promoCode, clearCart } = useCart();
+  const { cartItems, subtotal: estimatedSubtotal, discount: estimatedDiscount, promoCode, clearCart, pricing, checkoutIssue } = useCart();
   const { showToast } = useToast();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
@@ -25,16 +26,38 @@ export const CheckoutView = ({ setView }) => {
   const [phoneError, setPhoneError] = useState('');
   const [address, setAddress] = useState('');
   const [governorate, setGovernorate] = useState(GOVERNORATES[0]);
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [selectedPayment, setPaymentMethod] = useState('cod');
+  const paymentMethod = pricing.customQuantity ? 'instapay' : selectedPayment;
   const [paymentProofFile, setPaymentProofFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderReference, setOrderReference] = useState(null);
+  const [receiptPayment, setReceiptPayment] = useState(null);
   const [requestId] = useState(() => crypto.randomUUID());
+  const [quoteState, setQuoteState] = useState(null);
+  const [quoteAttempt, setQuoteAttempt] = useState(0);
+  const quoteKey = JSON.stringify({ items: compactCartItems(cartItems), couponCode: promoCode, governorateId: governorate.id });
+  useEffect(() => {
+    let cancelled = false;
+    const payload = JSON.parse(quoteKey);
+    if (payload.items.length) {
+      quoteOrder(payload).then((quote) => {
+        if (!cancelled) setQuoteState({ key: quoteKey, quote });
+      }).catch(() => {
+        if (!cancelled) setQuoteState({ key: quoteKey, error: true });
+      });
+    }
+    return () => { cancelled = true; };
+  }, [quoteKey, quoteAttempt]);
+  const trustedQuote = quoteState?.key === quoteKey ? quoteState.quote : null;
+  const quoteError = quoteState?.key === quoteKey && quoteState.error;
+  const bookingIssue = trustedQuote?.checkoutIssue || checkoutIssue;
+  const subtotal = trustedQuote?.subtotal ?? estimatedSubtotal;
+  const discount = trustedQuote?.discount ?? estimatedDiscount;
 
   // Free shipping threshold >= 800 EGP
   const isFreeShipping = subtotal >= 800;
-  const shippingFee = isFreeShipping ? 0 : (governorate ? governorate.fee : 110);
-  const finalTotal = Math.max(0, subtotal - discount + shippingFee);
+  const shippingFee = trustedQuote?.shippingFee ?? (isFreeShipping ? 0 : (governorate ? governorate.fee : 110));
+  const finalTotal = trustedQuote?.total ?? Math.max(0, subtotal - discount + shippingFee);
 
   const handleCopyInstaPay = () => {
     navigator.clipboard.writeText('moataz_m25@instapay');
@@ -53,6 +76,10 @@ export const CheckoutView = ({ setView }) => {
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
+    if (!trustedQuote || bookingIssue) {
+      showToast(checkoutMessage(bookingIssue, isRtl) || (isRtl ? 'استنى تأكيد السعر النهائي.' : 'Wait for the confirmed total.'), 'info');
+      return;
+    }
     if (!fullName || !phone || !address) {
       showToast(isRtl ? 'يرجى إكمال جميع الحقول المطلوبة' : 'Please complete all required fields', 'error');
       return;
@@ -91,6 +118,12 @@ export const CheckoutView = ({ setView }) => {
 
     setIsSubmitting(true);
     try {
+      const freshQuote = await quoteOrder(JSON.parse(quoteKey));
+      if (freshQuote.total !== trustedQuote.total || freshQuote.checkoutIssue) {
+        setQuoteState({ key: quoteKey, quote: freshQuote });
+        showToast(checkoutMessage(freshQuote.checkoutIssue, isRtl) || (isRtl ? 'السعر اتحدّث. راجع الإجمالي قبل المتابعة.' : 'The total changed. Review it before continuing.'), 'info');
+        return;
+      }
       const paymentProof = paymentMethod === 'instapay'
         ? await uploadOrderFile(paymentProofFile, 'payment-proof')
         : null;
@@ -101,7 +134,8 @@ export const CheckoutView = ({ setView }) => {
         couponCode: promoCode,
         governorateId: governorate.id,
         paymentMethod,
-        paymentProof
+        paymentProof,
+        expectedTotal: freshQuote.total
       });
 
       const ref = savedOrder.ref;
@@ -130,6 +164,7 @@ export const CheckoutView = ({ setView }) => {
         console.warn('Could not save the local tracking shortcut:', storageError.message);
       }
 
+      setReceiptPayment(paymentMethod);
       setOrderReference(ref);
       clearCart();
     } catch (error) {
@@ -155,10 +190,10 @@ export const CheckoutView = ({ setView }) => {
             {t('orderSuccessTitle')}
           </span>
           <h1 className="font-clash text-4xl sm:text-5xl uppercase text-bone tracking-tight">
-            PASSAGE CONFIRMED
+            {receiptPayment === 'instapay' ? (isRtl ? 'استلمنا طلبك — التحويل قيد المراجعة' : 'ORDER RECEIVED — PAYMENT UNDER REVIEW') : 'ORDER RECEIVED'}
           </h1>
           <p className="font-space text-base text-bone/80 font-light max-w-lg mx-auto">
-            {t('orderSuccessDesc')}
+            {receiptPayment === 'instapay' ? (isRtl ? 'هنأكد الدفع بعد مراجعة وصول التحويل. صورة التحويل لوحدها مش تأكيد استلام الفلوس.' : 'Payment will be confirmed after we verify the transfer. A screenshot alone is not payment confirmation.') : t('orderSuccessDesc')}
           </p>
         </div>
 
@@ -195,6 +230,11 @@ export const CheckoutView = ({ setView }) => {
         </h1>
       </div>
 
+      {pricing.customQuantity > 0 && <div className="border border-gold/40 bg-gold/10 p-4 text-sm text-bone leading-7">
+        <p>{isRtl ? 'الحجز لمدة 7 أيام، وبعد قفل الحجز من 3 إلى 5 أيام للتصنيع والشحن. الدفع مقدمًا؛ التحويل بيخضع للمراجعة.' : 'Booking is open for 7 days, followed by 3–5 days for production and shipping. Payment is upfront and transfers are reviewed.'}</p>
+        {PREORDER.closesAt && <p>{isRtl ? 'إغلاق الحجز: ' : 'Booking closes: '}{new Date(PREORDER.closesAt).toLocaleString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} ({isRtl ? 'توقيت القاهرة' : 'Cairo time'})</p>}
+        {PREORDER.shipsBy && <p>{isRtl ? 'التصنيع والشحن من ' : 'Production and shipping: '}{new Date(PREORDER.shipsFrom).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} — {new Date(PREORDER.shipsBy).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })}</p>}
+      </div>}
       {/* Free Shipping Notification Banner */}
       <div className={`p-4 border font-mono text-xs flex items-center justify-between gap-4 ${isFreeShipping ? 'bg-gold/15 border-gold text-gold font-bold' : 'bg-stone border-grave text-bone'}`}>
         <span>
@@ -302,7 +342,7 @@ export const CheckoutView = ({ setView }) => {
               {[
                 { id: 'cod', title: isRtl ? 'الدفع عند الاستلام (COD)' : 'Cash on Delivery (COD)', desc: isRtl ? 'ادفع نقداً عند استلام الشحنة من المندوب.' : 'Pay cash to the delivery courier.' },
                 { id: 'instapay', title: isRtl ? 'الدفع السريع عبر إنستاباي (InstaPay)' : 'InstaPay Direct Payment', desc: isRtl ? 'تحويل سريع عبر تطبيق إنستاباي وإرفاق اسكرين شوت.' : 'Instant transfer via InstaPay app + attach screenshot.' }
-              ].map((method) => {
+              ].filter((method) => !pricing.customQuantity || method.id === 'instapay').map((method) => {
                 const isSelected = paymentMethod === method.id;
                 return (
                   <label
@@ -330,7 +370,7 @@ export const CheckoutView = ({ setView }) => {
             </div>
 
             {/* InstaPay Flow with Direct Payment Link + Required Screenshot Upload */}
-            {paymentMethod === 'instapay' && (
+            {paymentMethod === 'instapay' && trustedQuote && !bookingIssue && (
               <div className="p-5 bg-coal border border-gold/50 space-y-4 font-mono text-xs">
                 <div className="flex items-center justify-between gap-4 border-b border-grave/60 pb-3">
                   <div>
@@ -367,8 +407,8 @@ export const CheckoutView = ({ setView }) => {
                   </p>
                   <p className="font-bold text-gold">
                     {isRtl
-                      ? '٢) ارفع اسكرين شوت التحويل هنا لتأكيد الطلب.'
-                      : '2) Upload the payment screenshot here to confirm.'}
+                      ? '٢) ارفع صورة التحويل. بنأكد الدفع بعد مراجعة وصوله.'
+                      : '2) Upload the screenshot. Payment is confirmed after transfer verification.'}
                   </p>
                 </div>
 
@@ -395,9 +435,22 @@ export const CheckoutView = ({ setView }) => {
             )}
           </div>
 
+          <p role="status" className="text-sm text-gold">
+            {bookingIssue ? checkoutMessage(bookingIssue, isRtl) : quoteError
+              ? (isRtl ? 'تعذر تأكيد السعر. حاول تاني من غير ما تقفل الصفحة.' : 'Could not confirm the total. Retry without closing this page.')
+              : !trustedQuote ? (isRtl ? 'جاري تأكيد السعر والشحن…' : 'Confirming total and shipping…') : ''}
+          </p>
+          {quoteError && (
+            <button type="button" className="btn-ghost py-3 px-4" onClick={() => {
+              setQuoteState(null);
+              setQuoteAttempt((attempt) => attempt + 1);
+            }}>
+              {isRtl ? 'إعادة تأكيد السعر' : 'Retry price confirmation'}
+            </button>
+          )}
           <button
             type="submit"
-            disabled={isSubmitting || cartItems.length === 0 || !!phoneError}
+            disabled={isSubmitting || cartItems.length === 0 || !!phoneError || !trustedQuote || !!bookingIssue}
             className="w-full btn-primary py-4 text-sm font-mono tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 min-h-[48px]"
           >
             <span>{isSubmitting ? (isRtl ? 'جاري تنفيذ الطلب...' : 'Placing Order...') : t('placeOrder')}</span>
@@ -417,12 +470,12 @@ export const CheckoutView = ({ setView }) => {
               const name = isRtl ? (item.nameAr || item.nameEn || item.name) : (item.nameEn || item.nameAr || item.name);
               const cDetails = item.customDetails || item.customConfig || {};
 
-              const isCustomSticker = item.id?.startsWith('custom-sticker-') || item.category === 'stickers' || cDetails?.mode === 'text' || cDetails?.mode === 'image';
+              const isCustomSticker = isCustomPreorder(item);
               const isCustomBundle = item.category === 'bundles' || item.id?.startsWith('bundle-') || !!cDetails?.selectedItems;
 
               return (
                 <div
-                  key={item.cartId || item.id}
+                  key={item.cartItemId || item.id}
                   className="flex gap-3 p-3 bg-coal/80 border border-grave hover:border-gold/60 transition-colors rounded relative group"
                 >
                   {/* Thumbnail / Mockup Image */}

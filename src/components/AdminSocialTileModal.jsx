@@ -13,6 +13,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
   });
 
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (tile) {
@@ -50,7 +51,7 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.image) {
       showToast('يرجى اختيار صورة للمنشور', 'error');
@@ -60,9 +61,17 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
       showToast('يرجى كتابة عنوان للصورة', 'error');
       return;
     }
-    onSave(tile.id, formData);
-    showToast(isEditing ? 'تم تحديث الصورة بنجاح ✨' : 'تم إضافة الصورة الجديدة بنجاح ✨', 'success');
-    onClose();
+    setSaving(true);
+    try {
+      await onSave(tile.id, formData);
+      showToast(isEditing ? 'تم تحديث الصورة على الموقع ✨' : 'تم إضافة الصورة إلى الموقع ✨', 'success');
+      onClose();
+    } catch (error) {
+      console.error('Social tile save failed:', error?.message || error);
+      showToast('تعذر حفظ الصورة على الموقع. راجع الاتصال وصلاحية الأدمن.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -195,10 +204,11 @@ export const AdminSocialTileModal = ({ isOpen, onClose, tile, onSave }) => {
             </button>
             <button
               type="submit"
-              className="btn-primary px-6 py-2.5 font-mono text-xs uppercase font-bold flex items-center gap-2"
+              disabled={saving || uploading}
+              className="btn-primary px-6 py-2.5 font-mono text-xs uppercase font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Save size={16} />
-              <span>حفظ التغييرات 💾</span>
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات 💾'}</span>
             </button>
           </div>
         </form>

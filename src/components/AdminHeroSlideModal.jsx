@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, Upload, Sparkles, Languages } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
 
@@ -6,6 +6,8 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
   const { products = [] } = useProducts();
   const [activeLangTab, setActiveLangTab] = useState('ar'); // 'ar' | 'en'
 
+  const saving = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
     eyebrowEn: 'DUAT / STICKER BUILDER',
@@ -128,10 +130,13 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    if (saving.current) return;
+    saving.current = true;
+    setIsSaving(true);
+    try { if (await onSave(formData) !== false) onClose(); }
+    finally { saving.current = false; setIsSaving(false); }
   };
 
   return (
@@ -855,6 +860,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
 
           <button
             type="submit"
+            disabled={isSaving}
             className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-lg shadow-gold/20 flex items-center gap-2 ring-1 ring-gold"
           >
             <Save size={16} />

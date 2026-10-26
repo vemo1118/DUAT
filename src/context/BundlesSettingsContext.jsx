@@ -20,7 +20,7 @@ export const DEFAULT_BUNDLES_SETTINGS = {
     perks: [
       { id: 1, textAr: 'توفير يصل إلى ١٥٠ ج.م بالبندل', textEn: 'Save up to 150 EGP per bundle', icon: 'Tag', active: true },
       { id: 2, textAr: 'تأتي في علبة هدايا العبور الفاخرة', textEn: 'Includes DUAT luxury gift box', icon: 'Gift', active: true },
-      { id: 3, textAr: 'شحن فوري لكل المحافظات', textEn: 'Fast shipping across Egypt', icon: 'Zap', active: true }
+      { id: 3, textAr: 'موعد الطلب بيظهر قبل الدفع', textEn: 'Order timing shown before payment', icon: 'Zap', active: true }
     ]
   },
   cta: {
@@ -128,54 +128,38 @@ export const BundlesSettingsProvider = ({ children }) => {
 
 
   const saveSettingsToSupabase = async (newSettings) => {
-    try {
-      await supabase.from('store_settings').upsert({
+    const { data, error } = await supabase.from('store_settings').upsert({
         key: 'bundles_page_settings',
         value: newSettings,
         updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Error upserting bundles_page_settings to Supabase:', err);
-    }
+      }).select('key').single();
+    if (error || !data) throw error || new Error('BUNDLES_SETTINGS_SAVE_FAILED');
   };
 
   const updateBundlesHero = async (heroFields) => {
-    setBundlesSettings((prev) => {
-      const updated = {
-        ...prev,
-        hero: { ...prev.hero, ...heroFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...bundlesSettings, hero: { ...bundlesSettings.hero, ...heroFields } };
+    await saveSettingsToSupabase(updated);
+    setBundlesSettings(updated);
+    return updated;
   };
 
   const updateBundlesCta = async (ctaFields) => {
-    setBundlesSettings((prev) => {
-      const updated = {
-        ...prev,
-        cta: { ...prev.cta, ...ctaFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...bundlesSettings, cta: { ...bundlesSettings.cta, ...ctaFields } };
+    await saveSettingsToSupabase(updated);
+    setBundlesSettings(updated);
+    return updated;
   };
 
   const updateBundlesGridSettings = async (gridFields) => {
-    setBundlesSettings((prev) => {
-      const updated = {
-        ...prev,
-        grid: { ...prev.grid, ...gridFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...bundlesSettings, grid: { ...bundlesSettings.grid, ...gridFields } };
+    await saveSettingsToSupabase(updated);
+    setBundlesSettings(updated);
+    return updated;
   };
 
   const resetBundlesSettings = async () => {
-    setBundlesSettings(DEFAULT_BUNDLES_SETTINGS);
-    localStorage.removeItem('duat_bundles_settings_v1');
     await saveSettingsToSupabase(DEFAULT_BUNDLES_SETTINGS);
+    setBundlesSettings(DEFAULT_BUNDLES_SETTINGS);
   };
 
   return (

@@ -17,7 +17,6 @@ export const Navbar = ({ onOpenTracker }) => {
 
   const navLinks = [
     { path: '/', label: lang === 'ar' ? 'الرئيسية' : 'Home', end: true },
-    { path: '/bundles', label: t('navBundles') },
     { path: '/stickers', label: t('navStickers') },
     { path: '/sticker-builder', label: t('navStickerBuilder') },
     { path: '/the-duat', label: t('navDuat') }
@@ -36,7 +35,7 @@ export const Navbar = ({ onOpenTracker }) => {
           {/* LOGO LOCKUP: SunDisc + DUAT Typography (Left in LTR, Right in RTL) */}
           <Link to="/" className="flex items-center gap-3 group focus:outline-none min-h-[44px]">
             <SunDisc size={28} variant="gold" />
-            <span className="font-clash text-2xl font-bold tracking-tight text-bone group-hover:text-gold transition-colors leading-none">
+            <span className="brand-wordmark text-2xl text-bone">
               DUAT
             </span>
           </Link>

@@ -10,7 +10,7 @@ async function apiRequest(path, body, options = {}) {
     body: JSON.stringify(body || {})
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok || result.success === false) throw new Error(result.error || 'Request failed');
+  if (!response.ok || result.success !== true) throw new Error(result.error || 'Request failed');
   return result;
 }
 
@@ -33,6 +33,10 @@ export function compactCartItems(items) {
         textColor: cleanText(customDetails.textColor, 20),
         bgFinish: cleanText(customDetails.bgFinish, 40),
         cutShape: cleanText(customDetails.cutShape, 40),
+        imageScale: customDetails.imageScale,
+        borderStyle: cleanText(customDetails.borderStyle, 20),
+        printWidthMm: customDetails.printWidthMm,
+        printHeightMm: customDetails.printHeightMm,
         designNotes: cleanText(customDetails.designNotes, 500),
         selectedItems: Array.isArray(customDetails.selectedItems)
           ? customDetails.selectedItems.slice(0, 12).map((selected) => ({

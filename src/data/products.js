@@ -386,10 +386,10 @@ export const FAQS = [
   },
   {
     id: 'faq-2',
-    questionEn: 'What is your return policy?',
-    questionAr: 'ما هي سياسة الإرجاع؟',
-    answerEn: 'We offer 14-day hassle-free returns across all Egyptian governorates.',
-    answerAr: 'نقدم إمكانية الإرجاع بسهولة خلال ١٤ يوماً لكافة المحافظات.'
+    questionEn: 'When is a custom pre-order made?',
+    questionAr: 'إمتى بيتصنع طلب الكستمايز؟',
+    answerEn: 'The booking window lasts 7 days. Production and shipping take 3–5 days after it closes.',
+    answerAr: 'باب الحجز بيفضل مفتوح ٧ أيام، وبعد ما يقفل التصنيع والشحن بياخدوا من ٣ لـ٥ أيام.'
   }
 ];
 

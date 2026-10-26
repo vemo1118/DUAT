@@ -6,6 +6,7 @@ import {
   YEAR_STICKER_PRODUCTS,
   GOVERNORATES
 } from '../../src/data/products.js';
+import { PRICING, ORDER_LIMITS, PREORDER, priceCart, checkoutIssue, validateCheckout } from '../../src/domain/commerce.js';
 
 const STATIC_PRODUCTS = [
   ...PRODUCTS,
@@ -17,9 +18,8 @@ const STATIC_PRODUCTS = [
 
 const STATIC_CATALOG = new Map(STATIC_PRODUCTS.map((product) => [String(product.id), product]));
 const GOVERNORATE_MAP = new Map(GOVERNORATES.map((governorate) => [governorate.id, governorate]));
-const MAX_CART_ITEMS = 24;
-const MAX_QUANTITY = 20;
-const CUSTOM_STICKER_PRICE = 100;
+const MAX_CART_ITEMS = ORDER_LIMITS.lines;
+const MAX_QUANTITY = ORDER_LIMITS.quantityPerLine;
 
 function cleanText(value, maxLength = 160) {
   return String(value || '').trim().slice(0, maxLength);
@@ -31,8 +31,8 @@ function cleanNumber(value, fallback = 0) {
 }
 
 function cleanQuantity(value) {
-  const quantity = Math.floor(cleanNumber(value, 1));
-  if (quantity < 1 || quantity > MAX_QUANTITY) throw new Error('INVALID_ITEMS');
+  const quantity = value === undefined ? 1 : Number(value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) throw new Error('INVALID_ITEMS');
   return quantity;
 }
 
@@ -106,7 +106,10 @@ function normalizeCustomSticker(item, quantity) {
     nameAr: cleanText(item.nameAr, 160) || 'استيكر مخصص',
     nameEn: cleanText(item.nameEn, 160) || 'Custom Sticker',
     quantity,
-    price: CUSTOM_STICKER_PRICE,
+    price: PRICING.custom,
+    purchaseType: 'custom-preorder',
+    productionStartsAt: PREORDER.productionStartsAt,
+    shipsBy: PREORDER.shipsBy,
     design_image_path: path,
     design_upload_token: uploadToken,
     customDetails: {
@@ -116,6 +119,10 @@ function normalizeCustomSticker(item, quantity) {
       textColor: cleanText(details.textColor, 20),
       bgFinish: cleanText(details.bgFinish, 40),
       cutShape: cleanText(details.cutShape, 40),
+      imageScale: Math.min(100, Math.max(50, Number(details.imageScale) || 100)),
+      borderStyle: cleanText(details.borderStyle, 20),
+      printWidthMm: Math.min(40, Math.max(0.01, Number(details.printWidthMm) || 25)),
+      printHeightMm: Math.min(40, Math.max(0.01, Number(details.printHeightMm) || 25)),
       designNotes: cleanText(details.designNotes, 500)
     }
   };
@@ -164,7 +171,13 @@ export function calculateTrustedQuote(payload, sources = {}) {
     return normalizeCatalogItem(item, quantity, catalog);
   });
 
-  const subtotal = safeItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const pricing = priceCart(safeItems);
+  const { subtotal } = pricing;
+  const issue = checkoutIssue(pricing);
+  if (payload.requireCheckout) validateCheckout(pricing, payload.paymentMethod);
+  // Launch custom prices do not stack with coupons; stock retains existing coupon support.
+  const couponSubtotal = pricing.items.filter((item) => item.purchaseType !== 'custom-preorder')
+    .reduce((sum, item) => sum + item.price * item.quantity, 0);
   let discount = 0;
   let couponCode = null;
   const coupon = sources.coupon;
@@ -174,9 +187,9 @@ export function calculateTrustedQuote(payload, sources = {}) {
       couponCode = cleanText(coupon.code, 80).toUpperCase();
       const couponValue = Math.max(0, cleanNumber(coupon.value));
       if (coupon.type === 'percentage') {
-        discount = Math.min(subtotal, Math.round(subtotal * Math.min(100, couponValue) / 100));
+        discount = Math.min(couponSubtotal, Math.round(couponSubtotal * Math.min(100, couponValue) / 100));
       } else if (coupon.type === 'fixed') {
-        discount = Math.min(subtotal, couponValue);
+        discount = Math.min(couponSubtotal, couponValue);
       }
     }
   }
@@ -188,7 +201,10 @@ export function calculateTrustedQuote(payload, sources = {}) {
   const total = Math.max(0, subtotal - discount + shippingFee);
 
   return {
-    items: safeItems,
+    items: pricing.items,
+    customQuantity: pricing.customQuantity,
+    customRemaining: pricing.customRemaining,
+    checkoutIssue: issue,
     subtotal,
     discount,
     shippingFee,

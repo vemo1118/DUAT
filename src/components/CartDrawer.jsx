@@ -9,6 +9,7 @@ import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag, Messag
 import { generateWhatsAppOrderLink } from '../utils/orderNotifier';
 
 import { CustomStickerThumbnail } from './CustomStickerThumbnail';
+import { checkoutMessage, PRICING } from '../domain/commerce';
 
 export const CartDrawer = () => {
   const {
@@ -21,7 +22,9 @@ export const CartDrawer = () => {
     discount,
     total,
     promoCode,
-    applyPromoCode
+    applyPromoCode,
+    pricing,
+    checkoutIssue
   } = useCart();
 
   const { lang, t, formatPrice } = useLanguage();
@@ -50,11 +53,19 @@ export const CartDrawer = () => {
   };
 
   const handleProceedCheckout = () => {
+    if (checkoutIssue) {
+      showToast(checkoutMessage(checkoutIssue, isRtl), 'info');
+      return;
+    }
     toggleCart();
     navigate('/checkout');
   };
 
   const handleWhatsAppCheckout = () => {
+    if (pricing.customQuantity) {
+      showToast(isRtl ? 'كمّل حجز الكستمايز من الموقع لحفظ تصميماتك.' : 'Complete custom pre-orders on the website to keep your designs attached.', 'info');
+      return;
+    }
     const tempOrder = {
       id: `WA-${Date.now().toString().slice(-6)}`,
       items: cartList,
@@ -100,24 +111,27 @@ export const CartDrawer = () => {
 
           {/* Smart Bundle Nudge Bar */}
           {(() => {
-            const stickerTotalCount = cartList.reduce((sum, i) => sum + (i.category === 'stickers' ? i.quantity : 0), 0);
+            const stickerTotalCount = pricing.stockQuantity;
             if (stickerTotalCount === 0) return null;
 
             return (
               <div className="bg-gold/10 border-b border-gold/30 px-5 py-3 font-mono text-xs text-gold flex items-center gap-2">
                 <Tag size={15} className="flex-shrink-0" />
-                {stickerTotalCount === 1 && (
-                  <span>{isRtl ? '🎁 أضف استيكرين كمان وافتَح خصم الثلاثية (توفير ٥٠ ج.م)!' : '🎁 Add 2 more stickers for Trio Discount (Save 50 EGP)!'}</span>
-                )}
-                {stickerTotalCount === 2 && (
-                  <span>{isRtl ? '🎉 باقي استيكر واحد بس وتوفر ٥٠ ج.م بخصم البندل!' : '🎉 Add 1 more sticker to save 50 EGP with Trio Bundle!'}</span>
-                )}
-                {stickerTotalCount >= 3 && (
-                  <span>{isRtl ? '✨ مبروك! حصلت على الخصم المجمع لاستيكرات دوات.' : '✨ Congrats! You unlocked DUAT Bundle Savings.'}</span>
-                )}
+                <span>{stickerTotalCount >= PRICING.stockMinimum
+                  ? (isRtl ? 'الجاهز اتحسب بـ50 ج للقطعة.' : 'Ready-made stickers are now EGP 50 each.')
+                  : (isRtl ? `أضف ${PRICING.stockMinimum - stickerTotalCount} من الجاهز عشان القطعة تتحسب بـ50 ج.` : `Add ${PRICING.stockMinimum - stickerTotalCount} ready-made stickers for EGP 50 each.`)}</span>
               </div>
             );
           })()}
+          {pricing.customQuantity > 0 && (
+            <div className="px-5 py-3 text-sm border-b border-gold/30" aria-live="polite">
+              <p>{isRtl ? `كستمايز: ${pricing.customQuantity} قطعة × 45 ج` : `Custom: ${pricing.customQuantity} pieces × EGP 45`}</p>
+              {checkoutIssue && <p>{checkoutMessage(checkoutIssue, isRtl)}</p>}
+              <button className="text-gold underline mt-2" onClick={() => { toggleCart(); navigate('/sticker-builder'); }}>
+                {isRtl ? 'صمّم قطعة تانية' : 'Design another piece'}
+              </button>
+            </div>
+          )}
 
           {/* Body — Scrollable Items List or Empty State */}
           <div className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDawn ? 'bg-[#EFEAE0]' : 'bg-[#14110F]'}`}>

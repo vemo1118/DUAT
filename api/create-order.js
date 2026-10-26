@@ -119,8 +119,11 @@ export default async function handler(req, res) {
       items: payload.items,
       couponCode: payload.couponCode,
       governorateId: payload.governorateId,
-      requireGovernorate: true
+      requireGovernorate: true,
+      requireCheckout: true,
+      paymentMethod
     });
+    if (payload.expectedTotal !== quote.total) throw new Error('ORDER_TOTAL_CHANGED');
     const expectedUploads = collectExpectedUploads(quote, paymentMethod, payload.paymentProof);
     const pendingUploads = await validatePendingUploads(admin, expectedUploads, identifierHash);
 

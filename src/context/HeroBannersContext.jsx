@@ -255,22 +255,15 @@ function saveLocalSlides(slides) {
 }
 
 async function saveSlideToSupabase(slide, index = 0) {
-  if (!slide || !slide.id) return;
-  const fullPayload = mapToDb(slide, index);
-  try {
-    const { error: fullErr } = await supabase.from('hero_slides').upsert(fullPayload, { onConflict: 'id' });
-    if (fullErr) {
-      const minimalPayload = {
-        id: String(slide.id),
-        is_active: slide.is_active !== undefined ? Boolean(slide.is_active) : true,
-        sort_order: slide.sort_order ?? index + 1,
-        data: slide
-      };
-      await supabase.from('hero_slides').upsert(minimalPayload, { onConflict: 'id' });
-    }
-  } catch (err) {
-    // Ignore Supabase connection errors gracefully
+  if (!slide?.id) throw new Error('Missing slide ID');
+  let result = await supabase.from('hero_slides').upsert(mapToDb(slide, index), { onConflict: 'id' }).select('id').single();
+  if (['PGRST204', '42703'].includes(result.error?.code)) {
+    result = await supabase.from('hero_slides').upsert({
+      id: String(slide.id), is_active: slide.is_active !== false,
+      sort_order: slide.sort_order ?? index + 1, data: slide
+    }, { onConflict: 'id' }).select('id').single();
   }
+  if (result.error || !result.data?.id) throw result.error || new Error('Cloud save was not confirmed');
 }
 
 export function HeroBannersProvider({ children }) {
@@ -342,87 +335,38 @@ export function HeroBannersProvider({ children }) {
   }, []);
 
   const addSlide = async (slideData) => {
-    const newSlide = {
-      ...slideData,
-      id: slideData.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `00000000-0000-4000-8000-${Date.now().toString().padStart(12, '0')}`)
-    };
-    setSlides((prev) => {
-      const updated = [newSlide, ...prev];
-      saveLocalSlides(updated);
-      return updated;
-    });
-
+    const newSlide = { ...slideData, id: slideData.id || crypto.randomUUID() };
     await saveSlideToSupabase(newSlide, 0);
+    setSlides(prev => { const updated = [newSlide, ...prev]; saveLocalSlides(updated); return updated; });
     return newSlide;
   };
 
-  const updateSlide = async (id, updatedFields) => {
-    let targetSlide = null;
-    let targetIdx = 0;
-    setSlides((prev) => {
-      const updatedList = prev.map((slide, idx) => {
-        if (slide.id === id) {
-          const updated = { ...slide, ...updatedFields };
-          targetSlide = updated;
-          targetIdx = idx;
-          return updated;
-        }
-        return slide;
-      });
-      saveLocalSlides(updatedList);
-      return updatedList;
-    });
-
-    if (targetSlide) {
-      await saveSlideToSupabase(targetSlide, targetIdx);
-    }
+  const updateSlide = async (id, fields) => {
+    const index = slides.findIndex(slide => slide.id === id);
+    if (index < 0) throw new Error('Slide not found');
+    const updated = { ...slides[index], ...fields };
+    await saveSlideToSupabase(updated, index);
+    setSlides(prev => { const next = prev.map(slide => slide.id === id ? updated : slide); saveLocalSlides(next); return next; });
   };
 
   const toggleSlideVisibility = async (id) => {
-    let targetSlide = null;
-    let targetIdx = 0;
-    setSlides((prev) => {
-      const updatedList = prev.map((slide, idx) => {
-        if (slide.id === id) {
-          const currentStatus = slide.is_active !== undefined ? Boolean(slide.is_active) : (slide.isActive !== undefined ? Boolean(slide.isActive) : true);
-          const newStatus = !currentStatus;
-          const updated = { ...slide, is_active: newStatus, isActive: newStatus };
-          targetSlide = updated;
-          targetIdx = idx;
-          return updated;
-        }
-        return slide;
-      });
-      saveLocalSlides(updatedList);
-      return updatedList;
-    });
-
-    if (targetSlide) {
-      await saveSlideToSupabase(targetSlide, targetIdx);
-    }
+    const slide = slides.find(item => item.id === id);
+    if (!slide) throw new Error('Slide not found');
+    const active = !(slide.is_active ?? slide.isActive ?? true);
+    await updateSlide(id, { is_active: active, isActive: active });
   };
 
   const deleteSlide = async (id) => {
-    setSlides((prev) => {
-      const updatedList = prev.filter((slide) => slide.id !== id);
-      saveLocalSlides(updatedList);
-      return updatedList;
-    });
-    try {
-      const { error } = await supabase.from('hero_slides').delete().eq('id', id);
-      if (error) console.error('Supabase delete hero slide error:', error);
-    } catch (err) {
-      console.error('Supabase delete hero slide error:', err);
-    }
+    const { data, error } = await supabase.from('hero_slides').delete().eq('id', id).select('id');
+    if (error || !data?.length) throw error || new Error('Delete was not confirmed');
+    setSlides(prev => { const next = prev.filter(slide => slide.id !== id); saveLocalSlides(next); return next; });
   };
 
   const resetSlides = async () => {
-    localStorage.removeItem(HERO_SLIDES_STORAGE_KEY);
-    setSlides(INITIAL_HERO_SLIDES);
-    saveLocalSlides(INITIAL_HERO_SLIDES);
     for (let i = 0; i < INITIAL_HERO_SLIDES.length; i++) {
       await saveSlideToSupabase(INITIAL_HERO_SLIDES[i], i);
     }
+    await fetchSlides();
   };
 
   return (

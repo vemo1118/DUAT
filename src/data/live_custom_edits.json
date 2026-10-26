@@ -154,7 +154,7 @@
       "perks": [
         { "id": 1, "textAr": "توفير يصل إلى ١٥٠ ج.م بالبندل", "textEn": "Save up to 150 EGP per bundle", "icon": "Tag", "active": true },
         { "id": 2, "textAr": "تأتي في علبة هدايا العبور الفاخرة", "textEn": "Includes DUAT luxury gift box", "icon": "Gift", "active": true },
-        { "id": 3, "textAr": "شحن فوري لكل المحافظات", "textEn": "Fast shipping across Egypt", "icon": "Zap", "active": true }
+        { "id": 3, "textAr": "موعد الطلب بيظهر قبل الدفع", "textEn": "Order timing shown before payment", "icon": "Zap", "active": true }
       ]
     },
     "cta": {

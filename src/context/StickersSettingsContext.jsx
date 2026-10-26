@@ -79,11 +79,11 @@ export const StickersSettingsProvider = ({ children }) => {
         }
 
         if (isMounted && data?.value && typeof data.value === 'object') {
-          setStickersSettings((prev) => ({
+          setStickersSettings({
             hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...(data.value.hero || {}) },
             promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...(data.value.promo || {}) },
             grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...(data.value.grid || {}) }
-          }));
+          });
         }
       } catch (err) {
         console.warn('Error loading stickers_page_settings from Supabase:', err);
@@ -128,54 +128,38 @@ export const StickersSettingsProvider = ({ children }) => {
 
 
   const saveSettingsToSupabase = async (newSettings) => {
-    try {
-      await supabase.from('store_settings').upsert({
+    const { data, error } = await supabase.from('store_settings').upsert({
         key: 'stickers_page_settings',
         value: newSettings,
         updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.warn('Error upserting stickers_page_settings to Supabase:', err);
-    }
+      }).select('key').single();
+    if (error || !data) throw error || new Error('STICKERS_SETTINGS_SAVE_FAILED');
   };
 
   const updateStickersHero = async (heroFields) => {
-    setStickersSettings((prev) => {
-      const updated = {
-        ...prev,
-        hero: { ...prev.hero, ...heroFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...stickersSettings, hero: { ...stickersSettings.hero, ...heroFields } };
+    await saveSettingsToSupabase(updated);
+    setStickersSettings(updated);
+    return updated;
   };
 
   const updateStickersPromo = async (promoFields) => {
-    setStickersSettings((prev) => {
-      const updated = {
-        ...prev,
-        promo: { ...prev.promo, ...promoFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...stickersSettings, promo: { ...stickersSettings.promo, ...promoFields } };
+    await saveSettingsToSupabase(updated);
+    setStickersSettings(updated);
+    return updated;
   };
 
   const updateStickersGridSettings = async (gridFields) => {
-    setStickersSettings((prev) => {
-      const updated = {
-        ...prev,
-        grid: { ...prev.grid, ...gridFields }
-      };
-      saveSettingsToSupabase(updated);
-      return updated;
-    });
+    const updated = { ...stickersSettings, grid: { ...stickersSettings.grid, ...gridFields } };
+    await saveSettingsToSupabase(updated);
+    setStickersSettings(updated);
+    return updated;
   };
 
   const resetStickersSettings = async () => {
-    setStickersSettings(DEFAULT_STICKERS_SETTINGS);
-    localStorage.removeItem('duat_stickers_settings_v1');
     await saveSettingsToSupabase(DEFAULT_STICKERS_SETTINGS);
+    setStickersSettings(DEFAULT_STICKERS_SETTINGS);
   };
 
   return (

@@ -25,7 +25,6 @@ import { Loader2 } from 'lucide-react';
 
 // Direct import for lightweight core landing views
 import { HomeView } from './views/HomeView';
-import { BundlesView } from './views/BundlesView';
 import { StickersView } from './views/StickersView';
 import { ShopView } from './views/ShopView';
 import { AboutView } from './views/AboutView';
@@ -112,7 +111,7 @@ export function App() {
                                         <HomeView setSelectedCategory={handleSelectCategory} />
                                       }
                                     />
-                                    <Route path="/bundles" element={<BundlesView />} />
+                                    <Route path="/bundles" element={<Navigate to="/stickers" replace />} />
                                     <Route path="/stickers" element={<StickersView />} />
                                     <Route path="/sticker-builder" element={<StickerBuilderView />} />
 

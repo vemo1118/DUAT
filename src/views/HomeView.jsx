@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeroSlider } from '../components/HeroSlider';
+import { PreorderWelcome } from '../components/PreorderWelcome';
+import { PreorderHero } from '../components/PreorderHero';
 import { TrustNumbersBar } from '../components/TrustNumbersBar';
-import { CategoryGrid } from '../components/CategoryGrid';
 import { ProductRow } from '../components/ProductRow';
-import { REVIEWS, FAQS } from '../data/products';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductsContext';
 import { useCategoryBanners } from '../context/CategoryBannersContext';
-import { Star, ChevronDown, ChevronUp, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles, ArrowRight, ArrowLeft, Palette, ShoppingBag, BadgeCheck } from 'lucide-react';
 
-export const HomeView = ({ setSelectedCategory }) => {
+export const HomeView = () => {
   const { products } = useProducts();
   const { forgeBanner } = useCategoryBanners();
   const { lang, t } = useLanguage();
@@ -33,22 +33,51 @@ export const HomeView = ({ setSelectedCategory }) => {
   const activeProducts = filteredProducts.length > 0 ? filteredProducts : (Array.isArray(products) ? products : []);
   const stickersOnly = activeProducts.filter((p) => p?.category === 'stickers');
   const latestDrops = stickersOnly.length > 0 ? stickersOnly.slice(0, 6) : activeProducts.slice(0, 6);
+  const preorderFaqs = [
+    {
+      id: 'custom-minimum',
+      questionAr: 'لازم الأربع قطع يكونوا نفس التصميم؟',
+      questionEn: 'Do all four pieces need the same design?',
+      answerAr: 'لأ. تقدر تعمل كل قطعة بتصميم مختلف، أو تكرر أي تصميم بالعدد اللي يناسبك.',
+      answerEn: 'No. Every piece can have a different design, or you can repeat any design as many times as you want.'
+    },
+    {
+      id: 'custom-price',
+      questionAr: 'سعر الحجز بيتحسب إزاي؟',
+      questionEn: 'How is the pre-order price calculated?',
+      answerAr: 'القطعة الكستمايز بـ45 جنيه، وأقل طلب كستمايز 4 قطع؛ يعني البداية من 180 جنيه قبل الشحن.',
+      answerEn: 'Each custom piece is EGP 45, with a four-piece minimum. That means custom orders start at EGP 180 before shipping.'
+    },
+    {
+      id: 'stock-price',
+      questionAr: 'طب والاستيكرات الجاهزة؟',
+      questionEn: 'What about ready-made stickers?',
+      answerAr: 'الاستيكر الجاهز بـ60 جنيه. لو اخترت 4 قطع جاهزة أو أكتر، سعر القطعة الجاهزة يبقى 50 جنيه.',
+      answerEn: 'A ready-made sticker is EGP 60. Choose four or more ready-made pieces and each ready-made sticker becomes EGP 50.'
+    },
+    {
+      id: 'production',
+      questionAr: 'إمتى يبدأ تنفيذ الطلبات؟',
+      questionEn: 'When does production begin?',
+      answerAr: 'الحجز مفتوح 7 أيام. بعد قفل الحجز، من 3 إلى 5 أيام للتصنيع والشحن.',
+      answerEn: 'Booking stays open for 7 days, followed by 3–5 days for production and shipping.'
+    }
+  ];
 
   return (
     <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">
       
-      {/* 1. FULL-BLEED HERO SLIDER */}
+      {/* 1. PRE-ORDER OFFER — fixed here so cloud hero content cannot dilute the launch */}
+      <PreorderWelcome />
       <HeroSlider />
+      <PreorderHero imageUrl={forge.imageUrl} />
 
       {/* 2. TRUST NUMBERS BAR — SOFTENED THEME-AWARE GRADIENT BAND 1 */}
       <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-16 sm:py-24 shadow-inner`}>
         <TrustNumbersBar />
       </div>
 
-      {/* 3. CATEGORY TILES BLOCK */}
-      <CategoryGrid onSelectCategory={setSelectedCategory} />
-
-      {/* 4. PRODUCT ROW 1 — LATEST STICKER DROPS */}
+      {/* 3. READY-MADE STICKERS — secondary to the custom offer */}
       <div className="py-4">
         <ProductRow
           eyebrow="DUAT / 01"
@@ -58,6 +87,29 @@ export const HomeView = ({ setSelectedCategory }) => {
         />
       </div>
 
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <button
+            onClick={() => navigate('/sticker-builder')}
+            className="group border border-gold/50 bg-gold/10 p-7 text-start transition-colors hover:bg-gold/15 sm:p-9"
+          >
+            <Palette className="mb-5 text-gold" size={28} />
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold">{isAr ? 'الاختيار الأساسي' : 'MAIN OFFER'}</span>
+            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? 'كستمايز — 45 ج للقطعة' : 'CUSTOM — EGP 45 EACH'}</h2>
+            <p className="mt-3 max-w-lg font-space text-sm leading-relaxed text-bone/75">{isAr ? 'ابدأ من 4 قطع بـ180 جنيه. صمّم كل واحدة لوحدها أو كرر نفس التصميم.' : 'Start with four pieces for EGP 180. Design each one separately or repeat the same design.'}</p>
+          </button>
+          <button
+            onClick={() => navigate('/stickers')}
+            className="group border border-grave bg-stone p-7 text-start transition-colors hover:border-gold/60 sm:p-9"
+          >
+            <ShoppingBag className="mb-5 text-gold" size={28} />
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ash">{isAr ? 'جاهز من الكتالوج' : 'READY-MADE CATALOGUE'}</span>
+            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? '60 ج — أو 50 من 4 قطع' : 'EGP 60 — OR 50 FROM 4'}</h2>
+            <p className="mt-3 max-w-lg font-space text-sm leading-relaxed text-bone/75">{isAr ? 'اختار أي 4 استيكرات جاهزة أو أكتر، وسعر كل قطعة جاهزة يتحول تلقائيًا لـ50 جنيه.' : 'Choose any four or more ready-made stickers and each ready-made piece automatically becomes EGP 50.'}</p>
+          </button>
+        </div>
+      </section>
+
       {/* 5. STICKER BUILDER FEATURE BAND */}
       {isForgeActive && (
         <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E5DFC5] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#1A2042] to-[#0A0C16]'} border-y border-gold/40 py-20 sm:py-28 shadow-2xl relative overflow-hidden`}>
@@ -66,16 +118,24 @@ export const HomeView = ({ setSelectedCategory }) => {
               
               <div className="lg:col-span-7 space-y-6 relative z-10">
                 <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold block">
-                  {isAr ? 'دوات / مصمم الاستيكرات' : 'DUAT / STICKER BUILDER'}
+                  {isAr ? '3 خطوات بسيطة' : '3 SIMPLE STEPS'}
                 </span>
                 <h2 className="font-clash text-3xl sm:text-5xl uppercase text-bone font-bold">
-                  {isAr ? 'صمّم استيكرك المجسم بنفسك.' : 'BUILD YOUR OWN STICKER.'}
+                  {isAr ? 'فكرتك. معاينتك. طلبك.' : 'YOUR IDEA. YOUR PREVIEW. YOUR ORDER.'}
                 </h2>
                 <p className="font-space text-base text-bone/90 font-medium leading-relaxed max-w-xl">
                   {isAr
-                    ? 'اكتب أي كلمة، عبارة، أو ارفع تصميمك وصورتك الخاصة ونعملها لك استيكر إيبوكسي مجسم 3D بتشطيب فاخر ومقاوم للماء.'
-                    : 'Write custom text or upload your design to turn it into a 3D epoxy dome sticker.'}
+                    ? 'اكتب كلامك أو ارفع صورتك، شوف المعاينة، وبعدها أضف التصميم للسلة. كررها لحد ما تكمل 4 قطع أو أكتر.'
+                    : 'Add your text or upload an image, review the preview, then add it to your cart. Repeat until you have four custom pieces or more.'}
                 </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {[Palette, BadgeCheck, ShoppingBag].map((Icon, index) => (
+                    <div key={index} className="border border-grave bg-coal p-4 font-mono text-xs text-bone">
+                      <Icon size={18} className="mb-2 text-gold" />
+                      {isAr ? ['صمّم', 'راجع', 'كمّل 4+'][index] : ['DESIGN', 'PREVIEW', 'BUILD 4+'][index]}
+                    </div>
+                  ))}
+                </div>
                 <button
                   onClick={() => navigate('/sticker-builder')}
                   className="btn-primary py-4 px-8 text-xs font-mono font-bold tracking-widest flex items-center gap-3 min-h-[48px]"
@@ -99,65 +159,7 @@ export const HomeView = ({ setSelectedCategory }) => {
         </div>
       )}
 
-      {/* 6. PRODUCT ROW 2 — FEATURED BUNDLES */}
-      <div className="py-4">
-        <ProductRow
-          eyebrow="DUAT / 02"
-          title={isAr ? 'قسم البندلز الجاهزة' : 'FEATURED BUNDLES'}
-          products={activeProducts.filter(p => p.category === 'bundles')}
-          viewAllPath="/bundles"
-        />
-      </div>
-
-      {/* 7. REVIEWS SECTION — HIDE IF EMPTY */}
-      {REVIEWS && REVIEWS.length > 0 && (
-        <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-20 sm:py-28 shadow-inner`}>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
-            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-grave pb-6 gap-4">
-              <div>
-                <span className="font-mono text-xs text-gold font-bold uppercase tracking-[0.25em] block">
-                  {t('reviewsEyebrow')}
-                </span>
-                <h2 className="font-clash text-3xl sm:text-4xl text-bone font-bold uppercase mt-1">
-                  {t('reviewsTitle')}
-                </h2>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {REVIEWS.map((rev) => (
-                <div
-                  key={rev.id}
-                  className="bg-stone border border-grave p-8 space-y-4 card-depth-highlight relative flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex text-gold">
-                        {[...Array(rev.rating)].map((_, i) => (
-                          <Star key={i} size={14} className="fill-gold" />
-                        ))}
-                      </div>
-                      <span className="font-mono text-[10px] text-ash uppercase tracking-widest font-bold">
-                        VERIFIED BUYER
-                      </span>
-                    </div>
-                    <p className="font-space text-base text-bone/90 font-medium italic leading-relaxed">
-                      "{isAr ? rev.textAr : rev.textEn}"
-                    </p>
-                  </div>
-
-                  <div className="border-t border-grave/60 pt-4 flex justify-between items-center font-mono text-xs">
-                    <span className="text-bone font-bold">{rev.author}</span>
-                    <span className="text-ash font-medium">{rev.location}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      )}
-
-      {/* 8. FAQ ACCORDION SECTION */}
+      {/* 6. PRE-ORDER FAQ */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 reveal-fade-up">
         <div className="text-center space-y-2 border-b border-grave pb-6">
           <span className="font-mono text-xs text-gold font-bold uppercase tracking-[0.25em] block">
@@ -169,7 +171,7 @@ export const HomeView = ({ setSelectedCategory }) => {
         </div>
 
         <div className="space-y-4">
-          {FAQS.map((faq) => {
+          {preorderFaqs.map((faq) => {
             const isOpen = openFaqId === faq.id;
             return (
               <div

@@ -21,7 +21,7 @@ export const Footer = () => {
               className="flex items-center gap-3.5 min-h-[44px]"
             >
               <SunDisc size={30} variant="gold" />
-              <span className="font-clash text-2xl text-bone uppercase tracking-tight">
+              <span className="brand-wordmark text-2xl text-bone">
                 DUAT
               </span>
             </Link>
@@ -39,13 +39,6 @@ export const Footer = () => {
               NAVIGATION
             </h4>
             <div className="flex flex-col space-y-2">
-              <Link
-                to="/bundles"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="text-left text-bone/80 hover:text-gold transition-colors py-1"
-              >
-                {t('navBundles')}
-              </Link>
               <Link
                 to="/stickers"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

@@ -1,13 +1,27 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { Sparkles, Truck, ShieldCheck, Clock } from 'lucide-react';
+import { PREORDER, preorderState } from '../domain/commerce';
 
 export const AnnouncementMarquee = () => {
   const { lang } = useLanguage();
   const isAr = lang === 'ar';
 
-  const textEn = "Free shipping on orders over 800 EGP • Made to order in Egypt • Ships in 3–5 days • 100% Handcrafted • 14-Day Returns • ";
-  const textAr = "شحن مجاني للطلبات أكثر من ٨٠٠ ج.م • صُنع حسب الطلب في مصر • يُشحن خلال ٣-٥ أيام • تشطيب يدوي ٪١٠٠ • إرجاع خلال ١٤ يوماً • ";
+  const state = preorderState();
+  const closes = PREORDER.closesAt
+    ? new Date(PREORDER.closesAt).toLocaleString(isAr ? 'ar-EG' : 'en-GB', {
+        timeZone: 'Africa/Cairo', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+      })
+    : '';
+  const textEn = state === 'open'
+    ? `CUSTOM PRE-ORDER: EGP 45 EACH • MINIMUM 4 • DIFFERENT DESIGNS WELCOME • BOOKING CLOSES ${closes} CAIRO • `
+    : state === 'closed'
+      ? 'THIS CUSTOM DROP IS CLOSED • READY-MADE STICKERS ARE STILL AVAILABLE • '
+      : 'CUSTOM DROP IS BEING PREPARED • READY-MADE STICKERS ARE AVAILABLE • ';
+  const textAr = state === 'open'
+    ? `الحجز المسبق: ٤٥ ج للقطعة • أقل عدد ٤ • كل قطعة ممكن تكون بتصميم مختلف • الحجز يقفل ${closes} بتوقيت القاهرة • `
+    : state === 'closed'
+      ? 'حجز دفعة الكستمايز انتهى • الاستيكرات الجاهزة لسه متاحة • '
+      : 'بنجهز فتح دفعة الكستمايز • الاستيكرات الجاهزة متاحة • ';
 
   const content = isAr ? textAr : textEn;
 

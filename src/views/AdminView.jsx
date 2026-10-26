@@ -64,7 +64,7 @@ import {
 export function AdminView() {
   const { formatPrice } = useLanguage();
   const {
-    products,
+    catalogProducts: products,
     addProduct,
     updateProduct,
     adjustPrice,
@@ -103,6 +103,8 @@ export function AdminView() {
 
   const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
   const [editingSocialTile, setEditingSocialTile] = useState(null);
+  const [socialForm, setSocialForm] = useState(() => ({ ...socialSettings }));
+  useEffect(() => setSocialForm({ ...socialSettings }), [socialSettings]);
   const {
     bundlesSettings,
     updateBundlesHero,
@@ -250,10 +252,9 @@ export function AdminView() {
     }
   }, [forgeBanner]);
 
-  const handleSaveForgeBanner = (e) => {
+  const handleSaveForgeBanner = async (e) => {
     e.preventDefault();
-    updateForgeBanner(forgeEdit);
-    showToast('تم حفظ بنر مصمم الاستيكرات بنجاح ✨', 'success');
+    await cloudAction(() => updateForgeBanner(forgeEdit), 'تم حفظ بنر مصمم الاستيكرات على الموقع ✨');
   };
 
   // Orders Tab State
@@ -495,20 +496,15 @@ export function AdminView() {
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (productData) => {
-    if (editingProduct) {
-      updateProduct(editingProduct.id, productData);
-      showToast('تم تحديث بيانات المنتج بنجاح!', 'success');
-    } else {
-      addProduct(productData);
-      showToast('تمت إضافة المنتج الجديد بنجاح!', 'success');
-    }
+  const cloudAction = async (action, message) => {
+    try { await action(); showToast(message, 'success'); return true; }
+    catch { showToast('الحفظ على السيرفر فشل. اتأكد من اتصالك وتسجيل دخول الأدمن وحاول تاني؛ التعديل لم يُنشر.', 'error'); return false; }
   };
+  const handleSaveProduct = (data) => cloudAction(
+    () => editingProduct ? updateProduct(editingProduct.id, data) : addProduct(data), 'تم حفظ المنتج على الموقع');
 
-  const handleDeleteProductConfirm = (id) => {
-    deleteProduct(id);
-    setDeleteConfirmId(null);
-    showToast('تم حذف المنتج بنجاح!', 'warning');
+  const handleDeleteProductConfirm = async (id) => {
+    if (await cloudAction(() => deleteProduct(id), 'تم حذف المنتج من الموقع')) setDeleteConfirmId(null);
   };
 
   const handleResetCatalog = () => {
@@ -529,30 +525,14 @@ export function AdminView() {
     setIsHeroModalOpen(true);
   };
 
-  const handleSaveHeroSlide = (slideData) => {
-    if (editingSlide) {
-      updateSlide(editingSlide.id, slideData);
-      showToast('تم تحديث بنر العرض بنجاح!', 'success');
-    } else {
-      addSlide(slideData);
-      showToast('تمت إضافة البنر/العرض الجديد بنجاح!', 'success');
-    }
-  };
-
+  const handleSaveHeroSlide = (data) => cloudAction(
+    () => editingSlide ? updateSlide(editingSlide.id, data) : addSlide(data), 'تم حفظ البنر على الموقع');
   const handleDeleteHeroSlide = (id) => {
-    if (window.confirm('هل أنت تأكد من حذف هذا البنر من الشاشة الرئيسية؟')) {
-      deleteSlide(id);
-      showToast('تم حذف البنر بنجاح!', 'warning');
-    }
+    if (window.confirm('حذف البنر من الموقع؟')) cloudAction(() => deleteSlide(id), 'تم حذف البنر');
   };
-
   const handleResetHeroSlides = () => {
-    if (window.confirm('هل أنت تأكد من إعادة ضبط السلايدر الرئيسي إلى العروض الافتراضية؟')) {
-      resetSlides();
-      showToast('تم استعادة البنرات الافتراضية!', 'info');
-    }
+    if (window.confirm('استعادة البنرات الافتراضية؟')) cloudAction(resetSlides, 'تمت استعادة البنرات');
   };
-
   const handleStatusChange = (orderId, newStatus) => {
     updateOrderStatus(orderId, newStatus);
     showToast(`تم تحديث حالة الطلب #${orderId} بنجاح!`, 'success');
@@ -1082,7 +1062,7 @@ export function AdminView() {
                             <div className="flex items-center justify-center gap-1 font-mono text-xs">
                               <button
                                 onClick={() => {
-                                  moveProductUp(product.id);
+                                  cloudAction(() => moveProductUp(product.id), 'تم حفظ ترتيب المنتجات');
                                   showToast('تم تمييز المنتج ورفعه للأعلى!', 'info');
                                 }}
                                 disabled={globalIndex <= 0}
@@ -1096,7 +1076,7 @@ export function AdminView() {
                               </span>
                               <button
                                 onClick={() => {
-                                  moveProductDown(product.id);
+                                  cloudAction(() => moveProductDown(product.id), 'تم حفظ ترتيب المنتجات');
                                   showToast('تم تحريك المنتج للأسفل!', 'info');
                                 }}
                                 disabled={globalIndex === -1 || globalIndex >= products.length - 1}
@@ -1145,7 +1125,7 @@ export function AdminView() {
                           <td className="py-4 px-4">
                             <div className="flex items-center justify-center gap-2">
                               <button
-                                onClick={() => adjustPrice(product.id, -50)}
+                                onClick={() => cloudAction(() => adjustPrice(product.id, -50), 'تم حفظ السعر')}
                                 className="p-1 text-ash hover:text-red-400 border border-grave hover:border-red-500/50 bg-stone/40 transition-colors"
                                 title="-50 ج.م"
                               >
@@ -1157,7 +1137,7 @@ export function AdminView() {
                               </div>
 
                               <button
-                                onClick={() => adjustPrice(product.id, 50)}
+                                onClick={() => cloudAction(() => adjustPrice(product.id, 50), 'تم حفظ السعر')}
                                 className="p-1 text-ash hover:text-emerald-400 border border-grave hover:border-emerald-500/50 bg-stone/40 transition-colors"
                                 title="+50 ج.م"
                               >
@@ -1176,8 +1156,8 @@ export function AdminView() {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => {
-                                  toggleProductVisibility(product.id);
-                                  showToast(product.is_active !== false ? 'تم إخفاء المنتج من المتجر' : 'تم إظهار المنتج في المتجر', 'info');
+                                  cloudAction(() => toggleProductVisibility(product.id), 'تم تحديث ظهور المنتج');
+
                                 }}
                                 className={`flex items-center gap-1 px-2.5 py-1.5 border transition-colors font-mono text-xs font-bold ${
                                   product.is_active !== false
@@ -1527,8 +1507,8 @@ export function AdminView() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleSlideVisibility(slide.id);
-                          showToast(isSlideActive ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                          cloudAction(() => toggleSlideVisibility(slide.id), 'تم تحديث ظهور البنر');
+
                         }}
                         className={`px-3 py-1 border font-mono text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
                           isSlideActive
@@ -1572,8 +1552,8 @@ export function AdminView() {
                   <div className="p-4 bg-stone/40 border-t border-grave flex flex-wrap items-center justify-between gap-2">
                     <button
                       onClick={() => {
-                        toggleSlideVisibility(slide.id);
-                        showToast(isSlideActive ? 'تم إخفاء البنر من الصفحة الرئيسية' : 'تم إظهار البنر في الصفحة الرئيسية', 'info');
+                        cloudAction(() => toggleSlideVisibility(slide.id), 'تم تحديث ظهور البنر');
+
                       }}
                       className={`flex items-center gap-1.5 px-3 py-2 border font-mono text-xs font-bold transition-colors ${
                         isSlideActive
@@ -1810,8 +1790,7 @@ export function AdminView() {
                 <button
                   onClick={() => {
                     if (window.confirm('هل أنت تأكد من إعادة ضبط معرض الصور للوضع الافتراضي؟')) {
-                      resetSocialGrid();
-                      showToast('تمت إعادة ضبط معرض إنستجرام الافتراضي 🔄', 'success');
+                      cloudAction(resetSocialGrid, 'تمت إعادة ضبط معرض إنستجرام على الموقع 🔄');
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 border border-grave bg-stone/60 hover:border-gold text-ash hover:text-gold font-mono text-xs font-bold transition-all rounded"
@@ -1832,8 +1811,8 @@ export function AdminView() {
                   <label className="block text-ash mb-1">النص العلوي (Eyebrow):</label>
                   <input
                     type="text"
-                    value={socialSettings?.eyebrow || ''}
-                    onChange={(e) => updateSocialSettings({ eyebrow: e.target.value })}
+                    value={socialForm.eyebrow || ''}
+                    onChange={(e) => setSocialForm((current) => ({ ...current, eyebrow: e.target.value }))}
                     className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
                   />
                 </div>
@@ -1841,8 +1820,8 @@ export function AdminView() {
                   <label className="block text-gold font-bold mb-1">العنوان بالعربي (Title AR):</label>
                   <input
                     type="text"
-                    value={socialSettings?.titleAr || ''}
-                    onChange={(e) => updateSocialSettings({ titleAr: e.target.value })}
+                    value={socialForm.titleAr || ''}
+                    onChange={(e) => setSocialForm((current) => ({ ...current, titleAr: e.target.value }))}
                     className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
                   />
                 </div>
@@ -1850,8 +1829,8 @@ export function AdminView() {
                   <label className="block text-gold font-bold mb-1">العنوان بالإنجليزي (Title EN):</label>
                   <input
                     type="text"
-                    value={socialSettings?.titleEn || ''}
-                    onChange={(e) => updateSocialSettings({ titleEn: e.target.value })}
+                    value={socialForm.titleEn || ''}
+                    onChange={(e) => setSocialForm((current) => ({ ...current, titleEn: e.target.value }))}
                     className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
                   />
                 </div>
@@ -1859,8 +1838,8 @@ export function AdminView() {
                   <label className="block text-ash mb-1">اسم حساب إنستجرام (Handle Label):</label>
                   <input
                     type="text"
-                    value={socialSettings?.handleLabel || ''}
-                    onChange={(e) => updateSocialSettings({ handleLabel: e.target.value })}
+                    value={socialForm.handleLabel || ''}
+                    onChange={(e) => setSocialForm((current) => ({ ...current, handleLabel: e.target.value }))}
                     className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
                   />
                 </div>
@@ -1868,11 +1847,20 @@ export function AdminView() {
                   <label className="block text-ash mb-1">رابط صفحة إنستجرام (Instagram URL):</label>
                   <input
                     type="text"
-                    value={socialSettings?.handleUrl || ''}
-                    onChange={(e) => updateSocialSettings({ handleUrl: e.target.value })}
+                    value={socialForm.handleUrl || ''}
+                    onChange={(e) => setSocialForm((current) => ({ ...current, handleUrl: e.target.value }))}
                     className="w-full bg-coal border border-grave p-2.5 text-bone focus:border-gold outline-none rounded"
                   />
                 </div>
+              </div>
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => cloudAction(() => updateSocialSettings(socialForm), 'تم حفظ إعدادات إنستجرام على الموقع')}
+                  className="btn-primary px-5 py-3 text-xs font-mono font-bold"
+                >
+                  حفظ إعدادات إنستجرام
+                </button>
               </div>
             </div>
 
@@ -1915,7 +1903,7 @@ export function AdminView() {
                     {/* Actions */}
                     <div className="p-2 bg-stone/40 border-t border-grave flex items-center justify-between gap-1">
                       <button
-                        onClick={() => toggleSocialTileVisibility(tile.id)}
+                        onClick={() => cloudAction(() => toggleSocialTileVisibility(tile.id), 'تم تحديث ظهور الصورة')}
                         className={`p-1.5 border font-mono text-xs transition-all rounded ${
                           isActive
                             ? 'border-ash/40 bg-coal text-ash hover:text-gold'
@@ -1941,8 +1929,7 @@ export function AdminView() {
                         <button
                           onClick={() => {
                             if (window.confirm(`حذف هذه الصورة "${tile.title}" من المعرض؟`)) {
-                              deleteSocialTile(tile.id);
-                              showToast('تم حذف الصورة من المعرض 🗑️', 'success');
+                              cloudAction(() => deleteSocialTile(tile.id), 'تم حذف الصورة من الموقع 🗑️');
                             }
                           }}
                           className="p-1.5 border border-red-900/60 bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition-all rounded"
@@ -2344,10 +2331,9 @@ export function AdminView() {
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (window.confirm('هل أنت تأكد من إعادة ضبط صفحة البندلات للافتراضي؟')) {
-                    resetBundlesSettings();
-                    showToast('تم إعادة ضبط صفحة البندلات للافتراضي 🔄', 'info');
+                    await cloudAction(resetBundlesSettings, 'تم إعادة ضبط صفحة البندلات على الموقع 🔄');
                   }
                 }}
                 className="flex items-center gap-2 px-4 py-2.5 bg-stone border border-grave hover:border-gold text-ash hover:text-bone font-mono text-xs uppercase font-bold transition-all"
@@ -2374,12 +2360,13 @@ export function AdminView() {
               {/* Enable / Disable Hero Banner Toggle */}
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   const nextActive = !bundlesFormHero.isActive;
                   const updated = { ...bundlesFormHero, isActive: nextActive };
-                  setBundlesFormHero(updated);
-                  updateBundlesHero(updated);
-                  showToast(nextActive ? 'تم تفعيل البنر العلوي 👁️' : 'تم إخفاء البنر العلوي 🙈', 'info');
+                  if (await cloudAction(
+                    () => updateBundlesHero(updated),
+                    nextActive ? 'تم تفعيل البنر العلوي على الموقع 👁️' : 'تم إخفاء البنر العلوي على الموقع 🙈'
+                  )) setBundlesFormHero(updated);
                 }}
                 className={`px-4 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 border transition-all ${
                   bundlesFormHero.isActive !== false
@@ -2557,10 +2544,10 @@ export function AdminView() {
             <div className="flex justify-end pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  updateBundlesHero(bundlesFormHero);
-                  showToast('تم حفظ إعدادات هيدر صفحة البندلات بنجاح! 🎉', 'success');
-                }}
+                onClick={() => cloudAction(
+                  () => updateBundlesHero(bundlesFormHero),
+                  'تم حفظ إعدادات هيدر صفحة البندلات على الموقع 🎉'
+                )}
                 className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-md"
               >
                 حفظ إعدادات الهيدر والبنر العلوي 💾
@@ -2651,7 +2638,7 @@ export function AdminView() {
                               {/* Toggle active */}
                               <button
                                 type="button"
-                                onClick={() => toggleProductVisibility(bundle.id)}
+                                onClick={() => cloudAction(() => toggleProductVisibility(bundle.id), 'تم تحديث الظهور')}
                                 className={`flex-1 py-1.5 font-mono text-[11px] uppercase font-bold flex items-center justify-center gap-1 border transition-all ${
                                   isBundleActive
                                     ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-400'
@@ -2717,12 +2704,13 @@ export function AdminView() {
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   const nextActive = !bundlesFormCta.isActive;
                   const updated = { ...bundlesFormCta, isActive: nextActive };
-                  setBundlesFormCta(updated);
-                  updateBundlesCta(updated);
-                  showToast(nextActive ? 'تم تفعيل البنر السفلي 👁️' : 'تم إخفاء البنر السفلي 🙈', 'info');
+                  if (await cloudAction(
+                    () => updateBundlesCta(updated),
+                    nextActive ? 'تم تفعيل البنر السفلي على الموقع 👁️' : 'تم إخفاء البنر السفلي على الموقع 🙈'
+                  )) setBundlesFormCta(updated);
                 }}
                 className={`px-4 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 border transition-all ${
                   bundlesFormCta.isActive !== false
@@ -2831,10 +2819,10 @@ export function AdminView() {
             <div className="flex justify-end pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  updateBundlesCta(bundlesFormCta);
-                  showToast('تم حفظ إعدادات البنر السفلي لصفحة البندلات! 🎉', 'success');
-                }}
+                onClick={() => cloudAction(
+                  () => updateBundlesCta(bundlesFormCta),
+                  'تم حفظ إعدادات البنر السفلي على الموقع 🎉'
+                )}
                 className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-md"
               >
                 حفظ إعدادات البنر السفلي 💾
@@ -2876,10 +2864,9 @@ export function AdminView() {
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (window.confirm('هل أنت تأكد من إعادة ضبط صفحة الاستيكرات للافتراضي؟')) {
-                    resetStickersSettings();
-                    showToast('تم إعادة ضبط صفحة الاستيكرات للافتراضي 🔄', 'info');
+                    await cloudAction(resetStickersSettings, 'تم إعادة ضبط صفحة الاستيكرات على الموقع 🔄');
                   }
                 }}
                 className="flex items-center gap-2 px-4 py-2.5 bg-stone border border-grave hover:border-gold text-ash hover:text-bone font-mono text-xs uppercase font-bold transition-all"
@@ -2905,12 +2892,13 @@ export function AdminView() {
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   const nextActive = !stickersFormHero.isActive;
                   const updated = { ...stickersFormHero, isActive: nextActive };
-                  setStickersFormHero(updated);
-                  updateStickersHero(updated);
-                  showToast(nextActive ? 'تم تفعيل البنر العلوي 👁️' : 'تم إخفاء البنر العلوي 🙈', 'info');
+                  if (await cloudAction(
+                    () => updateStickersHero(updated),
+                    nextActive ? 'تم تفعيل البنر العلوي على الموقع 👁️' : 'تم إخفاء البنر العلوي على الموقع 🙈'
+                  )) setStickersFormHero(updated);
                 }}
                 className={`px-4 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 border transition-all ${
                   stickersFormHero.isActive !== false
@@ -3017,10 +3005,10 @@ export function AdminView() {
             <div className="flex justify-end pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  updateStickersHero(stickersFormHero);
-                  showToast('تم حفظ إعدادات هيدر صفحة الاستيكرات! 🎉', 'success');
-                }}
+                onClick={() => cloudAction(
+                  () => updateStickersHero(stickersFormHero),
+                  'تم حفظ إعدادات هيدر صفحة الاستيكرات على الموقع 🎉'
+                )}
                 className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-md"
               >
                 حفظ إعدادات الهيدر والبنر العلوي 💾
@@ -3043,12 +3031,13 @@ export function AdminView() {
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   const nextActive = !stickersFormPromo.isActive;
                   const updated = { ...stickersFormPromo, isActive: nextActive };
-                  setStickersFormPromo(updated);
-                  updateStickersPromo(updated);
-                  showToast(nextActive ? 'تم تفعيل بنر الترويج 👁️' : 'تم إخفاء بنر الترويج 🙈', 'info');
+                  if (await cloudAction(
+                    () => updateStickersPromo(updated),
+                    nextActive ? 'تم تفعيل بنر الترويج على الموقع 👁️' : 'تم إخفاء بنر الترويج على الموقع 🙈'
+                  )) setStickersFormPromo(updated);
                 }}
                 className={`px-4 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 border transition-all ${
                   stickersFormPromo.isActive !== false
@@ -3137,10 +3126,10 @@ export function AdminView() {
             <div className="flex justify-end pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  updateStickersPromo(stickersFormPromo);
-                  showToast('تم حفظ إعدادات بنر الترويج بنجاح! 🎉', 'success');
-                }}
+                onClick={() => cloudAction(
+                  () => updateStickersPromo(stickersFormPromo),
+                  'تم حفظ إعدادات بنر الترويج على الموقع 🎉'
+                )}
                 className="px-6 py-2.5 bg-gold text-[#0A0C16] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-md"
               >
                 حفظ إعدادات بنر الترويج 💾
@@ -3223,7 +3212,7 @@ export function AdminView() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => toggleProductVisibility(st.id)}
+                                onClick={() => cloudAction(() => toggleProductVisibility(st.id), 'تم تحديث الظهور')}
                                 className="p-1 text-ash hover:text-gold border border-grave bg-stone"
                                 title="تغيير الرؤية"
                               >
@@ -3284,9 +3273,9 @@ export function AdminView() {
         tile={editingSocialTile}
         onSave={(tileId, updatedFields) => {
           if (tileId) {
-            updateSocialTile(tileId, updatedFields);
+            return updateSocialTile(tileId, updatedFields);
           } else {
-            addSocialTile(updatedFields);
+            return addSocialTile(updatedFields);
           }
         }}
       />

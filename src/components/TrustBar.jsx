@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { Sparkles, RotateCcw, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Sparkles, Ruler, CheckCircle2, ReceiptText } from 'lucide-react';
 
 export const TrustBar = () => {
   const { lang } = useLanguage();
@@ -13,19 +13,19 @@ export const TrustBar = () => {
       titleAr: 'صُنع حسب الطلب في مصر'
     },
     {
-      icon: RotateCcw,
-      titleEn: '14-Day Hassle-Free Returns',
-      titleAr: 'إرجاع خلال ١٤ يوماً'
+      icon: Ruler,
+      titleEn: 'Size shown before order',
+      titleAr: 'المقاس ظاهر قبل الطلب'
     },
     {
       icon: CheckCircle2,
-      titleEn: '1,000+ Orders Delivered',
-      titleAr: '+١,٠٠٠ طلب مُسلَّم'
+      titleEn: 'Every custom piece can differ',
+      titleAr: 'كل قطعة ممكن تكون مختلفة'
     },
     {
-      icon: ShieldCheck,
-      titleEn: '100% Secure Checkout',
-      titleAr: 'دفع آمن بالكامل'
+      icon: ReceiptText,
+      titleEn: 'Full total before payment',
+      titleAr: 'الإجمالي كامل قبل الدفع'
     }
   ];
 

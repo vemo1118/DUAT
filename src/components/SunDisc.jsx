@@ -15,13 +15,13 @@ export const SunDisc = ({ size = 24, variant = 'gold', className = '', strokeCol
 
   // Horizon line color: explicit strokeColor prop OR bone (#EDE4D3) in dark/night OR dark (#0A0C16) in light/dawn
   const horizonColor = strokeColor || (isDawn ? '#0A0C16' : '#EDE4D3');
-  const sunColor = '#E8A33D';
+  const sunColor = isDawn ? '#C97B22' : '#E8A33D';
 
   return (
     <svg
       width={sizePx}
       height={sizePx}
-      viewBox="0 0 100 100"
+      viewBox="0 0 120 120"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`inline-block flex-shrink-0 transition-transform duration-300 ${className}`}
@@ -29,19 +29,19 @@ export const SunDisc = ({ size = 24, variant = 'gold', className = '', strokeCol
     >
       {/* Rising Sun Disc */}
       <circle
-        cx="50"
-        cy="52"
-        r="24"
+        cx="60"
+        cy="56"
+        r="26"
         fill={sunColor}
       />
       {/* Horizon Line */}
       <line
-        x1="12"
-        y1="70"
-        x2="88"
-        y2="70"
+        x1="14"
+        y1="74"
+        x2="106"
+        y2="74"
         stroke={horizonColor}
-        strokeWidth="3"
+        strokeWidth="5"
         strokeLinecap="round"
       />
     </svg>

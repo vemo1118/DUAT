@@ -1,19 +1,26 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useRef } from 'react';
 import { quoteOrder } from '../services/orderApi';
+import { priceCart, checkoutIssue, ORDER_LIMITS } from '../domain/commerce';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [rawItems, setCartItems] = useState([]);
+  const pricing = priceCart(rawItems);
+  const cartItems = pricing.items;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
+  const cartRevision = useRef(0);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen(prev => !prev);
 
   const addToCart = (product, customConfig = null) => {
+    cartRevision.current += 1;
+    setPromoCode('');
+    setDiscountAmount(0);
     setCartItems(prevItems => {
       const cfg = customConfig || product.customConfig || product.customDetails;
       const isStickerOrBundle = product.id?.startsWith('custom-sticker-') ||
@@ -45,7 +52,7 @@ export const CartProvider = ({ children }) => {
       const existingIndex = prevItems.findIndex(item => item.id === product.id && !item.isCustom);
       if (existingIndex > -1) {
         const updated = [...prevItems];
-        updated[existingIndex].quantity += (product.quantity || 1);
+        updated[existingIndex] = { ...updated[existingIndex], quantity: Math.min(ORDER_LIMITS.quantityPerLine, updated[existingIndex].quantity + (product.quantity || 1)) };
         return updated;
       }
 
@@ -72,10 +79,17 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (targetId) => {
+    cartRevision.current += 1;
+    setPromoCode('');
+    setDiscountAmount(0);
     setCartItems(prev => prev.filter(item => item.cartItemId !== targetId && item.id !== targetId));
   };
 
   const updateQuantity = (targetId, newQty) => {
+    if (!Number.isInteger(newQty) || newQty > ORDER_LIMITS.quantityPerLine) return;
+    cartRevision.current += 1;
+    setPromoCode('');
+    setDiscountAmount(0);
     if (newQty <= 0) {
       removeFromCart(targetId);
       return;
@@ -86,21 +100,24 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => {
+    cartRevision.current += 1;
     setCartItems([]);
     setPromoCode('');
     setDiscountAmount(0);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = pricing.subtotal;
   const total = Math.max(0, subtotal - discountAmount);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const applyPromoCode = async (code) => {
     if (!code) return false;
     const clean = code.trim().toUpperCase();
+    const revision = cartRevision.current;
 
     try {
       const quote = await quoteOrder({ items: cartItems, couponCode: clean });
+      if (revision !== cartRevision.current) return false;
       if (quote.couponCode === clean && Number(quote.discount) > 0) {
         setPromoCode(clean);
         setDiscountAmount(Number(quote.discount));
@@ -116,6 +133,8 @@ export const CartProvider = ({ children }) => {
   return (
     <CartContext.Provider value={{
       cartItems,
+      pricing,
+      checkoutIssue: checkoutIssue(pricing),
       items: cartItems, // Alias for backward compatibility
       isCartOpen,
       isOpen: isCartOpen, // Alias for backward compatibility

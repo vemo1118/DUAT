@@ -270,21 +270,31 @@ export const CategoryBannersProvider = ({ children }) => {
   };
 
   const deleteCategoryBanner = async (bannerId) => {
-    const { error } = await supabase.from('category_banners').delete().eq('id', bannerId);
+    const { data, error } = await supabase
+      .from('category_banners')
+      .delete()
+      .eq('id', bannerId)
+      .select('id');
     if (error) throw error;
+    if (!Array.isArray(data) || data.length !== 1) throw new Error('CATEGORY_DELETE_NOT_CONFIRMED');
     setCategoryBanners((banners) => banners.filter((banner) => banner.id !== bannerId));
   };
 
   const updateForgeBanner = async (updatedFields) => {
     const updated = { ...forgeBanner, ...updatedFields };
-    const { error } = await supabase.from('store_settings').upsert({
-      key: 'forge_banner',
-      value: updated,
-      updated_at: new Date().toISOString()
-    });
-    if (error) throw error;
-    setForgeBanner(updated);
-    return updated;
+    const { data, error } = await supabase
+      .from('store_settings')
+      .upsert({
+        key: 'forge_banner',
+        value: updated,
+        updated_at: new Date().toISOString()
+      })
+      .select('value')
+      .single();
+    if (error || !data?.value) throw error || new Error('FORGE_SAVE_NOT_CONFIRMED');
+    const saved = { ...DEFAULT_FORGE_BANNER, ...data.value };
+    setForgeBanner(saved);
+    return saved;
   };
 
   const resetCategoryBanners = async () => {

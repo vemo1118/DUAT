@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { Sparkles, Hammer, Truck, ShieldCheck } from 'lucide-react';
+import { Palette, Layers3, Plus, CalendarDays } from 'lucide-react';
 
 export const TrustNumbersBar = () => {
   const { lang } = useLanguage();
@@ -8,24 +8,24 @@ export const TrustNumbersBar = () => {
 
   const signals = [
     {
-      icon: Sparkles,
-      labelEn: 'MADE TO ORDER',
-      labelAr: 'صُنع حسب الطلب'
+      icon: Palette,
+      labelEn: 'EGP 45 EACH',
+      labelAr: '٤٥ ج للقطعة'
     },
     {
-      icon: Hammer,
-      labelEn: 'HANDCRAFTED IN EGYPT',
-      labelAr: 'تشطيب يدوي في مصر'
+      icon: Layers3,
+      labelEn: 'MINIMUM 4',
+      labelAr: 'أقل عدد ٤'
     },
     {
-      icon: Truck,
-      labelEn: 'SHIPS 3–5 DAYS',
-      labelAr: 'الشحن خلال ٣-٥ أيام'
+      icon: Plus,
+      labelEn: 'MIX YOUR DESIGNS',
+      labelAr: 'كل قطعة بتصميم'
     },
     {
-      icon: ShieldCheck,
-      labelEn: '14-DAY RETURNS',
-      labelAr: 'إرجاع خلال ١٤ يوم'
+      icon: CalendarDays,
+      labelEn: '7-DAY BOOKING',
+      labelAr: 'الحجز لمدة ٧ أيام'
     }
   ];
 

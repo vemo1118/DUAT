@@ -17,13 +17,13 @@ export default {
         ash: 'rgb(var(--ash-rgb, 142 152 191) / <alpha-value>)',
       },
       fontFamily: {
-        clash: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
+        clash: ['"Anton"', '"Space Grotesk"', 'sans-serif'],
         space: ['"Space Grotesk"', 'sans-serif'],
         kufi: ['"IBM Plex Sans Arabic"', 'sans-serif'],
         ruqaa: ['"Aref Ruqaa Ink"', '"Aref Ruqaa"', '"Katibeh"', '"Rakkas"', 'serif'],
         cinzel: ['"Cinzel"', '"Playfair Display"', 'Georgia', 'serif'],
         mono: ['"Space Grotesk"', 'sans-serif'],
-        display: ['"Clash Display"', '"Space Grotesk"', 'sans-serif'],
+        display: ['"Anton"', '"Space Grotesk"', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.04em',

@@ -37,7 +37,10 @@ export default async function handler(req, res) {
         discount: quote.discount,
         shippingFee: quote.shippingFee,
         total: quote.total,
-        couponCode: quote.couponCode
+        couponCode: quote.couponCode,
+        customQuantity: quote.customQuantity,
+        customRemaining: quote.customRemaining,
+        checkoutIssue: quote.checkoutIssue
       }
     });
   } catch (error) {

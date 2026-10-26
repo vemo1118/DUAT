@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { uploadDesignDataUrl } from '../services/orderApi';
+import { PRICING, ORDER_LIMITS } from '../domain/commerce';
+import { imageLayout, renderImageSticker } from '../domain/stickerArtwork';
 import { SunDisc } from '../components/SunDisc';
 import { Type, Image as ImageIcon, Sparkles, ShoppingBag, RotateCcw, Upload, Check, Info, ChevronLeft, ChevronRight, Layers, Palette, Eye, Shield, Tag, Loader2 } from 'lucide-react';
 
@@ -39,9 +41,8 @@ export function getStickerExportLayout(cutShape, text) {
 
 export function StickerBuilderView() {
   const { lang, t, formatPrice } = useLanguage();
-  const { addToCart } = useCart();
-  const { addToast } = useToast();
-  const navigate = useNavigate();
+  const { addToCart, cartItems } = useCart();
+  const { showToast: addToast } = useToast();
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
@@ -50,26 +51,39 @@ export function StickerBuilderView() {
   const [isUploading, setIsUploading] = useState(false);
 
   // Builder Mode: 'text' or 'image'
-  const [mode, setMode] = useState('text');
+  const [mode, setMode] = useState('image');
 
   // Text Sticker State
   const [customText, setCustomText] = useState('طالع نور');
   const [selectedFont, setSelectedFont] = useState('camel');
-  const [textColor, setTextColor] = useState('#E0A93B');
-  const [bgFinish, setBgFinish] = useState('obsidian');
+  const [textColor, setTextColor] = useState('#232A55');
+  const [bgFinish, setBgFinish] = useState('ivory');
   const [cutShape, setCutShape] = useState('pill');
 
   // Image Sticker State
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imageScale, setImageScale] = useState(100);
-  const [borderStyle, setBorderStyle] = useState('gold');
-  const [imgCutShape, setImgCutShape] = useState('diecut');
+  const [borderStyle, setBorderStyle] = useState('none');
+  const [imgCutShape, setImgCutShape] = useState('auto');
 
   // Common Options
   const [quantity, setQuantity] = useState(1);
   const [designNotes, setDesignNotes] = useState('');
 
   const stickerExportRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
+  const [imageArtwork, setImageArtwork] = useState(null);
+  const layout = imageLayout(imageDimensions.width, imageDimensions.height, imgCutShape);
+  const customCount = cartItems.filter(item => item.id?.startsWith('custom-sticker-')).reduce((sum, item) => sum + item.quantity, 0);
+  useEffect(() => {
+    let cancelled = false;
+    setImageArtwork(null);
+    if (uploadedImage) renderImageSticker(uploadedImage, { shape: imgCutShape, background: bgFinish, border: borderStyle, scale: imageScale })
+      .then(result => { if (!cancelled) setImageArtwork(result); })
+      .catch(() => { if (!cancelled) addToast(isAr ? 'تعذر تجهيز الصورة، جرّب صورة تانية' : 'Could not prepare this image. Try another.', 'error'); });
+    return () => { cancelled = true; };
+  }, [uploadedImage, imgCutShape, bgFinish, borderStyle, imageScale]);
 
   const FONTS = [
     { id: 'camel', nameAr: 'خط دوات الملكي', nameEn: 'DUAT Royal Camel', fontClass: 'font-arabic-camel', sample: 'دوات' },
@@ -108,20 +122,31 @@ export function StickerBuilderView() {
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        addToast(isAr ? 'حجم الصورة يجب ألا يتجاوز ٥ ميجابايت' : 'Image size must be less than 5MB', 'error');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedImage(event.target?.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      addToast(isAr ? 'اختار PNG أو JPG أو WebP بحد أقصى 5 ميجابايت' : 'Choose PNG, JPG or WebP up to 5MB.', 'error');
+      return;
     }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        if (!img.naturalWidth || !img.naturalHeight || img.naturalWidth * img.naturalHeight > 40000000) {
+          addToast(isAr ? 'الصورة كبيرة جدًا، صغّرها وحاول تاني' : 'Image is too large. Resize and retry.', 'error');
+          return;
+        }
+        setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+        setUploadedImage(reader.result);
+        setImageScale(100);
+      };
+      img.onerror = () => addToast(isAr ? 'ملف الصورة غير صالح' : 'Invalid image file.', 'error');
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
-  const basePrice = 100;
+  const basePrice = PRICING.custom;
 
   const handleAddToCart = async () => {
     if (mode === 'text' && !customText.trim()) {
@@ -134,7 +159,7 @@ export function StickerBuilderView() {
     }
 
     setIsUploading(true);
-    let stickerSnapshot = uploadedImage;
+    let stickerSnapshot = mode === 'image' ? imageArtwork : null;
     if (mode === 'text' && stickerExportRef.current) {
       try {
         if (document.fonts?.ready) await document.fonts.ready;
@@ -182,12 +207,12 @@ export function StickerBuilderView() {
       design_upload_token: uploadResult.claimToken,
       specsAr: [
         mode === 'text' ? `النص: ${customText}` : `استيكر صورة مرفقة`,
-        `القص والتشكيل: ${cutShape}`,
+        `القص والتشكيل: ${mode === 'image' ? imgCutShape : cutShape}`,
         `التشطيب: إيبوكسي ثلاثي الأبعاد 3D Polyurethane`
       ],
       specsEn: [
         mode === 'text' ? `Text: ${customText}` : `Uploaded Custom Image`,
-        `Cut Shape: ${cutShape}`,
+        `Cut Shape: ${mode === 'image' ? imgCutShape : cutShape}`,
         `Finish: 3D Polyurethane Epoxy Dome`
       ],
       customDetails: {
@@ -196,7 +221,11 @@ export function StickerBuilderView() {
         selectedFont,
         textColor,
         bgFinish,
-        cutShape,
+        cutShape: mode === 'image' ? imgCutShape : cutShape,
+        imageScale,
+        borderStyle,
+        printWidthMm: mode === 'image' ? layout.widthMm : (cutShape === 'circle' ? 25 : 40),
+        printHeightMm: mode === 'image' ? layout.heightMm : (cutShape === 'circle' ? 25 : 40 * exportLayout.height / exportLayout.width),
         designNotes,
         design_image_path: uploadResult.path,
         design_upload_token: uploadResult.claimToken
@@ -208,7 +237,8 @@ export function StickerBuilderView() {
     addToCart(customItem);
     setIsUploading(false);
     addToast(isAr ? 'تمت إضافة الاستيكر المخصص إلى سلة الشراء! 🎨' : 'Custom sticker added to cart! 🎨', 'success');
-    navigate('/stickers');
+    // Stay in the builder so the next piece can have its own design.
+    setQuantity(1);
   };
 
   const activeFontObj = FONTS.find(f => f.id === selectedFont) || FONTS[0];
@@ -219,7 +249,7 @@ export function StickerBuilderView() {
   const totalPrice = basePrice * quantity;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 min-h-screen">
+    <div className="sticker-builder max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 min-h-screen">
       {/* Fixed-size print artwork. It stays off-screen so responsive preview styles never crop order files. */}
       {mode === 'text' && (
         <div aria-hidden="true" className="fixed -left-[10000px] top-0 pointer-events-none">
@@ -281,8 +311,8 @@ export function StickerBuilderView() {
         </h1>
         <p className="font-space text-xs sm:text-sm text-bone/70 max-w-2xl">
           {isAr
-            ? 'صمّم استيكر إيبوكسي مجسم 3D بالكلمة اللي تختارها أو صورتك الخاصة، بتشطيب عنبري مقاوم للماء والخدش!'
-            : 'Design your custom 3D epoxy sticker with custom text or image with waterproof resin finish.'}
+            ? 'ارفع صورتك، شوفها على الاستيكر، وكمل مجموعتك. 4 تصميمات مختلفة بـ180 جنيه قبل الشحن.'
+            : 'Upload your image, preview your sticker, and build your set. Four different designs for EGP 180 before shipping.'}
         </p>
       </div>
 
@@ -335,9 +365,10 @@ export function StickerBuilderView() {
             {/* Scale / Dimension guide badge */}
             <div className="absolute bottom-4 right-4 z-10 font-mono text-[10px] text-ash uppercase bg-coal/80 px-2.5 py-1 border border-grave">
               <span>
-                {isAr
-                  ? `المقاس: ${Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1)} × ${cutShape === 'circle' ? Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1) : 2.5} سم تقريباً`
-                  : `Approx: ${Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1)} x ${cutShape === 'circle' ? Math.max(3.5, (customText.length * 0.75 + 2.0)).toFixed(1) : 2.5} cm`}
+                {mode === 'image'
+                  ? (uploadedImage ? `${layout.widthMm} × ${layout.heightMm} mm · ${isAr ? 'مقاس الطباعة' : 'Print size'}` : (isAr ? 'معاينة تصميمك هتظهر هنا' : 'Your design will appear here'))
+                  : `${cutShape === 'circle' ? '25 × 25' : `40 × ${(40 * exportLayout.height / exportLayout.width).toFixed(1)}`} mm`}
+
               </span>
             </div>
 
@@ -345,7 +376,7 @@ export function StickerBuilderView() {
             <div className="relative group transition-all duration-300 transform hover:scale-105 my-auto">
               
               {/* Soft Drop Shadow under 3D dome */}
-              <div className={`absolute inset-0 bg-black/70 blur-lg transform translate-y-3 scale-95 ${activeShapeObj.class}`} />
+              <div className={`absolute inset-0 bg-black/10 blur-lg transform translate-y-3 scale-95 ${activeShapeObj.class}`} />
 
               {/* Mode A: TEXT STICKER DOME */}
               {mode === 'text' && (
@@ -371,36 +402,18 @@ export function StickerBuilderView() {
 
               {/* Mode B: IMAGE STICKER DOME */}
               {mode === 'image' && (
-                <div
-                  className={`relative z-10 transition-all duration-300 border shadow-2xl overflow-hidden flex items-center justify-center p-4 ${
-                    imgCutShape === 'circle' ? 'rounded-full w-44 h-44' :
-                    imgCutShape === 'oval' ? 'rounded-[40%] w-52 h-36' : 'rounded-xl w-48 h-48'
-                  } ${
-                    borderStyle === 'gold' ? 'border-4 border-gold' :
-                    borderStyle === 'white' ? 'border-4 border-white' :
-                    borderStyle === 'black' ? 'border-4 border-black' : 'border-none'
-                  } ${activeBgObj.bg} ${activeBgObj.border}`}
-                  style={{
-                    boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
-                  }}
-                >
-                  {/* Polyurethane Gloss Sheen Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none z-20" />
-
-                  {uploadedImage ? (
-                    <img
-                      src={uploadedImage}
-                      alt="Uploaded sticker design"
-                      className="max-w-full max-h-full object-contain transition-transform duration-200"
-                      style={{ transform: `scale(${imageScale / 100})` }}
-                    />
-                  ) : (
-                    <div className="text-center p-6 space-y-2 text-ash font-mono text-xs">
-                      <Upload size={32} className="mx-auto text-gold animate-bounce" />
-                      <p>{isAr ? 'ارفع صورة أو لوجو هنا' : 'Upload image or logo here'}</p>
-                    </div>
-                  )}
-                </div>
+                uploadedImage ? (
+                  imageArtwork ? <img src={imageArtwork} alt={isAr ? 'تصميم الاستيكر اللي هيتطبع' : 'Your print artwork'}
+                    style={{ width: `${layout.widthMm * 8}px`, height: `${layout.heightMm * 8}px`, objectFit: 'contain', filter: 'drop-shadow(0 12px 14px #232a5522)' }} />
+                  : <Loader2 className="animate-spin text-gold" aria-label="Preparing preview" />
+                ) : (
+                  <button type="button" onClick={() => imageInputRef.current?.click()} className="relative z-10 rounded-2xl border-2 border-dashed border-gold/60 bg-white/80 p-8 sm:p-12 text-center max-w-sm space-y-4 hover:border-gold">
+                    <Upload size={36} className="mx-auto text-gold" />
+                    <strong className="block text-lg text-bone">{isAr ? 'ارفع صورة عشان نبدأ' : 'Upload an image to begin'}</strong>
+                    <span className="block text-sm text-ash">{isAr ? 'صورتك أو لوجو أو رسمة بتحبها. هنظبط الأبعاد من غير ما نمطّ الصورة.' : 'A photo, logo or artwork you love. We fit its proportions without stretching.'}</span>
+                    <span className="block text-xs text-ash">PNG · JPG · WebP / 5 MB</span>
+                  </button>
+                )
               )}
 
             </div>
@@ -412,8 +425,8 @@ export function StickerBuilderView() {
             <Shield size={18} className="text-gold flex-shrink-0" />
             <span>
               {isAr
-                ? 'جميع استيكرات دوات مصنوعة من طبقة صمغ بولي يوريثان إيبوكسي مسبوقة بلاصق 3M عالي الالتصاق مقاوم للماء والخدش.'
-                : 'All DUAT stickers feature 3D polyurethane resin domes with high-tack 3M waterproof adhesive.'}
+                ? 'المعاينة بتوضح التصميم والمقاس؛ لون الطباعة ولمعة الإيبوكسي ممكن يختلفوا عن الشاشة. تأكد إن التصميم بعيد عن كاميرات الموبايل.'
+                : 'Preview shows artwork and size. Printed colors and resin gloss may differ from your screen. Keep the sticker clear of phone cameras.'}
             </span>
           </div>
 
@@ -573,11 +586,12 @@ export function StickerBuilderView() {
                     {isAr ? 'اضغط هنا لاختيار صورة' : 'Click to select image file'}
                   </span>
                   <span className="font-mono text-[10px] text-ash mt-1">
-                    PNG, JPG, WebP (up to 10MB)
+                    PNG, JPG, WebP (up to 5MB)
                   </span>
                   <input
                     type="file"
-                    accept="image/*"
+                    ref={imageInputRef}
+                    accept="image/png,image/jpeg,image/webp"
                     onChange={handleImageUpload}
                     className="hidden"
                   />
@@ -591,6 +605,7 @@ export function StickerBuilderView() {
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
+                    { id: 'auto', label: isAr ? 'نفس أبعاد الصورة' : 'Original ratio' },
                     { id: 'circle', label: isAr ? 'دائري' : 'Circle' },
                     { id: 'oval', label: isAr ? 'بيضاوي' : 'Oval' },
                     { id: 'rectangle', label: isAr ? 'مربع' : 'Square' }
@@ -660,13 +675,13 @@ export function StickerBuilderView() {
               {uploadedImage && (
                 <div className="space-y-2">
                   <div className="flex justify-between font-mono text-xs text-bone">
-                    <span>{isAr ? 'حجم الصورة:' : 'Image Zoom:'}</span>
+                    <span>{isAr ? 'حجم الصورة:' : 'Image size within frame:'}</span>
                     <span>{imageScale}%</span>
                   </div>
                   <input
                     type="range"
                     min="50"
-                    max="150"
+                    max="100"
                     value={imageScale}
                     onChange={(e) => setImageScale(Number(e.target.value))}
                     className="w-full accent-gold bg-coal cursor-pointer"
@@ -677,6 +692,10 @@ export function StickerBuilderView() {
             </div>
           )}
 
+          <div className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-sm text-bone">
+            {isAr ? `مجموعتك: ${customCount} قطعة — ${Math.max(0, 4 - customCount)} متبقية للحد الأدنى` : `Your set: ${customCount} pieces — ${Math.max(0, 4 - customCount)} to reach the minimum`}
+            {uploadedImage && Math.min(layout.widthMm, layout.heightMm) < 10 && <p className="mt-2">{isAr ? 'الصورة طويلة أو عريضة جدًا، التفاصيل هتطلع صغيرة. اختار إطار مربع أو صورة أقرب للمربع.' : 'This image is very narrow. Details will print small. Choose a square frame or a less narrow image.'}</p>}
+          </div>
           {/* Workshop Notes Field */}
           <div className="space-y-2 pt-4 border-t border-grave">
             <label className="font-mono text-xs text-ash block">
@@ -692,10 +711,13 @@ export function StickerBuilderView() {
 
           {/* PRICING & ADD TO CART CTA */}
           <div className="pt-6 border-t border-grave space-y-4">
+            <p className="text-sm text-gold">
+              {isAr ? 'حجز مسبق — 45 ج للقطعة، بحد أدنى 4 قطع في الطلب. خصّص كل قطعة براحتك.' : 'Pre-order — EGP 45 each, minimum 4 custom pieces per order. Personalize each one.'}
+            </p>
             
             {/* Quantity Selector */}
             <div className="flex items-center justify-between font-mono text-xs text-bone">
-              <span>{isAr ? 'الكمية المطلوبة:' : 'Quantity:'}</span>
+              <span>{isAr ? 'عدد النسخ من التصميم ده:' : 'Copies of this design:'}</span>
               <div className="flex items-center border border-grave bg-coal">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -706,7 +728,7 @@ export function StickerBuilderView() {
 
                 <span className="px-4 py-1.5 font-bold">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => setQuantity(Math.min(ORDER_LIMITS.quantityPerLine, quantity + 1))}
                   className="px-3 py-1.5 text-gold hover:bg-stone transition-colors font-bold"
                 >
                   +
@@ -725,7 +747,7 @@ export function StickerBuilderView() {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              disabled={isUploading}
+              disabled={isUploading || (mode === 'image' && !imageArtwork)}
               className="w-full btn-primary py-4 px-6 font-mono text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl"
             >
               {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ShoppingBag size={18} />}

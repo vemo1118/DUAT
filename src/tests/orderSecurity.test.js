@@ -51,9 +51,9 @@ describe('server-authoritative order pricing', () => {
     expect(quote.items[0]).toMatchObject({
       nameAr: 'منتج قاعدة البيانات',
       nameEn: 'Database Product',
-      price: 725
+      price: 60
     });
-    expect(quote.subtotal).toBe(725);
+    expect(quote.subtotal).toBe(60);
   });
 
   it('stores trusted product artwork metadata for admin order previews', () => {

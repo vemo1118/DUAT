@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useHeroBanners, INITIAL_HERO_SLIDES } from '../context/HeroBannersContext';
 import { SunDisc } from './SunDisc';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, ShieldCheck, Truck, Clock } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, MapPin, Palette, Clock } from 'lucide-react';
 
 function safeNum(val, fallback) {
   const n = Number(val);
@@ -251,16 +251,16 @@ export const HeroSlider = () => {
       {/* Micro Trust Bar Overlay with Strict Language Switching */}
       <div className="absolute bottom-0 left-0 hidden md:flex items-center gap-6 px-6 py-3 bg-stone/80 border-t border-r border-grave font-mono text-[11px] text-ash">
         <span className="flex items-center gap-1.5">
-          <ShieldCheck size={14} className="text-gold" />
-          <span>{isAr ? 'ضمان سنة استبدال' : '1-YEAR WARRANTY'}</span>
+          <Palette size={14} className="text-gold" />
+          <span>{isAr ? 'كل قطعة بتصميمك' : 'YOUR DESIGN, EACH PIECE'}</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <Truck size={14} className="text-gold" />
-          <span>{isAr ? 'شحن لكافة المحافظات' : 'FAST EGYPT SHIPPING'}</span>
+          <MapPin size={14} className="text-gold" />
+          <span>{isAr ? 'مصنوع حسب الطلب في مصر' : 'MADE TO ORDER IN EGYPT'}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <Clock size={14} className="text-gold" />
-          <span>{isAr ? 'تقفيل مصري فاخر' : 'HAND-FINISHED IN EGYPT'}</span>
+          <span>{isAr ? 'المقاس ظاهر قبل الطلب' : 'SIZE SHOWN BEFORE ORDER'}</span>
         </span>
       </div>
     </section>

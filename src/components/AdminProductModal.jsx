@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, Sparkles, Tag, Gift, Check, Eye } from 'lucide-react';
 import { CATEGORIES } from '../data/products';
 
 export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = null }) {
+  const saving = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
     category: 'bundles',
@@ -44,8 +46,8 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         optionsText: Array.isArray(p.options) ? p.options.join(', ') : '',
         tagEn: p.tagEn || '',
         tagAr: p.tagAr || '',
-        craftTagEn: p.craftTagEn || (p.category === 'bundles' ? 'Collector Box • Egypt Craft' : 'Ships in 3–5 Days • Egypt Craft'),
-        craftTagAr: p.craftTagAr || (p.category === 'bundles' ? 'علبة هدايا خاصة • صنع في مصر' : 'يُشحن خلال ٣-٥ أيام • تشطيب مصري'),
+        craftTagEn: p.craftTagEn || (p.category === 'bundles' ? 'Collector Box • Egypt Craft' : 'Made to order • Egypt Craft'),
+        craftTagAr: p.craftTagAr || (p.category === 'bundles' ? 'علبة هدايا خاصة • صنع في مصر' : 'بيتصنع حسب الطلب • تشطيب مصري'),
         descriptionEn: p.descriptionEn || '',
         descriptionAr: p.descriptionAr || '',
         specsEnText: Array.isArray(p.specsEn) ? p.specsEn.join('\n') : '',
@@ -91,8 +93,9 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving.current) return;
     
     // Convert specs & options text to arrays
     const specsEn = formData.specsEnText
@@ -135,8 +138,10 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
     delete payload.specsArText;
     delete payload.optionsText;
 
-    onSave(payload);
-    onClose();
+    saving.current = true;
+    setIsSaving(true);
+    try { if (await onSave(payload) !== false) onClose(); }
+    finally { saving.current = false; setIsSaving(false); }
   };
 
   const specsListAr = formData.specsArText.split('\n').map(s => s.trim()).filter(Boolean);
@@ -550,6 +555,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
           </button>
           <button
             type="submit"
+            disabled={isSaving}
             className="flex items-center gap-2 px-6 py-2.5 bg-gold text-[#050505] font-bold font-mono text-xs uppercase tracking-wider hover:bg-gold-light transition-colors shadow-lg shadow-gold/20"
           >
             <Save size={16} />
