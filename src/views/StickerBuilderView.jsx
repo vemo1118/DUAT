@@ -420,7 +420,7 @@ export function StickerBuilderView() {
 
           </div>
 
-          {/* Material Quality Assurance Notice */}
+          {/* Finish quality assurance notice */}
           <div className="bg-coal border border-grave p-4 font-mono text-xs text-ash flex items-center gap-3">
             <Shield size={18} className="text-gold flex-shrink-0" />
             <span>
@@ -704,7 +704,7 @@ export function StickerBuilderView() {
             <textarea
               value={designNotes}
               onChange={(e) => setDesignNotes(e.target.value)}
-              placeholder={isAr ? 'مثال: يرجى جعل الحروف بارزةة أكثر أو محاذاة النص لليمين...' : 'e.g. Please align text to right...'}
+              placeholder={isAr ? 'مثال: يرجى جعل الحروف بارزة أكثر أو محاذاة النص لليمين...' : 'e.g. Please align text to right...'}
               className="w-full bg-coal border border-grave p-3 text-xs font-mono text-bone placeholder:text-ash focus:border-gold focus:outline-none min-h-[70px]"
             />
           </div>

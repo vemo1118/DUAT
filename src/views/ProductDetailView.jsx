@@ -310,18 +310,18 @@ export function ProductDetailView() {
               )}
             </div>
 
-            {/* 2. Materials & Craft */}
+            {/* 2. Finish & Craft */}
             <div className="py-4">
               <button
                 onClick={() => toggleAccordion('craft')}
                 className="w-full flex items-center justify-between font-mono text-xs uppercase tracking-widest text-bone font-bold text-right"
               >
-                <span>{isAr ? 'الخامات والصناعة المصرية (Materials & Craft)' : 'Materials & Craft'}</span>
+                <span>{isAr ? 'التشطيب والصناعة المصرية' : 'Finish & Egyptian Craft'}</span>
                 {openAccordions.craft ? <ChevronUp size={16} className="text-gold" /> : <ChevronDown size={16} className="text-ash" />}
               </button>
               {openAccordions.craft && (
                 <div className="pt-3 text-sm text-ash space-y-2 font-space font-light leading-relaxed">
-                  <p>{craftTag || (isAr ? 'صناعة وتشطيب يدوي فاخر في مصر بمواصفات عالمية' : 'Hand-finished in Egypt with luxury grade materials.')}</p>
+                  <p>{craftTag || (isAr ? 'صناعة وتشطيب يدوي فاخر في مصر بمواصفات عالمية' : 'Hand-finished in Egypt with a premium finish.')}</p>
                 </div>
               )}
             </div>
