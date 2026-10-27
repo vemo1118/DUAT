@@ -14,6 +14,7 @@ import { AdminProductModal } from '../components/AdminProductModal';
 import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
 import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
+import { AdminPreorderHeroEditor } from '../components/AdminPreorderHeroEditor';
 import { CATEGORIES } from '../data/products';
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
 import {
@@ -746,6 +747,13 @@ export function AdminView() {
                 </button>
 
                 <button
+                  onClick={() => setActiveTab('preorder_hero')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${activeTab === 'preorder_hero' ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]' : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'}`}
+                >
+                  <div className="flex items-center gap-2.5"><Zap size={16}/><span>2. عرض الحجز والكستمايز</span></div><span className="text-[10px] text-emerald-400">مباشر</span>
+                </button>
+
+                <button
                   onClick={() => setActiveTab('bundles_page')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${
                     activeTab === 'bundles_page'
@@ -755,7 +763,7 @@ export function AdminView() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Gift size={16} />
-                    <span>2. صفحة البندلات (/bundles)</span>
+                    <span>3. صفحة البندلات (/bundles)</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 text-emerald-400 font-mono">مباشر</span>
                 </button>
@@ -770,7 +778,7 @@ export function AdminView() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Sparkles size={16} />
-                    <span>3. صفحة الاستيكرات (/stickers)</span>
+                    <span>4. صفحة الاستيكرات (/stickers)</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 text-emerald-400 font-mono">مباشر</span>
                 </button>
@@ -785,7 +793,7 @@ export function AdminView() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Zap size={16} />
-                    <span>4. بنر مصمم الاستيكرات</span>
+                    <span>5. بنر مصمم الاستيكرات</span>
                   </div>
                 </button>
               </div>
@@ -1947,6 +1955,9 @@ export function AdminView() {
 
         </div>
       )}
+
+      {/* ============================================================ */}
+      {activeTab === 'preorder_hero' && <AdminPreorderHeroEditor showToast={showToast} />}
 
       {/* ============================================================ */}
       {/* TAB 3.5: STICKER BUILDER FEATURE PROMO BANNER EDITOR */}

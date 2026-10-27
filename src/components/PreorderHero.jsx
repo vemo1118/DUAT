@@ -3,19 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, ArrowRight, Check, Layers3, Palette, Sparkles } from 'lucide-react';
 import { preorderState } from '../domain/commerce';
+import { usePreorderHeroSettings } from '../context/PreorderHeroSettingsContext';
 
-export function PreorderHero({ imageUrl }) {
+export function PreorderHero() {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const isAr = lang === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
   const campaignState = preorderState();
+  const { settings: s } = usePreorderHeroSettings();
   const isOpen = campaignState === 'open';
   const isClosed = campaignState === 'closed';
 
-  const features = isAr
-    ? ['كل قطعة بتصميم مختلف', 'ابدأ من 4 قطع بس', 'زوّد أي عدد يناسبك']
-    : ['A different design on every piece', 'Start with only 4 pieces', 'Add as many as you need'];
+  const features = isAr ? s.featuresAr : s.featuresEn;
+  const total = Number(s.price || 0) * Number(s.minimumQuantity || 0);
+  if (s.isActive === false) return null;
 
   return (
     <section className="relative overflow-hidden border-b border-grave bg-void">
@@ -29,39 +31,37 @@ export function PreorderHero({ imageUrl }) {
           <div className="inline-flex items-center gap-2 border border-gold/40 bg-gold/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-gold">
             <Sparkles size={14} />
             <span>{isOpen
-              ? (isAr ? 'الحجز مفتوح لمدة 7 أيام' : '7-DAY PRE-ORDER IS OPEN')
+              ? (isAr ? s.badgeOpenAr : s.badgeOpenEn)
               : isClosed
-                ? (isAr ? 'حجز الدفعة انتهى' : 'THIS CUSTOM DROP IS CLOSED')
-                : (isAr ? 'دفعة الكستمايز الجاية' : 'NEXT CUSTOM DROP')}</span>
+                ? (isAr ? s.badgeClosedAr : s.badgeClosedEn)
+                : (isAr ? s.badgeUpcomingAr : s.badgeUpcomingEn)}</span>
           </div>
 
           <div className="space-y-3">
             <h1 className="font-clash text-4xl text-bone sm:text-6xl lg:text-7xl">
-              {isClosed ? (isAr ? 'دفعة الكستمايز خلصت.' : 'THIS CUSTOM DROP IS DONE.') : (isAr ? 'إنت تتخيلها.' : 'YOU IMAGINE IT.')}
+              {isClosed ? (isAr ? s.closedTitleAr : s.closedTitleEn) : (isAr ? s.titleAr : s.titleEn)}
             </h1>
             <h2 className="font-clash text-4xl text-gold sm:text-6xl lg:text-7xl">
-              {isClosed ? (isAr ? 'الجاهز لسه متاح.' : 'READY-MADE IS STILL HERE.') : (isAr ? 'إحنا نعملهالك.' : 'WE MAKE IT.')}
+              {isClosed ? (isAr ? s.closedAccentTitleAr : s.closedAccentTitleEn) : (isAr ? s.accentTitleAr : s.accentTitleEn)}
             </h2>
           </div>
 
           <p className="max-w-2xl font-space text-base leading-relaxed text-bone/85 sm:text-lg">
-            {isAr
-              ? 'حوّل كلمة، صورة أو فكرة لاستيكر على مزاجك. صمّم كل قطعة لوحدها أو كرّر التصميم اللي بتحبه.'
-              : 'Turn a word, image or idea into a sticker made your way. Create a different design for every piece or repeat your favourite.'}
+            {isAr ? s.descriptionAr : s.descriptionEn}
           </p>
 
           {isOpen ? <>
             <div className="flex flex-wrap items-end gap-3 border-y border-grave py-5">
               <div>
                 <span className="block font-mono text-[10px] uppercase tracking-widest text-ash">
-                  {isAr ? 'سعر الحجز للقطعة' : 'PRE-ORDER PRICE / PIECE'}
+                  {isAr ? s.priceLabelAr : s.priceLabelEn}
                 </span>
-                <span className="font-clash text-6xl font-bold leading-none text-gold">45</span>
-                <span className="mx-2 font-mono text-sm text-bone">{isAr ? 'جنيه' : 'EGP'}</span>
+                <span className="font-clash text-6xl font-bold leading-none text-gold">{s.price}</span>
+                <span className="mx-2 font-mono text-sm text-bone">{isAr ? s.currencyAr : s.currencyEn}</span>
               </div>
               <div className="mb-1 border-s border-grave px-4 font-mono text-xs leading-relaxed text-bone/75">
-                <span className="block font-bold text-bone">{isAr ? '4 قطع = 180 جنيه' : '4 pieces = EGP 180'}</span>
-                <span>{isAr ? 'قبل مصاريف الشحن' : 'before shipping'}</span>
+                <span className="block font-bold text-bone">{isAr ? `${s.minimumQuantity} قطع = ${total} ${s.currencyAr}` : `${s.minimumQuantity} pieces = ${s.currencyEn} ${total}`}</span>
+                <span>{isAr ? s.beforeShippingAr : s.beforeShippingEn}</span>
               </div>
             </div>
 
@@ -78,35 +78,35 @@ export function PreorderHero({ imageUrl }) {
           </> : (
             <div className="border-y border-grave py-5 font-space text-sm leading-relaxed text-bone/80">
               {isClosed
-                ? (isAr ? 'سعر الحجز السابق اتقفل مع الدفعة. تقدر تطلب من الاستيكرات الجاهزة دلوقتي.' : 'The previous pre-order price closed with that drop. Ready-made stickers are available now.')
-                : (isAr ? 'تفاصيل وسعر الدفعة الجاية هيظهروا هنا وقت فتح الحجز.' : 'The next drop price and details will appear here when booking opens.')}
+                ? (isAr ? s.closedMessageAr : s.closedMessageEn)
+                : (isAr ? s.upcomingMessageAr : s.upcomingMessageEn)}
             </div>
           )}
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button
-              onClick={() => navigate(isOpen ? '/sticker-builder' : '/stickers')}
+              onClick={() => navigate(isOpen ? s.primaryOpenLink : s.primaryClosedLink)}
               className="btn-primary flex min-h-[54px] items-center justify-center gap-3 px-8 py-4 font-mono text-sm font-bold tracking-wider"
             >
               {isOpen ? <Palette size={18} /> : <Layers3 size={18} />}
-              <span>{isOpen ? (isAr ? 'ابدأ صمّم قطعك' : 'DESIGN YOUR PIECES') : (isAr ? 'شوف الاستيكرات الجاهزة' : 'SHOP READY-MADE')}</span>
+              <span>{isOpen ? (isAr ? s.primaryOpenTextAr : s.primaryOpenTextEn) : (isAr ? s.primaryClosedTextAr : s.primaryClosedTextEn)}</span>
               <ArrowIcon size={17} />
             </button>
-            {isOpen && <button
-                onClick={() => navigate('/stickers')}
+            {isOpen && s.showSecondaryButton !== false && <button
+                onClick={() => navigate(s.secondaryLink)}
                 className="flex min-h-[54px] items-center justify-center gap-2 border border-grave bg-stone px-7 py-4 font-mono text-xs font-bold tracking-wider text-bone transition-colors hover:border-gold hover:text-gold"
               >
                 <Layers3 size={17} />
-                <span>{isAr ? 'شوف الاستيكرات الجاهزة' : 'SHOP READY-MADE'}</span>
+                <span>{isAr ? s.secondaryTextAr : s.secondaryTextEn}</span>
               </button>}
           </div>
 
           <p className="font-mono text-[11px] leading-relaxed text-ash">
             {isOpen
-              ? (isAr ? 'الحجز 7 أيام، وبعد قفله من 3 إلى 5 أيام للتصنيع والشحن.' : 'Book during the 7-day window. Production and shipping take 3–5 days after booking closes.')
+              ? (isAr ? s.footerOpenAr : s.footerOpenEn)
               : isClosed
-                ? (isAr ? 'تابعنا لموعد دفعة الكستمايز الجاية.' : 'Follow us for the next custom drop.')
-                : (isAr ? 'هنعلن وقت فتح الحجز قبل استقبال أي مدفوعات.' : 'We will announce the booking window before accepting payments.')}
+                ? (isAr ? s.footerClosedAr : s.footerClosedEn)
+                : (isAr ? s.footerUpcomingAr : s.footerUpcomingEn)}
           </p>
         </div>
 
@@ -114,23 +114,23 @@ export function PreorderHero({ imageUrl }) {
           <div className="absolute inset-8 rotate-6 border border-gold/30 bg-gold/5" aria-hidden="true" />
           <div className="relative overflow-hidden border border-grave bg-stone p-6 shadow-2xl sm:p-8">
             <div className="mb-5 flex items-center justify-between border-b border-grave pb-4 font-mono text-[10px] uppercase tracking-widest">
-              <span className="text-gold">DUAT / CUSTOM</span>
-              <span className="text-ash">01 — 04</span>
+              <span className="text-gold">{s.cardEyebrow}</span>
+              <span className="text-ash">{s.rangeStart} — {s.rangeEnd}</span>
             </div>
             <img
-              src={imageUrl || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png'}
-              alt={isAr ? 'معاينة استيكر دوات كستمايز' : 'DUAT custom sticker preview'}
+              src={s.imageUrl}
+              alt={isAr ? s.imageAltAr : s.imageAltEn}
               className="mx-auto aspect-square w-full max-w-sm object-contain drop-shadow-2xl"
             />
             <div className="mt-5 grid grid-cols-4 gap-2" aria-label={isAr ? 'أربع قطع قابلة للتخصيص' : 'Four customizable pieces'}>
-              {['01', '02', '03', '04'].map((number) => (
+              {(s.pieceLabels || []).map((number) => (
                 <div key={number} className="border border-grave bg-coal py-3 text-center font-mono text-xs text-gold">
                   {number}
                 </div>
               ))}
             </div>
             <p className="mt-4 text-center font-space text-xs text-bone/70">
-              {isAr ? 'كل رقم ممكن يكون تصميم مختلف' : 'Every number can be a different design'}
+              {isAr ? s.cardCaptionAr : s.cardCaptionEn}
             </p>
           </div>
         </div>

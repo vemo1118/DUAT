@@ -70,7 +70,7 @@ export const HomeView = () => {
       {/* 1. PRE-ORDER OFFER — fixed here so cloud hero content cannot dilute the launch */}
       <PreorderWelcome />
       <HeroSlider />
-      <PreorderHero imageUrl={forge.imageUrl} />
+      <PreorderHero />
 
       {/* 2. TRUST NUMBERS BAR — SOFTENED THEME-AWARE GRADIENT BAND 1 */}
       <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-16 sm:py-24 shadow-inner`}>
