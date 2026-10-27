@@ -15,6 +15,7 @@ import { AdminHeroSlideModal } from '../components/AdminHeroSlideModal';
 import { AdminCategoryBannerModal } from '../components/AdminCategoryBannerModal';
 import { AdminSocialTileModal } from '../components/AdminSocialTileModal';
 import { AdminPreorderHeroEditor } from '../components/AdminPreorderHeroEditor';
+import { AdminPreorderPopupEditor } from '../components/AdminPreorderPopupEditor';
 import { CATEGORIES } from '../data/products';
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
 import {
@@ -752,6 +753,11 @@ export function AdminView() {
                 >
                   <div className="flex items-center gap-2.5"><Zap size={16}/><span>2. عرض الحجز والكستمايز</span></div><span className="text-[10px] text-emerald-400">مباشر</span>
                 </button>
+
+                <button
+                  onClick={() => setActiveTab('preorder_popup')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 font-mono text-xs font-bold transition-all border rounded-xs ${activeTab === 'preorder_popup' ? 'bg-gold text-[#0A0C16] border-gold shadow-md scale-[1.01]' : 'bg-coal text-bone border-grave hover:border-gold/50 hover:text-gold'}`}
+                ><div className="flex items-center gap-2.5"><Bell size={16}/><span>3. بوب أب عرض الحجز</span></div><span className="text-[10px] text-emerald-400">مباشر</span></button>
 
                 <button
                   onClick={() => setActiveTab('bundles_page')}
@@ -1958,6 +1964,7 @@ export function AdminView() {
 
       {/* ============================================================ */}
       {activeTab === 'preorder_hero' && <AdminPreorderHeroEditor showToast={showToast} />}
+      {activeTab === 'preorder_popup' && <AdminPreorderPopupEditor showToast={showToast} />}
 
       {/* ============================================================ */}
       {/* TAB 3.5: STICKER BUILDER FEATURE PROMO BANNER EDITOR */}

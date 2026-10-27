@@ -18,6 +18,7 @@ import { BundlesSettingsProvider } from './context/BundlesSettingsContext';
 import { StickersSettingsProvider } from './context/StickersSettingsContext';
 import { SocialGridProvider } from './context/SocialGridContext';
 import { PreorderHeroSettingsProvider } from './context/PreorderHeroSettingsContext';
+import { PreorderPopupSettingsProvider } from './context/PreorderPopupSettingsContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { AnnouncementMarquee } from './components/AnnouncementMarquee';
@@ -89,6 +90,7 @@ export function App() {
             <CategoryBannersProvider>
               <BundlesSettingsProvider>
                 <PreorderHeroSettingsProvider>
+                <PreorderPopupSettingsProvider>
                 <StickersSettingsProvider>
                     <WishlistProvider>
                         <CartProvider>
@@ -182,6 +184,7 @@ export function App() {
                         </CartProvider>
                     </WishlistProvider>
                 </StickersSettingsProvider>
+                </PreorderPopupSettingsProvider>
                 </PreorderHeroSettingsProvider>
               </BundlesSettingsProvider>
             </CategoryBannersProvider>

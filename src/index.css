@@ -502,3 +502,9 @@ button, a.btn, select, input[type="submit"] {
   margin-top: 24px;
   margin-bottom: 24px;
 }
+
+/* Dashboard-controlled pre-order popup overlay */
+dialog.preorder-popup::backdrop {
+  background: var(--popup-overlay, #000000);
+  opacity: 0.72;
+}

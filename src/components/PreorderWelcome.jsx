@@ -1,34 +1,4 @@
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { preorderState, PREORDER } from '../domain/commerce';
-
-export function PreorderWelcome() {
-  const { lang } = useLanguage();
-  const isAr = lang === 'ar';
-  const dialog = useRef(null);
-  const key = `duat-preorder-welcome-${PREORDER.opensAt}`;
-  useEffect(() => {
-    if (preorderState() !== 'open') return;
-    try { if (sessionStorage.getItem(key)) return; } catch { /* Storage is optional. */ }
-    const timer = setTimeout(() => dialog.current?.showModal(), 1200);
-    return () => clearTimeout(timer);
-  }, [key]);
-  const dismiss = () => {
-    dialog.current?.close();
-    try { sessionStorage.setItem(key, 'seen'); } catch { /* Storage is optional. */ }
-  };
-  return <dialog ref={dialog} onCancel={dismiss} onClick={event => { if (event.target === dialog.current) dismiss(); }}
-    aria-labelledby="preorder-welcome-title" className="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-gold/30 bg-stone p-0 text-bone shadow-2xl backdrop:bg-black/70">
-    <div className="relative p-7 sm:p-10" dir={isAr ? 'rtl' : 'ltr'}>
-      <button autoFocus onClick={dismiss} aria-label={isAr ? 'إغلاق العرض' : 'Close offer'} className="absolute end-3 top-3 p-3"><X size={20} /></button>
-      <p className="mt-4 text-sm font-bold text-gold">{isAr ? 'حجز أول دفعة · لمدة 7 أيام' : 'FIRST DROP · 7-DAY PRE-ORDER'}</p>
-      <h2 id="preorder-welcome-title" className="mt-4 text-3xl font-bold leading-snug">{isAr ? '4 استيكرات. على مزاجك أنت.' : 'Four stickers. All your own.'}</h2>
-      <p className="my-5 text-5xl font-bold">180 <span className="text-lg">{isAr ? 'جنيه' : 'EGP'}</span></p>
-      <p className="text-sm leading-7">{isAr ? 'صمّم كل واحدة بصورة مختلفة أو كرر تصميمك. القطعة بـ45 جنيه، وتقدر تزود براحتك. الشحن بيتحسب عند الدفع.' : 'Use a different image for each piece or repeat your design. EGP 45 each, with more pieces whenever you want. Shipping calculated at checkout.'}</p>
-      <Link onClick={dismiss} to="/sticker-builder" className="mt-6 block rounded-lg bg-gold p-4 text-center font-bold text-ink hover:brightness-110">{isAr ? 'ابدأ بأول استيكر' : 'Create my first sticker'}</Link>
-      <button onClick={dismiss} className="mt-3 w-full p-2 text-sm underline">{isAr ? 'أتفرج على الموقع الأول' : 'Let me explore first'}</button>
-    </div>
-  </dialog>;
-}
+import React,{useEffect,useRef,useState}from'react';
+import{useNavigate}from'react-router-dom';import{X}from'lucide-react';
+import{useLanguage}from'../context/LanguageContext';import{usePreorderPopupSettings}from'../context/PreorderPopupSettingsContext';import{preorderState,PREORDER}from'../domain/commerce';
+export function PreorderWelcome(){const{lang}=useLanguage(),isAr=lang==='ar',navigate=useNavigate(),{settings:s,submitLead}=usePreorderPopupSettings(),dialog=useRef(null),[values,setValues]=useState({}),[statuses,setStatuses]=useState({}),key=`duat-preorder-popup-${PREORDER.opensAt}`;useEffect(()=>{if(!s.isActive||(s.showOnlyWhenOpen&&preorderState()!=='open'))return;try{if(s.showOncePerSession&&sessionStorage.getItem(key))return}catch{}const timer=setTimeout(()=>dialog.current?.showModal(),Math.max(0,Number(s.delaySeconds)||0)*1000);return()=>clearTimeout(timer)},[key,s.isActive,s.showOnlyWhenOpen,s.showOncePerSession,s.delaySeconds]);const dismiss=()=>{dialog.current?.close();try{if(s.showOncePerSession)sessionStorage.setItem(key,'seen')}catch{}};const clickButton=item=>{if(item.closeOnClick)dismiss();if(item.link){if(/^https?:\/\//i.test(item.link))window.location.assign(item.link);else navigate(item.link)}};const send=async item=>{const value=(values[item.id]||'').trim();if(!value)return;setStatuses(x=>({...x,[item.id]:'saving'}));try{await submitLead(item,value);setValues(x=>({...x,[item.id]:''}));setStatuses(x=>({...x,[item.id]:'saved'}));if(item.closeOnSubmit)setTimeout(dismiss,500)}catch{setStatuses(x=>({...x,[item.id]:'error'}))}};if(!s.isActive)return null;return <dialog ref={dialog} onCancel={dismiss} onClick={e=>{if(e.target===dialog.current)dismiss()}} aria-labelledby="preorder-welcome-title" style={{backgroundColor:s.backgroundColor,color:s.textColor,borderColor:s.borderColor,'--popup-overlay':s.overlayColor}} className="preorder-popup w-[calc(100%-2rem)] max-w-lg rounded-2xl border p-0 shadow-2xl"><div className="relative p-7 sm:p-10" dir={isAr?'rtl':'ltr'}><button autoFocus onClick={dismiss} aria-label={isAr?'إغلاق العرض':'Close offer'} className="absolute end-3 top-3 p-3"><X size={20}/></button><p style={{color:s.accentColor}} className="mt-4 text-sm font-bold">{isAr?s.eyebrowAr:s.eyebrowEn}</p><h2 id="preorder-welcome-title" className="mt-4 text-3xl font-bold leading-snug">{isAr?s.titleAr:s.titleEn}</h2>{(isAr?s.priceAr:s.priceEn)&&<p className="my-5 text-5xl font-bold">{isAr?s.priceAr:s.priceEn}</p>}<p className="text-sm leading-7">{isAr?s.descriptionAr:s.descriptionEn}</p><div className="mt-6 space-y-3">{(s.elements||[]).map(item=>item.type==='button'?<button key={item.id} onClick={()=>clickButton(item)} style={item.style==='primary'?{backgroundColor:s.primaryButtonColor,color:s.primaryButtonTextColor}:item.style==='outline'?{borderColor:s.accentColor,color:s.accentColor}:{color:s.textColor}} className={item.style==='primary'?'block w-full rounded-lg p-4 text-center font-bold hover:brightness-110':item.style==='outline'?'block w-full rounded-lg border p-4 text-center font-bold':'w-full p-2 text-sm underline'}>{isAr?item.textAr:item.textEn}</button>:<div key={item.id} className="space-y-2"><label className="block text-xs font-bold text-bone/80">{isAr?item.labelAr:item.labelEn}</label><div className="flex gap-2"><input type={item.inputType||'text'} inputMode={item.inputType==='tel'?'tel':undefined} value={values[item.id]||''} onChange={e=>setValues(v=>({...v,[item.id]:e.target.value}))} placeholder={isAr?item.placeholderAr:item.placeholderEn} style={{backgroundColor:s.inputBackgroundColor,color:s.textColor,borderColor:s.borderColor}} className="min-w-0 flex-1 rounded-lg border px-4 py-3 outline-none"/><button onClick={()=>send(item)} disabled={statuses[item.id]==='saving'} style={{backgroundColor:s.primaryButtonColor,color:s.primaryButtonTextColor}} className="rounded-lg px-4 font-bold disabled:opacity-60">{statuses[item.id]==='saved'?(isAr?'تم':'Saved'):(isAr?item.submitTextAr:item.submitTextEn)}</button></div>{statuses[item.id]==='error'&&<p className="text-xs text-red-400">{isAr?'حصل خطأ، جرّب تاني.':'Something went wrong. Try again.'}</p>}</div>)}</div></div></dialog>}
