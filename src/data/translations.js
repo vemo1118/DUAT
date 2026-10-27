@@ -17,20 +17,20 @@ export const TRANSLATIONS = {
     heroEyebrow: 'DUAT / 00 — THE PASSAGE',
     heroHeadline1: 'THROUGH THE NIGHT',
     heroHeadline2: 'BORN AT DAWN.',
-    heroSub: 'Objects for the night crossing. Custom 3D epoxy stickers and pre-packaged bundles.',
+    heroSub: 'Objects for the night crossing. Custom raised 3D stickers and pre-packaged bundles.',
     heroCtaPrimary: 'STICKER BUILDER',
     heroCtaSecondary: 'EXPLORE BUNDLES',
 
     // Sections
     bundlesEyebrow: 'DUAT / STICKER BUNDLES',
     bundlesTitle: 'Sticker Bundles',
-    bundlesSubtitle: 'Discounted pre-packaged sets of 3D epoxy stickers.',
+    bundlesSubtitle: 'Discounted pre-packaged sets of raised 3D stickers.',
     stickersEyebrow: 'DUAT / STICKER COLLECTION',
     stickersTitle: 'Stickers Collection',
-    stickersSubtitle: 'Explore our 3D epoxy dome stickers, slogans, letters, and badges.',
+    stickersSubtitle: 'Explore our raised 3D stickers, slogans, letters, and badges.',
     stickerBuilderTitle: 'Sticker Builder',
     stickerBuilderEyebrow: 'DUAT / STICKER BUILDER',
-    stickerBuilderSubtitle: 'Create custom 3D epoxy stickers with your text or uploaded image.',
+    stickerBuilderSubtitle: 'Create custom raised 3D stickers with your text or uploaded image.',
 
     // Categories
     catEyebrow: 'THE FOUR HOURS',
@@ -51,7 +51,7 @@ export const TRANSLATIONS = {
     // Forge
     forgeEyebrow: 'STICKER BUILDER',
     forgeTitle: 'Build your own sticker.',
-    forgeDesc: 'Write custom text or upload your artwork to create a raised 3D epoxy sticker. Made to order in Egypt.',
+    forgeDesc: 'Write custom text or upload your artwork to create a raised 3D sticker. Made to order in Egypt.',
     forgeCta: 'OPEN STICKER BUILDER',
 
     // Featured
@@ -142,7 +142,7 @@ export const TRANSLATIONS = {
     stepPlaced: 'Order placed',
     stepPlacedDesc: 'WhatsApp confirmed',
     stepForge: 'In production',
-    stepForgeDesc: 'Epoxy domes & assembly',
+    stepForgeDesc: 'Raised finishing & assembly',
     stepShipped: 'Shipped',
     stepShippedDesc: 'Express dispatch',
     stepDelivered: 'Delivered',
@@ -173,12 +173,12 @@ export const TRANSLATIONS = {
     aboutOriginTitle: 'Born in Egypt. Built for now.',
     aboutOriginBody: 'This isn\'t a museum. We take the symbols this land invented — life, rebirth, the return of the sun — and put them where you actually carry them: the thing in your hand all day. Not a costume. A statement.',
     aboutCraftTitle: 'The Craft.',
-    aboutCraft1Name: '3D Epoxy Domes',
-    aboutCraft1Body: 'Raised polyurethane stickers with a glossy, scratch-resistant finish.',
+    aboutCraft1Name: 'Raised 3D Stickers',
+    aboutCraft1Body: 'Raised stickers with a glossy, scratch-resistant finish.',
     aboutCraft2Name: 'Precision Cut Shapes',
     aboutCraft2Body: 'Letters, slogans, badges, and custom artwork cut to shape.',
-    aboutCraft3Name: 'High-Tack Adhesive',
-    aboutCraft3Body: 'Strong adhesive backing for phones, laptops, bottles, and personal gear.',
+    aboutCraft3Name: 'Everyday Ready',
+    aboutCraft3Body: 'Designed for phones, laptops, bottles, and personal gear.',
     aboutCraftFootnote: 'Made to order in Egypt. The delivery timeline is shown before payment.',
     aboutSymbolsEyebrow: 'THE PASSAGE',
     aboutSymbolsTitle: 'Dusk to dawn.',
@@ -224,7 +224,7 @@ export const TRANSLATIONS = {
     heroEyebrow: 'دوات / ٠٠ — العبور',
     heroHeadline1: 'عبر ظلمة الليل',
     heroHeadline2: 'مولود مع الفجر.',
-    heroSub: 'أغراض مخصصة لعبور الليل. ملصقات إيبوكسي مجسمة وبندلات مجمعة موفّرة.',
+    heroSub: 'أغراض مخصصة لعبور الليل. ملصقات بارزة مجسمة وبندلات مجمعة موفّرة.',
     heroCtaPrimary: 'بيلدر الاستيكرز',
     heroCtaSecondary: 'تصفح البندلز',
 
@@ -234,10 +234,10 @@ export const TRANSLATIONS = {
     bundlesSubtitle: 'باقات استيكرات مجمعة ومجهزة بسعر موفر وأرخص من الشراء المنفرد.',
     stickersEyebrow: 'دوات / تشكيلة الاستيكرات',
     stickersTitle: 'قسم الاستيكرات',
-    stickersSubtitle: 'استكشف ملصقات الإيبوكسي البارزة، العبارات، الحروف وشارات الميلاد.',
+    stickersSubtitle: 'استكشف ملصقات البارزة، العبارات، الحروف وشارات الميلاد.',
     stickerBuilderTitle: 'بيلدر الاستيكرز',
     stickerBuilderEyebrow: 'دوات / مصمم الاستيكرات',
-    stickerBuilderSubtitle: 'صمم استيكرك الخاص بالكلمة اللي تحبها أو ارفع صورتك ونعملها لك استيكر إيبوكسي مجسم.',
+    stickerBuilderSubtitle: 'صمم استيكرك الخاص بالكلمة اللي تحبها أو ارفع صورتك ونعملها لك استيكر مجسم بارز.',
 
     // Categories
     catEyebrow: 'الساعات الأربع',
@@ -258,7 +258,7 @@ export const TRANSLATIONS = {
     // Forge
     forgeEyebrow: 'بيلدر الاستيكرز',
     forgeTitle: 'صمّم استيكرك الخاص.',
-    forgeDesc: 'اكتب نصك أو ارفع تصميمك لنحوّله إلى استيكر إيبوكسي مجسم، مصنوع حسب الطلب في مصر.',
+    forgeDesc: 'اكتب نصك أو ارفع تصميمك لنحوّله إلى استيكر مجسم بارز، مصنوع حسب الطلب في مصر.',
     forgeCta: 'افتح بيلدر الاستيكرز',
 
     // Featured
@@ -380,12 +380,12 @@ export const TRANSLATIONS = {
     aboutOriginTitle: 'اتولد في مصر. مصمّم للحظة دي.',
     aboutOriginBody: 'ده مش متحف. بناخد الرموز اللي الأرض دي اخترعتها — الحياة، البعث، رجوع الشمس — ونحطها في المكان اللي بتشيله فعلاً طول اليوم: الحاجة اللي في إيدك. مش تنكّر، ده موقف.',
     aboutCraftTitle: 'الصنعة.',
-    aboutCraft1Name: 'قباب إيبوكسي ثلاثية الأبعاد',
-    aboutCraft1Body: 'استيكرات بولي يوريثان بارزة بسطح لامع ومقاوم للخدش.',
+    aboutCraft1Name: 'قباب بارز ثلاثية الأبعاد',
+    aboutCraft1Body: 'استيكرات تشطيب بارز بارزة بسطح لامع ومقاوم للخدش.',
     aboutCraft2Name: 'قص دقيق حسب الشكل',
     aboutCraft2Body: 'حروف وعبارات وشارات وتصميمات مخصصة مقصوصة بدقة.',
-    aboutCraft3Name: 'لاصق قوي',
-    aboutCraft3Body: 'ظهر لاصق قوي للموبايل واللابتوب والزجاجات والأغراض الشخصية.',
+    aboutCraft3Name: 'جاهز للاستخدام اليومي',
+    aboutCraft3Body: 'مصمم للموبايل واللابتوب والزجاجات والأغراض الشخصية.',
     aboutCraftFootnote: 'بيتصنع حسب الطلب في مصر. ميعاد التسليم بيظهر قبل الدفع.',
     aboutSymbolsEyebrow: 'العبور',
     aboutSymbolsTitle: 'من الغروب للفجر.',

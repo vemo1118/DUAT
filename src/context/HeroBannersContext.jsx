@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
-import {
-  fetchCloudEdits,
-  publishCloudEdits,
-  getLiveSyncState
-} from '../services/liveSyncService';
+import { publishCloudEdits } from '../services/liveSyncService';
+import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
 
 const HeroBannersContext = createContext();
 
@@ -18,8 +15,8 @@ export const INITIAL_HERO_SLIDES = [
     headline1Ar: 'نعدّي الليل،',
     headline2En: 'BORN AT DAWN.',
     headline2Ar: 'ونطلع نور.',
-    subEn: 'Custom 3D epoxy dome stickers and ready-made collections. Made to order in Egypt.',
-    subAr: 'استيكرات إيبوكسي مجسّمة مخصصة وتشكيلات جاهزة، مصنوعة حسب الطلب في مصر.',
+    subEn: 'Custom raised 3D stickers and ready-made collections. Made to order in Egypt.',
+    subAr: 'استيكرات بارزة مجسّمة مخصصة وتشكيلات جاهزة، مصنوعة حسب الطلب في مصر.',
     badgeEn: 'LUXE CATEGORY',
     badgeAr: 'فئة LUXE الفاخرة',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg',
@@ -47,10 +44,10 @@ export const INITIAL_HERO_SLIDES = [
     eyebrowAr: 'دوات / فئة التسعيناتي',
     headline1En: '90s NOSTALGIA & POP,',
     headline1Ar: 'نوستالجيا التسعينات،',
-    headline2En: 'IN 3D EPOXY DOMES.',
+    headline2En: 'IN A RAISED 3D FINISH.',
     headline2Ar: 'بلمسة مجسمة.',
-    subEn: 'Retro vintage Egyptian pop culture icons in raised 3D epoxy domes.',
-    subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات الإيبوكسي البارزة.',
+    subEn: 'Retro vintage Egyptian pop culture icons in raised 3D stickers.',
+    subAr: 'أصالة التسعينات والرموز المصرية الكلاسيكية مع استيكرات البارزة.',
     badgeEn: 'NINETIES 90S',
     badgeAr: 'فئة التسعيناتي 90s',
     imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
@@ -80,7 +77,7 @@ export const INITIAL_HERO_SLIDES = [
     headline1Ar: 'عصري، جريء،',
     headline2En: 'EXPRESS YOURSELF.',
     headline2Ar: 'وبيعدّي الحدود.',
-    subEn: 'Vibrant neon street aesthetics & high-impact 3D epoxy dome badges.',
+    subEn: 'Vibrant neon street aesthetics & high-impact raised 3D finish badges.',
     subAr: 'تشكيلة الاستيكرات الشبابية الأكثر جرأة وحيوية لتعبير فريد عن شخصيتك.',
     badgeEn: 'YOUTH COLLECTION',
     badgeAr: 'الفئة الشبابية YOUTH',
@@ -256,14 +253,24 @@ function saveLocalSlides(slides) {
 
 async function saveSlideToSupabase(slide, index = 0) {
   if (!slide?.id) throw new Error('Missing slide ID');
-  let result = await supabase.from('hero_slides').upsert(mapToDb(slide, index), { onConflict: 'id' }).select('id').single();
+  let savedSlide = slide;
+  for (const field of ['imageUrl', 'mobileImageUrl']) {
+    if (isInlineStoreImage(savedSlide[field])) {
+      const upload = await uploadStoreImageDataUrl(savedSlide[field], {
+        folder: 'hero-slides', assetId: `${slide.id}-${field}`
+      });
+      savedSlide = { ...savedSlide, [field]: upload.publicUrl };
+    }
+  }
+  let result = await supabase.from('hero_slides').upsert(mapToDb(savedSlide, index), { onConflict: 'id' }).select('*').single();
   if (['PGRST204', '42703'].includes(result.error?.code)) {
     result = await supabase.from('hero_slides').upsert({
-      id: String(slide.id), is_active: slide.is_active !== false,
-      sort_order: slide.sort_order ?? index + 1, data: slide
-    }, { onConflict: 'id' }).select('id').single();
+      id: String(savedSlide.id), is_active: savedSlide.is_active !== false,
+      sort_order: savedSlide.sort_order ?? index + 1, data: savedSlide
+    }, { onConflict: 'id' }).select('*').single();
   }
   if (result.error || !result.data?.id) throw result.error || new Error('Cloud save was not confirmed');
+  return mapFromDb(result.data);
 }
 
 export function HeroBannersProvider({ children }) {
@@ -294,7 +301,7 @@ export function HeroBannersProvider({ children }) {
             if (JSON.stringify(prev) === JSON.stringify(fetched)) {
               return prev;
             }
-            saveLocalSlides(fetched);
+            try { localStorage.setItem(HERO_SLIDES_STORAGE_KEY, JSON.stringify(fetched)); } catch { /* Optional cache. */ }
             return fetched;
           });
           setLoading(false);
@@ -328,25 +335,28 @@ export function HeroBannersProvider({ children }) {
         fetchSlides
       )
       .subscribe();
+    window.addEventListener('focus', fetchSlides);
 
     return () => {
+      window.removeEventListener('focus', fetchSlides);
       supabase.removeChannel(channel);
     };
   }, []);
 
   const addSlide = async (slideData) => {
     const newSlide = { ...slideData, id: slideData.id || crypto.randomUUID() };
-    await saveSlideToSupabase(newSlide, 0);
-    setSlides(prev => { const updated = [newSlide, ...prev]; saveLocalSlides(updated); return updated; });
-    return newSlide;
+    const saved = await saveSlideToSupabase(newSlide, 0);
+    setSlides(prev => { const updated = [saved, ...prev]; saveLocalSlides(updated); return updated; });
+    return saved;
   };
 
   const updateSlide = async (id, fields) => {
     const index = slides.findIndex(slide => slide.id === id);
     if (index < 0) throw new Error('Slide not found');
     const updated = { ...slides[index], ...fields };
-    await saveSlideToSupabase(updated, index);
-    setSlides(prev => { const next = prev.map(slide => slide.id === id ? updated : slide); saveLocalSlides(next); return next; });
+    const saved = await saveSlideToSupabase(updated, index);
+    setSlides(prev => { const next = prev.map(slide => slide.id === id ? saved : slide); saveLocalSlides(next); return next; });
+    return saved;
   };
 
   const toggleSlideVisibility = async (id) => {

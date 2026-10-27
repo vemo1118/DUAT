@@ -8,12 +8,12 @@ const StickersSettingsContext = createContext();
 export const DEFAULT_STICKERS_SETTINGS = {
   hero: {
     isActive: true,
-    eyebrowAr: 'استيكرات إيبوكسي مجسمة ✦',
-    eyebrowEn: '3D EPOXY STICKERS ✦',
+    eyebrowAr: 'استيكرات بارزة مجسمة ✦',
+    eyebrowEn: 'RAISED 3D STICKERS ✦',
     titleAr: 'قسم الاستيكرات ✦',
     titleEn: 'Stickers Collection ✦',
-    descAr: 'تشكيلة ملصقات الإيبوكسي ثلاثية الأبعاد البارزة، عبارات العبور، الحروف العربية والإنجليزية وشارات الميلاد.',
-    descEn: 'Browse our 3D epoxy dome stickers, slogans, letters, and badges.',
+    descAr: 'تشكيلة ملصقات البارز ثلاثية الأبعاد البارزة، عبارات العبور، الحروف العربية والإنجليزية وشارات الميلاد.',
+    descEn: 'Browse our raised 3D stickers, slogans, letters, and badges.',
     bgImage: '',
     mobileBgImage: ''
   },
@@ -21,8 +21,8 @@ export const DEFAULT_STICKERS_SETTINGS = {
     isActive: true,
     titleAr: 'عايز استيكر بمواصفاتك الخاصة؟ 🎨',
     titleEn: 'Want a custom sticker? 🎨',
-    descAr: 'خش على بيلدر الاستيكرات واكتب النص اللي تحبه أو ارفع صورتك الخاصة ونعملها لك استيكر إيبوكسي مجسم 3D!',
-    descEn: 'Use our Sticker Builder to write custom text or upload an image to turn into a 3D epoxy sticker!',
+    descAr: 'خش على بيلدر الاستيكرات واكتب النص اللي تحبه أو ارفع صورتك الخاصة ونعملها لك استيكر مجسم بارز 3D!',
+    descEn: 'Use our Sticker Builder to write custom text or upload an image to turn into a raised 3D sticker!',
     buttonTextAr: 'بيلدر الاستيكرز',
     buttonTextEn: 'STICKER BUILDER',
     buttonLink: '/sticker-builder',

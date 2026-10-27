@@ -137,14 +137,14 @@ export function CustomStickerThumbnail({ item, size = 'normal' }) {
 
   return (
     <div className="w-full h-full flex items-center justify-center p-1 bg-coal/90 rounded relative overflow-hidden select-none">
-      {/* 3D Polyurethane Epoxy Dome Element */}
+      {/* Premium Raised 3D Finish Element */}
       <div
         className={`relative z-10 border shadow-lg flex items-center justify-center text-center max-w-full overflow-hidden ${getBgStyle()} ${getShapeStyle()}`}
         style={{
           boxShadow: '0 4px 12px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.3)'
         }}
       >
-        {/* Epoxy Sheen Overlay */}
+        {/* Premium Sheen Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none" />
 
         {/* Sticker Custom Text */}

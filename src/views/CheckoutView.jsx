@@ -493,7 +493,7 @@ export const CheckoutView = ({ setView }) => {
                     {isCustomSticker && cDetails?.customText && (
                       <div className="font-mono text-[11px] text-ash space-y-0.5 bg-stone/40 p-1.5 rounded border border-grave/30">
                         <p className="text-gold font-bold">✍️ "{cDetails.customText}"</p>
-                        {cDetails.cutShape && <p className="text-[10px]">📐 {cDetails.cutShape} • {cDetails.bgFinish || 'إيبوكسي 3D'}</p>}
+                        {cDetails.cutShape && <p className="text-[10px]">📐 {cDetails.cutShape} • {cDetails.bgFinish || 'بارز 3D'}</p>}
                       </div>
                     )}
 

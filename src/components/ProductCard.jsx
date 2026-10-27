@@ -49,7 +49,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
 
-  // Render sticker artwork, uploaded product images, or a neutral epoxy placeholder.
+  // Render sticker artwork, uploaded product images, or a neutral premium placeholder.
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
     if (customImage) {
@@ -89,7 +89,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
       // Show placeholder silhouette if no image uploaded
       return (
         <div className="w-full h-full flex items-center justify-center bg-void/40">
-          <span className="font-mono text-xs text-ash opacity-50 uppercase tracking-widest">3D Epoxy Dome</span>
+          <span className="font-mono text-xs text-ash opacity-50 uppercase tracking-widest">Raised 3D Finish</span>
         </div>
       );
     }

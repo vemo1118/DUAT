@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
 
 const SocialGridContext = createContext();
 
@@ -142,9 +143,11 @@ export const SocialGridProvider = ({ children }) => {
         reloadSocial
       )
       .subscribe();
+    window.addEventListener('focus', reloadSocial);
 
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', reloadSocial);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -178,12 +181,23 @@ export const SocialGridProvider = ({ children }) => {
   };
 
   const saveTilesToSupabase = async (updatedTiles) => {
+    const cloudTiles = [];
+    for (const tile of updatedTiles) {
+      const image = tile.image || tile.imageUrl || '';
+      if (isInlineStoreImage(image)) {
+        const upload = await uploadStoreImageDataUrl(image, { folder: 'social-grid', assetId: tile.id });
+        cloudTiles.push({ ...tile, image: upload.publicUrl, imageUrl: upload.publicUrl });
+      } else {
+        cloudTiles.push(tile);
+      }
+    }
     const { data, error } = await supabase.from('store_settings').upsert({
         key: 'social_grid_tiles',
-        value: updatedTiles,
+        value: cloudTiles,
         updated_at: new Date().toISOString()
       }).select('key').single();
     if (error || !data) throw error || new Error('SOCIAL_TILES_SAVE_FAILED');
+    return cloudTiles;
   };
 
   const addTile = async (tileData) => {
@@ -193,15 +207,15 @@ export const SocialGridProvider = ({ children }) => {
       is_active: tileData.is_active !== undefined ? tileData.is_active : true
     };
     const updated = [...tiles, newTile];
-    await saveTilesToSupabase(updated);
-    setTiles(updated);
-    return newTile;
+    const saved = await saveTilesToSupabase(updated);
+    setTiles(saved);
+    return saved.find((tile) => tile.id === newTile.id);
   };
 
   const updateTile = async (id, updatedFields) => {
     const updated = tiles.map((t) => (t.id === id ? { ...t, ...updatedFields } : t));
-    await saveTilesToSupabase(updated);
-    setTiles(updated);
+    const saved = await saveTilesToSupabase(updated);
+    setTiles(saved);
   };
 
   const toggleTileVisibility = async (id) => {

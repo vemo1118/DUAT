@@ -107,10 +107,10 @@ export function StickerBuilderView() {
 
   const BG_FINISHES = [
     { id: 'obsidian', nameAr: 'أسود فحم لامع', nameEn: 'Obsidian Gloss', bg: 'bg-[#121214]', border: 'border-gold/40' },
-    { id: 'clear', nameAr: 'شفاف أكريليك', nameEn: 'Clear Acrylic', bg: 'bg-void/40 backdrop-blur-md', border: 'border-bone/30' },
+    { id: 'clear', nameAr: 'شفاف شفاف', nameEn: 'Clear Finish', bg: 'bg-void/40 backdrop-blur-md', border: 'border-bone/30' },
     { id: 'gold-foil', nameAr: 'خلفية رقائق الذهب', nameEn: 'Gold Foil', bg: 'bg-gradient-to-r from-gold/30 via-gold/50 to-gold/30', border: 'border-gold' },
     { id: 'ivory', nameAr: 'عاجي ألباستر', nameEn: 'Alabaster Ivory', bg: 'bg-[#EFEAE0]', border: 'border-[#D8CFBC]' },
-    { id: 'amber', nameAr: 'صمغ عنبري شفاف', nameEn: 'Translucent Amber', bg: 'bg-[#D97706]/20', border: 'border-[#D97706]/60' }
+    { id: 'amber', nameAr: 'عنبر شفاف', nameEn: 'Translucent Amber', bg: 'bg-[#D97706]/20', border: 'border-[#D97706]/60' }
   ];
 
   const CUT_SHAPES = [
@@ -198,8 +198,8 @@ export function StickerBuilderView() {
       nameAr: mode === 'text' ? `استيكر مخصص: "${customText}"` : `استيكر صورة مخصصة`,
       nameEn: mode === 'text' ? `Custom Sticker: "${customText}"` : `Custom Image Sticker`,
       price: basePrice,
-      tagAr: 'استيكر إيبوكسي مجسم مخصص',
-      tagEn: 'Custom 3D Epoxy Dome Sticker',
+      tagAr: 'استيكر مجسم بارز مخصص',
+      tagEn: 'Custom Raised 3D Sticker',
       craftTagAr: 'تصنيع خاص حسب الطلب • مصر',
       craftTagEn: 'Custom Made to Order • Egypt',
       designSnapshot: stickerSnapshot,
@@ -208,12 +208,12 @@ export function StickerBuilderView() {
       specsAr: [
         mode === 'text' ? `النص: ${customText}` : `استيكر صورة مرفقة`,
         `القص والتشكيل: ${mode === 'image' ? imgCutShape : cutShape}`,
-        `التشطيب: إيبوكسي ثلاثي الأبعاد 3D Polyurethane`
+        `التشطيب: بارز ثلاثي الأبعاد 3D Raised Finish`
       ],
       specsEn: [
         mode === 'text' ? `Text: ${customText}` : `Uploaded Custom Image`,
         `Cut Shape: ${mode === 'image' ? imgCutShape : cutShape}`,
-        `Finish: 3D Polyurethane Epoxy Dome`
+        `Finish: Premium Raised 3D Finish`
       ],
       customDetails: {
         mode,
@@ -359,7 +359,7 @@ export function StickerBuilderView() {
             {/* Sticker Dimension Tag Top Left */}
             <div className="absolute top-4 left-4 z-10 font-mono text-[10px] text-ash uppercase bg-coal/80 px-2.5 py-1 border border-grave flex items-center gap-1.5">
               <Eye size={12} className="text-gold" />
-              <span>{isAr ? 'معاينة الاستيكر المجسم (3D)' : '3D Epoxy Dome Preview'}</span>
+              <span>{isAr ? 'معاينة الاستيكر المجسم (3D)' : 'Raised 3D Finish Preview'}</span>
             </div>
 
             {/* Scale / Dimension guide badge */}
@@ -372,7 +372,7 @@ export function StickerBuilderView() {
               </span>
             </div>
 
-            {/* RENDERED 3D EPOXY STICKER ITEM */}
+            {/* RENDERED RAISED 3D STICKER ITEM */}
             <div className="relative group transition-all duration-300 transform hover:scale-105 my-auto">
               
               {/* Soft Drop Shadow under 3D dome */}
@@ -386,7 +386,7 @@ export function StickerBuilderView() {
                     boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
                   }}
                 >
-                  {/* Glossy Polyurethane Epoxy Sheen Glare */}
+                  {/* Glossy Raised 3D Finish Sheen Glare */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent pointer-events-none" />
 
                   {/* Sticker Text */}
@@ -425,8 +425,8 @@ export function StickerBuilderView() {
             <Shield size={18} className="text-gold flex-shrink-0" />
             <span>
               {isAr
-                ? 'المعاينة بتوضح التصميم والمقاس؛ لون الطباعة ولمعة الإيبوكسي ممكن يختلفوا عن الشاشة. تأكد إن التصميم بعيد عن كاميرات الموبايل.'
-                : 'Preview shows artwork and size. Printed colors and resin gloss may differ from your screen. Keep the sticker clear of phone cameras.'}
+                ? 'المعاينة بتوضح التصميم والمقاس؛ لون الطباعة ولمعة البارز ممكن يختلفوا عن الشاشة. تأكد إن التصميم بعيد عن كاميرات الموبايل.'
+                : 'Preview shows artwork and size. Printed colors and surface gloss may differ from your screen. Keep the sticker clear of phone cameras.'}
             </span>
           </div>
 
@@ -526,7 +526,7 @@ export function StickerBuilderView() {
               {/* 4. Select Background Finish */}
               <div className="space-y-2">
                 <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '✨ اختر خامة خلفية الاستيكر:' : '✨ Select Base Finish:'}
+                  {isAr ? '✨ اختر شكل خلفية الاستيكر:' : '✨ Select Background Style:'}
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {BG_FINISHES.map((bg) => (
@@ -651,7 +651,7 @@ export function StickerBuilderView() {
               {/* 4. Select Background Finish */}
               <div className="space-y-2">
                 <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '🎨 اختر خامة خلفية الاستيكر:' : '🎨 Select Base Finish:'}
+                  {isAr ? '🎨 اختر شكل خلفية الاستيكر:' : '🎨 Select Background Style:'}
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {BG_FINISHES.map((bg) => (
@@ -704,7 +704,7 @@ export function StickerBuilderView() {
             <textarea
               value={designNotes}
               onChange={(e) => setDesignNotes(e.target.value)}
-              placeholder={isAr ? 'مثال: يرجى جعل الحروف بارزة أكثر أو محاذاة النص لليمين...' : 'e.g. Please align text to right...'}
+              placeholder={isAr ? 'مثال: يرجى جعل الحروف بارزةة أكثر أو محاذاة النص لليمين...' : 'e.g. Please align text to right...'}
               className="w-full bg-coal border border-grave p-3 text-xs font-mono text-bone placeholder:text-ash focus:border-gold focus:outline-none min-h-[70px]"
             />
           </div>

@@ -81,7 +81,7 @@ export const HomeView = () => {
       <div className="py-4">
         <ProductRow
           eyebrow="DUAT / 01"
-          title={isAr ? 'أحدث استيكرات الإيبوكسي' : 'LATEST STICKERS'}
+          title={isAr ? 'أحدث استيكرات البارز' : 'LATEST STICKERS'}
           products={latestDrops}
           viewAllPath="/stickers"
         />

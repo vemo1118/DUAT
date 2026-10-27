@@ -9,11 +9,8 @@ import {
 } from '../data/products';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
-import {
-  fetchCloudEdits,
-  publishCloudEdits,
-  getLiveSyncState
-} from '../services/liveSyncService';
+import { publishCloudEdits, getLiveSyncState } from '../services/liveSyncService';
+import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
 
 // Merge all sticker product groups into one flat list
 const INITIAL_PRODUCTS = [
@@ -51,10 +48,7 @@ function mapFromDb(row) {
   const data = row.data && typeof row.data === 'object' ? row.data : {};
   const isActiveVal = row.is_active !== undefined ? Boolean(row.is_active) : (data.is_active !== undefined ? Boolean(data.is_active) : (data.isActive !== undefined ? Boolean(data.isActive) : true));
 
-  let img = data.imageUrl || data.image || row.image_url || '';
-  if ((!img || img.includes('SH1_ST_j1z2h3.png')) && initP && (initP.image || initP.imageUrl)) {
-    img = initP.imageUrl || initP.image;
-  }
+  const img = data.imageUrl || data.image || row.image_url || '';
 
   const baseObj = initP ? { ...initP } : {};
   const images = normalizeProductImages(img, data.images || [], baseObj.images || []);
@@ -309,8 +303,20 @@ function saveLocalProducts(products) {
 }
 
 async function saveProductToSupabase(product) {
-  const { data, error } = await supabase.from('products').upsert(mapToDb(product), { onConflict: 'id' }).select('id').single();
+  let savedProduct = product;
+  const image = product.imageUrl || product.image || '';
+  if (isInlineStoreImage(image)) {
+    const upload = await uploadStoreImageDataUrl(image, { folder: 'products', assetId: product.id });
+    savedProduct = {
+      ...product,
+      image: upload.publicUrl,
+      imageUrl: upload.publicUrl,
+      images: normalizeProductImages(upload.publicUrl, (product.images || []).filter((item) => !isInlineStoreImage(item)))
+    };
+  }
+  const { data, error } = await supabase.from('products').upsert(mapToDb(savedProduct), { onConflict: 'id' }).select('*').single();
   if (error || !data?.id) throw error || new Error('Cloud save was not confirmed');
+  return mapFromDb(data);
 }
 
 export function ProductsProvider({ children }) {
@@ -364,11 +370,6 @@ export function ProductsProvider({ children }) {
     // 1. Initial load from Supabase (source of truth)
     fetchProducts();
 
-    // 2. Initial fetch from JSONBlob fallback (for product overrides / edits)
-    fetchCloudEdits().then(() => {
-      setProducts(loadLocalProducts());
-    });
-
     const channel = supabase
       .channel('duat-products')
       .on(
@@ -377,8 +378,10 @@ export function ProductsProvider({ children }) {
         fetchProducts
       )
       .subscribe();
+    window.addEventListener('focus', fetchProducts);
 
     return () => {
+      window.removeEventListener('focus', fetchProducts);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -409,9 +412,9 @@ export function ProductsProvider({ children }) {
       image: img,
       images: normalizeProductImages(img, Array.isArray(prodData.images) ? prodData.images : [])
     };
-    await saveProductToSupabase(newProduct);
-    setProducts(prev => { const next = [newProduct, ...prev]; saveLocalProducts(next); return next; });
-    return newProduct;
+    const saved = await saveProductToSupabase(newProduct);
+    setProducts(prev => { const next = [saved, ...prev]; saveLocalProducts(next); return next; });
+    return saved;
   };
 
   const updateProduct = async (id, fields) => {
@@ -420,8 +423,9 @@ export function ProductsProvider({ children }) {
     const img = fields.imageUrl ?? fields.image ?? product.imageUrl ?? product.image ?? '';
     const updated = { ...product, ...fields, imageUrl: img, image: img,
       images: normalizeProductImages(img, fields.images || [], product.images || []) };
-    await saveProductToSupabase(updated);
-    setProducts(prev => { const next = prev.map(item => item.id === id ? updated : item); saveLocalProducts(next); return next; });
+    const saved = await saveProductToSupabase(updated);
+    setProducts(prev => { const next = prev.map(item => item.id === id ? saved : item); saveLocalProducts(next); return next; });
+    return saved;
   };
 
   const adjustPrice = async (id, delta) => {

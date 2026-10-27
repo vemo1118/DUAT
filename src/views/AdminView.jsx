@@ -225,8 +225,8 @@ export function AdminView() {
     eyebrowAr: forgeBanner?.eyebrowAr || 'دوات / مصمم الاستيكرات',
     titleEn: forgeBanner?.titleEn || 'BUILD YOUR OWN STICKER.',
     titleAr: forgeBanner?.titleAr || 'صمّم استيكرك الخاص بنفسك.',
-    descEn: forgeBanner?.descEn || 'Write custom text or upload your artwork to create a raised 3D epoxy sticker. Made to order in Egypt.',
-    descAr: forgeBanner?.descAr || 'اكتب نصك أو ارفع تصميمك لنحوّله إلى استيكر إيبوكسي مجسم، مصنوع حسب الطلب في مصر.',
+    descEn: forgeBanner?.descEn || 'Write custom text or upload your artwork to create a raised 3D sticker. Made to order in Egypt.',
+    descAr: forgeBanner?.descAr || 'اكتب نصك أو ارفع تصميمك لنحوّله إلى استيكر مجسم بارز، مصنوع حسب الطلب في مصر.',
     buttonTextEn: forgeBanner?.buttonTextEn || 'OPEN STICKER BUILDER →',
     buttonTextAr: forgeBanner?.buttonTextAr || 'افتح بيلدر الاستيكرز ←',
     buttonLink: forgeBanner?.buttonLink || '/sticker-builder',
@@ -2919,7 +2919,7 @@ export function AdminView() {
                   type="text"
                   value={stickersFormHero.eyebrowAr || ''}
                   onChange={(e) => setStickersFormHero({ ...stickersFormHero, eyebrowAr: e.target.value })}
-                  placeholder="استيكرات إيبوكسي مجسمة ✦"
+                  placeholder="استيكرات بارزة مجسمة ✦"
                   className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-gold focus:outline-none"
                 />
               </div>
@@ -2929,7 +2929,7 @@ export function AdminView() {
                   type="text"
                   value={stickersFormHero.eyebrowEn || ''}
                   onChange={(e) => setStickersFormHero({ ...stickersFormHero, eyebrowEn: e.target.value })}
-                  placeholder="3D EPOXY STICKERS ✦"
+                  placeholder="RAISED 3D STICKERS ✦"
                   className="w-full bg-coal border border-grave px-4 py-2.5 text-xs font-mono text-bone focus:border-gold focus:outline-none"
                 />
               </div>
@@ -3397,7 +3397,7 @@ export function AdminView() {
                           <div className="grid grid-cols-2 gap-2 text-ash text-[10px]">
                             {cDetails.selectedFont && <span>🔤 الخط: {cDetails.selectedFont}</span>}
                             {cDetails.textColor && <span>🎨 اللون: {cDetails.textColor}</span>}
-                            {cDetails.bgFinish && <span>✨ الخامة: {cDetails.bgFinish}</span>}
+                            {cDetails.bgFinish && <span>✨ التفاصيل: {cDetails.bgFinish}</span>}
                             {cDetails.cutShape && <span>📐 القص: {cDetails.cutShape}</span>}
                           </div>
 

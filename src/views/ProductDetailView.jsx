@@ -162,7 +162,7 @@ export function ProductDetailView() {
               </div>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-void/40">
-                <span className="font-mono text-xs text-ash uppercase tracking-widest">3D Epoxy Sticker</span>
+                <span className="font-mono text-xs text-ash uppercase tracking-widest">Raised 3D Sticker</span>
               </div>
             )}
 

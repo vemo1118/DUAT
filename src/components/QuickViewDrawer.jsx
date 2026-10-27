@@ -96,7 +96,7 @@ export function QuickViewDrawer({ product, isOpen, onClose }) {
                 {mainImage ? (
                   <img src={mainImage} alt={name} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="font-mono text-[10px] text-ash uppercase tracking-wider">3D Epoxy Sticker</span>
+                  <span className="font-mono text-[10px] text-ash uppercase tracking-wider">Raised 3D Sticker</span>
                 )}
               </div>
 

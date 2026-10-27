@@ -70,8 +70,8 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
         craftTagAr: 'علبة هدايا خاصة • صنع في مصر',
         descriptionEn: '',
         descriptionAr: '',
-        specsEnText: 'Includes: 3D Epoxy Stickers Set\nSave 150 EGP vs Individual Purchase\nCollector Gift Packaging Included',
-        specsArText: 'تتضمن: طقم استيكرات إيبوكسي مجسمة\nتوفير ١٥٠ ج.م عن الشراء المنفرد\nتأتي داخل علبة هدايا فاخرة'
+        specsEnText: 'Includes: Raised 3D Stickers Set\nSave 150 EGP vs Individual Purchase\nCollector Gift Packaging Included',
+        specsArText: 'تتضمن: طقم استيكرات بارزة مجسمة\nتوفير ١٥٠ ج.م عن الشراء المنفرد\nتأتي داخل علبة هدايا فاخرة'
       });
     }
   }, [productToEdit, isOpen]);
@@ -419,7 +419,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 rows="3"
                 value={formData.descriptionAr}
                 onChange={handleChange}
-                placeholder="المجموعة الكاملة المكونة من ٦ ملصقات إيبوكسي مجسمة من دوات في علبة فاخرة..."
+                placeholder="المجموعة الكاملة المكونة من ٦ ملصقات بارزة مجسمة من دوات في علبة فاخرة..."
                 className="w-full bg-stone border border-grave p-3 text-bone focus:border-gold focus:outline-none text-sm text-right resize-none"
                 dir="rtl"
               />
@@ -434,7 +434,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 rows="3"
                 value={formData.descriptionEn}
                 onChange={handleChange}
-                placeholder="The complete DUAT 6-sticker collector set featuring all raised 3D epoxy slogan pills..."
+                placeholder="The complete DUAT 6-sticker collector set featuring all raised 3D slogan pills..."
                 className="w-full bg-stone border border-grave p-3 text-bone focus:border-gold focus:outline-none text-sm resize-none"
                 dir="ltr"
               />
@@ -467,7 +467,7 @@ export function AdminProductModal({ isOpen, onClose, onSave, productToEdit = nul
                 rows="4"
                 value={formData.specsEnText}
                 onChange={handleChange}
-                placeholder="Includes: All 6 DUAT 3D Epoxy Stickers&#10;Save 150 EGP vs Individual Purchase&#10;Collector Gift Packaging Included"
+                placeholder="Includes: All 6 DUAT Raised 3D Stickers&#10;Save 150 EGP vs Individual Purchase&#10;Collector Gift Packaging Included"
                 className="w-full bg-stone border border-grave p-3 text-bone focus:border-gold focus:outline-none font-mono text-xs resize-none"
                 dir="ltr"
               />
