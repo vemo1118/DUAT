@@ -407,7 +407,7 @@ export function StickerBuilderView() {
                     style={{ width: `${layout.widthMm * 8}px`, height: `${layout.heightMm * 8}px`, objectFit: 'contain', filter: 'drop-shadow(0 12px 14px #232a5522)' }} />
                   : <Loader2 className="animate-spin text-gold" aria-label="Preparing preview" />
                 ) : (
-                  <button type="button" onClick={() => imageInputRef.current?.click()} className="relative z-10 rounded-2xl border-2 border-dashed border-gold/60 bg-white/80 p-8 sm:p-12 text-center max-w-sm space-y-4 hover:border-gold">
+                  <button type="button" onClick={() => imageInputRef.current?.click()} className="relative z-10 rounded-2xl border-2 border-dashed border-gold/60 bg-coal p-8 sm:p-12 text-center max-w-sm space-y-4 hover:border-gold">
                     <Upload size={36} className="mx-auto text-gold" />
                     <strong className="block text-lg text-bone">{isAr ? 'ارفع صورة عشان نبدأ' : 'Upload an image to begin'}</strong>
                     <span className="block text-sm text-ash">{isAr ? 'صورتك أو لوجو أو رسمة بتحبها. هنظبط الأبعاد من غير ما نمطّ الصورة.' : 'A photo, logo or artwork you love. We fit its proportions without stretching.'}</span>

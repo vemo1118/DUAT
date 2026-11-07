@@ -24,13 +24,18 @@ export const DEFAULT_PREORDER_HERO_SETTINGS = {
   upcomingMessageEn: 'The next drop price and details will appear here when booking opens.',
   primaryOpenTextAr: 'ابدأ صمّم قطعك', primaryOpenTextEn: 'DESIGN YOUR PIECES', primaryOpenLink: '/sticker-builder',
   primaryClosedTextAr: 'شوف الاستيكرات الجاهزة', primaryClosedTextEn: 'SHOP READY-MADE', primaryClosedLink: '/stickers',
-  showSecondaryButton: true, secondaryTextAr: 'شوف الاستيكرات الجاهزة', secondaryTextEn: 'SHOP READY-MADE', secondaryLink: '/stickers',
+  showSecondaryButton: false, secondaryTextAr: 'شوف الاستيكرات الجاهزة', secondaryTextEn: 'SHOP READY-MADE', secondaryLink: '/stickers',
   footerOpenAr: 'الحجز لحد آخر نوفمبر. تنفيذ الطلبات يبدأ 1 ديسمبر.',
   footerOpenEn: 'Book through November 30. Production starts December 1.',
   footerClosedAr: 'تابعنا لموعد دفعة الكستمايز الجاية.', footerClosedEn: 'Follow us for the next custom drop.',
   footerUpcomingAr: 'هنعلن وقت فتح الحجز قبل استقبال أي مدفوعات.', footerUpcomingEn: 'We will announce the booking window before accepting payments.',
   cardEyebrow: 'DUAT / CUSTOM', rangeStart: '01', rangeEnd: '04',
-  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+  imageUrl: '',
+  galleryImages: [
+    'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+    'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103661/through_the_night_squ9bn.png',
+    'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786103675/DUAT_SUN_rqu7s4.png'
+  ],
   imageAltAr: 'معاينة استيكر دوات كستمايز', imageAltEn: 'DUAT custom sticker preview',
   pieceLabels: ['01', '02', '03', '04'],
   cardCaptionAr: 'كل رقم ممكن يكون تصميم مختلف', cardCaptionEn: 'Every number can be a different design'
@@ -45,7 +50,10 @@ export function PreorderHeroSettingsProvider({ children }) {
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from('store_settings').select('value').eq('key', SETTINGS_KEY).maybeSingle();
-    if (!error && data?.value) setSettings({ ...DEFAULT_PREORDER_HERO_SETTINGS, ...data.value });
+    if (!error) {
+      const next = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...data?.value };
+      setSettings(current => JSON.stringify(current) === JSON.stringify(next) ? current : next);
+    }
     setLoading(false);
   }, []);
 
@@ -65,6 +73,11 @@ export function PreorderHeroSettingsProvider({ children }) {
       const uploaded = await uploadStoreImageDataUrl(payload.imageUrl, { folder: 'preorder-hero', assetId: 'main' });
       payload.imageUrl = uploaded.publicUrl;
     }
+    payload.galleryImages = await Promise.all(payload.galleryImages.map(async (image, index) => {
+      if (!isInlineStoreImage(image)) return image;
+      const uploaded = await uploadStoreImageDataUrl(image, { folder: 'preorder-hero', assetId: `piece-${index + 2}` });
+      return uploaded.publicUrl;
+    }));
     const { data, error } = await supabase.from('store_settings').upsert({ key: SETTINGS_KEY, value: payload }, { onConflict: 'key' }).select('value').single();
     if (error) throw error;
     const saved = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...(data?.value || payload) };

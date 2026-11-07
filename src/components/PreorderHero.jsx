@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, ArrowRight, Check, Layers3, Palette, Sparkles } from 'lucide-react';
 import { preorderState } from '../domain/commerce';
 import { usePreorderHeroSettings } from '../context/PreorderHeroSettingsContext';
 
-export function PreorderHero() {
+export function PreorderHero({ fallbackImage }) {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const isAr = lang === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
   const campaignState = preorderState();
   const { settings: s } = usePreorderHeroSettings();
+  const [selectedPiece, setSelectedPiece] = useState(0);
+  const defaultImage = 'https://res.cloudinary.com/ikim5u08/image/upload/v1786192179/iPhone_1_1_cdhx8b.jpg';
+  const images = [s.imageUrl || fallbackImage || defaultImage, ...s.galleryImages].map((image, index) => ({ src: image?.trim(), index })).filter(image => image.src);
+  const activePiece = images.find(image => image.index === selectedPiece) || images[0];
   const isOpen = campaignState === 'open';
   const isClosed = campaignState === 'closed';
 
@@ -118,15 +122,21 @@ export function PreorderHero() {
               <span className="text-ash">{s.rangeStart} — {s.rangeEnd}</span>
             </div>
             <img
-              src={s.imageUrl}
+              src={activePiece.src}
               alt={isAr ? s.imageAltAr : s.imageAltEn}
               className="mx-auto aspect-square w-full max-w-sm object-contain drop-shadow-2xl"
             />
-            <div className="mt-5 grid grid-cols-4 gap-2" aria-label={isAr ? 'أربع قطع قابلة للتخصيص' : 'Four customizable pieces'}>
-              {(s.pieceLabels || []).map((number) => (
-                <div key={number} className="border border-grave bg-coal py-3 text-center font-mono text-xs text-gold">
-                  {number}
-                </div>
+            <div className="mt-5 grid grid-cols-4 gap-2" aria-label={isAr ? 'معاينات الاستيكرات' : 'Sticker previews'}>
+              {images.map(({ index }) => (
+                <button
+                  type="button"
+                  key={index}
+                  aria-pressed={activePiece.index === index}
+                  onClick={() => setSelectedPiece(index)}
+                  className={`border py-3 text-center font-mono text-xs ${activePiece.index === index ? 'border-gold bg-gold text-ink' : 'border-grave bg-coal text-gold hover:border-gold'}`}
+                >
+                  {s.pieceLabels?.[index] || String(index + 1).padStart(2, '0')}
+                </button>
               ))}
             </div>
             <p className="mt-4 text-center font-space text-xs text-bone/70">

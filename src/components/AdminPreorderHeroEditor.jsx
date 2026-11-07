@@ -25,12 +25,16 @@ export function AdminPreorderHeroEditor({ showToast }) {
     catch (error) { console.error(error); showToast('تعذر حفظ السيكشن. حاول مرة أخرى.', 'error'); }
     finally { setSaving(false); }
   };
-  const uploadPreview = (file) => {
+  const setGalleryImage = (index, value) => setForm(current => ({
+    ...current,
+    galleryImages: current.galleryImages.map((image, i) => i === index ? value : image)
+  }));
+  const uploadPreview = (file, onLoad = value => set('imageUrl', value)) => {
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
       showToast('اختار PNG أو JPG أو WEBP بحجم أقل من 8MB.', 'error'); return;
     }
-    const reader = new FileReader(); reader.onload = () => set('imageUrl', reader.result); reader.readAsDataURL(file);
+    const reader = new FileReader(); reader.onload = () => onLoad(reader.result); reader.readAsDataURL(file);
   };
 
   return <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
@@ -69,8 +73,26 @@ export function AdminPreorderHeroEditor({ showToast }) {
         <label className="flex items-center gap-3 text-bone"><input type="checkbox" checked={form.showSecondaryButton!==false} onChange={e=>set('showSecondaryButton',e.target.checked)} className="accent-gold"/>إظهار الزر الثانوي</label>
 
         <div className="grid sm:grid-cols-2 gap-5 bg-coal p-4 border border-grave">
-          <div className="space-y-3"><label className="text-ash block">رابط الصورة<input dir="ltr" value={form.imageUrl||''} onChange={e=>set('imageUrl',e.target.value)} className="mt-1 w-full bg-stone border border-grave p-3 text-bone"/></label><label className="inline-flex cursor-pointer items-center gap-2 border border-gold/40 px-4 py-3 text-gold"><ImageIcon size={16}/>رفع صورة من الجهاز<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>uploadPreview(e.target.files?.[0])}/></label></div>
+          <div className="space-y-3"><label className="text-ash block">رابط صورة 01 (اتركه فاضي لاستخدام صورة بنر المصمم)<input dir="ltr" value={form.imageUrl||''} onChange={e=>set('imageUrl',e.target.value)} className="mt-1 w-full bg-stone border border-grave p-3 text-bone"/></label><label className="inline-flex cursor-pointer items-center gap-2 border border-gold/40 px-4 py-3 text-gold"><ImageIcon size={16}/>رفع صورة من الجهاز<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>uploadPreview(e.target.files?.[0])}/></label></div>
           <div className="aspect-video bg-void border border-grave p-3 flex items-center justify-center">{form.imageUrl&&<img src={form.imageUrl} alt="preview" className="max-w-full max-h-full object-contain"/>}</div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {form.galleryImages.map((image, index) => (
+            <div key={index} className="space-y-3 border border-grave bg-coal p-4">
+              <label className="block text-ash">
+                رابط صورة {String(index + 2).padStart(2, '0')}
+                <input dir="ltr" value={image} onChange={event => setGalleryImage(index, event.target.value)}
+                  className="mt-1 w-full border border-grave bg-stone p-2 text-bone" />
+              </label>
+              <label className="inline-flex cursor-pointer items-center gap-2 text-gold">
+                <ImageIcon size={16} /> رفع صورة
+                <input hidden type="file" accept="image/png,image/jpeg,image/webp"
+                  onChange={event => uploadPreview(event.target.files?.[0], value => setGalleryImage(index, value))} />
+              </label>
+              {image && <img src={image} alt="" className="h-24 w-full object-contain" />}
+            </div>
+          ))}
         </div>
 
         <div className="grid sm:grid-cols-4 gap-4">
