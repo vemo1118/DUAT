@@ -9,7 +9,6 @@ import {
 const CategoryBannersContext = createContext();
 const CATEGORY_COLUMNS = 'id, name_en, name_ar, subtitle_en, subtitle_ar, image_url, badge, category_link, is_active, updated_at';
 const CATEGORY_STORAGE_KEY = 'duat_category_banners_v5';
-const FORGE_STORAGE_KEY = 'duat_forge_banner_v1';
 
 export const INITIAL_CATEGORY_BANNERS = [
   {
@@ -46,7 +45,7 @@ export const DEFAULT_FORGE_BANNER = {
   buttonTextEn: 'OPEN STICKER BUILDER →',
   buttonTextAr: 'افتح بيلدر الاستيكرز ←',
   buttonLink: '/sticker-builder',
-  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1786036786/born_at_dawn_k5gb1v.png',
+  imageUrl: 'https://res.cloudinary.com/ikim5u08/image/upload/v1786192179/iPhone_1_1_cdhx8b.jpg',
   isActive: true
 };
 
@@ -64,21 +63,12 @@ function readLocalCategories() {
   return INITIAL_CATEGORY_BANNERS;
 }
 
-function readLocalForgeBanner() {
-  try {
-    const saved = localStorage.getItem(FORGE_STORAGE_KEY);
-    const parsed = saved ? JSON.parse(saved) : {};
-    const legacyLink = ['/customize', '/customizer'].includes(parsed.buttonLink);
-    return {
-      ...DEFAULT_FORGE_BANNER,
-      ...parsed,
-      ...(legacyLink ? DEFAULT_FORGE_BANNER : {}),
-      buttonLink: legacyLink ? '/sticker-builder' : (parsed.buttonLink || DEFAULT_FORGE_BANNER.buttonLink)
-    };
-  } catch {
-    return DEFAULT_FORGE_BANNER;
-  }
+function normalizeForgeBanner(fields = {}) {
+  const banner = { ...DEFAULT_FORGE_BANNER, ...fields };
+  if (['/customize', '/customizer'].includes(banner.buttonLink)) banner.buttonLink = '/sticker-builder';
+  return banner;
 }
+
 
 function mapCategoryRow(row) {
   return {
@@ -162,7 +152,7 @@ async function migrateLegacyCategoriesIfAdmin(banners) {
 
 export const CategoryBannersProvider = ({ children }) => {
   const [categoryBanners, setCategoryBanners] = useState(readLocalCategories);
-  const [forgeBanner, setForgeBanner] = useState(readLocalForgeBanner);
+  const [forgeBanner, setForgeBanner] = useState(DEFAULT_FORGE_BANNER);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -177,15 +167,11 @@ export const CategoryBannersProvider = ({ children }) => {
           supabase.from('category_banners').select(CATEGORY_COLUMNS).order('id')
         ]);
         if (forgeResult.error) throw forgeResult.error;
-        if (categoryResult.error) throw categoryResult.error;
         if (!isMounted) return;
 
-        if (forgeResult.data?.value && typeof forgeResult.data.value === 'object') {
-          const cloudForge = forgeResult.data.value;
-          setForgeBanner(['/customize', '/customizer'].includes(cloudForge.buttonLink)
-            ? DEFAULT_FORGE_BANNER
-            : { ...DEFAULT_FORGE_BANNER, ...cloudForge });
-        }
+        const nextForge = normalizeForgeBanner(forgeResult.data?.value);
+        setForgeBanner(current => JSON.stringify(current) === JSON.stringify(nextForge) ? current : nextForge);
+        if (categoryResult.error) throw categoryResult.error;
 
         if (Array.isArray(categoryResult.data) && categoryResult.data.length > 0) {
           setCategoryBanners(categoryResult.data.map(mapCategoryRow));
@@ -219,7 +205,9 @@ export const CategoryBannersProvider = ({ children }) => {
       )
       .subscribe();
 
+    window.addEventListener('focus', loadFromSupabase);
     return () => {
+      window.removeEventListener('focus', loadFromSupabase);
       isMounted = false;
       supabase.removeChannel(channel);
     };
@@ -232,14 +220,6 @@ export const CategoryBannersProvider = ({ children }) => {
       console.warn('Failed saving category banners to localStorage:', error);
     }
   }, [categoryBanners]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(FORGE_STORAGE_KEY, JSON.stringify(forgeBanner));
-    } catch (error) {
-      console.warn('Failed saving forge banner to localStorage:', error);
-    }
-  }, [forgeBanner]);
 
   const addCategoryBanner = async (newBanner) => {
     const banner = {
@@ -292,7 +272,7 @@ export const CategoryBannersProvider = ({ children }) => {
       .select('value')
       .single();
     if (error || !data?.value) throw error || new Error('FORGE_SAVE_NOT_CONFIRMED');
-    const saved = { ...DEFAULT_FORGE_BANNER, ...data.value };
+    const saved = normalizeForgeBanner(data.value);
     setForgeBanner(saved);
     return saved;
   };
@@ -314,7 +294,6 @@ export const CategoryBannersProvider = ({ children }) => {
     setCategoryBanners(data.map(mapCategoryRow));
     setForgeBanner(DEFAULT_FORGE_BANNER);
     localStorage.removeItem(CATEGORY_STORAGE_KEY);
-    localStorage.removeItem(FORGE_STORAGE_KEY);
   };
 
   return (
