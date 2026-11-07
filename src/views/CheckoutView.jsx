@@ -231,9 +231,9 @@ export const CheckoutView = ({ setView }) => {
       </div>
 
       {pricing.customQuantity > 0 && <div className="border border-gold/40 bg-gold/10 p-4 text-sm text-bone leading-7">
-        <p>{isRtl ? 'الحجز لمدة 7 أيام، وبعد قفل الحجز من 3 إلى 5 أيام للتصنيع والشحن. الدفع مقدمًا؛ التحويل بيخضع للمراجعة.' : 'Booking is open for 7 days, followed by 3–5 days for production and shipping. Payment is upfront and transfers are reviewed.'}</p>
+        <p>{isRtl ? 'تنفيذ الطلبات يبدأ 1 ديسمبر. الدفع كامل مقدمًا عبر إنستاباي، والتحويل بيخضع للمراجعة.' : 'Production starts December 1. Full payment is due via InstaPay and transfers are reviewed.'}</p>
         {PREORDER.closesAt && <p>{isRtl ? 'إغلاق الحجز: ' : 'Booking closes: '}{new Date(PREORDER.closesAt).toLocaleString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} ({isRtl ? 'توقيت القاهرة' : 'Cairo time'})</p>}
-        {PREORDER.shipsBy && <p>{isRtl ? 'التصنيع والشحن من ' : 'Production and shipping: '}{new Date(PREORDER.shipsFrom).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} — {new Date(PREORDER.shipsBy).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })}</p>}
+        {PREORDER.shipsBy && <p>{isRtl ? 'التسليم المتوقع لشركة الشحن: ' : 'Estimated handoff to the carrier: '}{new Date(PREORDER.shipsFrom).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} — {new Date(PREORDER.shipsBy).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })}</p>}
       </div>}
       {/* Free Shipping Notification Banner */}
       <div className={`p-4 border font-mono text-xs flex items-center justify-between gap-4 ${isFreeShipping ? 'bg-gold/15 border-gold text-gold font-bold' : 'bg-stone border-grave text-bone'}`}>

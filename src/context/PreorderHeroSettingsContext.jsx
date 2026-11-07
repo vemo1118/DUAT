@@ -4,7 +4,7 @@ import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAs
 
 export const DEFAULT_PREORDER_HERO_SETTINGS = {
   isActive: true,
-  badgeOpenAr: 'الحجز مفتوح لمدة 7 أيام', badgeOpenEn: '7-DAY PRE-ORDER IS OPEN',
+  badgeOpenAr: 'الحجز مفتوح لحد آخر نوفمبر', badgeOpenEn: 'PRE-ORDER THROUGH NOVEMBER 30',
   badgeClosedAr: 'حجز الدفعة انتهى', badgeClosedEn: 'THIS CUSTOM DROP IS CLOSED',
   badgeUpcomingAr: 'دفعة الكستمايز الجاية', badgeUpcomingEn: 'NEXT CUSTOM DROP',
   titleAr: 'إنت تتخيلها.', titleEn: 'YOU IMAGINE IT.',
@@ -25,8 +25,8 @@ export const DEFAULT_PREORDER_HERO_SETTINGS = {
   primaryOpenTextAr: 'ابدأ صمّم قطعك', primaryOpenTextEn: 'DESIGN YOUR PIECES', primaryOpenLink: '/sticker-builder',
   primaryClosedTextAr: 'شوف الاستيكرات الجاهزة', primaryClosedTextEn: 'SHOP READY-MADE', primaryClosedLink: '/stickers',
   showSecondaryButton: true, secondaryTextAr: 'شوف الاستيكرات الجاهزة', secondaryTextEn: 'SHOP READY-MADE', secondaryLink: '/stickers',
-  footerOpenAr: 'الحجز 7 أيام، وبعد قفله من 3 إلى 5 أيام للتصنيع والشحن.',
-  footerOpenEn: 'Book during the 7-day window. Production and shipping take 3–5 days after booking closes.',
+  footerOpenAr: 'الحجز لحد آخر نوفمبر. تنفيذ الطلبات يبدأ 1 ديسمبر.',
+  footerOpenEn: 'Book through November 30. Production starts December 1.',
   footerClosedAr: 'تابعنا لموعد دفعة الكستمايز الجاية.', footerClosedEn: 'Follow us for the next custom drop.',
   footerUpcomingAr: 'هنعلن وقت فتح الحجز قبل استقبال أي مدفوعات.', footerUpcomingEn: 'We will announce the booking window before accepting payments.',
   cardEyebrow: 'DUAT / CUSTOM', rangeStart: '01', rangeEnd: '04',

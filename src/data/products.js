@@ -388,8 +388,8 @@ export const FAQS = [
     id: 'faq-2',
     questionEn: 'When is a custom pre-order made?',
     questionAr: 'إمتى بيتصنع طلب الكستمايز؟',
-    answerEn: 'The booking window lasts 7 days. Production and shipping take 3–5 days after it closes.',
-    answerAr: 'باب الحجز بيفضل مفتوح ٧ أيام، وبعد ما يقفل التصنيع والشحن بياخدوا من ٣ لـ٥ أيام.'
+    answerEn: 'November 30 is the last day to book. Production starts December 1.',
+    answerAr: 'آخر يوم للحجز 30 نوفمبر. تنفيذ الطلبات يبدأ 1 ديسمبر.'
   }
 ];
 

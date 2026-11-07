@@ -8,17 +8,17 @@ export const AnnouncementMarquee = () => {
 
   const state = preorderState();
   const closes = PREORDER.closesAt
-    ? new Date(PREORDER.closesAt).toLocaleString(isAr ? 'ar-EG' : 'en-GB', {
-        timeZone: 'Africa/Cairo', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+    ? new Date(Date.parse(PREORDER.closesAt) - 1).toLocaleDateString(isAr ? 'ar-EG' : 'en-GB', {
+        timeZone: 'Africa/Cairo', day: 'numeric', month: 'long'
       })
     : '';
   const textEn = state === 'open'
-    ? `CUSTOM PRE-ORDER: EGP 45 EACH • MINIMUM 4 • DIFFERENT DESIGNS WELCOME • BOOKING CLOSES ${closes} CAIRO • `
+    ? `CUSTOM PRE-ORDER: EGP 45 EACH • MINIMUM 4 • DIFFERENT DESIGNS WELCOME • BOOK THROUGH ${closes} (CAIRO TIME) • `
     : state === 'closed'
       ? 'THIS CUSTOM DROP IS CLOSED • READY-MADE STICKERS ARE STILL AVAILABLE • '
       : 'CUSTOM DROP IS BEING PREPARED • READY-MADE STICKERS ARE AVAILABLE • ';
   const textAr = state === 'open'
-    ? `الحجز المسبق: ٤٥ ج للقطعة • أقل عدد ٤ • كل قطعة ممكن تكون بتصميم مختلف • الحجز يقفل ${closes} بتوقيت القاهرة • `
+    ? `الحجز المسبق: ٤٥ ج للقطعة • أقل عدد ٤ • كل قطعة ممكن تكون بتصميم مختلف • آخر يوم للحجز ${closes} بتوقيت القاهرة • `
     : state === 'closed'
       ? 'حجز دفعة الكستمايز انتهى • الاستيكرات الجاهزة لسه متاحة • '
       : 'بنجهز فتح دفعة الكستمايز • الاستيكرات الجاهزة متاحة • ';

@@ -24,8 +24,8 @@ export const TrustNumbersBar = () => {
     },
     {
       icon: CalendarDays,
-      labelEn: '7-DAY BOOKING',
-      labelAr: 'الحجز لمدة ٧ أيام'
+      labelEn: 'PRODUCTION STARTS DEC 1',
+      labelAr: 'التنفيذ يبدأ ١ ديسمبر'
     }
   ];
 

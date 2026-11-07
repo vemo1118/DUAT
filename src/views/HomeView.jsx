@@ -59,8 +59,8 @@ export const HomeView = () => {
       id: 'production',
       questionAr: 'إمتى يبدأ تنفيذ الطلبات؟',
       questionEn: 'When does production begin?',
-      answerAr: 'الحجز مفتوح 7 أيام. بعد قفل الحجز، من 3 إلى 5 أيام للتصنيع والشحن.',
-      answerEn: 'Booking stays open for 7 days, followed by 3–5 days for production and shipping.'
+      answerAr: 'آخر يوم للحجز 30 نوفمبر. تنفيذ الطلبات يبدأ 1 ديسمبر.',
+      answerEn: 'November 30 is the last day to book. Production starts December 1.'
     }
   ];
 
