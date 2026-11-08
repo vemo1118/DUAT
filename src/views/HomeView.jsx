@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HeroSlider } from '../components/HeroSlider';
 import { PreorderWelcome } from '../components/PreorderWelcome';
 import { PreorderHero } from '../components/PreorderHero';
@@ -30,9 +30,15 @@ export const HomeView = () => {
   const filteredProducts = Array.isArray(products)
     ? products.filter((p) => p && p.is_active !== false && p.isActive !== false)
     : [];
-  const activeProducts = filteredProducts.length > 0 ? filteredProducts : (Array.isArray(products) ? products : []);
-  const stickersOnly = activeProducts.filter((p) => p?.category === 'stickers');
-  const latestDrops = stickersOnly.length > 0 ? stickersOnly.slice(0, 6) : activeProducts.slice(0, 6);
+  const stickersOnly = filteredProducts.filter(product => product.category === 'stickers');
+  const firstBatch = stickersOnly.filter(product => Number.isInteger(product.firstBatchRank))
+    .sort((a, b) => a.firstBatchRank - b.firstBatchRank);
+  const newStickers = firstBatch.filter(product => !product.theme);
+  const latestDrops = (newStickers.length ? newStickers : stickersOnly).slice(0, 6);
+  const brownPreview = firstBatch.find(product => product.id === 'st-fpb-coffee-cup') ||
+    firstBatch.find(product => product.theme === 'brown');
+  const pinkPreview = firstBatch.find(product => product.id === 'st-fpb-pink-tulips') ||
+    firstBatch.find(product => product.theme === 'pink');
   const preorderFaqs = [
     {
       id: 'custom-minimum',
@@ -99,6 +105,29 @@ export const HomeView = () => {
       <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-5 sm:py-24 shadow-inner`}>
         <TrustNumbersBar />
       </div>
+
+      {brownPreview && pinkPreview && (
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-6 border border-grave bg-stone p-5 sm:grid-cols-2 sm:p-8">
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gold">{isAr ? 'من أول دفعة طباعة' : 'FROM THE FIRST PRINT BATCH'}</p>
+              <h2 className="font-clash text-3xl text-bone sm:text-5xl">{isAr ? 'البني والوردي' : 'Brown & Pink'}</h2>
+              <p className="text-sm text-bone/80">{isAr ? 'درجات القهوة والوردي في مجموعة واحدة. اختار كل استيكر لوحده.' : 'Coffee tones and soft pinks in one collection. Pick each sticker individually.'}</p>
+              <Link to="/stickers?collection=brown-pink" className="btn-primary inline-flex min-h-11 items-center gap-2 px-5 py-3 text-sm">
+                {isAr ? 'شوف المجموعة' : 'Explore the collection'} <ArrowIcon size={16} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-2" aria-hidden="true">
+              <div className="flex h-32 items-center justify-center rounded bg-[#ab896b] p-3 sm:h-48">
+                <img src={brownPreview.imageUrl} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain shadow-lg" />
+              </div>
+              <div className="flex h-32 items-center justify-center rounded bg-[#eac1cf] p-3 sm:h-48">
+                <img src={pinkPreview.imageUrl} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain shadow-lg" />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 3. READY-MADE STICKERS — secondary to the custom offer */}
       <div className="py-4">

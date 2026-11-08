@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useProducts } from '../context/ProductsContext';
 import { useStickersSettings } from '../context/StickersSettingsContext';
@@ -11,6 +11,8 @@ export function StickersView() {
   const { products = [] } = useProducts();
   const { lang, t } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isBrownPink = searchParams.get('collection') === 'brown-pink';
 
   const { heroSettings, promoSettings, gridSettings } = useStickersSettings();
 
@@ -19,7 +21,8 @@ export function StickersView() {
   const ArrowIcon = isRtl ? ChevronLeft : ChevronRight;
   const CtaArrow = isRtl ? ArrowLeft : ArrowRight;
 
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'slogans', 'arabic', 'english', 'badges'
+  const [activeTab, setActiveTab] = useState('all');
+  const [activeTheme, setActiveTheme] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
 
@@ -28,6 +31,7 @@ export function StickersView() {
 
   const filteredStickers = stickerProducts.filter((product) => {
     if (!product) return false;
+    if (isBrownPink && (!Number.isInteger(product.firstBatchRank) || !['brown', 'pink'].includes(product.theme))) return false;
     const isVisible = product.is_active !== false && product.isActive !== false;
     const pid = String(product.id || '');
 
@@ -52,7 +56,8 @@ export function StickersView() {
       (product.tagEn && product.tagEn.toLowerCase().includes(query)) ||
       (product.tagAr && product.tagAr.toLowerCase().includes(query));
 
-    return isVisible && matchesTab && matchesSearch;
+    const matchesGroup = isBrownPink ? activeTheme === 'all' || product.theme === activeTheme : matchesTab;
+    return isVisible && matchesGroup && matchesSearch;
   });
 
   // Sort logic
@@ -62,9 +67,15 @@ export function StickersView() {
     filteredStickers.sort((a, b) => (b.price || 0) - (a.price || 0));
   } else if (sortBy === 'name') {
     filteredStickers.sort((a, b) => (a.nameEn || '').localeCompare(b.nameEn || ''));
+  } else if (isBrownPink) {
+    filteredStickers.sort((a, b) => a.firstBatchRank - b.firstBatchRank);
   }
 
-  const tabs = [
+  const tabs = isBrownPink ? [
+    { id: 'all', label: isAr ? 'المجموعة كلها' : 'Full collection' },
+    { id: 'brown', label: isAr ? 'البني' : 'Brown' },
+    { id: 'pink', label: isAr ? 'الوردي' : 'Pink' }
+  ] : [
     { id: 'all', label: isAr ? 'كل الاستيكرات' : 'All Stickers' },
     { id: 'slogans', label: isAr ? 'العبارات والموتيفات' : 'Slogans & Motifs' },
     { id: 'arabic', label: isAr ? 'حروف عربي' : 'Arabic Letters' },
@@ -83,7 +94,7 @@ export function StickersView() {
       </div>
 
       {/* Header & Title Area */}
-      {heroSettings?.isActive !== false && (
+      {(isBrownPink || heroSettings?.isActive !== false) && (
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-grave p-6 sm:p-10 relative overflow-hidden rounded-sm">
           {heroSettings?.bgImage && (
             <picture className="absolute inset-0 w-full h-full pointer-events-none">
@@ -106,10 +117,10 @@ export function StickersView() {
               </div>
             )}
             <h1 className="font-clash text-4xl sm:text-6xl uppercase text-bone tracking-tight">
-              {isAr ? heroSettings?.titleAr : heroSettings?.titleEn}
+              {isBrownPink ? (isAr ? 'مجموعة البني والوردي' : 'Brown & Pink Collection') : (isAr ? heroSettings?.titleAr : heroSettings?.titleEn)}
             </h1>
             <p className="font-space text-sm text-bone/80 max-w-2xl leading-relaxed">
-              {isAr ? heroSettings?.descAr : heroSettings?.descEn}
+              {isBrownPink ? (isAr ? 'اختار من درجات القهوة والوردي من أول دفعة طباعة.' : 'Explore coffee tones and soft pinks from our first print batch.') : (isAr ? heroSettings?.descAr : heroSettings?.descEn)}
             </p>
           </div>
 
@@ -137,7 +148,7 @@ export function StickersView() {
       )}
 
       {/* STICKER BUILDER PROMPT BANNER */}
-      {promoSettings?.isActive !== false && (
+      {!isBrownPink && promoSettings?.isActive !== false && (
         <div className="bg-coal border border-gold/40 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 card-depth-highlight">
           <div className="flex items-center gap-4 text-center sm:text-left">
             <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/40 flex items-center justify-center text-gold flex-shrink-0">
@@ -163,6 +174,7 @@ export function StickersView() {
         </div>
       )}
 
+      {isBrownPink && <Link className="text-sm font-bold text-gold underline" to="/stickers">{isAr ? 'كل الاستيكرات' : 'All stickers'}</Link>}
       {/* Search Bar & Sub-Category Tabs */}
       <div className="space-y-6">
         <div className="relative max-w-md">
@@ -181,9 +193,10 @@ export function StickersView() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => (isBrownPink ? setActiveTheme : setActiveTab)(tab.id)}
+              aria-pressed={(isBrownPink ? activeTheme : activeTab) === tab.id}
               className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap min-h-[40px] rounded-xs border ${
-                activeTab === tab.id
+                (isBrownPink ? activeTheme : activeTab) === tab.id
                   ? 'bg-gold text-void font-bold border-gold shadow-md'
                   : 'bg-stone text-bone border-grave hover:border-gold/60'
               }`}
@@ -201,7 +214,7 @@ export function StickersView() {
             {isAr ? gridSettings?.emptyMessageAr : gridSettings?.emptyMessageEn}
           </p>
           <button
-            onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
+            onClick={() => { setActiveTab('all'); setActiveTheme('all'); setSearchQuery(''); }}
             className="btn-secondary py-2.5 px-5 font-mono text-xs uppercase"
           >
             {isAr ? 'عرض الكل' : 'Clear Filters'}
