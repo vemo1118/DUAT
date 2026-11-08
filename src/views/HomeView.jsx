@@ -65,27 +65,12 @@ export const HomeView = () => {
   ];
 
   return (
-    <div className="space-y-20 sm:space-y-32 pb-24 overflow-hidden">
+    <div className="space-y-9 sm:space-y-24 pb-24 overflow-hidden">
       
       {/* 1. PRE-ORDER OFFER — fixed here so cloud hero content cannot dilute the launch */}
       <PreorderWelcome />
       <HeroSlider />
       <PreorderHero fallbackImage={forge.imageUrl} />
-
-      {/* 2. TRUST NUMBERS BAR — SOFTENED THEME-AWARE GRADIENT BAND 1 */}
-      <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-16 sm:py-24 shadow-inner`}>
-        <TrustNumbersBar />
-      </div>
-
-      {/* 3. READY-MADE STICKERS — secondary to the custom offer */}
-      <div className="py-4">
-        <ProductRow
-          eyebrow="DUAT / 01"
-          title={isAr ? 'أحدث استيكرات البارز' : 'LATEST STICKERS'}
-          products={latestDrops}
-          viewAllPath="/stickers"
-        />
-      </div>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -95,7 +80,7 @@ export const HomeView = () => {
           >
             <Palette className="mb-5 text-gold" size={28} />
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold">{isAr ? 'الاختيار الأساسي' : 'MAIN OFFER'}</span>
-            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? 'كستمايز — 45 ج للقطعة' : 'CUSTOM — EGP 45 EACH'}</h2>
+            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? 'استيكر بتصميمك — ٤٥ جنيه' : 'CUSTOM — EGP 45 EACH'}</h2>
             <p className="mt-3 max-w-lg font-space text-sm leading-relaxed text-bone/75">{isAr ? 'ابدأ من 4 قطع بـ180 جنيه. صمّم كل واحدة لوحدها أو كرر نفس التصميم.' : 'Start with four pieces for EGP 180. Design each one separately or repeat the same design.'}</p>
           </button>
           <button
@@ -104,11 +89,26 @@ export const HomeView = () => {
           >
             <ShoppingBag className="mb-5 text-gold" size={28} />
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ash">{isAr ? 'جاهز من الكتالوج' : 'READY-MADE CATALOGUE'}</span>
-            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? '60 ج — أو 50 من 4 قطع' : 'EGP 60 — OR 50 FROM 4'}</h2>
-            <p className="mt-3 max-w-lg font-space text-sm leading-relaxed text-bone/75">{isAr ? 'اختار أي 4 استيكرات جاهزة أو أكتر، وسعر كل قطعة جاهزة يتحول تلقائيًا لـ50 جنيه.' : 'Choose any four or more ready-made stickers and each ready-made piece automatically becomes EGP 50.'}</p>
+            <h2 className="mt-2 font-clash text-3xl font-bold text-bone sm:text-4xl">{isAr ? '٦٠ جنيه للقطعة' : 'EGP 60 — OR 50 FROM 4'}</h2>
+            <p className="mt-3 max-w-lg font-space text-sm leading-relaxed text-bone/75">{isAr ? 'لو اخترت ٤ استيكرات جاهزة أو أكتر، القطعة بـ٥٠ جنيه.' : 'Choose any four or more ready-made stickers and each ready-made piece automatically becomes EGP 50.'}</p>
           </button>
         </div>
       </section>
+
+      {/* 2. TRUST NUMBERS BAR — SOFTENED THEME-AWARE GRADIENT BAND 1 */}
+      <div className={`w-full ${isDawn ? 'bg-gradient-to-b from-[#FAF6F0] via-[#E8DFCE] to-[#FAF6F0]' : 'bg-gradient-to-b from-[#0A0C16] via-[#161C38] to-[#0A0C16]'} border-y border-grave py-5 sm:py-24 shadow-inner`}>
+        <TrustNumbersBar />
+      </div>
+
+      {/* 3. READY-MADE STICKERS — secondary to the custom offer */}
+      <div className="py-4">
+        <ProductRow
+          eyebrow="DUAT / 01"
+          title={isAr ? 'أحدث الاستيكرات' : 'LATEST STICKERS'}
+          products={latestDrops}
+          viewAllPath="/stickers"
+        />
+      </div>
 
       {/* 5. STICKER BUILDER FEATURE BAND */}
       {isForgeActive && (

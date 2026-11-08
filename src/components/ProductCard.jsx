@@ -89,7 +89,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
       // Show placeholder silhouette if no image uploaded
       return (
         <div className="w-full h-full flex items-center justify-center bg-void/40">
-          <span className="font-mono text-xs text-ash opacity-50 uppercase tracking-widest">Raised 3D Finish</span>
+          <span className="font-mono text-xs text-ash opacity-50 uppercase tracking-widest">{lang === 'ar' ? 'تشطيب بارز' : 'Raised 3D Finish'}</span>
         </div>
       );
     }
@@ -110,21 +110,21 @@ export const ProductCard = ({ product, onSelectProduct }) => {
     >
       
       {/* 3:4 Aspect Ratio Visual Canvas Area */}
-      <div className={`aspect-[3/4] w-full overflow-hidden relative border-b border-grave flex items-center justify-center ${isSticker ? 'p-3 sm:p-4 bg-gradient-to-b from-stone/60 via-void to-void' : 'p-6 bg-void'}`}>
+      <div className={`aspect-square sm:aspect-[3/4] w-full overflow-hidden relative border-b border-grave flex items-center justify-center ${isSticker ? 'p-3 sm:p-4 bg-gradient-to-b from-stone/60 via-void to-void' : 'p-6 bg-void'}`}>
         {renderProductGraphic()}
         
         {/* Soft Contrast Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-stone/60 via-transparent to-transparent pointer-events-none" />
 
         {/* Top Badges Bar */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10">
+        <div className="absolute top-2 inset-x-2 sm:top-3 sm:inset-x-3 flex items-start justify-between gap-2 z-10">
           {tag ? (
-            <div className="bg-void/85 backdrop-blur-sm border border-grave px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest truncate pointer-events-none">
+            <div className="bg-void/85 backdrop-blur-sm border border-grave hidden sm:block px-2.5 py-1 font-mono text-[10px] uppercase text-ash tracking-widest truncate pointer-events-none">
               {tag}
             </div>
           ) : craftTag ? (
-            <div className="bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider shrink-0 pointer-events-none">
-              CRAFT
+            <div className="bg-gold/10 border border-gold/30 px-2 py-0.5 font-mono text-[9px] uppercase text-gold tracking-wider shrink-0 pointer-events-none hidden sm:block">
+              {lang === 'ar' ? 'صُنع بعناية' : 'CRAFT'}
             </div>
           ) : (
             <div />
@@ -147,10 +147,10 @@ export const ProductCard = ({ product, onSelectProduct }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+      <div className="p-2.5 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
         <div>
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-space font-bold text-base text-bone group-hover:text-gold transition-colors">
+            <h3 className="font-space font-bold text-sm sm:text-base text-bone break-words group-hover:text-gold transition-colors">
               {name}
             </h3>
             {/* Star Rating Badge */}
@@ -171,7 +171,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
           {/* Craftsmanship Micro-Label */}
           {craftTag && (
-            <p className="font-mono text-[10px] text-ash tracking-wider mt-1 border-t border-grave/40 pt-1.5">
+            <p className="hidden sm:block font-mono text-[10px] text-ash tracking-wider mt-1 border-t border-grave/40 pt-1.5">
               {craftTag}
             </p>
           )}
