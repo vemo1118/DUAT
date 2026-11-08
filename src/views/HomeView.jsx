@@ -1,3 +1,4 @@
+import { BatchStickerPreview } from '../components/BatchStickerPreview';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeroSlider } from '../components/HeroSlider';
@@ -118,12 +119,8 @@ export const HomeView = () => {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-2" aria-hidden="true">
-              <div className="flex h-32 items-center justify-center rounded bg-[#ab896b] p-3 sm:h-48">
-                <img src={brownPreview.imageUrl} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain shadow-lg" />
-              </div>
-              <div className="flex h-32 items-center justify-center rounded bg-[#eac1cf] p-3 sm:h-48">
-                <img src={pinkPreview.imageUrl} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain shadow-lg" />
-              </div>
+              <BatchStickerPreview productId={brownPreview.id} src={brownPreview.imageUrl} alt="" className="h-32 overflow-hidden rounded sm:h-48" />
+              <BatchStickerPreview productId={pinkPreview.id} src={pinkPreview.imageUrl} alt="" className="h-32 overflow-hidden rounded sm:h-48" />
             </div>
           </div>
         </section>

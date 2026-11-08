@@ -1,3 +1,4 @@
+import { BatchStickerPreview, hasBatchStickerPreview } from '../components/BatchStickerPreview';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
@@ -150,7 +151,9 @@ export function ProductDetailView() {
 
           {/* Main Visual Display Box */}
           <div className="flex-1 w-full bg-void border border-grave aspect-[3/4] relative overflow-hidden flex items-center justify-center p-6 card-depth-highlight order-1 md:order-2">
-            {images.length > 0 && images[0] ? (
+            {images.length > 0 && hasBatchStickerPreview(product.id) && activeImageIndex === 0 ? (
+              <BatchStickerPreview productId={product.id} src={images[0]} alt={name} className="absolute inset-0" />
+            ) : images.length > 0 && images[0] ? (
               <img
                 src={images[activeImageIndex] || images[0]}
                 alt={name}

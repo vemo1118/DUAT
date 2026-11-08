@@ -1,3 +1,4 @@
+import { BatchStickerPreview, hasBatchStickerPreview } from './BatchStickerPreview';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -49,9 +50,12 @@ export const ProductCard = ({ product, onSelectProduct }) => {
   const tag = (lang === 'ar' ? product.tagAr : product.tagEn) || product.tagEn || product.tagAr || '';
   const craftTag = (lang === 'ar' ? product.craftTagAr : product.craftTagEn) || product.craftTagEn || product.craftTagAr || '';
 
+  const batchPreview = hasBatchStickerPreview(id) && Boolean(product.imageUrl || product.image);
+
   // Render sticker artwork, uploaded product images, or a neutral premium placeholder.
   const renderProductGraphic = () => {
     const customImage = product.imageUrl || product.image;
+    if (batchPreview) return <BatchStickerPreview productId={id} src={customImage} alt={name} className="absolute inset-0" />;
     if (customImage) {
       const fitClass = isSticker && product.cardImageFit === 'contain'
         ? 'w-full h-full object-contain scale-100 group-hover:scale-105 transition-transform duration-500 ease-out drop-shadow-xl'
@@ -114,7 +118,7 @@ export const ProductCard = ({ product, onSelectProduct }) => {
         {renderProductGraphic()}
         
         {/* Soft Contrast Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone/60 via-transparent to-transparent pointer-events-none" />
+        {!batchPreview && <div className="absolute inset-0 bg-gradient-to-t from-stone/60 via-transparent to-transparent pointer-events-none" />}
 
         {/* Top Badges Bar */}
         <div className="absolute top-2 inset-x-2 sm:top-3 sm:inset-x-3 flex items-start justify-between gap-2 z-10">
