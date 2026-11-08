@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, Upload, Sparkles, Languages } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
+import { HeroMobileImage } from './HeroMobileImage';
 
 export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = null }) {
   const { products = [] } = useProducts();
@@ -21,6 +22,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
     badgeEn: 'OFFER 30% OFF',
     badgeAr: 'عرض خاص 30%',
     imageUrl: '',
+    mobileRatio: '16:9',
     ctaPrimaryTextEn: 'START BUILDING',
     ctaPrimaryTextAr: 'ابدأ التصميم الآن',
     ctaPrimaryLink: '/sticker-builder',
@@ -55,6 +57,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         badgeAr: slideToEdit.badgeAr || '',
         imageUrl: slideToEdit.imageUrl || slideToEdit.image_url || '',
         mobileImageUrl: slideToEdit.mobileImageUrl || slideToEdit.mobile_image_url || '',
+        mobileRatio: slideToEdit.mobileRatio === '5:4' ? '5:4' : '16:9',
         ctaPrimaryTextEn: slideToEdit.ctaPrimaryTextEn || '',
         ctaPrimaryTextAr: slideToEdit.ctaPrimaryTextAr || '',
         ctaPrimaryLink: ['/customize', '/customizer'].includes(slideToEdit.ctaPrimaryLink) ? '/sticker-builder' : (slideToEdit.ctaPrimaryLink || '/sticker-builder'),
@@ -87,6 +90,7 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
         badgeAr: 'عرض محدود 30%',
         imageUrl: '',
         mobileImageUrl: '',
+        mobileRatio: '16:9',
         ctaPrimaryTextEn: 'SHOP NOW',
         ctaPrimaryTextAr: 'تسوق العرض الآن',
         ctaPrimaryLink: '/shop',
@@ -227,12 +231,20 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                 name="mobileImageUrl"
                 value={formData.mobileImageUrl || ''}
                 onChange={handleChange}
-                placeholder="ضع رابط صورة الموبايل هنا بمقاس طولي مناسب للتلفون"
+                placeholder="رابط صورة الموبايل (اختياري)"
                 className="w-full bg-coal border border-grave px-3 py-2 text-bone focus:border-amber-400 focus:outline-none font-mono text-xs"
                 dir="ltr"
               />
-              <p className="font-mono text-[11px] text-ash">
-                💡 إذا وضعت صورة للتلفون، سيتم عرضها تلقائياً للشاشات الصغيرة لتجنب القص وضمان ظهور التصميم كاملاً.
+              <label className="block text-xs text-bone">
+                إطار صورة الموبايل
+                <select name="mobileRatio" value={formData.mobileRatio} onChange={handleChange}
+                  className="mt-1 block w-full border border-grave bg-coal px-3 py-2 text-bone">
+                  <option value="16:9">١٦:٩ — بالعرض (مقترح)</option>
+                  <option value="5:4">٥:٤ — بالعرض ومساحة أكبر للصورة</option>
+                </select>
+              </label>
+              <p className="text-xs text-ash">
+                الصورة تظهر كاملة والنص تحتها. لو سيبت صورة الموبايل فاضية، هنستخدم صورة الكمبيوتر.
               </p>
             </div>
 
@@ -246,12 +258,10 @@ export function AdminHeroSlideModal({ isOpen, onClose, onSave, slideToEdit = nul
                   </div>
                 </div>
               )}
-              {formData.mobileImageUrl && (
+              {(formData.mobileImageUrl || formData.imageUrl) && (
                 <div>
                   <span className="font-mono text-[11px] text-amber-400 block mb-1">📱 معاينة التلفون:</span>
-                  <div className="w-full h-32 bg-void border border-amber-400/40 relative overflow-hidden">
-                    <img src={formData.mobileImageUrl} alt="Mobile Preview" className="w-full h-full object-cover" />
-                  </div>
+                  <HeroMobileImage src={formData.mobileImageUrl || formData.imageUrl} ratio={formData.mobileRatio} />
                 </div>
               )}
             </div>

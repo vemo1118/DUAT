@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useHeroBanners, INITIAL_HERO_SLIDES } from '../context/HeroBannersContext';
 import { SunDisc } from './SunDisc';
+import { EMPTY_HERO_IMAGE, HeroMobileImage } from './HeroMobileImage';
 import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Sparkles, MapPin, Palette, Clock } from 'lucide-react';
 
 function safeNum(val, fallback) {
@@ -24,18 +25,6 @@ export const HeroSlider = () => {
 
   const isAr = lang === 'ar';
   const isRtl = isAr;
-
-  // Preload all active slide images on mount to eliminate image load flashes completely
-  useEffect(() => {
-    if (!Array.isArray(activeSlides)) return;
-    activeSlides.forEach((slide) => {
-      const url = slide?.imageUrl || slide?.image_url || slide?.image;
-      if (url) {
-        const img = new Image();
-        img.src = url;
-      }
-    });
-  }, [activeSlides]);
 
   // Auto-advance slide every 6 seconds
   useEffect(() => {
@@ -65,6 +54,8 @@ export const HeroSlider = () => {
     : (activeSlides[0] && typeof activeSlides[0] === 'object')
     ? activeSlides[0]
     : INITIAL_HERO_SLIDES[0];
+
+  const mobileImage = current.mobileImageUrl || current.imageUrl || current.image_url || current.image || INITIAL_HERO_SLIDES[0].imageUrl;
 
   const eyebrow = isAr ? current?.eyebrowAr || current?.eyebrowEn || '' : current?.eyebrowEn || current?.eyebrowAr || '';
   const headline1 = isAr ? current?.headline1Ar || current?.headline1En || '' : current?.headline1En || current?.headline1Ar || '';
@@ -97,12 +88,11 @@ export const HeroSlider = () => {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="hero-section relative w-full bg-void border-b border-grave overflow-hidden min-h-[620px] sm:min-h-[720px] lg:min-h-[800px] flex items-center font-sans text-bone transition-colors"
+      className="hero-section relative w-full bg-stone md:bg-void border-b border-grave overflow-hidden md:min-h-[720px] lg:min-h-[800px] md:flex md:items-center font-sans text-bone transition-colors"
     >
       {/* Stacked Cross-Fading Slide Background Layers (Zero Flicker) */}
       {activeSlides.map((slide, idx) => {
         const slideBg = slide?.imageUrl || slide?.image_url || slide?.image || 'https://res.cloudinary.com/ikim5u08/image/upload/f_auto,q_auto/v1785712166/B1_u3veqk.jpg';
-        const slideMobileBg = slide?.mobileImageUrl || slide?.mobile_image_url || slide?.mobileImage || '';
         const slidePosX = safeNum(slide?.posX, 0);
         const slidePosY = safeNum(slide?.posY, 30);
         const slideRightAlign = slide?.textAlign === 'right';
@@ -111,16 +101,14 @@ export const HeroSlider = () => {
         return (
           <div
             key={slide.id || idx}
-            className={`absolute inset-0 z-0 overflow-hidden transition-opacity duration-1000 ease-in-out ${
+            className={`absolute inset-0 z-0 hidden overflow-hidden transition-opacity md:block duration-1000 ease-in-out ${
               isActive ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
           >
             <picture className="w-full h-full">
-              {slideMobileBg && (
-                <source media="(max-width: 767px)" srcSet={slideMobileBg} />
-              )}
+              <source media="(min-width: 768px)" srcSet={slideBg} />
               <img
-                src={slideBg}
+                src={EMPTY_HERO_IMAGE}
                 alt="Hero Background"
                 className="w-full h-full object-cover brightness-110 contrast-110 saturate-105"
                 style={{ objectPosition: `${50 + slidePosX}% ${slidePosY}%` }}
@@ -139,10 +127,14 @@ export const HeroSlider = () => {
         );
       })}
 
+      <div className="px-3 pt-3 md:hidden">
+        <HeroMobileImage src={mobileImage} ratio={current.mobileRatio} storefront />
+      </div>
+
       {/* Full Bleed Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-16 sm:py-24 relative z-10">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 pt-3 pb-2 md:py-24 relative z-10">
         <div
-          className={`flex flex-col space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${alignClass}`}
+          className={`flex flex-col space-y-2 md:space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${alignClass}`}
           key={current.id}
         >
           
@@ -163,14 +155,14 @@ export const HeroSlider = () => {
           {/* Headlines */}
           <div className="space-y-1 w-full">
             <h1
-              className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone drop-shadow-sm"
+              className="font-clash text-2xl md:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-bone drop-shadow-sm"
               style={{ color: current?.headline1Color || undefined }}
             >
               {headline1}
             </h1>
             {headline2 && (
               <h2
-                className="font-clash text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold drop-shadow-sm"
+                className="font-clash text-2xl md:text-6xl lg:text-7xl uppercase tracking-tight font-bold leading-none text-gold drop-shadow-sm"
                 style={{ color: current?.headline2Color || undefined }}
               >
                 {headline2}
@@ -187,11 +179,11 @@ export const HeroSlider = () => {
           </p>
 
           {/* Action Buttons: Solid Gold & Glass Styles */}
-          <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
+          <div className={`flex flex-wrap items-stretch md:items-center gap-2 pt-1 md:gap-4 md:pt-4 font-mono text-xs font-bold uppercase tracking-wider w-full ${flexJustifyClass}`}>
             {/* Primary Action Button - Dynamic Gold */}
             <button
               onClick={() => navigate(primaryBtnLink)}
-              className="py-4 px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-2.5 px-3 md:py-4 md:px-8 bg-gold hover:bg-ember text-void font-bold border border-gold transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[44px] md:min-h-[48px] rounded-sm"
             >
               <ShoppingBag size={18} />
               <span>{primaryBtnText}</span>
@@ -201,7 +193,7 @@ export const HeroSlider = () => {
             {/* Secondary Action Button - Dynamic Frosted Glass */}
             <button
               onClick={() => navigate(secondaryBtnLink)}
-              className="py-4 px-8 bg-stone hover:bg-coal border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[48px] rounded-sm"
+              className="py-2.5 px-3 md:py-4 md:px-8 bg-stone hover:bg-coal border border-grave text-bone hover:border-gold hover:text-gold transition-all duration-300 backdrop-blur-md shadow-xl flex items-center justify-center gap-2.5 text-sm tracking-wider min-h-[44px] md:min-h-[48px] rounded-sm"
             >
               <Sparkles size={16} className="text-gold" />
               <span>{secondaryBtnText}</span>
@@ -212,7 +204,7 @@ export const HeroSlider = () => {
       </div>
 
       {/* Manual Slide Controls & Dots Bar (Bottom) */}
-      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-4 bg-stone/90 border border-grave px-4 py-2 backdrop-blur">
+      <div className="relative z-20 mx-auto flex w-fit items-center gap-3 px-4 pb-2 md:absolute md:bottom-6 md:right-6 md:border md:border-grave md:bg-stone/90 md:py-2 md:backdrop-blur">
         {/* Slide Counter / Indicators */}
         <div className="flex items-center gap-1.5 font-mono text-xs text-ash">
           {activeSlides.map((_, idx) => (
@@ -222,7 +214,8 @@ export const HeroSlider = () => {
               className={`h-2 transition-all rounded-full shrink-0 ${
                 currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-ash hover:bg-gold'
               }`}
-              aria-label={`Go to slide ${idx + 1}`}
+              aria-pressed={currentSlide === idx}
+              aria-label={isAr ? `اعرض البنر ${idx + 1}` : `Go to slide ${idx + 1}`}
             />
           ))}
         </div>
