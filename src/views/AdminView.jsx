@@ -1398,6 +1398,12 @@ export function AdminView() {
                           <div className="font-mono font-bold text-bone">
                             {ord.total} <span className="text-xs text-gold">ج.م</span>
                           </div>
+                          {(ord.couponCode || ord.discount > 0) && (
+                            <p className="mt-1 text-xs text-gold">
+                              {ord.couponCode && <><bdi>{ord.couponCode}</bdi> · </>}
+                              خصم {formatPrice(ord.discount)}
+                            </p>
+                          )}
                           <span className="font-mono text-[11px] text-ash uppercase flex items-center gap-1.5 mt-0.5">
                             <span>{ord.paymentMethod === 'instapay' ? 'InstaPay' : 'دفع عند الاستلام'}</span>
                             {(ord.payment_proof_path || ord.paymentProofPath) && (
@@ -3529,6 +3535,15 @@ export function AdminView() {
                 </div>
               );
             })()}
+
+            {(selectedOrderDetails.subtotal != null || selectedOrderDetails.couponCode || selectedOrderDetails.discount > 0) && (
+              <dl className="space-y-2 border-t border-grave pt-4 text-sm">
+                {selectedOrderDetails.subtotal != null && <div className="flex justify-between gap-4"><dt>المنتجات قبل الخصم</dt><dd>{formatPrice(selectedOrderDetails.subtotal)}</dd></div>}
+                {selectedOrderDetails.couponCode && <div className="flex justify-between gap-4"><dt>الكوبون</dt><dd><bdi>{selectedOrderDetails.couponCode}</bdi></dd></div>}
+                {(selectedOrderDetails.couponCode || selectedOrderDetails.discount > 0) && <div className="flex justify-between gap-4 text-gold"><dt>قيمة الخصم</dt><dd>{formatPrice(selectedOrderDetails.discount)}</dd></div>}
+                {selectedOrderDetails.shippingFee != null && <div className="flex justify-between gap-4"><dt>الشحن</dt><dd>{formatPrice(selectedOrderDetails.shippingFee)}</dd></div>}
+              </dl>
+            )}
 
             <div className="flex items-center justify-between border-t border-grave pt-4">
               <div>

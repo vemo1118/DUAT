@@ -128,11 +128,40 @@ export const HeroSlider = () => {
       })}
 
       <div className="px-3 pt-3 md:hidden">
-        <HeroMobileImage src={mobileImage} ratio={current.mobileRatio} storefront />
+        <HeroMobileImage src={mobileImage} storefront />
+        <div className="grid gap-y-2 px-1 pb-1 pt-3">
+          {activeSlides.map((slide, index) => {
+            const localized = (field) => slide[field + (isAr ? 'Ar' : 'En')] ||
+              slide[field + (isAr ? 'En' : 'Ar')] || '';
+            const active = slide.id === current.id && index === (activeSlides[currentSlide] ? currentSlide : 0);
+
+            return (
+              <div key={slide.id || index} aria-hidden={!active}
+                className={`col-start-1 row-start-1 row-span-4 grid grid-rows-subgrid text-start ${active ? '' : 'invisible'}`}>
+                <p className="self-start text-xs font-bold text-gold">{localized('eyebrow')}</p>
+                <h1 className="self-start break-words font-clash text-2xl font-bold uppercase leading-tight text-bone">
+                  <span style={{ color: slide.headline1Color }}>{localized('headline1')}</span>
+                  <span className="block text-gold" style={{ color: slide.headline2Color }}>{localized('headline2')}</span>
+                </h1>
+                <p className="self-start break-words text-sm leading-snug text-bone/80">{localized('sub')}</p>
+                <div className="grid min-w-0 grid-cols-2 gap-2" data-mobile-hero-actions>
+                  <button type="button" onClick={() => navigate(slide.ctaPrimaryLink || '/sticker-builder')}
+                    className="min-h-11 min-w-0 break-words rounded-sm bg-gold px-2 py-2 text-xs font-bold text-void">
+                    {localized('ctaPrimaryText') || (isAr ? 'تسوق الآن' : 'Shop now')}
+                  </button>
+                  <button type="button" onClick={() => navigate(slide.ctaSecondaryLink || '/shop')}
+                    className="min-h-11 min-w-0 break-words rounded-sm border border-grave bg-stone px-2 py-2 text-xs font-bold text-bone">
+                    {localized('ctaSecondaryText') || (isAr ? 'معرض الكتالوج' : 'View gallery')}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Full Bleed Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 pt-3 pb-2 md:py-24 relative z-10">
+      <div className="relative z-10 mx-auto hidden w-full max-w-7xl px-8 py-24 md:block lg:px-12">
         <div
           className={`flex flex-col space-y-2 md:space-y-6 animate-fade-in transition-all duration-300 max-w-xl lg:max-w-xl ${alignClass}`}
           key={current.id}
@@ -211,12 +240,12 @@ export const HeroSlider = () => {
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-2 transition-all rounded-full shrink-0 ${
-                currentSlide === idx ? 'w-6 bg-gold' : 'w-2 bg-ash hover:bg-gold'
-              }`}
+              className="grid min-h-11 w-8 shrink-0 place-items-center"
               aria-pressed={currentSlide === idx}
               aria-label={isAr ? `اعرض البنر ${idx + 1}` : `Go to slide ${idx + 1}`}
-            />
+            >
+              <span aria-hidden="true" className={`h-1.5 rounded-full transition-all ${currentSlide === idx ? 'w-5 bg-gold' : 'w-1.5 bg-ash'}`} />
+            </button>
           ))}
         </div>
 

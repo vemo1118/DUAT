@@ -48,6 +48,10 @@ function mapFromDb(ord) {
     customer: ord.customer || {},
     items: Array.isArray(ord.items) ? ord.items : [],
     total: Number(ord.total) || 0,
+    subtotal: ord.subtotal == null ? null : Number(ord.subtotal),
+    shippingFee: ord.shipping_fee == null ? null : Number(ord.shipping_fee),
+    discount: Number(ord.discount) || 0,
+    couponCode: ord.coupon_code || null,
     paymentMethod: ord.payment_method || ord.paymentMethod || 'cod',
     payment_proof_path: ord.payment_proof_path || null,
     paymentProofPath: ord.payment_proof_path || null
@@ -78,7 +82,7 @@ export function OrdersProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, ref, created_at, updated_at, status, customer, items, total, payment_method, payment_proof_path')
+        .select('id, ref, created_at, updated_at, status, customer, items, total, subtotal, shipping_fee, discount, coupon_code, payment_method, payment_proof_path')
         .order('created_at', { ascending: false });
 
       if (error) {
