@@ -7,7 +7,7 @@ import { useToast } from '../context/ToastContext';
 import { uploadOrderFile } from '../services/orderApi';
 import { PRICING, ORDER_LIMITS } from '../domain/commerce';
 import { imageLayout, drawImageSticker } from '../domain/stickerArtwork';
-import { BUILDER_COLORS, BUILDER_FONTS, contrastRatio, textStickerLayout, drawTextSticker, canvasBlob, blobDataUrl } from '../domain/builderArtwork';
+import { BUILDER_COLORS, BUILDER_FONTS, contrastRatio, textStickerGeometry, textStickerLayout, drawTextSticker, canvasBlob, blobDataUrl } from '../domain/builderArtwork';
 
 // Retained for older print-layout callers. The current UI offers square and circle.
 export function getStickerExportLayout(shape, text) {
@@ -50,12 +50,14 @@ export function StickerBuilderView() {
   const canvas = useRef(null), fileInput = useRef(null), uploadVersion = useRef(0);
   const font = BUILDER_FONTS.find(f => f.id === fontId);
   const shape = mode === 'text' ? textShape : imageShape;
-  const layout = mode === 'text' ? { widthMm: 25, heightMm: 25 } : imageLayout(source?.width || 1, source?.height || 1, imageShape);
+  const layout = mode === 'text' ? textStickerGeometry(textShape) : imageLayout(source?.width || 1, source?.height || 1, imageShape);
   const customCount = cartItems.filter(i => i.id?.startsWith('custom-sticker-')).reduce((n, i) => n + i.quantity, 0);
   const textPreview = useMemo(() => {
     if (!measure.current) measure.current = document.createElement('canvas').getContext('2d');
     return textStickerLayout(measure.current, { text: text.trim(), shape: textShape, fontFamily: font.family });
   }, [text, textShape, font.family, fontReady]);
+  const previewWidth = textShape === 'pill' ? 280 : 220;
+  const previewScale = previewWidth / textStickerGeometry(textShape).width;
   const canAdd = !busy && !loadingImage && (mode === 'image' ? !!source : fontReady && !!text.trim());
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
@@ -135,7 +137,7 @@ export function StickerBuilderView() {
         <div className="builder-stage relative flex items-center justify-center p-8 min-h-[220px] sm:min-h-[300px] bg-coal" data-builder-stage>
           <canvas ref={canvas} aria-label={isAr ? 'تصميم الاستيكر للطباعة' : 'Sticker print artwork'} className={`builder-artwork ${(mode === 'image' && source) ? '' : 'hidden'}`} style={{ aspectRatio: layout.widthMm / layout.heightMm }} />
           {mode === 'image' && !source && <button type="button" onClick={() => fileInput.current?.click()} className="w-full max-w-xs py-5 px-3 rounded-xl border border-dashed border-gold/70 text-center space-y-2"><Upload size={27} className="mx-auto text-gold"/><strong className="block text-base">{isAr ? 'ارفع صورة عشان نبدأ' : 'Upload an image to begin'}</strong><span className="text-xs text-ash block">PNG · JPG · WebP / 5 MB</span></button>}
-          {mode === 'text' && text.trim() && <div data-text-preview className="builder-text-preview flex items-center justify-center text-center overflow-hidden" style={{ backgroundColor: background === 'clear' ? '#EFEAE0' : background, borderRadius: textShape === 'circle' ? '50%' : '10.56px' }}><span className="builder-print-text" dir="auto" style={{ '--art-font': `"${font.family}", "Cairo", sans-serif`, fontFamily: `"${font.family}", "Cairo", sans-serif`, color: textColor, fontSize: `${textPreview.size * .22}px`, lineHeight: 1.65, fontWeight: 700, whiteSpace: 'pre' }}>{textPreview.lines.join('\n')}</span></div>}
+          {mode === 'text' && text.trim() && <div data-text-preview data-text-shape={textShape} className="builder-text-preview flex items-center justify-center text-center overflow-hidden" style={{ backgroundColor: background === 'clear' ? '#EFEAE0' : background, width: `${previewWidth}px`, height: textShape === 'pill' ? 'auto' : `${previewWidth * layout.heightMm / layout.widthMm}px`, aspectRatio: `${layout.widthMm} / ${layout.heightMm}`, containerType: textShape === 'pill' ? 'inline-size' : undefined, borderRadius: textShape === 'circle' || textShape === 'pill' ? '999px' : '10.56px' }}><span className="builder-print-text" dir="auto" style={{ '--art-font': `"${font.family}", "Cairo", sans-serif`, fontFamily: `"${font.family}", "Cairo", sans-serif`, color: textColor, fontSize: textShape === 'pill' ? `${textPreview.size / 16}cqw` : `${textPreview.size * previewScale}px`, lineHeight: 1.65, fontWeight: 700, whiteSpace: 'pre' }}>{textPreview.lines.join('\n')}</span></div>}
           {mode === 'text' && !text.trim() && <p className="text-ash text-sm">{isAr ? 'اكتب كلمتك وهتشوفها هنا' : 'Type your words to see them here'}</p>}
           {(loadingImage || (mode === 'text' && !fontReady)) && <Loader2 size={22} className="absolute top-3 end-3 text-gold animate-spin"/>}
         </div>
@@ -150,9 +152,10 @@ export function StickerBuilderView() {
           <label className="block text-sm font-bold space-y-2">{isAr ? 'اكتب كلمتك' : 'Your words'}<input type="text" maxLength={40} value={text} onChange={e => setText(e.target.value)} placeholder={isAr ? 'اسمك أو كلمة بتحبها' : 'A name or words you love'} className="w-full bg-coal border border-grave rounded-lg min-h-12 px-3 text-base font-normal" dir="auto" /></label>
           <label className="block text-sm font-bold space-y-2">{isAr ? 'الخط' : 'Font'}<select value={fontId} onChange={e => setFontId(e.target.value)} className="block w-full bg-coal border border-grave rounded-lg min-h-12 px-3 font-normal text-base">{BUILDER_FONTS.map(f => <option key={f.id} value={f.id}>{isAr ? f.ar : f.en}</option>)}</select></label>
         </>}
-        <fieldset className="space-y-2"><legend className="text-sm font-bold mb-2">{isAr ? 'شكل الاستيكر' : 'Sticker shape'}</legend><div className={`grid ${mode === 'image' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
-          {(mode === 'image' ? ['auto', 'square', 'circle'] : ['square', 'circle']).map(id => <button key={id} type="button" aria-pressed={shape === id} onClick={() => mode === 'text' ? setTextShape(id) : setImageShape(id)} className={`min-h-11 rounded-lg border text-sm flex gap-2 justify-center items-center ${shape === id ? 'border-gold text-gold bg-gold/10' : 'border-grave text-bone'}`}><span className={`inline-block w-4 h-4 border border-current ${id === 'circle' ? 'rounded-full' : 'rounded-sm'}`} />{id === 'auto' ? (isAr ? 'الأصلية' : 'Original') : id === 'circle' ? (isAr ? 'دايرة' : 'Circle') : (isAr ? 'مربع' : 'Square')}</button>)}
+        <fieldset className="space-y-2"><legend className="text-sm font-bold mb-2">{isAr ? 'شكل الاستيكر' : 'Sticker shape'}</legend><div className="grid grid-cols-3 gap-2">
+          {(mode === 'image' ? ['auto', 'square', 'circle'] : ['square', 'circle', 'pill']).map(id => <button key={id} type="button" aria-pressed={shape === id} onClick={() => mode === 'text' ? setTextShape(id) : setImageShape(id)} className={`min-h-11 rounded-lg border text-sm flex gap-2 justify-center items-center ${shape === id ? 'border-gold text-gold bg-gold/10' : 'border-grave text-bone'}`}><span className={`inline-block w-4 h-4 border border-current ${id === 'circle' || id === 'pill' ? 'rounded-full' : 'rounded-sm'} ${id === 'pill' ? '!w-6 !h-2.5' : ''}`} />{id === 'auto' ? (isAr ? 'الأصلية' : 'Original') : id === 'circle' ? (isAr ? 'دايرة' : 'Circle') : id === 'pill' ? (isAr ? 'شريط' : 'Strip') : (isAr ? 'مربع' : 'Square')}</button>)}
         </div></fieldset>
+        {mode === 'text' && textShape === 'pill' && textPreview.size < 65 && <p className="text-xs text-gold">{isAr ? 'العبارة طويلة؛ اختصرها عشان الكتابة تبقى أوضح على الشريط.' : 'Shorten the phrase for clearer lettering on the strip.'}</p>}
         {mode === 'text' && <ColorPicker label={isAr ? 'لون النص' : 'Text color'} value={textColor} onChange={setTextColor} isAr={isAr}/>}
         <ColorPicker label={isAr ? 'لون الخلفية' : 'Background color'} value={background} onChange={setBackground} isAr={isAr} transparent={mode === 'image'}/>
         {mode === 'text' && contrastRatio(textColor, background === 'clear' ? '#EFEAE0' : background) < 2.5 && <p className="text-xs text-gold" role="status">{isAr ? 'اللونين قريبين من بعض؛ اختار لون أفتح أو أغمق عشان الكتابة تبقى واضحة.' : 'These colors are close together. Choose a lighter or darker color to make the text clear.'}</p>}

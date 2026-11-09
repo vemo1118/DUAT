@@ -37,7 +37,18 @@ export function textLines(ctx, text, maxWidth) {
   if (line) lines.push(line);
   return lines;
 }
+export function textStickerGeometry(shape) {
+  return shape === 'pill'
+    ? { width: 1600, height: 400, radius: 200, widthMm: 40, heightMm: 10 }
+    : { width: 1000, height: 1000, radius: shape === 'circle' ? 500 : 48, widthMm: 25, heightMm: 25 };
+}
 export function textStickerLayout(ctx, { text, shape, fontFamily }) {
+  if (shape === 'pill') {
+    const line = String(text).trim().replace(/\s+/g, ' ');
+    let size = 160;
+    do { ctx.font = `700 ${size}px "${fontFamily}", "Cairo", sans-serif`; if (ctx.measureText(line).width <= 1200) break; size -= 2; } while (size > 12);
+    return { size, lines: line ? [line] : [] };
+  }
   const width = shape === 'circle' ? 640 : 800;
   let size = 180, lines;
   do {
@@ -47,17 +58,19 @@ export function textStickerLayout(ctx, { text, shape, fontFamily }) {
   size += 4;
   return { size, lines };
 }
-export function drawTextSticker(canvas, { text, shape, textColor, background, fontFamily, resolution = 1000 }) {
-  canvas.width = canvas.height = resolution;
+export function drawTextSticker(canvas, { text, shape, textColor, background, fontFamily, resolution }) {
+  const geometry = textStickerGeometry(shape);
+  canvas.width = resolution || geometry.width;
+  canvas.height = Math.round(canvas.width * geometry.height / geometry.width);
   const ctx = canvas.getContext('2d');
-  ctx.save(); ctx.scale(resolution / 1000, resolution / 1000); ctx.beginPath();
+  ctx.save(); ctx.scale(canvas.width / geometry.width, canvas.width / geometry.width); ctx.beginPath();
   if (shape === 'circle') ctx.arc(500, 500, 500, 0, 2 * Math.PI);
-  else ctx.roundRect(0, 0, 1000, 1000, 48);
-  ctx.clip(); ctx.fillStyle = background; ctx.fillRect(0, 0, 1000, 1000);
+  else ctx.roundRect(0, 0, geometry.width, geometry.height, geometry.radius);
+  ctx.clip(); ctx.fillStyle = background; ctx.fillRect(0, 0, geometry.width, geometry.height);
   const { size, lines } = textStickerLayout(ctx, { text, shape, fontFamily });
   ctx.fillStyle = textColor; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.direction = /[\u0600-\u06ff]/.test(text) ? 'rtl' : 'ltr';
-  lines.forEach((line, i) => ctx.fillText(line, 500, 500 + (i - (lines.length - 1) / 2) * size * 1.65));
+  lines.forEach((line, i) => ctx.fillText(line, geometry.width / 2, geometry.height / 2 + (i - (lines.length - 1) / 2) * size * 1.65));
   ctx.restore();
 }
 export function canvasBlob(canvas) {
