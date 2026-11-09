@@ -858,7 +858,7 @@ export function AdminView() {
         {/* Total Revenue Card */}
         <div className="bg-stone border border-grave p-5 rounded-lg space-y-2 card-depth-highlight relative overflow-hidden">
           <div className="flex items-center justify-between text-ash">
-            <span className="font-mono text-xs uppercase tracking-wider">إجمالي المبيعات</span>
+            <span className="font-mono text-xs uppercase tracking-wider">قيمة الطلبات بعد الخصم</span>
             <div className="p-2 rounded bg-gold/10 text-gold">
               <DollarSign size={18} />
             </div>
@@ -867,7 +867,7 @@ export function AdminView() {
             <span className="font-clash text-2xl sm:text-3xl font-bold text-bone">{analyticsRevenue.toLocaleString()}</span>
             <span className="font-mono text-xs text-gold">ج.م</span>
           </div>
-          <p className="font-mono text-[10px] text-ash/80">من إجمالي {orders.length} طلبات مسجلة</p>
+          <p className="font-mono text-[10px] text-ash/80">من {orders.length} طلبات مسجلة — لا تعني تحصيل الدفع</p>
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-gold/5 rounded-full blur-2xl pointer-events-none" />
         </div>
 
@@ -1287,7 +1287,7 @@ export function AdminView() {
               <div className="absolute top-0 right-0 w-1 h-full bg-emerald-500" />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-mono text-xs text-ash uppercase tracking-wider">إجمالي المبيعات</p>
+                  <p className="font-mono text-xs text-ash uppercase tracking-wider">قيمة الطلبات بعد الخصم</p>
                   <h3 className="font-clash text-3xl font-bold text-bone mt-1">
                     {totalRevenue} <span className="text-sm font-mono text-gold">ج.م</span>
                   </h3>
@@ -3534,7 +3534,7 @@ export function AdminView() {
                     </div>
                   ) : isInstaPay ? (
                     <div className="text-ember font-bold text-[11px] pt-1">
-                      ⚠️ تم اختيار إنستاباي، لكن لم تتم إضافة صورة إثبات أثناء الطلب.
+                      ⚠️ طريقة الدفع تحويل مقدم. تعذر عرض إثبات التحويل؛ راجع الطلب والدفع قبل التنفيذ.
                     </div>
                   ) : (
                     <div className="text-ash text-[11px] pt-1">

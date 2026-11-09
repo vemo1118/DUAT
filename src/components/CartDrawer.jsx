@@ -1,3 +1,4 @@
+import { useCheckoutSettings } from '../context/CheckoutSettingsContext';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +30,7 @@ export const CartDrawer = () => {
 
   const { lang, t, formatPrice } = useLanguage();
   const { theme } = useTheme();
+  const { settings: checkoutSettings } = useCheckoutSettings();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -246,13 +248,15 @@ export const CartDrawer = () => {
               {promoCode && (
                 <div className="font-mono text-xs text-[#E0A93B] flex justify-between items-center p-2.5 border border-[#E0A93B]/30 bg-stone">
                   <span>COUPON APPLIED: {promoCode}</span>
-                  <span>-10%</span>
+                  <span>-{formatPrice(discount)}</span>
                 </div>
               )}
 
               {/* Free Shipping Progress Bar Nudge (800 EGP Target) */}
               {(() => {
-                const target = 800;
+                const target = checkoutSettings.freeShippingThreshold;
+                if (checkoutSettings.shippingMode === 'later') return <p className="text-sm text-gold">{checkoutSettings[isRtl ? 'shippingLaterAr' : 'shippingLaterEn']}</p>;
+                if (target <= 0) return null;
                 const needed = Math.max(0, target - subtotal);
                 const percent = Math.min(100, (subtotal / target) * 100);
                 return (
@@ -260,8 +264,8 @@ export const CartDrawer = () => {
                     <div className="flex justify-between items-center font-mono text-xs">
                       <span className="font-medium">
                         {needed > 0
-                          ? (isRtl ? `أضف ${needed} ج للحصول على شحن مجاني (فوق ٨٠٠ ج)` : `Add ${needed} EGP for FREE shipping (over 800 EGP)`)
-                          : (isRtl ? '🎉 شحن مجاني فوق ٨٠٠ ج!' : '🎉 Free shipping unlocked!')}
+                          ? (isRtl ? `أضف ${needed} ج للحصول على شحن مجاني (من ${target} ج)` : `Add ${needed} EGP for FREE shipping (from ${target} EGP)`)
+                          : (isRtl ? '🎉 حصلت على شحن مجاني!' : '🎉 Free shipping unlocked!')}
                       </span>
                       <span className="text-[#E0A93B] font-bold">{Math.round(percent)}%</span>
                     </div>
