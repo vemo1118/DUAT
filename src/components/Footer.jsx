@@ -81,14 +81,12 @@ export const Footer = () => {
 
         </div>
 
-        {/* Bottom Copyright & Admin Entrance */}
+        {/* Bottom Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-xs text-ash">
           <span>{t('footerRights')}</span>
           <div className="flex items-center gap-4">
             <span className="uppercase">{lang === 'ar' ? 'مصر • ٢٠٢٦' : 'Egypt • C.2026'}</span>
-            <Link to="/admin" className="hover:text-gold transition-colors flex items-center gap-1 opacity-75 hover:opacity-100">
-              <span>🔒 {lang === 'ar' ? 'إدارة المتجر' : 'Admin'}</span>
-            </Link>
+
           </div>
         </div>
 

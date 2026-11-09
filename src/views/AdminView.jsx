@@ -180,16 +180,28 @@ export function AdminView() {
 
   // Check initial session & listen for auth changes
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-      const { data: isAdmin } = currentSession ? await supabase.rpc('is_admin') : { data: false };
-      setSession(isAdmin === true ? currentSession : null);
-      if (currentSession && isAdmin !== true) setAuthError('هذا الحساب غير مصرح له بإدارة المتجر.');
-      setAuthLoading(false);
-      if (currentSession && isAdmin === true && fetchOrders) fetchOrders();
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      if (!currentSession) setSession(null);
+    let active = true;
+    let authVersion = 0;
+    const checkSession = async currentSession => {
+      const version = ++authVersion;
+      setAuthLoading(true);
+      try {
+        const { data: isAdmin, error } = currentSession ? await supabase.rpc('is_admin') : { data: false };
+        if (!active || version !== authVersion) return;
+        setSession(!error && isAdmin === true ? currentSession : null);
+        if (currentSession && (error || isAdmin !== true)) setAuthError('هذا الحساب غير مصرح له بإدارة المتجر.');
+        if (!error && currentSession && isAdmin === true && fetchOrders) fetchOrders();
+      } catch {
+        if (active && version === authVersion) { setSession(null); setAuthError('تعذر التحقق من صلاحية الدخول. حاول مرة أخرى.'); }
+      } finally { if (active && version === authVersion) setAuthLoading(false); }
+    };
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => { if (active) checkSession(currentSession); });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      if (!currentSession) { authVersion++; setSession(null); setAuthLoading(false); }
+      else if (event !== 'INITIAL_SESSION') {
+        // Defer SDK calls until the Auth callback has released its lock.
+        setTimeout(() => { if (active) checkSession(currentSession); }, 0);
+      }
     });
 
     const syncNotifSettingsFromDb = async () => {
@@ -204,7 +216,7 @@ export function AdminView() {
     };
     syncNotifSettingsFromDb();
 
-    return () => subscription.unsubscribe();
+    return () => { active = false; authVersion++; subscription.unsubscribe(); };
   }, []);
 
   // Products Tab State
@@ -413,7 +425,7 @@ export function AdminView() {
           setAuthError(userFriendlyMsg);
           showToast('تعذر الاتصال بالسيرفر - يرجى تعطيل AdBlocker أو التأكد من الإنترنيت', 'error');
         } else if (error.message.includes('Invalid login credentials')) {
-          setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التأكد من إضافة المستخدم في Supabase Dashboard > Authentication > Users.');
+          setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
           showToast('بيانات الدخول غير صحيحة', 'error');
         } else {
           setAuthError(error.message || 'بيانات الدخول غير صحيحة');
