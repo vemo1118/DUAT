@@ -1,332 +1,76 @@
-import { useCheckoutSettings } from '../context/CheckoutSettingsContext';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { X, Trash2, Plus, Minus, ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useCheckoutSettings } from '../context/CheckoutSettingsContext';
 import { useToast } from '../context/ToastContext';
-import { useTheme } from '../context/ThemeContext';
-import { X, Trash2, Plus, Minus, ArrowRight, ArrowLeft, Tag, ShoppingBag, MessageSquare } from 'lucide-react';
-import { generateWhatsAppOrderLink } from '../utils/orderNotifier';
-
 import { CustomStickerThumbnail } from './CustomStickerThumbnail';
-import { checkoutMessage, PRICING } from '../domain/commerce';
+import { checkoutMessage, PRICING, ORDER_LIMITS } from '../domain/commerce';
 
-export const CartDrawer = () => {
-  const {
-    items,
-    isOpen,
-    toggleCart,
-    removeFromCart,
-    updateQuantity,
-    subtotal,
-    discount,
-    total,
-    promoCode,
-    applyPromoCode,
-    pricing,
-    checkoutIssue
-  } = useCart();
-
+export function CartDrawer() {
+  const { items, isOpen, toggleCart, removeFromCart, updateQuantity, subtotal, discount, total, promoCode, applyPromoCode, pricing, checkoutIssue } = useCart();
   const { lang, t, formatPrice } = useLanguage();
-  const { theme } = useTheme();
-  const { settings: checkoutSettings } = useCheckoutSettings();
+  const { settings } = useCheckoutSettings();
   const { showToast } = useToast();
-  const navigate = useNavigate();
-
-  const [inputPromo, setInputPromo] = useState('');
-  const isRtl = lang === 'ar';
-  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
-
-  const cartList = items || [];
-  const calculatedTotal = total ?? Math.max(0, (subtotal || 0) - (discount || 0));
-
-  if (!isOpen) return null;
-
-  const handleApplyPromo = async () => {
-    if (!inputPromo.trim()) return;
-    const success = await applyPromoCode(inputPromo.trim());
-    if (success) {
-      showToast(t('promoSuccessToast'), 'success');
-    } else {
-      showToast(t('promoInvalidToast'), 'error');
-    }
-    setInputPromo('');
-  };
-
-  const handleProceedCheckout = () => {
-    if (checkoutIssue) {
-      showToast(checkoutMessage(checkoutIssue, isRtl), 'info');
-      return;
-    }
-    toggleCart();
-    navigate('/checkout');
-  };
-
-  const handleWhatsAppCheckout = () => {
-    if (pricing.customQuantity) {
-      showToast(isRtl ? 'كمّل حجز الكستمايز من الموقع لحفظ تصميماتك.' : 'Complete custom pre-orders on the website to keep your designs attached.', 'info');
-      return;
-    }
-    const tempOrder = {
-      id: `WA-${Date.now().toString().slice(-6)}`,
-      items: cartList,
-      totalPrice: calculatedTotal,
-      customerName: 'طلب مباشر عبر واتساب'
+  const navigate = useNavigate(), panel = useRef(null);
+  const [inputPromo, setInputPromo] = useState(''), [applying, setApplying] = useState(false);
+  const isAr = lang === 'ar', Arrow = isAr ? ArrowLeft : ArrowRight;
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement, overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panel.current?.querySelector('button')?.focus();
+    const keydown = event => {
+      if (event.key === 'Escape') toggleCart();
+      if (event.key === 'Tab') {
+        const nodes = [...panel.current.querySelectorAll('button:not([disabled]),a[href],input,summary')].filter(n => n.getClientRects().length);
+        const first = nodes[0], last = nodes.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
     };
-    const waUrl = generateWhatsAppOrderLink(tempOrder);
-    window.open(waUrl, '_blank');
+    document.addEventListener('keydown', keydown);
+    return () => { document.body.style.overflow = overflow; document.removeEventListener('keydown', keydown); previous?.focus?.(); };
+  }, [isOpen]);
+  if (!isOpen) return null;
+  const issue = !settings.enabled ? 'CHECKOUT_PAUSED' : checkoutIssue;
+  const proceed = () => {
+    if (issue) { showToast(checkoutMessage(issue, isAr), 'info'); return; }
+    toggleCart(); navigate('/checkout');
   };
-
-  const isDawn = theme === 'dawn';
-
-  const drawerContent = (
-    <div className="fixed inset-0 z-[9999] overflow-hidden" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* Dimmed Dark Backdrop Overlay */}
-      <div
-        onClick={toggleCart}
-        className="fixed inset-0 bg-[#000000]/80 backdrop-blur-sm animate-drawer-fade z-[9999]"
-      />
-
-      {/* Slide-out Panel Positioning */}
-      <div className={`fixed inset-y-0 ${isRtl ? 'left-0' : 'right-0'} w-full max-w-md z-[10000] flex flex-col`}>
-        
-        {/* 100% Solid Opaque Drawer Surface — No Overlap or Bleed-Through */}
-        <div className={`w-full h-full ${isDawn ? 'bg-[#EFEAE0] text-[#1A1714] border-[#DCD4C7]' : 'bg-[#14110F] text-[#F0EBE0] border-[#2E2823]'} border-x shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col relative z-[10001] overflow-hidden animate-drawer-slide`}>
-          
-          {/* Header Row — Fixed & Completely Above Page/Nav */}
-          <div className={`p-6 ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} border-b flex items-center justify-between flex-shrink-0`}>
-            <div className="flex items-center gap-3">
-              <ShoppingBag size={22} className="text-[#E0A93B]" />
-              <h2 className="font-clash text-xl uppercase tracking-wider font-bold">
-                {t('cartTitle')} ({cartList.reduce((sum, item) => sum + item.quantity, 0)})
-              </h2>
-            </div>
-            <button
-              onClick={toggleCart}
-              className={`p-2.5 transition-colors border ${isDawn ? 'bg-[#EFEAE0] border-[#DCD4C7] text-[#524C44] hover:text-[#E0A93B]' : 'bg-[#14110F] border-[#2E2823] text-[#8E877D] hover:text-[#E0A93B]'} min-h-[44px] min-w-[44px] flex items-center justify-center`}
-              aria-label="Close cart"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Smart Bundle Nudge Bar */}
-          {(() => {
-            const stickerTotalCount = pricing.stockQuantity;
-            if (stickerTotalCount === 0) return null;
-
-            return (
-              <div className="bg-gold/10 border-b border-gold/30 px-5 py-3 font-mono text-xs text-gold flex items-center gap-2">
-                <Tag size={15} className="flex-shrink-0" />
-                <span>{stickerTotalCount >= PRICING.stockMinimum
-                  ? (isRtl ? 'الجاهز اتحسب بـ50 ج للقطعة.' : 'Ready-made stickers are now EGP 50 each.')
-                  : (isRtl ? `أضف ${PRICING.stockMinimum - stickerTotalCount} من الجاهز عشان القطعة تتحسب بـ50 ج.` : `Add ${PRICING.stockMinimum - stickerTotalCount} ready-made stickers for EGP 50 each.`)}</span>
-              </div>
-            );
-          })()}
-          {pricing.customQuantity > 0 && (
-            <div className="px-5 py-3 text-sm border-b border-gold/30" aria-live="polite">
-              <p>{isRtl ? `كستمايز: ${pricing.customQuantity} قطعة × 45 ج` : `Custom: ${pricing.customQuantity} pieces × EGP 45`}</p>
-              {checkoutIssue && <p>{checkoutMessage(checkoutIssue, isRtl)}</p>}
-              <button className="text-gold underline mt-2" onClick={() => { toggleCart(); navigate('/sticker-builder'); }}>
-                {isRtl ? 'صمّم قطعة تانية' : 'Design another piece'}
-              </button>
-            </div>
-          )}
-
-          {/* Body — Scrollable Items List or Empty State */}
-          <div className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDawn ? 'bg-[#EFEAE0]' : 'bg-[#14110F]'}`}>
-            {cartList.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-16">
-                <div className={`w-16 h-16 rounded-full ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} border flex items-center justify-center text-[#E0A93B]`}>
-                  <ShoppingBag size={32} />
-                </div>
-                <p className="font-space text-sm font-medium text-ash max-w-xs leading-relaxed">
-                  {t('cartEmpty')}
-                </p>
-                <button
-                  onClick={() => {
-                    toggleCart();
-                    navigate('/shop');
-                  }}
-                  className="btn-primary py-3 px-6 text-xs font-mono font-bold uppercase tracking-wider"
-                >
-                  {t('heroCtaSecondary')}
-                </button>
-              </div>
-            ) : (
-              cartList.map((item) => (
-                <div
-                  key={item.cartItemId || item.id}
-                  className={`p-4 border ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} flex gap-3 justify-between items-start card-depth-highlight`}
-                >
-                  <div className="w-14 h-14 bg-stone border border-grave rounded flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
-                    <CustomStickerThumbnail item={item} />
-                  </div>
-
-                  <div className="flex-1 space-y-1 min-w-0">
-                    <h3 className="font-space font-bold text-sm truncate">
-                      {isRtl ? item.nameAr : item.nameEn}
-                    </h3>
-                    { (item.tagAr || item.tagEn) && (
-                      <p className="font-mono text-[10px] uppercase tracking-wider opacity-75">
-                        {isRtl ? item.tagAr : item.tagEn}
-                      </p>
-                    )}
-                    {item.customDetails?.customText && (
-                      <p className="font-mono text-[10px] text-[#E0A93B] font-bold">
-                        ✍️ "{item.customDetails.customText}"
-                      </p>
-                    )}
-                    {item.customConfig?.phoneModel && (
-                      <p className="font-mono text-[10px] text-[#E0A93B] uppercase font-bold">
-                        📱 {item.customConfig.phoneModel}
-                      </p>
-                    )}
-                    <p className="font-mono text-sm text-[#E0A93B] font-bold pt-1">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-end justify-between h-full space-y-3">
-                    <button
-                      onClick={() => removeFromCart(item.cartItemId || item.id)}
-                      className="text-ash hover:text-[#D9432E] transition-colors p-1"
-                      title="Remove item"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-
-                    <div className={`flex items-center border ${isDawn ? 'border-[#DCD4C7] bg-[#EFEAE0]' : 'border-[#2E2823] bg-[#14110F]'}`}>
-                      <button
-                        onClick={() => updateQuantity(item.cartItemId || item.id, item.quantity - 1)}
-                        className="px-2.5 py-1 hover:text-[#E0A93B] min-h-[36px] font-bold"
-                      >
-                        <Minus size={12} />
-                      </button>
-                      <span className="font-mono text-xs px-2.5 font-bold">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.cartItemId || item.id, item.quantity + 1)}
-                        className="px-2.5 py-1 hover:text-[#E0A93B] min-h-[36px] font-bold"
-                      >
-                        <Plus size={12} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Footer & Checkout Area */}
-          {cartList.length > 0 && (
-            <div className={`p-6 border-t ${isDawn ? 'bg-[#E5DFC5] border-[#DCD4C7]' : 'bg-[#1F1B17] border-[#2E2823]'} space-y-4 flex-shrink-0`}>
-              
-              {/* Promo Code Input */}
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Tag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ash" />
-                  <input
-                    type="text"
-                    value={inputPromo}
-                    onChange={(e) => setInputPromo(e.target.value)}
-                    placeholder={t('promoPlaceholder')}
-                    className={`w-full border ${isDawn ? 'bg-[#EFEAE0] border-[#DCD4C7] text-[#1A1714]' : 'bg-[#14110F] border-[#2E2823] text-[#F0EBE0]'} pl-9 pr-3 py-2 font-mono text-xs uppercase focus:border-[#E0A93B] outline-none min-h-[44px]`}
-                  />
-                </div>
-                <button
-                  onClick={handleApplyPromo}
-                  className="btn-ghost px-4 text-xs min-h-[44px]"
-                >
-                  {t('applyPromo')}
-                </button>
-              </div>
-
-              {promoCode && (
-                <div className="font-mono text-xs text-[#E0A93B] flex justify-between items-center p-2.5 border border-[#E0A93B]/30 bg-stone">
-                  <span>COUPON APPLIED: {promoCode}</span>
-                  <span>-{formatPrice(discount)}</span>
-                </div>
-              )}
-
-              {/* Free Shipping Progress Bar Nudge (800 EGP Target) */}
-              {(() => {
-                const target = checkoutSettings.freeShippingThreshold;
-                if (checkoutSettings.shippingMode === 'later') return <p className="text-sm text-gold">{checkoutSettings[isRtl ? 'shippingLaterAr' : 'shippingLaterEn']}</p>;
-                if (target <= 0) return null;
-                const needed = Math.max(0, target - subtotal);
-                const percent = Math.min(100, (subtotal / target) * 100);
-                return (
-                  <div className={`p-3 border ${isDawn ? 'bg-[#EFEAE0] border-[#DCD4C7]' : 'bg-[#14110F] border-[#2E2823]'} space-y-2`}>
-                    <div className="flex justify-between items-center font-mono text-xs">
-                      <span className="font-medium">
-                        {needed > 0
-                          ? (isRtl ? `أضف ${needed} ج للحصول على شحن مجاني (من ${target} ج)` : `Add ${needed} EGP for FREE shipping (from ${target} EGP)`)
-                          : (isRtl ? '🎉 حصلت على شحن مجاني!' : '🎉 Free shipping unlocked!')}
-                      </span>
-                      <span className="text-[#E0A93B] font-bold">{Math.round(percent)}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#1F1B17] rounded-full overflow-hidden border border-[#2E2823]">
-                      <div
-                        className="h-full bg-gradient-to-r from-[#E0A93B] via-amber-400 to-[#E0A93B] transition-all duration-500"
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Subtotal & Totals */}
-              <div className="space-y-1.5 font-mono text-xs pt-2">
-                <div className="flex justify-between opacity-80">
-                  <span>{t('subtotal')}</span>
-                  <span>{formatPrice(subtotal)}</span>
-                </div>
-
-                {discount > 0 && (
-                  <div className="flex justify-between text-[#E0A93B] font-bold">
-                    <span>{t('discount')}</span>
-                    <span>-{formatPrice(discount)}</span>
-                  </div>
-                )}
-
-                <div className={`flex justify-between text-base font-bold pt-2 border-t ${isDawn ? 'border-[#DCD4C7]' : 'border-[#2E2823]'}`}>
-                  <span>TOTAL</span>
-                  <span className="text-[#E0A93B]">{formatPrice(calculatedTotal)}</span>
-                </div>
-              </div>
-
-              {/* Checkout CTA Buttons */}
-              <div className="space-y-2 pt-1">
-                <button
-                  onClick={handleProceedCheckout}
-                  className="btn-primary w-full py-3.5 text-xs font-mono font-bold tracking-widest flex items-center justify-center gap-2"
-                >
-                  <span>{t('checkoutBtn')}</span>
-                  <ArrowIcon size={16} />
-                </button>
-
-                <button
-                  onClick={handleWhatsAppCheckout}
-                  className="w-full py-3 bg-[#25D366] hover:bg-[#20bd5a] text-[#0A0C16] font-mono text-xs font-bold tracking-wider transition-colors flex items-center justify-center gap-2 rounded-sm shadow-md"
-                >
-                  <MessageSquare size={15} />
-                  <span>طلب مباشر عبر الواتساب</span>
-                </button>
-              </div>
-
-            </div>
-          )}
-
-        </div>
+  return ReactDOM.createPortal(<div className="fixed inset-0 z-[9999] text-bone" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="absolute inset-0 bg-black/65" onClick={toggleCart}/>
+    <div ref={panel} role="dialog" aria-modal="true" aria-labelledby="cart-heading" className="absolute inset-y-0 end-0 w-full max-w-md bg-stone border-s border-grave flex flex-col h-[100dvh] shadow-xl">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-grave shrink-0">
+        <h2 id="cart-heading" className="font-bold text-lg flex items-center gap-2"><ShoppingBag size={20} className="text-gold"/>{isAr ? 'سلة طلبك' : 'Your cart'} <span className="text-ash text-sm">({items.reduce((n, i) => n + i.quantity, 0)})</span></h2>
+        <button type="button" aria-label={isAr ? 'إغلاق السلة' : 'Close cart'} onClick={toggleCart} className="w-11 h-11 flex items-center justify-center rounded-lg border border-grave"><X size={20}/></button>
       </div>
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4" data-cart-scroll>
+        {!items.length ? <div className="py-14 text-center space-y-5"><ShoppingBag size={36} className="mx-auto text-ash"/><p>{t('cartEmpty')}</p><button type="button" className="btn-primary p-3 w-full rounded-lg" onClick={() => { toggleCart(); navigate('/stickers'); }}>{isAr ? 'شوف الاستيكرات' : 'Browse stickers'}</button></div> : <>
+          {pricing.customQuantity > 0 && <div className="text-sm bg-gold/10 border border-gold/30 rounded-lg p-3 leading-6"><p>{isAr ? `كستمايز: ${pricing.customQuantity} قطعة × 45 جنيه` : `Custom: ${pricing.customQuantity} × EGP 45`}</p>{checkoutIssue && <p>{checkoutMessage(checkoutIssue, isAr)}</p>}<button type="button" className="underline text-gold min-h-11" onClick={() => { toggleCart(); navigate('/sticker-builder'); }}>{isAr ? 'صمّم قطعة تانية' : 'Design another piece'}</button></div>}
+          {pricing.stockQuantity > 0 && <p className="text-xs text-ash leading-6">{pricing.stockQuantity >= PRICING.stockMinimum ? (isAr ? 'الجاهز اتحسب بـ50 جنيه للقطعة.' : 'Ready-made pieces are EGP 50 each.') : (isAr ? `زوّد ${PRICING.stockMinimum - pricing.stockQuantity} من الجاهز عشان القطعة تتحسب بـ50 جنيه.` : `Add ${PRICING.stockMinimum - pricing.stockQuantity} ready-made pieces for EGP 50 each.`)}</p>}
+          <div className="space-y-3">{items.map(item => <div key={item.cartItemId || item.id} className="bg-coal border border-grave rounded-xl p-3 flex gap-3 items-start" data-cart-item>
+            <div className="w-16 h-16 shrink-0 rounded-lg bg-stone border border-grave p-1 flex items-center justify-center overflow-hidden"><CustomStickerThumbnail item={item}/></div>
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex items-start gap-2 justify-between"><h3 className="text-sm font-bold break-words min-w-0">{isAr ? item.nameAr : item.nameEn}</h3><button type="button" aria-label={`${isAr ? 'احذف' : 'Remove'} ${isAr ? item.nameAr : item.nameEn}`} onClick={() => removeFromCart(item.cartItemId || item.id)} className="shrink-0 w-11 h-11 -mt-2 -me-2 flex items-center justify-center text-ash"><Trash2 size={16}/></button></div>
+              <p className="text-xs text-ash">{formatPrice(item.price)} {isAr ? 'للقطعة' : 'each'}</p>
+              <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex items-center border border-grave rounded-lg bg-stone"><button type="button" aria-label={isAr ? 'تقليل العدد' : 'Decrease quantity'} onClick={() => updateQuantity(item.cartItemId || item.id, item.quantity - 1)} className="w-11 h-11 flex items-center justify-center"><Minus size={14}/></button><span className="min-w-6 text-center text-sm">{item.quantity}</span><button type="button" aria-label={isAr ? 'زيادة العدد' : 'Increase quantity'} disabled={item.quantity >= ORDER_LIMITS.quantityPerLine} onClick={() => updateQuantity(item.cartItemId || item.id, item.quantity + 1)} className="w-11 h-11 flex items-center justify-center disabled:opacity-40"><Plus size={14}/></button></div><strong className="text-sm text-gold whitespace-nowrap">{formatPrice(item.price * item.quantity)}</strong></div>
+            </div>
+          </div>)}</div>
+          <details className="border-t border-grave pt-2"><summary className="min-h-11 flex items-center cursor-pointer text-sm text-ash">{isAr ? 'عندك كود خصم؟' : 'Have a discount code?'}</summary><div className="flex gap-2 pt-2"><input value={inputPromo} onChange={e => setInputPromo(e.target.value)} aria-label={isAr ? 'كود الخصم' : 'Discount code'} className="min-w-0 flex-1 bg-coal border border-grave rounded-lg px-3 text-base min-h-11"/><button type="button" disabled={applying} className="btn-ghost px-3 min-h-11 rounded-lg" onClick={async () => { if (!inputPromo.trim()) return; setApplying(true); const ok = await applyPromoCode(inputPromo.trim()); showToast(ok ? t('promoSuccessToast') : t('promoInvalidToast'), ok ? 'success' : 'error'); setApplying(false); }}>{applying ? '…' : t('applyPromo')}</button></div></details>
+          {promoCode && <p className="text-sm text-gold">{promoCode}: −{formatPrice(discount)}</p>}
+          <div className="text-xs text-ash leading-6">{settings.shippingMode === 'later' ? settings[isAr ? 'shippingLaterAr' : 'shippingLaterEn'] : settings.freeShippingThreshold > 0 ? (subtotal >= settings.freeShippingThreshold ? (isAr ? 'الشحن مجاني للطلب ده.' : 'Shipping is free for this order.') : (isAr ? `الشحن بيتحسب حسب المحافظة. شحن مجاني من ${settings.freeShippingThreshold} جنيه.` : `Shipping is calculated by governorate. Free shipping from EGP ${settings.freeShippingThreshold}.`)) : (isAr ? 'الشحن بيتحسب حسب المحافظة في صفحة الطلب.' : 'Shipping is calculated by governorate at checkout.')}</div>
+        </>}
+      </div>
+      {!!items.length && <div className="shrink-0 border-t border-grave p-4 bg-stone space-y-3" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }} data-cart-footer>
+        {discount > 0 && <p className="flex justify-between text-xs text-ash"><span>{isAr ? 'قبل الخصم' : 'Before discount'}</span><span>{formatPrice(subtotal)}</span></p>}
+        <div className="flex items-center justify-between gap-3"><div><strong className="text-sm">{isAr ? 'إجمالي المنتجات' : 'Items total'}</strong><p className="text-xs text-ash mt-1">{isAr ? 'قبل الشحن' : 'Before shipping'}</p></div><strong className="text-xl text-gold">{formatPrice(total)}</strong></div>
+        <button type="button" onClick={proceed} disabled={!!issue} className="btn-primary w-full rounded-lg min-h-12 p-3 text-sm font-bold flex items-center justify-center gap-3 disabled:opacity-50">{t('checkoutBtn')}<Arrow size={17}/></button>
+        {issue && <p className="text-xs text-gold leading-5">{checkoutMessage(issue, isAr)}</p>}
+      </div>}
     </div>
-  );
-
-  return ReactDOM.createPortal(drawerContent, document.body);
-};
-
+  </div>, document.body);
+}
 export default CartDrawer;

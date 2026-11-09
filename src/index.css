@@ -488,20 +488,14 @@ button, a.btn, select, input[type="submit"] {
   background: var(--ember);
 }
 
-/* The workbench stays light independently of the storefront theme. */
-.sticker-builder {
-  --void: #faf6f0; --void-rgb: 250 246 240;
-  --stone: #fffdf9; --stone-rgb: 255 253 249;
-  --coal: #f1ece2; --coal-rgb: 241 236 226;
-  --grave: #d9d1c3; --grave-rgb: 217 209 195;
-  --bone: #232a55; --bone-rgb: 35 42 85;
-  --ash: #666052; --ash-rgb: 102 96 82;
-  --gold: #986016; --gold-rgb: 152 96 22;
-  background: #faf6f0;
-  border-radius: 24px;
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
+/* Builder surfaces inherit the selected storefront theme. */
+.builder-text-preview { width: 220px; height: 220px; max-width: 100%; flex-shrink: 0; box-shadow: 0 5px 8px rgb(0 0 0 / .12); }
+.builder-artwork { display: block; width: auto; height: auto; max-width: 100%; max-height: 220px; object-fit: contain; filter: drop-shadow(0 5px 8px rgb(0 0 0 / .12)); }
+.builder-artwork.hidden { display: none; }
+.builder-swatch { width: 100%; aspect-ratio: 1; min-height: 30px; }
+.builder-swatch[aria-pressed="true"] { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (min-width: 640px) { .builder-artwork { max-height: 260px; } }
+@media (min-width: 1024px) { .builder-stage { min-height: 400px; } .builder-artwork { max-height: 300px; } }
 
 /* Dashboard-controlled pre-order popup overlay */
 dialog.preorder-popup::backdrop {
@@ -524,3 +518,7 @@ dialog.preorder-popup::backdrop {
   background: linear-gradient(158deg, #ffffff9e 0%, #ffffff25 14%, transparent 30%, transparent 71%, #26203117 100%);
   box-shadow: inset 0 1px 2px #ffffffeb, inset 0 -2px 3px #382c4533, inset 0 0 0 1px #3424352b;
 }
+
+@media (max-width: 767px) { .checkout-view input, .checkout-view select, .checkout-view textarea, .builder-controls textarea { font-size: 16px; } }
+
+.builder-text-preview .builder-print-text { font-family: var(--art-font) !important; font-weight: 700 !important; line-height: 1.65 !important; letter-spacing: 0 !important; word-spacing: 0 !important; }

@@ -240,7 +240,7 @@ export const CheckoutView = ({ setView }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 min-h-screen">
+    <div className="checkout-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 min-h-screen">
       
       {/* Header */}
       <div className="space-y-2 border-b border-grave pb-6">
@@ -274,10 +274,10 @@ export const CheckoutView = ({ setView }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Customer Details Form */}
-        <form onSubmit={handleSubmitOrder} className="lg:col-span-7 space-y-8">
+        <form onSubmit={handleSubmitOrder} className="lg:col-span-7 space-y-5 sm:space-y-8">
           
           {/* Shipping Details */}
-          <div className="bg-stone border border-grave p-6 space-y-6">
+          <div className="bg-stone border border-grave rounded-xl p-4 sm:p-6 space-y-5">
             <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2 border-b border-grave pb-3">
               <Truck size={16} />
               <span>{t('shippingInfo')}</span>
@@ -290,6 +290,7 @@ export const CheckoutView = ({ setView }) => {
                 </label>
                 <input
                   type="text"
+                  autoComplete="name"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -305,6 +306,8 @@ export const CheckoutView = ({ setView }) => {
                   </label>
                   <input
                     type="tel"
+                    autoComplete="tel"
+                    inputMode="tel"
                     required
                     value={phone}
                     onChange={handlePhoneChange}
@@ -360,7 +363,7 @@ export const CheckoutView = ({ setView }) => {
           {settings.showNotes && <label className="block space-y-2">{isRtl ? 'ملاحظات الطلب (اختياري)' : 'Order notes (optional)'}<textarea maxLength={1500} value={notes} onChange={e => setNotes(e.target.value)} className="w-full bg-coal border border-grave p-3 text-bone" /></label>}
           {settingsError && <button type="button" onClick={reloadSettings}>{isRtl ? 'تعذر تحميل طرق الدفع — إعادة المحاولة' : 'Could not load payment settings — retry'}</button>}
           {/* Payment methods */}
-          <div className="bg-stone border border-grave p-6 space-y-6">
+          <div className="bg-stone border border-grave rounded-xl p-4 sm:p-6 space-y-5">
             <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2 border-b border-grave pb-3">
               <CreditCard size={16} />
               <span>{t('paymentMethod')}</span>
@@ -399,10 +402,10 @@ export const CheckoutView = ({ setView }) => {
               <div className="p-5 bg-coal border border-gold/50 space-y-4 font-mono text-xs">
                 <p className="text-bone text-base font-bold">{isRtl ? 'المبلغ المطلوب تحويله: ' : 'Amount to transfer: '}{formatPrice(finalTotal)}</p>
                 {shippingLater && <p className="text-gold">{localText('shippingLater')}</p>}
-                <div className="flex items-center justify-between gap-4 border-b border-grave/60 pb-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-grave/60 pb-3">
                   <div>
                     <span className="text-ash block text-[10px] uppercase">{isRtl ? 'بيانات التحويل:' : 'TRANSFER TO:'}</span>
-                    <span className="text-gold font-bold text-sm break-all" dir="ltr">{activePayment.account}</span>
+                    <span className="text-gold font-bold text-sm break-all inline-block max-w-full" dir="ltr">{activePayment.account}</span>
                   </div>
                   <button
                     type="button"
@@ -410,7 +413,7 @@ export const CheckoutView = ({ setView }) => {
                     className="btn-ghost py-2 px-3 text-[11px] flex items-center gap-1.5 min-h-[44px]"
                   >
                     <Copy size={13} />
-                    <span>{isRtl ? 'نسخ العنوان' : 'Copy Handle'}</span>
+                    <span>{isRtl ? 'نسخ البيانات' : 'Copy details'}</span>
                   </button>
                 </div>
 
@@ -478,12 +481,12 @@ export const CheckoutView = ({ setView }) => {
         </form>
 
         {/* Right Column: Summary Stack */}
-        <div className="lg:col-span-5 bg-stone border border-grave p-6 space-y-6">
+        <div className="order-first lg:order-none lg:col-span-5 bg-stone border border-grave rounded-xl p-4 sm:p-6 space-y-4">
           <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold border-b border-grave pb-3">
             {t('orderSummary')} ({cartItems.length})
           </h3>
 
-          <div className="space-y-3 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
+          <div className="space-y-3 max-h-48 lg:max-h-96 overflow-y-auto pr-1 custom-scrollbar">
             {cartItems.map((item) => {
               const name = isRtl ? (item.nameAr || item.nameEn || item.name) : (item.nameEn || item.nameAr || item.name);
               const cDetails = item.customDetails || item.customConfig || {};
@@ -566,7 +569,7 @@ export const CheckoutView = ({ setView }) => {
             </div>
 
             <div className="flex justify-between items-center text-sm font-bold border-t border-grave pt-3 text-gold">
-              <span>TOTAL</span>
+              <span>{isRtl ? 'الإجمالي' : 'Total'}</span>
               <span className="text-base">{formatPrice(finalTotal)}</span>
             </div>
           </div>

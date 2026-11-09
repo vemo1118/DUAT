@@ -29,19 +29,19 @@ export const Navbar = ({ onOpenTracker }) => {
 
   return (
     <header className="sticky top-0 z-40 bg-void/90 backdrop-blur-md border-b border-grave text-bone transition-colors shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
           
           {/* LOGO LOCKUP: SunDisc + DUAT Typography (Left in LTR, Right in RTL) */}
-          <Link to="/" className="flex items-center gap-3 group focus:outline-none min-h-[44px]">
-            <SunDisc size={28} variant="gold" />
-            <span className="brand-wordmark text-2xl text-bone">
+          <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-3 group focus:outline-none min-h-[44px]">
+            <SunDisc size={24} variant="gold" />
+            <span className="brand-wordmark text-xl sm:text-2xl text-bone">
               DUAT
             </span>
           </Link>
 
           {/* DESKTOP NAVIGATION LINKS CENTER (MD+) */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
+          <nav className="hidden xl:flex items-center gap-8 lg:gap-12">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
@@ -66,12 +66,12 @@ export const Navbar = ({ onOpenTracker }) => {
           </nav>
 
           {/* RIGHT / LEFT ACTIONS (RTL-BALANCED): TRACKER, THEME, BILINGUAL TOGGLE & CART */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             
             {/* Shipment Order Tracker Button */}
             <button
               onClick={handleTrackerClick}
-              className="hidden sm:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ash hover:text-gold transition-colors border border-grave bg-stone/50 px-3 py-2 min-h-[44px] rounded-sm"
+              className="hidden lg:flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ash hover:text-gold transition-colors border border-grave bg-stone/50 px-3 py-2 min-h-[44px] rounded-sm"
               title={t('trackOrderNav')}
             >
               <Truck size={14} className="text-gold" />
@@ -139,7 +139,7 @@ export const Navbar = ({ onOpenTracker }) => {
             {/* Mobile Hamburger Trigger (<768px) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 text-bone hover:text-gold border border-grave bg-stone flex items-center justify-center min-h-[44px] min-w-[44px] rounded-sm"
+              className="xl:hidden p-2.5 text-bone hover:text-gold border border-grave bg-stone flex items-center justify-center min-h-[44px] min-w-[44px] rounded-sm"
               aria-label="Toggle Mobile Menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -152,7 +152,7 @@ export const Navbar = ({ onOpenTracker }) => {
 
       {/* MOBILE DRAWER NAVIGATION MENU (<768px) */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-stone border-b border-grave px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
+        <div className="xl:hidden bg-stone border-b border-grave px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
           <nav className="flex flex-col space-y-3">
             {navLinks.map((link) => (
               <NavLink

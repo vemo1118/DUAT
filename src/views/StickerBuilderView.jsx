@@ -1,772 +1,171 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { toPng } from 'html-to-image';
+import { Image as ImageIcon, Type, Upload, ShoppingBag, Loader2, Check, Plus, Minus, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { uploadDesignDataUrl } from '../services/orderApi';
+import { uploadOrderFile } from '../services/orderApi';
 import { PRICING, ORDER_LIMITS } from '../domain/commerce';
-import { imageLayout, renderImageSticker } from '../domain/stickerArtwork';
-import { SunDisc } from '../components/SunDisc';
-import { Type, Image as ImageIcon, Sparkles, ShoppingBag, RotateCcw, Upload, Check, Info, ChevronLeft, ChevronRight, Layers, Palette, Eye, Shield, Tag, Loader2 } from 'lucide-react';
+import { imageLayout, drawImageSticker } from '../domain/stickerArtwork';
+import { BUILDER_COLORS, BUILDER_FONTS, contrastRatio, textStickerLayout, drawTextSticker, canvasBlob, blobDataUrl } from '../domain/builderArtwork';
 
-const EXPORT_LAYOUTS = {
-  pill: { width: 1200, height: 480, borderRadius: 240, paddingX: 120, paddingY: 70 },
-  badge: { width: 1200, height: 560, borderRadius: 48, paddingX: 110, paddingY: 80 },
-  circle: { width: 800, height: 800, borderRadius: 400, paddingX: 100, paddingY: 100 },
-  shield: { width: 1000, height: 700, borderRadius: 60, paddingX: 110, paddingY: 100 }
-};
+// Retained for older print-layout callers. The current UI offers square and circle.
+export function getStickerExportLayout(shape, text) {
+  const layouts = { pill: [1200, 480], circle: [1000, 1000], square: [1000, 1000] };
+  const [width, height] = layouts[shape] || layouts.square;
+  return { width, height, fontSize: Math.max(38, Math.min(180, Math.floor((width - 240) / (Math.max(1, Array.from(text).length) * .66)))) };
+}
 
-const EXPORT_BACKGROUNDS = {
-  obsidian: { background: '#121214', borderColor: 'rgba(224, 169, 59, 0.45)' },
-  clear: { background: 'rgba(10, 12, 22, 0.35)', borderColor: 'rgba(239, 234, 224, 0.45)' },
-  'gold-foil': { background: 'linear-gradient(90deg, #8f5d12 0%, #e0a93b 50%, #8f5d12 100%)', borderColor: '#e0a93b' },
-  ivory: { background: '#efeae0', borderColor: '#d8cfbc' },
-  amber: { background: 'rgba(217, 119, 6, 0.38)', borderColor: 'rgba(217, 119, 6, 0.75)' }
-};
-
-export function getStickerExportLayout(cutShape, text) {
-  const layout = EXPORT_LAYOUTS[cutShape] || EXPORT_LAYOUTS.pill;
-  const characterCount = Math.max(1, Array.from(String(text || '').trim()).length);
-  const availableWidth = layout.width - (layout.paddingX * 2);
-  const estimatedCharacterWidth = cutShape === 'circle' ? 0.72 : 0.66;
-  const maxByWidth = availableWidth / (characterCount * estimatedCharacterWidth);
-  const shapeMaximum = cutShape === 'circle' ? 112 : 128;
-
-  return {
-    ...layout,
-    fontSize: Math.max(38, Math.min(shapeMaximum, Math.floor(maxByWidth)))
-  };
+function ColorPicker({ label, value, onChange, isAr, transparent = false }) {
+  return <fieldset className="space-y-3 min-w-0">
+    <legend className="text-sm font-bold text-bone">{label}</legend>
+    <div className="grid grid-cols-8 gap-2">
+      {BUILDER_COLORS.map(c => <button key={c.id} type="button" onClick={() => onChange(c.color)} aria-label={`${label}: ${isAr ? c.nameAr : c.nameEn}`} aria-pressed={value === c.color} title={isAr ? c.nameAr : c.nameEn} className="builder-swatch rounded-full border border-grave flex items-center justify-center" style={{ backgroundColor: c.color }}>
+        {value === c.color && <Check size={18} strokeWidth={3} color={contrastRatio(c.color, '#FFFFFF') > 3 ? '#FFFFFF' : '#171B2E'} />}
+      </button>)}
+    </div>
+    {transparent && <button type="button" aria-pressed={value === 'clear'} onClick={() => onChange('clear')} className={`text-xs min-h-11 px-3 border rounded-lg ${value === 'clear' ? 'border-gold text-gold' : 'border-grave text-ash'}`}>{isAr ? 'خلفية شفافة (للـPNG)' : 'Transparent background (PNG)'}</button>}
+  </fieldset>;
 }
 
 export function StickerBuilderView() {
-  const { lang, t, formatPrice } = useLanguage();
+  const { lang, formatPrice } = useLanguage(), isAr = lang === 'ar';
   const { addToCart, cartItems } = useCart();
-  const { showToast: addToast } = useToast();
-
-  const isAr = lang === 'ar';
-  const isRtl = isAr;
-  const ArrowIcon = isRtl ? ChevronLeft : ChevronRight;
-
-  const [isUploading, setIsUploading] = useState(false);
-
-  // Builder Mode: 'text' or 'image'
+  const { showToast } = useToast();
   const [mode, setMode] = useState('image');
-
-  // Text Sticker State
-  const [customText, setCustomText] = useState('طالع نور');
-  const [selectedFont, setSelectedFont] = useState('camel');
-  const [textColor, setTextColor] = useState('#232A55');
-  const [bgFinish, setBgFinish] = useState('ivory');
-  const [cutShape, setCutShape] = useState('pill');
-
-  // Image Sticker State
-  const [uploadedImage, setUploadedImage] = useState(null);
+  const [text, setText] = useState('');
+  const [fontId, setFontId] = useState('cairo');
+  const [textColor, setTextColor] = useState('#171B2E');
+  const [background, setBackground] = useState('#EFEAE0');
+  const [textShape, setTextShape] = useState('square');
+  const [imageShape, setImageShape] = useState('auto');
+  const [source, setSource] = useState(null);
   const [imageScale, setImageScale] = useState(100);
-  const [borderStyle, setBorderStyle] = useState('none');
-  const [imgCutShape, setImgCutShape] = useState('auto');
-
-  // Common Options
   const [quantity, setQuantity] = useState(1);
-  const [designNotes, setDesignNotes] = useState('');
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [fontReady, setFontReady] = useState(false);
+  const [loadingImage, setLoadingImage] = useState(false);
+  const measure = useRef(null);
+  const canvas = useRef(null), fileInput = useRef(null), uploadVersion = useRef(0);
+  const font = BUILDER_FONTS.find(f => f.id === fontId);
+  const shape = mode === 'text' ? textShape : imageShape;
+  const layout = mode === 'text' ? { widthMm: 25, heightMm: 25 } : imageLayout(source?.width || 1, source?.height || 1, imageShape);
+  const customCount = cartItems.filter(i => i.id?.startsWith('custom-sticker-')).reduce((n, i) => n + i.quantity, 0);
+  const textPreview = useMemo(() => {
+    if (!measure.current) measure.current = document.createElement('canvas').getContext('2d');
+    return textStickerLayout(measure.current, { text: text.trim(), shape: textShape, fontFamily: font.family });
+  }, [text, textShape, font.family, fontReady]);
+  const canAdd = !busy && !loadingImage && (mode === 'image' ? !!source : fontReady && !!text.trim());
+  const Arrow = isAr ? ArrowLeft : ArrowRight;
 
-  const stickerExportRef = useRef(null);
-  const imageInputRef = useRef(null);
-  const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
-  const [imageArtwork, setImageArtwork] = useState(null);
-  const layout = imageLayout(imageDimensions.width, imageDimensions.height, imgCutShape);
-  const customCount = cartItems.filter(item => item.id?.startsWith('custom-sticker-')).reduce((sum, item) => sum + item.quantity, 0);
   useEffect(() => {
-    let cancelled = false;
-    setImageArtwork(null);
-    if (uploadedImage) renderImageSticker(uploadedImage, { shape: imgCutShape, background: bgFinish, border: borderStyle, scale: imageScale })
-      .then(result => { if (!cancelled) setImageArtwork(result); })
-      .catch(() => { if (!cancelled) addToast(isAr ? 'تعذر تجهيز الصورة، جرّب صورة تانية' : 'Could not prepare this image. Try another.', 'error'); });
-    return () => { cancelled = true; };
-  }, [uploadedImage, imgCutShape, bgFinish, borderStyle, imageScale]);
+    let active = true;
+    if (mode !== 'text') return;
+    setFontReady(false);
+    document.fonts.load(`700 32px "${font.family}"`, text || 'دوات DUAT').then(() => { if (active) setFontReady(true); }).catch(() => {
+      if (active) showToast(isAr ? 'تعذر تحميل الخط. جرّب خط تاني.' : 'Could not load this font. Try another.', 'error');
+    });
+    return () => { active = false; };
+  }, [font.family, mode]);
 
-  const FONTS = [
-    { id: 'camel', nameAr: 'خط دوات الملكي', nameEn: 'DUAT Royal Camel', fontClass: 'font-arabic-camel', sample: 'دوات' },
-    { id: 'ruqaa', nameAr: 'خط رقعة ديواني', nameEn: 'Traditional Ruqaa', fontClass: 'font-arabic-ruqaa', sample: 'رقعة' },
-    { id: 'kufi', nameAr: 'خط كوفي هندسي', nameEn: 'Geometric Kufi', fontClass: 'font-arabic-kufi', sample: 'كوفي' },
-    { id: 'amiri', nameAr: 'خط أميري نسخي', nameEn: 'Amiri Naskh', fontClass: 'font-arabic-amiri', sample: 'نسخ' },
-    { id: 'rakkas', nameAr: 'خط رقّاص عريض', nameEn: 'Rakkas Heavy', fontClass: 'font-arabic-rakkas', sample: 'رقاص' },
-    { id: 'cairo', nameAr: 'خط كايبرو عصري', nameEn: 'Cairo Modern Bold', fontClass: 'font-arabic-cairo', sample: 'مودرن' },
-    { id: 'changa', nameAr: 'خط تشانجا مجسّم', nameEn: 'Changa 3D Tech', fontClass: 'font-arabic-changa', sample: 'مجسم' },
-    { id: 'katibeh', nameAr: 'خط كتيبة ديواني', nameEn: 'Katibeh Script', fontClass: 'font-arabic-katibeh', sample: 'كتيبة' }
-  ];
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (!canvas.current) return;
+      if (mode === 'image' && source) {
+        drawImageSticker(canvas.current, source.image, { shape: imageShape, background, scale: imageScale, pixelsPerMm: 14.4 });
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [mode, background, source, imageShape, imageScale]);
 
-  const TEXT_COLORS = [
-    { id: 'gold', color: '#E0A93B', nameAr: 'ذهب ١٨ قيراط', nameEn: '18k Gold' },
-    { id: 'white', color: '#FFFFFF', nameAr: 'أبيض ناصع', nameEn: 'Pure White' },
-    { id: 'obsidian', color: '#121214', nameAr: 'أسود فحمي', nameEn: 'Obsidian Black' },
-    { id: 'ember', color: '#E53E3E', nameAr: 'أحمر جمري', nameEn: 'Crimson Ember' },
-    { id: 'navy', color: '#3182CE', nameAr: 'أزرق ملكي', nameEn: 'Royal Navy' },
-    { id: 'emerald', color: '#38A169', nameAr: 'أخضر مرامي', nameEn: 'Emerald Sage' }
-  ];
-
-  const BG_FINISHES = [
-    { id: 'obsidian', nameAr: 'أسود فحم لامع', nameEn: 'Obsidian Gloss', bg: 'bg-[#121214]', border: 'border-gold/40' },
-    { id: 'clear', nameAr: 'شفاف شفاف', nameEn: 'Clear Finish', bg: 'bg-void/40 backdrop-blur-md', border: 'border-bone/30' },
-    { id: 'gold-foil', nameAr: 'خلفية رقائق الذهب', nameEn: 'Gold Foil', bg: 'bg-gradient-to-r from-gold/30 via-gold/50 to-gold/30', border: 'border-gold' },
-    { id: 'ivory', nameAr: 'عاجي ألباستر', nameEn: 'Alabaster Ivory', bg: 'bg-[#EFEAE0]', border: 'border-[#D8CFBC]' },
-    { id: 'amber', nameAr: 'عنبر شفاف', nameEn: 'Translucent Amber', bg: 'bg-[#D97706]/20', border: 'border-[#D97706]/60' }
-  ];
-
-  const CUT_SHAPES = [
-    { id: 'pill', nameAr: 'قرص بيضاوي (Pill)', nameEn: 'Oval Pill', class: 'rounded-full px-8 py-4' },
-    { id: 'badge', nameAr: 'شارة مستطيلة (Badge)', nameEn: 'Rectangular Badge', class: 'rounded-md px-6 py-4' },
-    { id: 'circle', nameAr: 'قبة دائرية (Circle)', nameEn: 'Circle Dome', class: 'rounded-full w-32 h-32 flex items-center justify-center p-4' },
-    { id: 'shield', nameAr: 'درع العبور (Shield)', nameEn: 'Shield Cut', class: 'rounded-b-2xl rounded-t-sm px-6 py-4' }
-  ];
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
+  const uploadImage = async event => {
+    const file = event.target.files?.[0]; event.target.value = '';
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-      addToast(isAr ? 'اختار PNG أو JPG أو WebP بحد أقصى 5 ميجابايت' : 'Choose PNG, JPG or WebP up to 5MB.', 'error');
-      return;
+      showToast(isAr ? 'اختار PNG أو JPG أو WebP بحد أقصى 5 ميجابايت.' : 'Choose PNG, JPG or WebP up to 5MB.', 'error'); return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        if (!img.naturalWidth || !img.naturalHeight || img.naturalWidth * img.naturalHeight > 40000000) {
-          addToast(isAr ? 'الصورة كبيرة جدًا، صغّرها وحاول تاني' : 'Image is too large. Resize and retry.', 'error');
-          return;
-        }
-        setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-        setUploadedImage(reader.result);
-        setImageScale(100);
-      };
-      img.onerror = () => addToast(isAr ? 'ملف الصورة غير صالح' : 'Invalid image file.', 'error');
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
-  const basePrice = PRICING.custom;
-
-  const handleAddToCart = async () => {
-    if (mode === 'text' && !customText.trim()) {
-      addToast(isAr ? 'برجاء كتابة النص الخاص بالاستيكر أولاً' : 'Please enter custom sticker text first', 'error');
-      return;
-    }
-    if (mode === 'image' && !uploadedImage) {
-      addToast(isAr ? 'برجاء رفع صورة الاستيكر أولاً' : 'Please upload an image first', 'error');
-      return;
-    }
-
-    setIsUploading(true);
-    let stickerSnapshot = mode === 'image' ? imageArtwork : null;
-    if (mode === 'text' && stickerExportRef.current) {
-      try {
-        if (document.fonts?.ready) await document.fonts.ready;
-        const exportLayout = getStickerExportLayout(cutShape, customText);
-        stickerSnapshot = await toPng(stickerExportRef.current, {
-          cacheBust: true,
-          backgroundColor: 'transparent',
-          pixelRatio: 2,
-          width: exportLayout.width,
-          height: exportLayout.height
-        });
-      } catch (err) {
-        console.warn('Canvas snapshot capture fallback:', err);
-      }
-    }
-
-    if (!stickerSnapshot) {
-      setIsUploading(false);
-      addToast(isAr ? 'تعذر تجهيز التصميم، حاول مرة أخرى' : 'Could not prepare the design. Please retry.', 'error');
-      return;
-    }
-
-    let uploadResult;
+    const version = ++uploadVersion.current;
+    setLoadingImage(true);
+    const url = URL.createObjectURL(file);
     try {
-      uploadResult = await uploadDesignDataUrl(stickerSnapshot);
-    } catch (error) {
-      console.error('Design upload failed:', error.message);
-      setIsUploading(false);
-      addToast(isAr ? 'تعذر رفع التصميم بأمان، حاول مرة أخرى' : 'Secure design upload failed. Please retry.', 'error');
-      return;
-    }
-
-    const customItem = {
-      id: `custom-sticker-${Date.now()}`,
-      category: 'stickers',
-      nameAr: mode === 'text' ? `استيكر مخصص: "${customText}"` : `استيكر صورة مخصصة`,
-      nameEn: mode === 'text' ? `Custom Sticker: "${customText}"` : `Custom Image Sticker`,
-      price: basePrice,
-      tagAr: 'استيكر مجسم بارز مخصص',
-      tagEn: 'Custom Raised 3D Sticker',
-      craftTagAr: 'تصنيع خاص حسب الطلب • مصر',
-      craftTagEn: 'Custom Made to Order • Egypt',
-      designSnapshot: stickerSnapshot,
-      design_image_path: uploadResult.path,
-      design_upload_token: uploadResult.claimToken,
-      specsAr: [
-        mode === 'text' ? `النص: ${customText}` : `استيكر صورة مرفقة`,
-        `القص والتشكيل: ${mode === 'image' ? imgCutShape : cutShape}`,
-        `التشطيب: بارز ثلاثي الأبعاد 3D Raised Finish`
-      ],
-      specsEn: [
-        mode === 'text' ? `Text: ${customText}` : `Uploaded Custom Image`,
-        `Cut Shape: ${mode === 'image' ? imgCutShape : cutShape}`,
-        `Finish: Premium Raised 3D Finish`
-      ],
-      customDetails: {
-        mode,
-        customText: mode === 'text' ? customText : '',
-        selectedFont,
-        textColor,
-        bgFinish,
-        cutShape: mode === 'image' ? imgCutShape : cutShape,
-        imageScale,
-        borderStyle,
-        printWidthMm: mode === 'image' ? layout.widthMm : (cutShape === 'circle' ? 25 : 40),
-        printHeightMm: mode === 'image' ? layout.heightMm : (cutShape === 'circle' ? 25 : 40 * exportLayout.height / exportLayout.width),
-        designNotes,
-        design_expires_at: uploadResult.expiresAt,
-        design_image_path: uploadResult.path,
-        design_upload_token: uploadResult.claimToken
-      },
-      quantity,
-      is_active: true
-    };
-
-    addToCart(customItem);
-    setIsUploading(false);
-    addToast(isAr ? 'تمت إضافة الاستيكر المخصص إلى سلة الشراء! 🎨' : 'Custom sticker added to cart! 🎨', 'success');
-    // Stay in the builder so the next piece can have its own design.
-    setQuantity(1);
+      const image = new window.Image(); image.src = url; await image.decode();
+      if (!image.naturalWidth || image.naturalWidth * image.naturalHeight > 40_000_000) throw new Error('IMAGE_TOO_LARGE');
+      // Decode and reduce the source once, rather than re-decoding it for each slider movement.
+      const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
+      const reduced = document.createElement('canvas'); reduced.width = Math.max(1, Math.round(image.naturalWidth * scale)); reduced.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      reduced.getContext('2d').drawImage(image, 0, 0, reduced.width, reduced.height);
+      if (version === uploadVersion.current) { setSource({ image: reduced, width: image.naturalWidth, height: image.naturalHeight }); setImageScale(100); }
+    } catch { showToast(isAr ? 'تعذر فتح الصورة. اختار صورة أصغر أو ملف تاني.' : 'Could not open this image. Try a smaller image.', 'error'); }
+    finally { URL.revokeObjectURL(url); if (version === uploadVersion.current) setLoadingImage(false); }
   };
 
-  const activeFontObj = FONTS.find(f => f.id === selectedFont) || FONTS[0];
-  const activeBgObj = BG_FINISHES.find(b => b.id === bgFinish) || BG_FINISHES[0];
-  const activeShapeObj = CUT_SHAPES.find(s => s.id === cutShape) || CUT_SHAPES[0];
-  const exportLayout = getStickerExportLayout(cutShape, customText);
-  const exportBackground = EXPORT_BACKGROUNDS[bgFinish] || EXPORT_BACKGROUNDS.obsidian;
-  const totalPrice = basePrice * quantity;
+  const add = async () => {
+    if (!canAdd) return;
+    if (cartItems.length >= ORDER_LIMITS.lines) { showToast(isAr ? 'السلة وصلت للحد الأقصى من التصميمات. كمّل الطلب الحالي الأول.' : 'The cart has reached its design limit. Complete this order first.', 'info'); return; }
+    setBusy(true);
+    try {
+      const printCanvas = document.createElement('canvas');
+      if (mode === 'text') drawTextSticker(printCanvas, { text: text.trim(), shape: textShape, textColor, background: background === 'clear' ? '#EFEAE0' : background, fontFamily: font.family });
+      else drawImageSticker(printCanvas, source.image, { shape: imageShape, background, scale: imageScale });
+      const blob = await canvasBlob(printCanvas);
+      const [snapshot, upload] = await Promise.all([blobDataUrl(blob), uploadOrderFile(blob, 'order-design')]);
+      addToCart({ id: `custom-sticker-${crypto.randomUUID()}`, category: 'stickers', price: PRICING.custom, quantity,
+        nameAr: mode === 'text' ? `استيكر: ${text.trim()}` : 'استيكر بتصميمك', nameEn: mode === 'text' ? `Sticker: ${text.trim()}` : 'Your image sticker',
+        image: snapshot, designSnapshot: snapshot,
+        customDetails: { mode, customText: mode === 'text' ? text.trim() : '', selectedFont: fontId, textColor, bgFinish: background,
+          cutShape: shape, borderStyle: 'none', imageScale, printWidthMm: layout.widthMm, printHeightMm: layout.heightMm, designNotes: notes,
+          design_image_path: upload.path, design_upload_token: upload.claimToken, design_expires_at: upload.expiresAt } });
+      setQuantity(1);
+      showToast(isAr ? 'اتضاف تصميمك للسلة. تقدر تعمل تصميم مختلف للقطعة الجاية.' : 'Added to your cart. You can make a different design next.', 'success');
+    } catch { showToast(isAr ? 'تعذر رفع التصميم. جرّب مرة تانية.' : 'Could not upload the design. Please retry.', 'error'); }
+    finally { setBusy(false); }
+  };
 
-  return (
-    <div className="sticker-builder max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 min-h-screen">
-      {/* Fixed-size print artwork. It stays off-screen so responsive preview styles never crop order files. */}
-      {mode === 'text' && (
-        <div aria-hidden="true" className="fixed -left-[10000px] top-0 pointer-events-none">
-          <div
-            ref={stickerExportRef}
-            dir="auto"
-            className="relative flex items-center justify-center text-center overflow-hidden border-[8px]"
-            style={{
-              width: `${exportLayout.width}px`,
-              height: `${exportLayout.height}px`,
-              padding: `${exportLayout.paddingY}px ${exportLayout.paddingX}px`,
-              borderRadius: cutShape === 'shield'
-                ? `48px 48px ${exportLayout.borderRadius}px ${exportLayout.borderRadius}px`
-                : `${exportLayout.borderRadius}px`,
-              borderColor: exportBackground.borderColor,
-              background: exportBackground.background,
-              boxShadow: 'inset 0 12px 24px rgba(255,255,255,0.3), inset 0 -18px 36px rgba(0,0,0,0.42)',
-              boxSizing: 'border-box'
-            }}
-          >
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: 'linear-gradient(35deg, transparent 18%, rgba(255,255,255,0.2) 52%, transparent 78%)' }}
-            />
-            <span
-              className={`relative z-10 block w-full font-bold drop-shadow-md ${activeFontObj.fontClass}`}
-              style={{
-                color: textColor,
-                fontSize: `${exportLayout.fontSize}px`,
-                lineHeight: 1.7,
-                padding: '0.28em 0.12em 0.38em',
-                whiteSpace: 'nowrap',
-                boxSizing: 'border-box'
-              }}
-            >
-              {customText.trim() || (isAr ? 'اكتب كلمتك' : 'Your Text')}
-            </span>
-          </div>
-        </div>
-      )}
-      
-      {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 font-mono text-xs text-ash uppercase tracking-wider">
-        <Link to="/" className="hover:text-gold transition-colors">{isAr ? 'الرئيسية' : 'Home'}</Link>
-        <ArrowIcon size={12} className="text-grave" />
-        <Link to="/stickers" className="hover:text-gold transition-colors">{isAr ? 'الاستيكرات' : 'Stickers'}</Link>
-        <ArrowIcon size={12} className="text-grave" />
-        <span className="text-gold font-bold">{isAr ? 'بيلدر الاستيكرز' : 'Sticker Builder'}</span>
-      </div>
-
-      {/* Header Title */}
-      <div className="border-b border-grave pb-6 space-y-2">
-        <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-gold font-bold">
-          <SunDisc size={14} variant="gold" />
-          <span>{t('stickerBuilderEyebrow')}</span>
-        </div>
-        <h1 className="font-clash text-3xl sm:text-5xl uppercase text-bone tracking-tight">
-          {isAr ? 'مصمم الاستيكرات المخصص 🎨' : 'Custom Sticker Builder 🎨'}
-        </h1>
-        <p className="font-space text-xs sm:text-sm text-bone/70 max-w-2xl">
-          {isAr
-            ? 'ارفع صورتك، شوفها على الاستيكر، وكمل مجموعتك. 4 تصميمات مختلفة بـ180 جنيه قبل الشحن.'
-            : 'Upload your image, preview your sticker, and build your set. Four different designs for EGP 180 before shipping.'}
-        </p>
-      </div>
-
-      {/* MAIN BUILDER LAYOUT: LEFT STICKER PREVIEW CANVAS + RIGHT CONTROLS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* LEFT CANVAS PREVIEW (LG: 7 COLS) */}
-        <div className="lg:col-span-7 space-y-6">
-          
-          {/* Mode Switcher Tabs */}
-          <div className="bg-coal p-1.5 border border-grave flex items-center gap-2 rounded-sm">
-            <button
-              onClick={() => setMode('text')}
-              className={`flex-1 py-3 px-4 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                mode === 'text'
-                  ? 'bg-gold text-void font-bold shadow-md'
-                  : 'text-bone hover:text-gold'
-              }`}
-            >
-              <Type size={16} />
-              <span>{isAr ? 'استيكر نص / كلمات' : 'Custom Text Sticker'}</span>
-            </button>
-
-            <button
-              onClick={() => setMode('image')}
-              className={`flex-1 py-3 px-4 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                mode === 'image'
-                  ? 'bg-gold text-void font-bold shadow-md'
-                  : 'text-bone hover:text-gold'
-              }`}
-            >
-              <ImageIcon size={16} />
-              <span>{isAr ? 'استيكر صورة / لوجو' : 'Custom Image Sticker'}</span>
-            </button>
-          </div>
-
-          {/* REALTIME 3D STICKER CANVAS PREVIEW */}
-          <div className="bg-stone/90 border border-grave p-8 sm:p-14 relative flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] overflow-hidden card-depth-highlight">
-            
-            {/* Grid alignment overlay background */}
-            <div className="absolute inset-0 bg-noise opacity-30 pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-
-            {/* Sticker Dimension Tag Top Left */}
-            <div className="absolute top-4 left-4 z-10 font-mono text-[10px] text-ash uppercase bg-coal/80 px-2.5 py-1 border border-grave flex items-center gap-1.5">
-              <Eye size={12} className="text-gold" />
-              <span>{isAr ? 'معاينة الاستيكر المجسم (3D)' : 'Raised 3D Finish Preview'}</span>
-            </div>
-
-            {/* Scale / Dimension guide badge */}
-            <div className="absolute bottom-4 right-4 z-10 font-mono text-[10px] text-ash uppercase bg-coal/80 px-2.5 py-1 border border-grave">
-              <span>
-                {mode === 'image'
-                  ? (uploadedImage ? `${layout.widthMm} × ${layout.heightMm} mm · ${isAr ? 'مقاس الطباعة' : 'Print size'}` : (isAr ? 'معاينة تصميمك هتظهر هنا' : 'Your design will appear here'))
-                  : `${cutShape === 'circle' ? '25 × 25' : `40 × ${(40 * exportLayout.height / exportLayout.width).toFixed(1)}`} mm`}
-
-              </span>
-            </div>
-
-            {/* RENDERED RAISED 3D STICKER ITEM */}
-            <div className="relative group transition-all duration-300 transform hover:scale-105 my-auto">
-              
-              {/* Soft Drop Shadow under 3D dome */}
-              <div className={`absolute inset-0 bg-black/10 blur-lg transform translate-y-3 scale-95 ${activeShapeObj.class}`} />
-
-              {/* Mode A: TEXT STICKER DOME */}
-              {mode === 'text' && (
-                <div
-                  className={`relative z-10 transition-all duration-300 border shadow-2xl flex items-center justify-center text-center overflow-hidden ${activeBgObj.bg} ${activeBgObj.border} ${activeShapeObj.class}`}
-                  style={{
-                    boxShadow: '0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 10px rgba(0,0,0,0.6)'
-                  }}
-                >
-                  {/* Glossy Raised 3D Finish Sheen Glare */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent pointer-events-none" />
-
-                  {/* Sticker Text */}
-                  <span
-                    dir="auto"
-                    className={`text-xl sm:text-3xl font-bold tracking-wide relative z-10 drop-shadow-md leading-[1.7] py-2 ${activeFontObj.fontClass}`}
-                    style={{ color: textColor }}
-                  >
-                    {customText.trim() || (isAr ? 'اكتب كلمتك' : 'Your Text')}
-                  </span>
-                </div>
-              )}
-
-              {/* Mode B: IMAGE STICKER DOME */}
-              {mode === 'image' && (
-                uploadedImage ? (
-                  imageArtwork ? <img src={imageArtwork} alt={isAr ? 'تصميم الاستيكر اللي هيتطبع' : 'Your print artwork'}
-                    style={{ width: `${layout.widthMm * 8}px`, height: `${layout.heightMm * 8}px`, objectFit: 'contain', filter: 'drop-shadow(0 12px 14px #232a5522)' }} />
-                  : <Loader2 className="animate-spin text-gold" aria-label="Preparing preview" />
-                ) : (
-                  <button type="button" onClick={() => imageInputRef.current?.click()} className="relative z-10 rounded-2xl border-2 border-dashed border-gold/60 bg-coal p-8 sm:p-12 text-center max-w-sm space-y-4 hover:border-gold">
-                    <Upload size={36} className="mx-auto text-gold" />
-                    <strong className="block text-lg text-bone">{isAr ? 'ارفع صورة عشان نبدأ' : 'Upload an image to begin'}</strong>
-                    <span className="block text-sm text-ash">{isAr ? 'صورتك أو لوجو أو رسمة بتحبها. هنظبط الأبعاد من غير ما نمطّ الصورة.' : 'A photo, logo or artwork you love. We fit its proportions without stretching.'}</span>
-                    <span className="block text-xs text-ash">PNG · JPG · WebP / 5 MB</span>
-                  </button>
-                )
-              )}
-
-            </div>
-
-          </div>
-
-          {/* Finish quality assurance notice */}
-          <div className="bg-coal border border-grave p-4 font-mono text-xs text-ash flex items-center gap-3">
-            <Shield size={18} className="text-gold flex-shrink-0" />
-            <span>
-              {isAr
-                ? 'المعاينة بتوضح التصميم والمقاس؛ لون الطباعة ولمعة البارز ممكن يختلفوا عن الشاشة. تأكد إن التصميم بعيد عن كاميرات الموبايل.'
-                : 'Preview shows artwork and size. Printed colors and surface gloss may differ from your screen. Keep the sticker clear of phone cameras.'}
-            </span>
-          </div>
-
-        </div>
-
-        {/* RIGHT CONTROLS PANEL (LG: 5 COLS) */}
-        <div className="lg:col-span-5 bg-stone border border-grave p-6 sm:p-8 space-y-8 card-depth-highlight">
-          
-          {/* MODE A CONTROLS: TEXT */}
-          {mode === 'text' && (
-            <div className="space-y-6">
-              
-              {/* 1. Custom Text Input */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '✍️ اكتب النص / الكلمة المخصصة:' : '✍️ Enter Custom Text:'}
-                </label>
-                <input
-                  type="text"
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  placeholder={isAr ? 'مثال: طالع نور، DUAT، عمر...' : 'e.g. Born at Dawn, DUAT, Omar...'}
-                  className="w-full bg-coal border border-grave px-4 py-3 text-sm font-space text-bone placeholder:text-ash focus:border-gold focus:outline-none"
-                  maxLength={30}
-                />
-                
-                {/* One-Click Quick Presets */}
-                <div className="pt-1.5 space-y-1">
-                  <span className="font-mono text-[10px] text-ash block">
-                    {isAr ? '💡 أو اختر من العبارات الشائعة بنقرة واحدة:' : '💡 Or pick from quick presets:'}
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['طالع نور', 'عدّي الليل', 'دوات', 'سنة 2004', 'DUAT', 'Born at Dawn', '1999'].map((preset) => (
-                      <button
-                        key={preset}
-                        onClick={() => setCustomText(preset)}
-                        className="bg-coal hover:bg-stone border border-grave hover:border-gold px-2.5 py-1 text-[11px] font-mono text-bone transition-colors rounded-xs"
-                      >
-                        {preset}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <span className="font-mono text-[10px] text-ash block text-right pt-1">
-                  {customText.length} / 30 {isAr ? 'حرف' : 'chars'}
-                </span>
-              </div>
-
-              {/* 2. Select Font */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '🔤 اختر نوع الخط العربي (٨ خطوط متنوعة):' : '🔤 Select Arabic Font Style (8 Styles):'}
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {FONTS.map((font) => (
-                    <button
-                      key={font.id}
-                      onClick={() => setSelectedFont(font.id)}
-                      className={`p-3 border transition-all text-center flex flex-col items-center justify-center gap-1 rounded ${
-                        selectedFont === font.id
-                          ? 'border-gold bg-gold/15 text-gold font-bold shadow-md ring-1 ring-gold'
-                          : 'border-grave bg-coal text-bone hover:border-gold/50'
-                      }`}
-                    >
-                      <span className={`text-lg font-bold ${font.fontClass}`}>
-                        {font.sample}
-                      </span>
-                      <span className="font-mono text-[10px] opacity-80 truncate max-w-full">
-                        {isAr ? font.nameAr : font.nameEn}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 3. Select Text Color */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '🎨 اختر لون الكتابة:' : '🎨 Select Text Color:'}
-                </label>
-                <div className="flex flex-wrap gap-2.5">
-                  {TEXT_COLORS.map((c) => (
-                    <button
-                      key={c.id}
-                      onClick={() => setTextColor(c.color)}
-                      className={`w-9 h-9 rounded-full border-2 transition-transform ${
-                        textColor === c.color ? 'border-gold scale-110 shadow-lg' : 'border-grave hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: c.color }}
-                      title={isAr ? c.nameAr : c.nameEn}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Select Background Finish */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '✨ اختر شكل خلفية الاستيكر:' : '✨ Select Background Style:'}
-                </label>
-                <div className="grid grid-cols-1 gap-2">
-                  {BG_FINISHES.map((bg) => (
-                    <button
-                      key={bg.id}
-                      onClick={() => setBgFinish(bg.id)}
-                      className={`p-3 font-mono text-xs border flex items-center justify-between transition-all ${
-                        bgFinish === bg.id
-                          ? 'border-gold bg-gold/10 text-gold font-bold'
-                          : 'border-grave bg-coal text-bone hover:border-gold/40'
-                      }`}
-                    >
-                      <span>{isAr ? bg.nameAr : bg.nameEn}</span>
-                      {bgFinish === bg.id && <Check size={14} className="text-gold" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 5. Select Cut Shape */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '📐 اختر شكل القص والدرع:' : '📐 Select Cut Shape:'}
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {CUT_SHAPES.map((shape) => (
-                    <button
-                      key={shape.id}
-                      onClick={() => setCutShape(shape.id)}
-                      className={`p-2.5 font-mono text-xs border text-center transition-all ${
-                        cutShape === shape.id
-                          ? 'border-gold bg-gold/10 text-gold font-bold'
-                          : 'border-grave bg-coal text-bone hover:border-gold/40'
-                      }`}
-                    >
-                      {isAr ? shape.nameAr : shape.nameEn}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* MODE B CONTROLS: IMAGE */}
-          {mode === 'image' && (
-            <div className="space-y-6">
-              
-              {/* 1. File Upload Drop Zone */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '📁 ارفع صورتك أو اللوجو الخاص بك:' : '📁 Upload Image or Logo:'}
-                </label>
-                <label className="border-2 border-dashed border-grave hover:border-gold bg-coal p-6 flex flex-col items-center justify-center cursor-pointer transition-colors text-center">
-                  <Upload size={28} className="text-gold mb-2" />
-                  <span className="font-mono text-xs text-bone font-bold">
-                    {isAr ? 'اضغط هنا لاختيار صورة' : 'Click to select image file'}
-                  </span>
-                  <span className="font-mono text-[10px] text-ash mt-1">
-                    PNG, JPG, WebP (up to 5MB)
-                  </span>
-                  <input
-                    type="file"
-                    ref={imageInputRef}
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              {/* 2. Cut Shape */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '📐 شكل الإطار:' : '📐 Outline Frame:'}
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'auto', label: isAr ? 'نفس أبعاد الصورة' : 'Original ratio' },
-                    { id: 'circle', label: isAr ? 'دائري' : 'Circle' },
-                    { id: 'oval', label: isAr ? 'بيضاوي' : 'Oval' },
-                    { id: 'rectangle', label: isAr ? 'مربع' : 'Square' }
-                  ].map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setImgCutShape(s.id)}
-                      className={`p-2.5 font-mono text-xs border text-center ${
-                        imgCutShape === s.id ? 'border-gold bg-gold/10 text-gold font-bold' : 'border-grave bg-coal text-bone'
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 3. Border Color */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '✨ لون برقع الإطار:' : '✨ Border Color:'}
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'gold', label: isAr ? 'إطار ذهبي' : 'Gold Border' },
-                    { id: 'white', label: isAr ? 'إطار أبيض' : 'White Border' },
-                    { id: 'black', label: isAr ? 'إطار أسود' : 'Black Border' },
-                    { id: 'none', label: isAr ? 'بدون إطار' : 'No Border' }
-                  ].map((b) => (
-                    <button
-                      key={b.id}
-                      onClick={() => setBorderStyle(b.id)}
-                      className={`p-2.5 font-mono text-xs border text-center ${
-                        borderStyle === b.id ? 'border-gold bg-gold/10 text-gold font-bold' : 'border-grave bg-coal text-bone'
-                      }`}
-                    >
-                      {b.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Select Background Finish */}
-              <div className="space-y-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-bone block font-bold">
-                  {isAr ? '🎨 اختر شكل خلفية الاستيكر:' : '🎨 Select Background Style:'}
-                </label>
-                <div className="grid grid-cols-1 gap-2">
-                  {BG_FINISHES.map((bg) => (
-                    <button
-                      key={bg.id}
-                      onClick={() => setBgFinish(bg.id)}
-                      className={`p-3 font-mono text-xs border flex items-center justify-between transition-all ${
-                        bgFinish === bg.id
-                          ? 'border-gold bg-gold/10 text-gold font-bold'
-                          : 'border-grave bg-coal text-bone hover:border-gold/40'
-                      }`}
-                    >
-                      <span>{isAr ? bg.nameAr : bg.nameEn}</span>
-                      {bgFinish === bg.id && <Check size={14} className="text-gold" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Image Scale Slider */}
-              {uploadedImage && (
-                <div className="space-y-2">
-                  <div className="flex justify-between font-mono text-xs text-bone">
-                    <span>{isAr ? 'حجم الصورة:' : 'Image size within frame:'}</span>
-                    <span>{imageScale}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="50"
-                    max="100"
-                    value={imageScale}
-                    onChange={(e) => setImageScale(Number(e.target.value))}
-                    className="w-full accent-gold bg-coal cursor-pointer"
-                  />
-                </div>
-              )}
-
-            </div>
-          )}
-
-          <div className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-sm text-bone">
-            {isAr ? `مجموعتك: ${customCount} قطعة — ${Math.max(0, 4 - customCount)} متبقية للحد الأدنى` : `Your set: ${customCount} pieces — ${Math.max(0, 4 - customCount)} to reach the minimum`}
-            {uploadedImage && Math.min(layout.widthMm, layout.heightMm) < 10 && <p className="mt-2">{isAr ? 'الصورة طويلة أو عريضة جدًا، التفاصيل هتطلع صغيرة. اختار إطار مربع أو صورة أقرب للمربع.' : 'This image is very narrow. Details will print small. Choose a square frame or a less narrow image.'}</p>}
-          </div>
-          {/* Workshop Notes Field */}
-          <div className="space-y-2 pt-4 border-t border-grave">
-            <label className="font-mono text-xs text-ash block">
-              {isAr ? '📝 ملاحظات خاصة للورشة (اختياري):' : '📝 Special Workshop Notes (Optional):'}
-            </label>
-            <textarea
-              value={designNotes}
-              onChange={(e) => setDesignNotes(e.target.value)}
-              placeholder={isAr ? 'مثال: يرجى جعل الحروف بارزة أكثر أو محاذاة النص لليمين...' : 'e.g. Please align text to right...'}
-              className="w-full bg-coal border border-grave p-3 text-xs font-mono text-bone placeholder:text-ash focus:border-gold focus:outline-none min-h-[70px]"
-            />
-          </div>
-
-          {/* PRICING & ADD TO CART CTA */}
-          <div className="pt-6 border-t border-grave space-y-4">
-            <p className="text-sm text-gold">
-              {isAr ? 'حجز مسبق — 45 ج للقطعة، بحد أدنى 4 قطع في الطلب. خصّص كل قطعة براحتك.' : 'Pre-order — EGP 45 each, minimum 4 custom pieces per order. Personalize each one.'}
-            </p>
-            
-            {/* Quantity Selector */}
-            <div className="flex items-center justify-between font-mono text-xs text-bone">
-              <span>{isAr ? 'عدد النسخ من التصميم ده:' : 'Copies of this design:'}</span>
-              <div className="flex items-center border border-grave bg-coal">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-1.5 text-gold hover:bg-stone transition-colors font-bold"
-                >
-                  -
-                </button>
-
-                <span className="px-4 py-1.5 font-bold">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(Math.min(ORDER_LIMITS.quantityPerLine, quantity + 1))}
-                  className="px-3 py-1.5 text-gold hover:bg-stone transition-colors font-bold"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Total Price Display */}
-            <div className="flex items-baseline justify-between pt-2">
-              <span className="font-mono text-xs uppercase text-ash">{isAr ? 'إجمالي الاستيكر المخصص:' : 'Total Custom Sticker:'}</span>
-              <span className="font-mono text-2xl font-bold text-gold">
-                {formatPrice(totalPrice)}
-              </span>
-            </div>
-
-            {/* Add to Cart Button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={isUploading || (mode === 'image' && !imageArtwork)}
-              className="w-full btn-primary py-4 px-6 font-mono text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl"
-            >
-              {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ShoppingBag size={18} />}
-              <span>
-                {isAr
-                  ? `أضف الاستيكر المخصص للسلة — ${formatPrice(totalPrice)}`
-                  : `ADD CUSTOM STICKER — ${formatPrice(totalPrice)}`}
-              </span>
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
+  return <div className="sticker-builder max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-10 text-bone" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
+      <div><Link className="text-xs text-ash" to="/stickers">{isAr ? 'الاستيكرات / صمّم بنفسك' : 'Stickers / Make it yours'}</Link><h1 className="text-2xl sm:text-4xl font-bold mt-2">{isAr ? 'استيكر على مزاجك' : 'Your sticker. Your way.'}</h1></div>
+      <p className="text-sm text-gold font-bold">{formatPrice(PRICING.custom)} <span className="text-ash font-normal">{isAr ? 'للقطعة · أقل عدد 4' : 'each · minimum 4'}</span></p>
     </div>
-  );
+    <div className="builder-layout grid lg:grid-cols-2 gap-4 lg:gap-8 items-start">
+      <section className="builder-preview-panel bg-void lg:sticky lg:top-28 rounded-2xl overflow-hidden border border-grave" aria-label={isAr ? 'معاينة الاستيكر' : 'Sticker preview'}>
+        <div className="grid grid-cols-2 p-2 gap-2 border-b border-grave bg-stone">
+          {[['image', ImageIcon, isAr ? 'صورة أو لوجو' : 'Image or logo'], ['text', Type, isAr ? 'اكتب نص' : 'Write text']].map(([id, Icon, label]) => <button type="button" key={id} onClick={() => { setMode(id); if (id === 'text' && background === 'clear') setBackground('#EFEAE0'); }} aria-pressed={mode === id} className={`min-h-11 rounded-lg flex items-center justify-center gap-2 text-sm font-bold ${mode === id ? 'bg-gold text-void' : 'text-ash'}`}><Icon size={17}/>{label}</button>)}
+        </div>
+        <div className="builder-stage relative flex items-center justify-center p-8 min-h-[220px] sm:min-h-[300px] bg-coal" data-builder-stage>
+          <canvas ref={canvas} aria-label={isAr ? 'تصميم الاستيكر للطباعة' : 'Sticker print artwork'} className={`builder-artwork ${(mode === 'image' && source) ? '' : 'hidden'}`} style={{ aspectRatio: layout.widthMm / layout.heightMm }} />
+          {mode === 'image' && !source && <button type="button" onClick={() => fileInput.current?.click()} className="w-full max-w-xs py-5 px-3 rounded-xl border border-dashed border-gold/70 text-center space-y-2"><Upload size={27} className="mx-auto text-gold"/><strong className="block text-base">{isAr ? 'ارفع صورة عشان نبدأ' : 'Upload an image to begin'}</strong><span className="text-xs text-ash block">PNG · JPG · WebP / 5 MB</span></button>}
+          {mode === 'text' && text.trim() && <div data-text-preview className="builder-text-preview flex items-center justify-center text-center overflow-hidden" style={{ backgroundColor: background === 'clear' ? '#EFEAE0' : background, borderRadius: textShape === 'circle' ? '50%' : '10.56px' }}><span className="builder-print-text" dir="auto" style={{ '--art-font': `"${font.family}", "Cairo", sans-serif`, fontFamily: `"${font.family}", "Cairo", sans-serif`, color: textColor, fontSize: `${textPreview.size * .22}px`, lineHeight: 1.65, fontWeight: 700, whiteSpace: 'pre' }}>{textPreview.lines.join('\n')}</span></div>}
+          {mode === 'text' && !text.trim() && <p className="text-ash text-sm">{isAr ? 'اكتب كلمتك وهتشوفها هنا' : 'Type your words to see them here'}</p>}
+          {(loadingImage || (mode === 'text' && !fontReady)) && <Loader2 size={22} className="absolute top-3 end-3 text-gold animate-spin"/>}
+        </div>
+        <div className="flex justify-between gap-3 px-4 py-3 bg-stone text-xs text-ash"><span>{isAr ? 'معاينة التصميم' : 'Design preview'}</span><span dir="ltr">{mode === 'image' && !source ? '—' : `${layout.widthMm} × ${layout.heightMm} mm`}</span></div>
+      </section>
+      <div className="builder-controls bg-stone border border-grave rounded-2xl p-4 sm:p-6 space-y-5">
+        {mode === 'image' ? <div className="space-y-3">
+          <button type="button" onClick={() => fileInput.current?.click()} className="btn-ghost min-h-11 w-full rounded-lg text-sm flex justify-center items-center gap-2"><Upload size={16}/>{isAr ? (source ? 'غيّر الصورة' : 'اختار صورة') : source ? 'Change image' : 'Choose image'}</button>
+          <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadImage} className="hidden" aria-label={isAr ? 'ارفع صورة الاستيكر' : 'Upload sticker image'}/>
+          <p className="text-xs text-ash">{isAr ? 'أبعاد الصورة بتتظبط من غير قص أو تمطيط. PNG بيحافظ على شفافية التصميم.' : 'We fit the image without stretching or cropping. PNG preserves your artwork transparency.'}</p>
+        </div> : <>
+          <label className="block text-sm font-bold space-y-2">{isAr ? 'اكتب كلمتك' : 'Your words'}<input type="text" maxLength={40} value={text} onChange={e => setText(e.target.value)} placeholder={isAr ? 'اسمك أو كلمة بتحبها' : 'A name or words you love'} className="w-full bg-coal border border-grave rounded-lg min-h-12 px-3 text-base font-normal" dir="auto" /></label>
+          <label className="block text-sm font-bold space-y-2">{isAr ? 'الخط' : 'Font'}<select value={fontId} onChange={e => setFontId(e.target.value)} className="block w-full bg-coal border border-grave rounded-lg min-h-12 px-3 font-normal text-base">{BUILDER_FONTS.map(f => <option key={f.id} value={f.id}>{isAr ? f.ar : f.en}</option>)}</select></label>
+        </>}
+        <fieldset className="space-y-2"><legend className="text-sm font-bold mb-2">{isAr ? 'شكل الاستيكر' : 'Sticker shape'}</legend><div className={`grid ${mode === 'image' ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+          {(mode === 'image' ? ['auto', 'square', 'circle'] : ['square', 'circle']).map(id => <button key={id} type="button" aria-pressed={shape === id} onClick={() => mode === 'text' ? setTextShape(id) : setImageShape(id)} className={`min-h-11 rounded-lg border text-sm flex gap-2 justify-center items-center ${shape === id ? 'border-gold text-gold bg-gold/10' : 'border-grave text-bone'}`}><span className={`inline-block w-4 h-4 border border-current ${id === 'circle' ? 'rounded-full' : 'rounded-sm'}`} />{id === 'auto' ? (isAr ? 'الأصلية' : 'Original') : id === 'circle' ? (isAr ? 'دايرة' : 'Circle') : (isAr ? 'مربع' : 'Square')}</button>)}
+        </div></fieldset>
+        {mode === 'text' && <ColorPicker label={isAr ? 'لون النص' : 'Text color'} value={textColor} onChange={setTextColor} isAr={isAr}/>}
+        <ColorPicker label={isAr ? 'لون الخلفية' : 'Background color'} value={background} onChange={setBackground} isAr={isAr} transparent={mode === 'image'}/>
+        {mode === 'text' && contrastRatio(textColor, background === 'clear' ? '#EFEAE0' : background) < 2.5 && <p className="text-xs text-gold" role="status">{isAr ? 'اللونين قريبين من بعض؛ اختار لون أفتح أو أغمق عشان الكتابة تبقى واضحة.' : 'These colors are close together. Choose a lighter or darker color to make the text clear.'}</p>}
+        {mode === 'image' && source && <label className="block text-sm space-y-2">{isAr ? 'حجم الصورة داخل الشكل' : 'Image size in frame'} <span className="text-ash">{imageScale}%</span><input type="range" min="50" max="100" value={imageScale} onChange={e => setImageScale(Number(e.target.value))} className="w-full accent-gold min-h-8"/></label>}
+        <details className="text-sm border-t border-grave pt-3"><summary className="cursor-pointer min-h-11 flex items-center text-ash">{isAr ? 'ملاحظات للتنفيذ (اختياري)' : 'Production notes (optional)'}</summary><textarea maxLength={500} value={notes} onChange={e => setNotes(e.target.value)} aria-label={isAr ? 'ملاحظات للتنفيذ' : 'Production notes'} className="w-full min-h-20 p-3 bg-coal rounded-lg border border-grave"/></details>
+        <div className="border-t border-grave pt-4 space-y-4">
+          <div className="flex items-center justify-between gap-3 text-sm"><span>{isAr ? 'نسخ من التصميم ده' : 'Copies of this design'}</span><div className="flex items-center border border-grave rounded-lg"><button type="button" aria-label={isAr ? 'تقليل العدد' : 'Decrease quantity'} onClick={() => setQuantity(n => Math.max(1, n - 1))} className="w-11 h-11 flex items-center justify-center"><Minus size={16}/></button><span className="min-w-8 text-center" data-builder-quantity>{quantity}</span><button type="button" aria-label={isAr ? 'زيادة العدد' : 'Increase quantity'} onClick={() => setQuantity(n => Math.min(ORDER_LIMITS.quantityPerLine, n + 1))} className="w-11 h-11 flex items-center justify-center"><Plus size={16}/></button></div></div>
+          <button type="button" onClick={add} disabled={!canAdd} className="btn-primary rounded-lg w-full min-h-12 px-3 py-3 flex items-center justify-between gap-2 disabled:opacity-50 text-sm font-bold">{busy ? <Loader2 size={18} className="animate-spin"/> : <ShoppingBag size={18}/>}<span>{isAr ? 'أضف للسلة' : 'Add to cart'} · {formatPrice(quantity * PRICING.custom)}</span><Arrow size={17}/></button>
+          <p className="text-xs text-ash leading-6">{isAr ? `مجموعتك فيها ${customCount} قطعة. الحجز يبدأ من 4 قطع بـ180 جنيه قبل الشحن، وكل قطعة ممكن بتصميم مختلف.` : `Your set has ${customCount} pieces. Start with 4 for EGP 180 before shipping. Every piece can be a different design.`}</p>
+        </div>
+      </div>
+    </div>
+    <p className="text-xs text-ash leading-6 mt-4 max-w-2xl">{isAr ? 'ألوان هادية وواضحة للاختيار. نتيجة الطباعة ممكن تختلف عن الشاشة؛ خلّي الكتابة واضحة وبعيدة عن الحواف.' : 'Choose clear, balanced colors. Printed colors may differ from your screen; keep text legible and away from the edges.'}</p>
+  </div>;
 }
-
 export default StickerBuilderView;

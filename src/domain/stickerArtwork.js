@@ -11,10 +11,16 @@ export async function renderImageSticker(source, { shape, background, border, sc
   const image = new Image();
   image.src = source;
   await image.decode();
-  const layout = imageLayout(image.naturalWidth, image.naturalHeight, shape);
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(layout.widthMm * 40));
-  canvas.height = Math.max(1, Math.round(layout.heightMm * 40));
+  drawImageSticker(canvas, image, { shape, background, border, scale });
+  return canvas.toDataURL('image/png');
+}
+
+export function drawImageSticker(canvas, image, { shape, background, border = 'none', scale = 100, pixelsPerMm = 40 }) {
+  const sourceWidth = image.naturalWidth || image.width, sourceHeight = image.naturalHeight || image.height;
+  const layout = imageLayout(sourceWidth, sourceHeight, shape);
+  canvas.width = Math.max(1, Math.round(layout.widthMm * pixelsPerMm));
+  canvas.height = Math.max(1, Math.round(layout.heightMm * pixelsPerMm));
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   const rounded = shape === 'circle' || shape === 'oval';
@@ -22,17 +28,17 @@ export async function renderImageSticker(source, { shape, background, border, sc
   if (rounded) ctx.ellipse(w / 2, h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
   else ctx.roundRect(0, 0, w, h, Math.min(w, h) * 0.05);
   ctx.clip();
-  ctx.fillStyle = { ivory: '#efeae0', obsidian: '#121214', clear: 'rgba(0,0,0,0)', 'gold-foil': '#e0a93b', amber: '#e6b36a' }[background] || '#efeae0';
+  ctx.fillStyle = { ivory: '#efeae0', obsidian: '#121214', clear: 'rgba(0,0,0,0)', 'gold-foil': '#e0a93b', amber: '#e6b36a' }[background] || (/^#[a-f\d]{6}$/i.test(background) ? background : '#efeae0');
   ctx.fillRect(0, 0, w, h);
   // An inscribed box keeps every corner of the photo inside an oval/circle.
   const padding = rounded ? 0.67 : 0.92;
-  const fit = Math.min(w / image.naturalWidth, h / image.naturalHeight) * padding * Math.min(100, Math.max(50, scale)) / 100;
-  const iw = image.naturalWidth * fit, ih = image.naturalHeight * fit;
+  const fit = Math.min(w / sourceWidth, h / sourceHeight) * padding * Math.min(100, Math.max(50, scale)) / 100;
+  const iw = sourceWidth * fit, ih = sourceHeight * fit;
   ctx.drawImage(image, (w - iw) / 2, (h - ih) / 2, iw, ih);
   if (border !== 'none') {
     ctx.strokeStyle = { gold: '#e0a93b', white: '#ffffff', black: '#121214' }[border] || '#ffffff';
     ctx.lineWidth = Math.min(w, h) * 0.04;
     ctx.stroke();
   }
-  return canvas.toDataURL('image/png');
+  return layout;
 }
