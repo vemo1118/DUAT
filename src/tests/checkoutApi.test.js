@@ -31,16 +31,19 @@ const invoke = async (handler, body) => {
   return res;
 };
 
+let checkoutSettings;
 let insert;
 let existing;
 beforeEach(() => {
   existing = null;
+  checkoutSettings = null;
   insert = vi.fn((order) => ({ select: () => ({ single: async () => ({ data: {
     id: order.id, ref: 'DUAT-TEST', total: order.total, created_at: '2026-10-26'
   }, error: null }) }) }));
   dependencies.notify.mockReset().mockResolvedValue({ delivered: true });
   dependencies.admin = {
     from: vi.fn((table) => {
+      if (table === 'store_settings') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: checkoutSettings ? { value: checkoutSettings } : null, error: null }) }) }) };
       if (table === 'products') return { select: () => ({ in: async () => ({ data: [
         { id: 'test-stock', category: 'stickers', price: 999, is_active: true }
       ], error: null }) }) };
@@ -57,6 +60,23 @@ beforeEach(() => {
 afterEach(() => { vi.restoreAllMocks(); });
 
 describe('checkout API boundaries with isolated database and notification adapters', () => {
+  it('persists coupon totals and checkout payment snapshot on a real handler insert', async () => {
+    const res = await invoke(createOrder, { ...payload([stock], 310), customer: { fullName: 'Test', phone: '01012345678', address: 'Test address', email: 'test@example.com', notes: 'Test note' } });
+    expect(res.statusCode).toBe(201);
+    expect(insert.mock.calls[0][0]).toMatchObject({ subtotal: 200, discount: 0, shipping_fee: 110, total: 310,
+      customer: { notes: 'Test note', email: 'test@example.com', shippingMode: 'upfront', payment: { id: 'cod', type: 'cod' } } });
+  });
+  it('rejects removed payment methods before uploads, insertion or notifications', async () => {
+    checkoutSettings = { methods: [] };
+    const res = await invoke(createOrder, payload([stock], 310));
+    expect(res.statusCode).toBe(400); expect(insert).not.toHaveBeenCalled(); expect(dependencies.notify).not.toHaveBeenCalled();
+  });
+  it('quotes and stores shipping separately when configured by admin', async () => {
+    checkoutSettings = { shippingMode: 'later' };
+    const res = await invoke(createOrder, payload([stock], 200));
+    expect(res.statusCode).toBe(201);
+    expect(insert.mock.calls[0][0]).toMatchObject({ shipping_fee: 0, total: 200, customer: { shippingMode: 'later' } });
+  });
   it('quotes custom pieces but reports the unopened booking window', async () => {
     const res = await invoke(quoteOrder, { items: [custom(4)] });
     expect(res.statusCode).toBe(200);

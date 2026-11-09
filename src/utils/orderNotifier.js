@@ -54,6 +54,11 @@ ${itemsText}
 /**
  * Exports orders list to a downloadable CSV spreadsheet formatted for Egyptian Shipping Companies.
  */
+function csvCell(value) {
+  const raw = String(value ?? '');
+  return `"${(/^[-=+@]/.test(raw) ? "'" + raw : raw).replace(/"/g, '""')}"`;
+}
+
 export function exportOrdersToCSV(orders = []) {
   if (!Array.isArray(orders) || orders.length === 0) {
     alert('لا توجد طلبات لتصديرها حالياً!');
@@ -67,7 +72,14 @@ export function exportOrdersToCSV(orders = []) {
     'Governorate/City',
     'Full Address',
     'Items Summary',
+    'Subtotal (EGP)',
+    'Coupon Code',
+    'Discount (EGP)',
+    'Shipping (EGP)',
+    'Shipping Collection',
     'Total Amount (EGP)',
+    'Email',
+    'Order Notes',
     'Payment Method',
     'Order Status',
     'Date'
@@ -81,17 +93,24 @@ export function exportOrdersToCSV(orders = []) {
     const dateStr = order.createdAt || order.created_at ? new Date(order.createdAt || order.created_at).toLocaleDateString('ar-EG') : '';
 
     return [
-      `"${order.ref || order.id}"`,
-      `"${(cust.fullName || cust.name || order.customerName || '').replace(/"/g, '""')}"`,
-      `"${(cust.phone || order.customerPhone || '').replace(/"/g, '""')}"`,
-      `"${(typeof cust.governorate === 'object' ? (cust.governorate.nameAr || '') : (cust.governorate || order.customerGovernorate || '')).replace(/"/g, '""')}"`,
-      `"${(cust.address || order.customerAddress || '').replace(/"/g, '""')}"`,
-      `"${itemsSummary.replace(/"/g, '""')}"`,
-      order.total || order.totalPrice || 0,
-      `"${(order.payment_method || order.paymentMethod || 'cod').toUpperCase()}"`,
-      `"${order.status || 'معلق'}"`,
-      `"${dateStr}"`
-    ];
+      order.ref || order.id,
+      cust.fullName || cust.name || order.customerName || '',
+      cust.phone || order.customerPhone || '',
+      typeof cust.governorate === 'object' ? (cust.governorate?.nameAr || '') : (cust.governorate || order.customerGovernorate || ''),
+      cust.address || order.customerAddress || '',
+      itemsSummary,
+      order.subtotal ?? '',
+      order.couponCode || order.coupon_code || '',
+      order.discount ?? 0,
+      order.shippingFee ?? order.shipping_fee ?? '',
+      cust.shippingMode === 'later' ? 'Separate before dispatch' : 'Included in total',
+      order.total ?? order.totalPrice ?? 0,
+      cust.email || '',
+      cust.notes || '',
+      cust.payment?.titleAr || order.payment_method || order.paymentMethod || 'cod',
+      order.status || 'placed',
+      dateStr
+    ].map(csvCell);
   });
 
   const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
@@ -103,4 +122,5 @@ export function exportOrdersToCSV(orders = []) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

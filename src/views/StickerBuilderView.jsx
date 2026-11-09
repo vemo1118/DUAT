@@ -227,6 +227,7 @@ export function StickerBuilderView() {
         printWidthMm: mode === 'image' ? layout.widthMm : (cutShape === 'circle' ? 25 : 40),
         printHeightMm: mode === 'image' ? layout.heightMm : (cutShape === 'circle' ? 25 : 40 * exportLayout.height / exportLayout.width),
         designNotes,
+        design_expires_at: uploadResult.expiresAt,
         design_image_path: uploadResult.path,
         design_upload_token: uploadResult.claimToken
       },

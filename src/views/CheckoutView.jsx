@@ -1,3 +1,6 @@
+import { normalizeEgyptianPhone } from '../domain/customerDetails';
+import { useCheckoutSettings } from '../context/CheckoutSettingsContext';
+import { availablePaymentMethods, checkoutShipping } from '../domain/checkoutSettings';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,7 +9,7 @@ import { useToast } from '../context/ToastContext';
 import { SunDisc } from '../components/SunDisc';
 import { GOVERNORATES } from '../data/products';
 import { Truck, CreditCard, Copy, Check, ArrowRight, ArrowLeft, ExternalLink, Upload, AlertCircle } from 'lucide-react';
-import { createOrder, uploadOrderFile, quoteOrder, compactCartItems } from '../services/orderApi';
+import { createOrder, uploadOrderFile, quoteOrder, compactCartItems, renewExpiredDesignUploads } from '../services/orderApi';
 import { PREORDER, checkoutMessage, isCustomSticker as isCustomPreorder } from '../domain/commerce';
 
 import { CustomStickerThumbnail } from '../components/CustomStickerThumbnail';
@@ -16,26 +19,43 @@ const EGYPTIAN_PHONE_REGEX = /^01[0125][0-9]{8}$/;
 export const CheckoutView = ({ setView }) => {
   const navigate = useNavigate();
   const { lang, t, formatPrice } = useLanguage();
-  const { cartItems, subtotal: estimatedSubtotal, discount: estimatedDiscount, promoCode, clearCart, pricing, checkoutIssue } = useCart();
+  const { cartItems, cartLoaded, subtotal: estimatedSubtotal, discount: estimatedDiscount, promoCode, clearCart, pricing, checkoutIssue } = useCart();
   const { showToast } = useToast();
   const isRtl = lang === 'ar';
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
 
+  const { settings, loading: settingsLoading, error: settingsError, reload: reloadSettings } = useCheckoutSettings();
+  const localText = key => settings[`${key}${isRtl ? 'Ar' : 'En'}`];
+  const [email, setEmail] = useState('');
+  const [notes, setNotes] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [address, setAddress] = useState('');
   const [governorate, setGovernorate] = useState(GOVERNORATES[0]);
   const [selectedPayment, setPaymentMethod] = useState('cod');
-  const paymentMethod = pricing.customQuantity ? 'instapay' : selectedPayment;
+  const paymentMethods = availablePaymentMethods(settings, pricing.customQuantity);
+  const activePayment = paymentMethods.find(m => m.id === selectedPayment) || paymentMethods[0];
+  const paymentMethod = activePayment?.id;
+  const isTransfer = activePayment?.type === 'transfer';
   const [paymentProofFile, setPaymentProofFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderReference, setOrderReference] = useState(null);
   const [receiptPayment, setReceiptPayment] = useState(null);
-  const [requestId] = useState(() => crypto.randomUUID());
+  const orderIdentity = JSON.stringify(compactCartItems(cartItems));
+  const [requestState, setRequestState] = useState(null);
+  useEffect(() => {
+    if (!cartLoaded || !cartItems.length) return;
+    let saved;
+    try { saved = JSON.parse(sessionStorage.getItem('duat_checkout_request') || 'null'); } catch { /* optional browser storage */ }
+    const next = saved?.cart === orderIdentity ? saved : { cart: orderIdentity, id: crypto.randomUUID() };
+    setRequestState(next);
+    try { sessionStorage.setItem('duat_checkout_request', JSON.stringify(next)); } catch { /* optional browser storage */ }
+  }, [orderIdentity, cartLoaded, cartItems.length]);
+  const requestId = requestState?.cart === orderIdentity ? requestState.id : null;
   const [quoteState, setQuoteState] = useState(null);
   const [quoteAttempt, setQuoteAttempt] = useState(0);
-  const quoteKey = JSON.stringify({ items: compactCartItems(cartItems), couponCode: promoCode, governorateId: governorate.id });
+  const quoteKey = JSON.stringify({ checkoutSettings: settings, items: compactCartItems(cartItems), couponCode: promoCode, governorateId: governorate.id });
   useEffect(() => {
     let cancelled = false;
     const payload = JSON.parse(quoteKey);
@@ -50,22 +70,23 @@ export const CheckoutView = ({ setView }) => {
   }, [quoteKey, quoteAttempt]);
   const trustedQuote = quoteState?.key === quoteKey ? quoteState.quote : null;
   const quoteError = quoteState?.key === quoteKey && quoteState.error;
-  const bookingIssue = trustedQuote?.checkoutIssue || checkoutIssue;
+  const bookingIssue = !settings.enabled ? 'CHECKOUT_PAUSED' : !paymentMethods.length ? 'PAYMENT_UNAVAILABLE' : trustedQuote?.checkoutIssue || checkoutIssue;
   const subtotal = trustedQuote?.subtotal ?? estimatedSubtotal;
   const discount = trustedQuote?.discount ?? estimatedDiscount;
 
   // Free shipping threshold >= 800 EGP
-  const isFreeShipping = subtotal >= 800;
-  const shippingFee = trustedQuote?.shippingFee ?? (isFreeShipping ? 0 : (governorate ? governorate.fee : 110));
+  const shippingLater = (trustedQuote?.shippingMode || settings.shippingMode) === 'later';
+  const isFreeShipping = !shippingLater && settings.freeShippingThreshold > 0 && subtotal >= settings.freeShippingThreshold;
+  const shippingFee = trustedQuote?.shippingFee ?? checkoutShipping(settings, subtotal, governorate);
   const finalTotal = trustedQuote?.total ?? Math.max(0, subtotal - discount + shippingFee);
 
-  const handleCopyInstaPay = () => {
-    navigator.clipboard.writeText('moataz_m25@instapay');
-    showToast(isRtl ? 'تم نسخ عنوان إنستاباي بنجاح!' : 'InstaPay handle copied!', 'info');
+  const handleCopyInstaPay = async () => {
+    try { await navigator.clipboard.writeText(activePayment.account); } catch { showToast(isRtl ? 'انسخ بيانات التحويل يدويًا.' : 'Copy the payment details manually.', 'info'); return; }
+    showToast(isRtl ? 'تم نسخ بيانات التحويل' : 'Payment details copied', 'info');
   };
 
   const handlePhoneChange = (e) => {
-    const val = e.target.value;
+    const val = normalizeEgyptianPhone(e.target.value);
     setPhone(val);
     if (val.trim() && !EGYPTIAN_PHONE_REGEX.test(val.trim())) {
       setPhoneError(isRtl ? 'اكتب رقم موبايل مصري صحيح (١١ رقم يبدأ بـ 010 أو 011 أو 012 أو 015)' : 'Enter a valid Egyptian mobile number (11 digits starting with 010, 011, 012, or 015)');
@@ -76,7 +97,7 @@ export const CheckoutView = ({ setView }) => {
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
-    if (!trustedQuote || bookingIssue) {
+    if (!requestId || !trustedQuote || bookingIssue) {
       showToast(checkoutMessage(bookingIssue, isRtl) || (isRtl ? 'استنى تأكيد السعر النهائي.' : 'Wait for the confirmed total.'), 'info');
       return;
     }
@@ -96,9 +117,9 @@ export const CheckoutView = ({ setView }) => {
       return;
     }
 
-    if (paymentMethod === 'instapay') {
+    if (isTransfer) {
       if (!paymentProofFile) {
-        showToast(isRtl ? 'يرجى رفع اسكرين شوت التحويل عبر إنستاباي لتأكيد الطلب' : 'Please upload payment screenshot to confirm InstaPay order', 'error');
+        showToast(isRtl ? 'يرجى رفع اسكرين شوت التحويل لتسجيل الطلب ومراجعة الدفع' : 'Please upload payment screenshot for payment review', 'error');
         return;
       }
 
@@ -118,19 +139,20 @@ export const CheckoutView = ({ setView }) => {
 
     setIsSubmitting(true);
     try {
-      const freshQuote = await quoteOrder(JSON.parse(quoteKey));
+      const preparedItems = await renewExpiredDesignUploads(cartItems);
+      const freshQuote = await quoteOrder({ ...JSON.parse(quoteKey), items: preparedItems });
       if (freshQuote.total !== trustedQuote.total || freshQuote.checkoutIssue) {
         setQuoteState({ key: quoteKey, quote: freshQuote });
         showToast(checkoutMessage(freshQuote.checkoutIssue, isRtl) || (isRtl ? 'السعر اتحدّث. راجع الإجمالي قبل المتابعة.' : 'The total changed. Review it before continuing.'), 'info');
         return;
       }
-      const paymentProof = paymentMethod === 'instapay'
+      const paymentProof = isTransfer
         ? await uploadOrderFile(paymentProofFile, 'payment-proof')
         : null;
       const savedOrder = await createOrder({
         requestId,
-        customer: { fullName, phone: phone.trim(), address },
-        items: cartItems,
+        customer: { fullName, phone: phone.trim(), address, email: settings.showEmail ? email : '', notes: settings.showNotes ? notes : '' },
+        items: preparedItems,
         couponCode: promoCode,
         governorateId: governorate.id,
         paymentMethod,
@@ -164,13 +186,14 @@ export const CheckoutView = ({ setView }) => {
         console.warn('Could not save the local tracking shortcut:', storageError.message);
       }
 
-      setReceiptPayment(paymentMethod);
+      setReceiptPayment(isTransfer ? 'instapay' : 'cod');
       setOrderReference(ref);
       clearCart();
+      try { sessionStorage.removeItem('duat_checkout_request'); } catch { /* optional browser storage */ }
     } catch (error) {
       console.error('Order submission failed:', error.message);
       showToast(
-        isRtl ? 'تعذر تسجيل الطلب. السلة محفوظة؛ حاول مرة أخرى.' : 'Could not place the order. Your cart is still saved; please retry.',
+        isRtl ? 'تعذر تسجيل الطلب. راجع البيانات وطريقة الدفع وحاول مرة تانية.' : `Could not place the order: ${error.message}`,
         'error'
       );
     } finally {
@@ -226,24 +249,26 @@ export const CheckoutView = ({ setView }) => {
           <span>{t('checkoutEyebrow')}</span>
         </div>
         <h1 className="font-clash text-3xl sm:text-5xl uppercase text-bone tracking-tight">
-          {t('checkoutTitle')}
+          {localText('title')}
         </h1>
       </div>
 
       {pricing.customQuantity > 0 && <div className="border border-gold/40 bg-gold/10 p-4 text-sm text-bone leading-7">
-        <p>{isRtl ? 'تنفيذ الطلبات يبدأ 1 ديسمبر. الدفع كامل مقدمًا عبر إنستاباي، والتحويل بيخضع للمراجعة.' : 'Production starts December 1. Full payment is due via InstaPay and transfers are reviewed.'}</p>
+        <p>{isRtl ? 'تنفيذ طلبات الحجز يبدأ 1 ديسمبر. الكستمايز بدفع مقدم، والتحويل بيخضع للمراجعة.' : 'Pre-order production starts December 1. Custom orders require prepayment and transfers are reviewed.'}</p>
         {PREORDER.closesAt && <p>{isRtl ? 'إغلاق الحجز: ' : 'Booking closes: '}{new Date(PREORDER.closesAt).toLocaleString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} ({isRtl ? 'توقيت القاهرة' : 'Cairo time'})</p>}
         {PREORDER.shipsBy && <p>{isRtl ? 'التسليم المتوقع لشركة الشحن: ' : 'Estimated handoff to the carrier: '}{new Date(PREORDER.shipsFrom).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })} — {new Date(PREORDER.shipsBy).toLocaleDateString(isRtl ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo' })}</p>}
       </div>}
+      <p className="my-4 text-ash whitespace-pre-wrap">{localText(settings.enabled ? 'notice' : 'closed')}</p>
+      {shippingLater && <p className="my-4 p-4 border border-gold text-bone">{localText('shippingLater')}</p>}
       {/* Free Shipping Notification Banner */}
-      <div className={`p-4 border font-mono text-xs flex items-center justify-between gap-4 ${isFreeShipping ? 'bg-gold/15 border-gold text-gold font-bold' : 'bg-stone border-grave text-bone'}`}>
+      {!shippingLater && settings.freeShippingThreshold > 0 && <div className={`p-4 border font-mono text-xs flex items-center justify-between gap-4 ${isFreeShipping ? 'bg-gold/15 border-gold text-gold font-bold' : 'bg-stone border-grave text-bone'}`}>
         <span>
           {isFreeShipping
             ? (isRtl ? '🎉 مبروك! حصلت على شحن مجاني لكافة المحافظات' : '🎉 Congratulations! You unlocked Free Shipping across Egypt')
-            : (isRtl ? `شحن مجاني فوق ٨٠٠ ج (أضف ${800 - subtotal} ج للحصول عليه)` : `Free shipping over 800 EGP (Add ${800 - subtotal} EGP to qualify)`)}
+            : (isRtl ? `شحن مجاني من ${settings.freeShippingThreshold} ج (أضف ${Math.max(0, settings.freeShippingThreshold - subtotal)} ج للحصول عليه)` : `Free shipping from ${settings.freeShippingThreshold} EGP (Add ${Math.max(0, settings.freeShippingThreshold - subtotal)} EGP to qualify)`)}
         </span>
-        <span className="uppercase text-[10px] tracking-widest opacity-80">{isFreeShipping ? (isRtl ? 'شحن مجاني' : 'FREE SHIPPING') : '800 EGP GOAL'}</span>
-      </div>
+        <span className="uppercase text-[10px] tracking-widest opacity-80">{isFreeShipping ? (isRtl ? 'شحن مجاني' : 'FREE SHIPPING') : `${settings.freeShippingThreshold} EGP`}</span>
+      </div>}
 
       {/* Form Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -308,7 +333,7 @@ export const CheckoutView = ({ setView }) => {
                   >
                     {GOVERNORATES.map((gov) => (
                       <option key={gov.id} value={gov.id} className="bg-coal text-bone">
-                        {isRtl ? gov.nameAr : gov.nameEn} ({isFreeShipping ? (isRtl ? 'شحن مجاني' : 'Free Shipping') : `+${gov.fee} EGP`})
+                        {isRtl ? gov.nameAr : gov.nameEn}{shippingLater ? '' : ` (${isFreeShipping ? (isRtl ? 'شحن مجاني' : 'Free shipping') : formatPrice(settings.shippingFees[gov.id])})`}
                       </option>
                     ))}
                   </select>
@@ -331,7 +356,10 @@ export const CheckoutView = ({ setView }) => {
             </div>
           </div>
 
-          {/* Payment Method Selector (COD & InstaPay ONLY) */}
+          {settings.showEmail && <label className="block space-y-2">{isRtl ? 'الإيميل (اختياري)' : 'Email (optional)'}<input type="email" maxLength={200} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-coal border border-grave p-3 text-bone" /></label>}
+          {settings.showNotes && <label className="block space-y-2">{isRtl ? 'ملاحظات الطلب (اختياري)' : 'Order notes (optional)'}<textarea maxLength={1500} value={notes} onChange={e => setNotes(e.target.value)} className="w-full bg-coal border border-grave p-3 text-bone" /></label>}
+          {settingsError && <button type="button" onClick={reloadSettings}>{isRtl ? 'تعذر تحميل طرق الدفع — إعادة المحاولة' : 'Could not load payment settings — retry'}</button>}
+          {/* Payment methods */}
           <div className="bg-stone border border-grave p-6 space-y-6">
             <h3 className="font-mono text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-2 border-b border-grave pb-3">
               <CreditCard size={16} />
@@ -339,10 +367,7 @@ export const CheckoutView = ({ setView }) => {
             </h3>
 
             <div className="space-y-3 font-space text-sm">
-              {[
-                { id: 'cod', title: isRtl ? 'الدفع عند الاستلام (COD)' : 'Cash on Delivery (COD)', desc: isRtl ? 'ادفع نقداً عند استلام الشحنة من المندوب.' : 'Pay cash to the delivery courier.' },
-                { id: 'instapay', title: isRtl ? 'الدفع السريع عبر إنستاباي (InstaPay)' : 'InstaPay Direct Payment', desc: isRtl ? 'تحويل سريع عبر تطبيق إنستاباي وإرفاق اسكرين شوت.' : 'Instant transfer via InstaPay app + attach screenshot.' }
-              ].filter((method) => !pricing.customQuantity || method.id === 'instapay').map((method) => {
+              {paymentMethods.map((method) => {
                 const isSelected = paymentMethod === method.id;
                 return (
                   <label
@@ -360,8 +385,8 @@ export const CheckoutView = ({ setView }) => {
                         className="mt-1 accent-gold"
                       />
                       <div className="space-y-1">
-                        <span className="font-bold text-bone block">{method.title}</span>
-                        <p className="text-xs text-ash font-light">{method.desc}</p>
+                        <span className="font-bold text-bone block">{method[isRtl ? 'titleAr' : 'titleEn']}</span>
+                        <p className="text-xs text-ash font-light">{method[isRtl ? 'descriptionAr' : 'descriptionEn']}</p>
                       </div>
                     </div>
                   </label>
@@ -370,12 +395,14 @@ export const CheckoutView = ({ setView }) => {
             </div>
 
             {/* InstaPay Flow with Direct Payment Link + Required Screenshot Upload */}
-            {paymentMethod === 'instapay' && trustedQuote && !bookingIssue && (
+            {isTransfer && trustedQuote && !bookingIssue && (
               <div className="p-5 bg-coal border border-gold/50 space-y-4 font-mono text-xs">
+                <p className="text-bone text-base font-bold">{isRtl ? 'المبلغ المطلوب تحويله: ' : 'Amount to transfer: '}{formatPrice(finalTotal)}</p>
+                {shippingLater && <p className="text-gold">{localText('shippingLater')}</p>}
                 <div className="flex items-center justify-between gap-4 border-b border-grave/60 pb-3">
                   <div>
-                    <span className="text-ash block text-[10px] uppercase">INSTAPAY HANDLE:</span>
-                    <span className="text-gold font-bold text-sm">moataz_m25@instapay</span>
+                    <span className="text-ash block text-[10px] uppercase">{isRtl ? 'بيانات التحويل:' : 'TRANSFER TO:'}</span>
+                    <span className="text-gold font-bold text-sm break-all" dir="ltr">{activePayment.account}</span>
                   </div>
                   <button
                     type="button"
@@ -388,28 +415,19 @@ export const CheckoutView = ({ setView }) => {
                 </div>
 
                 {/* Direct Pay Link Button */}
-                <a
-                  href="https://ipn.eg/S/moataz_m25/instapay/4lLo7o"
+                {activePayment.url && <a
+                  href={activePayment.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-gold text-void font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 text-center rounded shadow-lg hover:brightness-110 transition-all min-h-[48px]"
                 >
-                  <span>{isRtl ? 'ادفع عبر إنستاباي' : 'Pay via InstaPay'}</span>
+                  <span>{activePayment[isRtl ? 'titleAr' : 'titleEn']}</span>
                   <ExternalLink size={15} />
-                </a>
+                </a>}
 
                 {/* Instructions */}
                 <div className="p-3 bg-stone border border-grave text-bone/90 leading-relaxed text-[11px] space-y-1">
-                  <p className="font-bold text-gold">
-                    {isRtl
-                      ? '١) اضغط ادفع عبر إنستاباي وحوّل قيمة الأوردر.'
-                      : '1) Pay the order total via InstaPay.'}
-                  </p>
-                  <p className="font-bold text-gold">
-                    {isRtl
-                      ? '٢) ارفع صورة التحويل. بنأكد الدفع بعد مراجعة وصوله.'
-                      : '2) Upload the screenshot. Payment is confirmed after transfer verification.'}
-                  </p>
+                  <p className="whitespace-pre-wrap">{activePayment[isRtl ? 'instructionsAr' : 'instructionsEn']}</p>
                 </div>
 
                 {/* Screenshot Upload Input (Required) */}
@@ -421,7 +439,7 @@ export const CheckoutView = ({ setView }) => {
                   <input
                     type="file"
                     accept="image/*"
-                    required={paymentMethod === 'instapay'}
+                    required={isTransfer}
                     onChange={(e) => setPaymentProofFile(e.target.files[0] || null)}
                     className="w-full bg-stone border border-gold/50 text-bone p-2.5 font-mono text-xs focus:border-gold outline-none file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-mono file:bg-gold file:text-void hover:file:bg-gold/80 cursor-pointer"
                   />
@@ -450,10 +468,10 @@ export const CheckoutView = ({ setView }) => {
           )}
           <button
             type="submit"
-            disabled={isSubmitting || cartItems.length === 0 || !!phoneError || !trustedQuote || !!bookingIssue}
+            disabled={!requestId || !cartLoaded || settingsLoading || settingsError || isSubmitting || cartItems.length === 0 || !!phoneError || !trustedQuote || !!bookingIssue}
             className="w-full btn-primary py-4 text-sm font-mono tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 min-h-[48px]"
           >
-            <span>{isSubmitting ? (isRtl ? 'جاري تنفيذ الطلب...' : 'Placing Order...') : t('placeOrder')}</span>
+            <span>{isSubmitting ? (isRtl ? 'جاري تنفيذ الطلب...' : 'Placing Order...') : localText('submit')}</span>
             <ArrowIcon size={16} />
           </button>
 
@@ -543,7 +561,7 @@ export const CheckoutView = ({ setView }) => {
             <div className="flex justify-between text-ash">
               <span>{t('shipping')} ({isRtl ? governorate.nameAr : governorate.nameEn})</span>
               <span className={isFreeShipping ? "text-gold font-bold" : "text-bone"}>
-                {isFreeShipping ? (isRtl ? 'مجاني' : 'FREE') : formatPrice(shippingFee)}
+                {shippingLater ? (isRtl ? 'منفصل قبل الإرسال' : 'Paid separately before dispatch') : isFreeShipping ? (isRtl ? 'مجاني' : 'FREE') : formatPrice(shippingFee)}
               </span>
             </div>
 

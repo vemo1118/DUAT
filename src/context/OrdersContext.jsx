@@ -123,44 +123,25 @@ export function OrdersProvider({ children }) {
     };
   }, []);
 
-  // Update order status
+  // Commit to the server before reporting success or changing local state.
   const updateOrderStatus = async (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((ord) => (ord.id === orderId || ord.ref === orderId ? { ...ord, status: newStatus } : ord))
-    );
-
-    try {
-      const { error: errId } = await supabase
-        .from('orders')
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
-        .eq('id', orderId);
-
-      if (errId) {
-        await supabase
-          .from('orders')
-          .update({ status: newStatus, updated_at: new Date().toISOString() })
-          .eq('ref', orderId);
-      }
-      return { success: true };
-    } catch (err) {
-      console.error('Supabase update order status error:', err);
-      return { success: false, error: err.message };
-    }
+    const current = orders.find(ord => ord.id === orderId || ord.ref === orderId);
+    if (!current) return { success: false, error: 'الطلب غير موجود.' };
+    const { data, error } = await supabase.from('orders')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', current.id).select('id, status, updated_at').single();
+    if (error || !data) return { success: false, error: 'تعذر حفظ حالة الطلب.' };
+    setOrders(prev => prev.map(ord => ord.id === data.id ? { ...ord, status: data.status, updatedAt: data.updated_at } : ord));
+    return { success: true };
   };
 
-  // Delete an order
-  const deleteOrder = async (orderId) => {
-    setOrders((prev) => prev.filter((ord) => ord.id !== orderId && ord.ref !== orderId));
-    try {
-      const { error: errId } = await supabase.from('orders').delete().eq('id', orderId);
-      if (errId) {
-        await supabase.from('orders').delete().eq('ref', orderId);
-      }
-      return { success: true };
-    } catch (err) {
-      console.error('Supabase delete order error:', err);
-      return { success: false, error: err.message };
-    }
+  const deleteOrder = async orderId => {
+    const current = orders.find(ord => ord.id === orderId || ord.ref === orderId);
+    if (!current) return { success: false, error: 'الطلب غير موجود.' };
+    const { data, error } = await supabase.from('orders').delete().eq('id', current.id).select('id').single();
+    if (error || !data) return { success: false, error: 'تعذر حذف الطلب.' };
+    setOrders(prev => prev.filter(ord => ord.id !== data.id));
+    return { success: true };
   };
 
   // Find order by code in local memory

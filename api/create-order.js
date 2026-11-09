@@ -94,7 +94,7 @@ export default async function handler(req, res) {
 
     const requestId = String(payload.requestId || '');
     if (!UUID_PATTERN.test(requestId)) throw new Error('INVALID_ORDER');
-    const paymentMethod = payload.paymentMethod === 'instapay' ? 'instapay' : 'cod';
+    const selectedPaymentId = String(payload.paymentMethod || '');
     const customer = validateCustomer(payload.customer);
     const admin = getSupabaseAdmin();
     const identifierHash = hashClientIdentifier(req);
@@ -121,15 +121,20 @@ export default async function handler(req, res) {
       governorateId: payload.governorateId,
       requireGovernorate: true,
       requireCheckout: true,
-      paymentMethod
+      paymentMethod: selectedPaymentId
     });
+    const paymentMethod = quote.payment.type === 'transfer' ? 'instapay' : 'cod';
     if (payload.expectedTotal !== quote.total) throw new Error('ORDER_TOTAL_CHANGED');
     const expectedUploads = collectExpectedUploads(quote, paymentMethod, payload.paymentProof);
     const pendingUploads = await validatePendingUploads(admin, expectedUploads, identifierHash);
 
     const storedCustomer = {
       ...customer,
-      governorate: quote.governorate
+      governorate: quote.governorate,
+      payment: { id: quote.payment.id, type: quote.payment.type, titleAr: quote.payment.titleAr, titleEn: quote.payment.titleEn, account: quote.payment.account },
+      shippingMode: quote.shippingMode,
+      email: String(payload.customer?.email || '').trim().slice(0, 200),
+      notes: String(payload.customer?.notes || '').trim().slice(0, 1500)
     };
     const storedItems = itemsForStorage(quote.items);
     const paymentProofPath = paymentMethod === 'instapay' ? String(payload.paymentProof.path) : null;

@@ -52,6 +52,8 @@ export function validateCheckout(pricing, paymentMethod, policy = PREORDER, now 
 
 export function checkoutMessage(code, isArabic) {
   const messages = {
+    CHECKOUT_PAUSED: ['استقبال الطلبات متوقف مؤقتًا.', 'Ordering is temporarily paused.'],
+    PAYMENT_UNAVAILABLE: ['لا توجد طريقة دفع متاحة للطلب حاليًا. تواصل معنا.', 'No payment method is available for this order. Please contact us.'],
     CUSTOM_MINIMUM: ['الحجز يبدأ من 4 استيكرات كستمايز. تقدر تعمل كل قطعة بتصميم مختلف.', 'Pre-orders start at 4 custom stickers. Each piece can have a different design.'],
     PREORDER_NOT_OPEN: ['بنجهز فتح الحجز. موعد الشحن هيتعلن قبل استقبال المدفوعات.', 'Pre-orders are being prepared. Shipping dates will be announced before payments open.'],
     PREORDER_CLOSED: ['حجز الدفعة دي انتهى. تابعنا لموعد الدفعة الجاية.', 'This pre-order window has closed. Follow us for the next batch.'],

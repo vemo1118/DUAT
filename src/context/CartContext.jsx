@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
+import { readCart, writeCart } from '../services/cartStorage';
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 import { quoteOrder } from '../services/orderApi';
 import { priceCart, checkoutIssue, ORDER_LIMITS } from '../domain/commerce';
 
@@ -6,12 +7,25 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [rawItems, setCartItems] = useState([]);
+  const [cartLoaded, setCartLoaded] = useState(false);
+  const cartWrites = useRef(Promise.resolve());
   const pricing = priceCart(rawItems);
   const cartItems = pricing.items;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const cartRevision = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    readCart().then(items => { if (active) setCartItems(current => current.length ? current : items); })
+      .catch(() => {}).finally(() => { if (active) setCartLoaded(true); });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    if (!cartLoaded) return;
+    cartWrites.current = cartWrites.current.catch(() => {}).then(() => writeCart(rawItems)).catch(() => {});
+  }, [rawItems, cartLoaded]);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
@@ -131,7 +145,7 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{
+    <CartContext.Provider value={{ cartLoaded,
       cartItems,
       pricing,
       checkoutIssue: checkoutIssue(pricing),

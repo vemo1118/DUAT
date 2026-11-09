@@ -1,3 +1,4 @@
+import { AdminCheckoutEditor } from '../components/AdminCheckoutEditor';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -535,9 +536,13 @@ export function AdminView() {
   const handleResetHeroSlides = () => {
     if (window.confirm('استعادة البنرات الافتراضية؟')) cloudAction(resetSlides, 'تمت استعادة البنرات');
   };
-  const handleStatusChange = (orderId, newStatus) => {
-    updateOrderStatus(orderId, newStatus);
-    showToast(`تم تحديث حالة الطلب #${orderId} بنجاح!`, 'success');
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const result = await updateOrderStatus(orderId, newStatus);
+      if (!result.success) throw new Error(result.error);
+      setSelectedOrderDetails(prev => prev?.id === orderId ? { ...prev, status: newStatus } : prev);
+      showToast('تم حفظ حالة الطلب على السيرفر.', 'success');
+    } catch { showToast('تعذر حفظ حالة الطلب. حاول مرة أخرى.', 'error'); }
   };
 
   // ============================================================
@@ -682,6 +687,7 @@ export function AdminView() {
               <Sliders size={14} className="text-gold" />
             </div>
 
+            <button onClick={() => setActiveTab('checkout_settings')} className="w-full btn-ghost p-3 text-sm">إتمام الطلب وطرق الدفع والشحن</button>
             {/* GROUP 1: SALES & CATALOG */}
             <div className="space-y-2">
               <span className="font-mono text-[11px] text-gold/80 uppercase font-bold block px-2">
@@ -1405,7 +1411,7 @@ export function AdminView() {
                             </p>
                           )}
                           <span className="font-mono text-[11px] text-ash uppercase flex items-center gap-1.5 mt-0.5">
-                            <span>{ord.paymentMethod === 'instapay' ? 'InstaPay' : 'دفع عند الاستلام'}</span>
+                            <span>{ord.customer?.payment?.titleAr || (ord.paymentMethod === 'instapay' ? 'InstaPay' : 'دفع عند الاستلام')}</span>
                             {(ord.payment_proof_path || ord.paymentProofPath) && (
                               <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded flex items-center gap-1">
                                 <ImageIcon size={10} />
@@ -1439,10 +1445,9 @@ export function AdminView() {
                             </button>
 
                             <button
-                              onClick={() => {
+                              onClick={async () => {
                                 if (window.confirm(`هل أنت تأكد من حذف الطلب #${ord.ref || ord.id}؟`)) {
-                                  deleteOrder(ord.id);
-                                  showToast('تم حذف الطلب!', 'warning');
+                                  try { const result = await deleteOrder(ord.id); if (!result.success) throw new Error(result.error); showToast('تم حذف الطلب من السيرفر.', 'warning'); } catch { showToast('تعذر حذف الطلب.', 'error'); }
                                 }
                               }}
                               className="p-1.5 border border-grave text-ash hover:text-red-400 hover:border-red-500/40 bg-stone/50 transition-colors"
@@ -1969,6 +1974,7 @@ export function AdminView() {
       )}
 
       {/* ============================================================ */}
+      {activeTab === 'checkout_settings' && <AdminCheckoutEditor showToast={showToast} />}
       {activeTab === 'preorder_hero' && <AdminPreorderHeroEditor showToast={showToast} />}
       {activeTab === 'preorder_popup' && <AdminPreorderPopupEditor showToast={showToast} />}
 
@@ -3481,6 +3487,9 @@ export function AdminView() {
               </div>
             </div>
 
+            {selectedOrderDetails.customer?.email && <p>الإيميل: {selectedOrderDetails.customer.email}</p>}
+            {selectedOrderDetails.customer?.notes && <p className="whitespace-pre-wrap">ملاحظات العميل: {selectedOrderDetails.customer.notes}</p>}
+            {selectedOrderDetails.customer?.shippingMode === 'later' && <p className="text-gold">الإجمالي لا يشمل الشحن — تحصيل منفصل قبل الإرسال بعد تأكيد التكلفة.</p>}
             {/* Payment Method & Proof Section */}
             {(() => {
               const proofPath = selectedOrderDetails.payment_proof_path || selectedOrderDetails.paymentProofPath;
@@ -3495,7 +3504,7 @@ export function AdminView() {
                       <span>طريقة الدفع:</span>
                     </span>
                     <span className="font-bold text-bone">
-                      {isInstaPay ? 'تحويل سريع عبر إنستاباي (InstaPay)' : 'الدفع نقداً عند الاستلام (COD)'}
+                      {selectedOrderDetails.customer?.payment?.titleAr || (isInstaPay ? 'إنستاباي' : 'الدفع عند الاستلام')}
                     </span>
                   </div>
 
@@ -3558,7 +3567,6 @@ export function AdminView() {
                   value={selectedOrderDetails.status}
                   onChange={(e) => {
                     handleStatusChange(selectedOrderDetails.id, e.target.value);
-                    setSelectedOrderDetails((prev) => ({ ...prev, status: e.target.value }));
                   }}
                   className="bg-stone border border-gold px-3 py-1.5 text-bone font-mono text-xs focus:outline-none"
                 >

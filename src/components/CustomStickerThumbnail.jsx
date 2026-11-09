@@ -39,7 +39,7 @@ export function resolveStickerImage(item) {
 
   return candidates.find((candidate) => (
     typeof candidate === 'string' &&
-    (candidate.startsWith('data:image') || candidate.startsWith('http://') || candidate.startsWith('https://'))
+    (candidate.startsWith('data:image') || candidate.startsWith('http://') || candidate.startsWith('https://') || (candidate.startsWith('/') && !candidate.startsWith('//')))
   )) || null;
 }
 

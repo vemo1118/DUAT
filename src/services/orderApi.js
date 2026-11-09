@@ -61,7 +61,7 @@ export async function uploadOrderFile(file, purpose) {
     .from(upload.bucket)
     .uploadToSignedUrl(upload.path, upload.signedToken, file, { contentType: file.type });
   if (error) throw new Error('File upload failed');
-  return { bucket: upload.bucket, path: upload.path, claimToken: upload.claimToken };
+  return { bucket: upload.bucket, path: upload.path, claimToken: upload.claimToken, expiresAt: upload.expiresAt };
 }
 
 export async function uploadDesignDataUrl(dataUrl) {
@@ -96,4 +96,18 @@ export async function testOrderNotification() {
   const accessToken = data.session?.access_token;
   if (!accessToken) throw new Error('Unauthorized');
   await apiRequest('/api/test-notification', {}, { accessToken });
+}
+
+export async function renewExpiredDesignUploads(items) {
+  const renewed = [];
+  for (const item of items) {
+    const details = item.customDetails || {};
+    const expires = Date.parse(details.design_expires_at);
+    if (String(item.id).startsWith('custom-sticker-') && (!Number.isFinite(expires) || expires < Date.now() + 60_000) && String(item.designSnapshot || '').startsWith('data:image')) {
+      const upload = await uploadDesignDataUrl(item.designSnapshot);
+      renewed.push({ ...item, design_image_path: upload.path, design_upload_token: upload.claimToken,
+        customDetails: { ...details, design_image_path: upload.path, design_upload_token: upload.claimToken, design_expires_at: upload.expiresAt } });
+    } else renewed.push(item);
+  }
+  return renewed;
 }

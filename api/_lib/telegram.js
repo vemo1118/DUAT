@@ -29,11 +29,15 @@ export async function sendTrustedOrderNotification(order) {
     `📞 <b>الموبايل:</b> <code>${escapeHtml(customer.phone)}</code>`,
     `📍 <b>المحافظة:</b> ${escapeHtml(governorate.nameAr || governorate.nameEn)}`,
     `🏠 <b>العنوان:</b> ${escapeHtml(customer.address)}`,
-    `💳 <b>الدفع:</b> ${escapeHtml(String(order.payment_method || 'cod').toUpperCase())}`,
+    `💳 <b>الدفع:</b> ${escapeHtml(customer.payment?.titleAr || String(order.payment_method || 'cod').toUpperCase())}`,
     '',
     '<b>المنتجات:</b>',
     ...itemLines,
     '',
+    `قبل الخصم: ${Number(order.subtotal || 0)} EGP`,
+    `الكوبون: ${escapeHtml(order.coupon_code || '—')} — الخصم: ${Number(order.discount || 0)} EGP`,
+    `الشحن: ${customer.shippingMode === 'later' ? 'منفصل قبل الإرسال بعد تأكيد التكلفة' : Number(order.shipping_fee || 0) + ' EGP'}`,
+    ...(customer.notes ? [`ملاحظات: ${escapeHtml(customer.notes)}`] : []),
     `💰 <b>الإجمالي:</b> ${Number(order.total || 0).toLocaleString('ar-EG')} EGP`
   ].join('\n');
 

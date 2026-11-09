@@ -36,6 +36,7 @@ export default async function handler(req, res) {
         subtotal: quote.subtotal,
         discount: quote.discount,
         shippingFee: quote.shippingFee,
+        shippingMode: quote.shippingMode,
         total: quote.total,
         couponCode: quote.couponCode,
         customQuantity: quote.customQuantity,

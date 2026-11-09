@@ -1,3 +1,5 @@
+import { normalizeEgyptianPhone } from '../../src/domain/customerDetails.js';
+import { normalizeCheckoutSettings, validatePaymentMethod, checkoutShipping, availablePaymentMethods } from '../../src/domain/checkoutSettings.js';
 import {
   PRODUCTS,
   ARABIC_LETTER_PRODUCTS,
@@ -174,7 +176,13 @@ export function calculateTrustedQuote(payload, sources = {}) {
   const pricing = priceCart(safeItems);
   const { subtotal } = pricing;
   const issue = checkoutIssue(pricing);
-  if (payload.requireCheckout) validateCheckout(pricing, payload.paymentMethod);
+  const checkoutSettings = normalizeCheckoutSettings(sources.checkoutSettings || {});
+  let payment = null;
+  if (payload.requireCheckout) {
+    if (issue) throw new Error(issue);
+    payment = validatePaymentMethod(checkoutSettings, payload.paymentMethod, pricing.customQuantity);
+    validateCheckout(pricing, payment.type === 'transfer' ? 'instapay' : 'cod');
+  }
   // Launch custom prices do not stack with coupons; stock retains existing coupon support.
   const couponSubtotal = pricing.items.filter((item) => item.purchaseType !== 'custom-preorder')
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -197,14 +205,16 @@ export function calculateTrustedQuote(payload, sources = {}) {
   const governorateId = cleanText(payload.governorateId, 80);
   const governorate = governorateId ? GOVERNORATE_MAP.get(governorateId) : null;
   if (payload.requireGovernorate && !governorate) throw new Error('INVALID_CUSTOMER');
-  const shippingFee = governorate ? (subtotal >= 800 ? 0 : governorate.fee) : 0;
+  const shippingFee = checkoutShipping(checkoutSettings, subtotal, governorate);
   const total = Math.max(0, subtotal - discount + shippingFee);
 
   return {
     items: pricing.items,
     customQuantity: pricing.customQuantity,
     customRemaining: pricing.customRemaining,
-    checkoutIssue: issue,
+    checkoutIssue: !checkoutSettings.enabled ? 'CHECKOUT_PAUSED' : !availablePaymentMethods(checkoutSettings, pricing.customQuantity).length ? 'PAYMENT_UNAVAILABLE' : issue,
+    payment,
+    shippingMode: checkoutSettings.shippingMode,
     subtotal,
     discount,
     shippingFee,
@@ -227,23 +237,26 @@ export async function loadQuote(admin, payload) {
     ? admin.from('coupons').select('code, type, value, is_active, expires_at').eq('code', couponCode).maybeSingle()
     : Promise.resolve({ data: null, error: null });
 
-  const [productsResult, couponResult] = await Promise.all([
+  const [productsResult, couponResult, settingsResult] = await Promise.all([
     productPromise,
-    couponPromise
+    couponPromise,
+    admin.from('store_settings').select('value').eq('key', 'checkout_settings').maybeSingle()
   ]);
 
+  if (settingsResult.error) throw new Error('CHECKOUT_SETTINGS_UNAVAILABLE');
   if (productsResult.error) throw new Error('INVALID_PRODUCT');
   if (couponCode && (couponResult.error || !couponResult.data)) throw new Error('INVALID_COUPON');
 
   return calculateTrustedQuote(payload, {
     dbProducts: productsResult.data || [],
+    checkoutSettings: settingsResult.data?.value || {},
     coupon: couponResult.data || null
   });
 }
 
 export function validateCustomer(customer) {
   const fullName = cleanText(customer?.fullName || customer?.name, 120);
-  const phone = cleanText(customer?.phone, 20).replace(/\s+/g, '');
+  const phone = normalizeEgyptianPhone(cleanText(customer?.phone, 30));
   const address = cleanText(customer?.address, 300);
   if (!fullName || !address) throw new Error('INVALID_CUSTOMER');
   if (!/^01[0125][0-9]{8}$/.test(phone)) throw new Error('INVALID_PHONE');
