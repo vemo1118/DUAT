@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -103,6 +104,7 @@ export function OrdersProvider({ children }) {
   };
 
   useEffect(() => {
+    const stopRefresh = subscribeCloudRefresh(fetchOrders, 15_000);
     // Only fetch orders if there is an active user session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -119,6 +121,7 @@ export function OrdersProvider({ children }) {
     });
 
     return () => {
+      stopRefresh();
       subscription.unsubscribe();
     };
   }, []);

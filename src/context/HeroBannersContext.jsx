@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import liveCustomEdits from '../data/live_custom_edits.json';
@@ -274,18 +275,12 @@ async function saveSlideToSupabase(slide, index = 0) {
 }
 
 export function HeroBannersProvider({ children }) {
-  const [slides, setSlides] = useState(() => loadLocalSlides() || INITIAL_HERO_SLIDES);
+  const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchSlides = async () => {
     setLoading(true);
     try {
-      // 1. Check local storage first for immediate user edits persistence
-      const local = loadLocalSlides();
-      if (local && Array.isArray(local) && local.length > 0) {
-        setSlides(local);
-      }
-
       // 2. Load from Supabase if available
       let query = supabase.from('hero_slides').select('*');
       try {
@@ -294,30 +289,14 @@ export function HeroBannersProvider({ children }) {
         // ignore order error
       }
       const { data, error } = await query;
-      if (!error && Array.isArray(data) && data.length > 0) {
+      if (error) throw error;
+      if (Array.isArray(data)) {
         const fetched = data.map(mapFromDb).filter(Boolean);
-        if (fetched.length > 0) {
-          setSlides((prev) => {
-            if (JSON.stringify(prev) === JSON.stringify(fetched)) {
-              return prev;
-            }
-            try { localStorage.setItem(HERO_SLIDES_STORAGE_KEY, JSON.stringify(fetched)); } catch { /* Optional cache. */ }
-            return fetched;
-          });
-          setLoading(false);
-          return;
-        }
-      }
-
-      // 3. Fallback to local or initial slides
-      if (!local || local.length === 0) {
-        setSlides(INITIAL_HERO_SLIDES);
-        saveLocalSlides(INITIAL_HERO_SLIDES);
+        setCloudValue(setSlides, prev => JSON.stringify(prev) === JSON.stringify(fetched) ? prev : fetched);
+        saveLocalSlides(fetched);
       }
     } catch (err) {
-      console.warn('Hero slides load fallback:', err);
-      const local = loadLocalSlides();
-      setSlides(local && local.length > 0 ? local : INITIAL_HERO_SLIDES);
+      console.warn('Could not refresh cloud hero slides:', err);
     } finally {
       setLoading(false);
     }
@@ -335,10 +314,10 @@ export function HeroBannersProvider({ children }) {
         fetchSlides
       )
       .subscribe();
-    window.addEventListener('focus', fetchSlides);
+    const stopRefresh = subscribeCloudRefresh(fetchSlides);
 
     return () => {
-      window.removeEventListener('focus', fetchSlides);
+      stopRefresh();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -346,7 +325,7 @@ export function HeroBannersProvider({ children }) {
   const addSlide = async (slideData) => {
     const newSlide = { ...slideData, id: slideData.id || crypto.randomUUID() };
     const saved = await saveSlideToSupabase(newSlide, 0);
-    setSlides(prev => { const updated = [saved, ...prev]; saveLocalSlides(updated); return updated; });
+    setCloudValue(setSlides, prev => { const updated = [saved, ...prev]; saveLocalSlides(updated); return updated; });
     return saved;
   };
 
@@ -355,7 +334,7 @@ export function HeroBannersProvider({ children }) {
     if (index < 0) throw new Error('Slide not found');
     const updated = { ...slides[index], ...fields };
     const saved = await saveSlideToSupabase(updated, index);
-    setSlides(prev => { const next = prev.map(slide => slide.id === id ? saved : slide); saveLocalSlides(next); return next; });
+    setCloudValue(setSlides, prev => { const next = prev.map(slide => slide.id === id ? saved : slide); saveLocalSlides(next); return next; });
     return saved;
   };
 
@@ -369,7 +348,7 @@ export function HeroBannersProvider({ children }) {
   const deleteSlide = async (id) => {
     const { data, error } = await supabase.from('hero_slides').delete().eq('id', id).select('id');
     if (error || !data?.length) throw error || new Error('Delete was not confirmed');
-    setSlides(prev => { const next = prev.filter(slide => slide.id !== id); saveLocalSlides(next); return next; });
+    setCloudValue(setSlides, prev => { const next = prev.filter(slide => slide.id !== id); saveLocalSlides(next); return next; });
   };
 
   const resetSlides = async () => {

@@ -1,7 +1,6 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import liveCustomEdits from '../data/live_custom_edits.json';
-import { getLiveSyncState } from '../services/liveSyncService';
 
 const StickersSettingsContext = createContext();
 
@@ -35,30 +34,7 @@ export const DEFAULT_STICKERS_SETTINGS = {
 };
 
 export const StickersSettingsProvider = ({ children }) => {
-  const getCombinedSettings = () => {
-    const syncState = getLiveSyncState();
-    const source = syncState?.stickersSettings || liveCustomEdits?.stickersSettings || {};
-    try {
-      const saved = localStorage.getItem('duat_stickers_settings_v1');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...source.hero, ...parsed.hero },
-          promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...source.promo, ...parsed.promo },
-          grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...source.grid, ...parsed.grid }
-        };
-      }
-    } catch (e) {
-      console.warn('Error reading duat_stickers_settings from localStorage:', e);
-    }
-    return {
-      hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...source.hero },
-      promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...source.promo },
-      grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...source.grid }
-    };
-  };
-
-  const [stickersSettings, setStickersSettings] = useState(() => getCombinedSettings());
+  const [stickersSettings, setStickersSettings] = useState(DEFAULT_STICKERS_SETTINGS);
   const [loading, setLoading] = useState(false);
 
   // Load settings from Supabase — also used by Realtime broadcast subscription
@@ -78,11 +54,11 @@ export const StickersSettingsProvider = ({ children }) => {
           console.warn('Supabase fetch error for stickers_page_settings:', error.message);
         }
 
-        if (isMounted && data?.value && typeof data.value === 'object') {
-          setStickersSettings({
-            hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...(data.value.hero || {}) },
-            promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...(data.value.promo || {}) },
-            grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...(data.value.grid || {}) }
+        if (isMounted && !error) {
+          setCloudValue(setStickersSettings, {
+            hero: { ...DEFAULT_STICKERS_SETTINGS.hero, ...(data?.value?.hero || {}) },
+            promo: { ...DEFAULT_STICKERS_SETTINGS.promo, ...(data?.value?.promo || {}) },
+            grid: { ...DEFAULT_STICKERS_SETTINGS.grid, ...(data?.value?.grid || {}) }
           });
         }
       } catch (err) {
@@ -94,6 +70,7 @@ export const StickersSettingsProvider = ({ children }) => {
 
     // Initial load
     loadFromSupabase();
+    const stopRefresh = subscribeCloudRefresh(loadFromSupabase);
 
     const channel = supabase
       .channel('duat-stickers-settings')
@@ -113,6 +90,7 @@ export const StickersSettingsProvider = ({ children }) => {
 
     return () => {
       isMounted = false;
+      stopRefresh();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -139,27 +117,27 @@ export const StickersSettingsProvider = ({ children }) => {
   const updateStickersHero = async (heroFields) => {
     const updated = { ...stickersSettings, hero: { ...stickersSettings.hero, ...heroFields } };
     await saveSettingsToSupabase(updated);
-    setStickersSettings(updated);
+    setCloudValue(setStickersSettings, updated);
     return updated;
   };
 
   const updateStickersPromo = async (promoFields) => {
     const updated = { ...stickersSettings, promo: { ...stickersSettings.promo, ...promoFields } };
     await saveSettingsToSupabase(updated);
-    setStickersSettings(updated);
+    setCloudValue(setStickersSettings, updated);
     return updated;
   };
 
   const updateStickersGridSettings = async (gridFields) => {
     const updated = { ...stickersSettings, grid: { ...stickersSettings.grid, ...gridFields } };
     await saveSettingsToSupabase(updated);
-    setStickersSettings(updated);
+    setCloudValue(setStickersSettings, updated);
     return updated;
   };
 
   const resetStickersSettings = async () => {
     await saveSettingsToSupabase(DEFAULT_STICKERS_SETTINGS);
-    setStickersSettings(DEFAULT_STICKERS_SETTINGS);
+    setCloudValue(setStickersSettings, DEFAULT_STICKERS_SETTINGS);
   };
 
   return (

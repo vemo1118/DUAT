@@ -10,4 +10,4 @@ if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KE
   console.warn('⚠️ VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY environment variables missing. Using fallback configuration.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, { global: { fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' }) } });

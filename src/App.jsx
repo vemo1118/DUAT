@@ -1,3 +1,4 @@
+import { NotificationSettingsProvider } from './context/NotificationSettingsContext';
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
@@ -10,7 +11,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { ProductsProvider } from './context/ProductsContext';
+import { ProductsProvider, useProducts } from './context/ProductsContext';
 import { OrdersProvider } from './context/OrdersContext';
 import { HeroBannersProvider } from './context/HeroBannersContext';
 import { CategoryBannersProvider } from './context/CategoryBannersContext';
@@ -46,6 +47,12 @@ function LoadingFallback() {
       <span>DUAT / LOADING...</span>
     </div>
   );
+}
+
+function StoreDataNotice() {
+  const { syncError, reload } = useProducts();
+  if (!syncError) return null;
+  return <div role="status" className="bg-stone border border-gold p-3 text-bone text-center text-sm" dir="rtl">تعذر تحديث بيانات الموقع. تأكد من اتصالك بالإنترنت. <button type="button" onClick={reload} className="text-gold underline px-2">إعادة المحاولة / Retry</button></div>;
 }
 
 export function App() {
@@ -86,13 +93,13 @@ export function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <ProductsProvider>
+        <ProductsProvider><StoreDataNotice />
           <HeroBannersProvider>
             <CategoryBannersProvider>
               <BundlesSettingsProvider>
                 <PreorderHeroSettingsProvider>
                 <PreorderPopupSettingsProvider>
-                <CheckoutSettingsProvider><StickersSettingsProvider>
+                <NotificationSettingsProvider><CheckoutSettingsProvider><StickersSettingsProvider>
                     <WishlistProvider>
                         <CartProvider>
                           <ToastProvider>
@@ -184,7 +191,7 @@ export function App() {
                           </ToastProvider>
                         </CartProvider>
                     </WishlistProvider>
-                </StickersSettingsProvider></CheckoutSettingsProvider>
+                </StickersSettingsProvider></CheckoutSettingsProvider></NotificationSettingsProvider>
                 </PreorderPopupSettingsProvider>
                 </PreorderHeroSettingsProvider>
               </BundlesSettingsProvider>

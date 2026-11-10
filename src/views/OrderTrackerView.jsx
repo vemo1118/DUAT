@@ -1,3 +1,4 @@
+import { useNotificationSettings } from '../context/NotificationSettingsContext';
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { SunDisc } from '../components/SunDisc';
@@ -6,6 +7,7 @@ import { Search, CheckCircle, Clock, Truck, ShieldCheck, Loader2 } from 'lucide-
 
 export const OrderTrackerView = () => {
   const { lang, t } = useLanguage();
+  const { settings: contactSettings } = useNotificationSettings();
   const [orderId, setOrderId] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,14 +153,14 @@ export const OrderTrackerView = () => {
 
             {/* Action Buttons */}
             <div className="pt-6 border-t border-grave flex flex-col sm:flex-row gap-3">
-              <a
-                href={`https://wa.me/201012345678?text=${encodeURIComponent(`أهلاً خدمة عملاء دوات، أود الاستفسار عن طلبي رقم: ${trackedResult.code}`)}`}
+              {contactSettings.whatsapp && <a
+                href={`https://wa.me/${contactSettings.whatsapp}?text=${encodeURIComponent(`أهلاً خدمة عملاء دوات، أود الاستفسار عن طلبي رقم: ${trackedResult.code}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3 px-6 border border-emerald-500/50 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-900/40 text-xs font-mono flex items-center justify-center gap-2 transition-colors flex-1"
               >
                 <span>💬 {lang === 'ar' ? 'محادثة الدعم على واتساب' : 'Chat Support on WhatsApp'}</span>
-              </a>
+              </a>}
             </div>
           </div>
         )}

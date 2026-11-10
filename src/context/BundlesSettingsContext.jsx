@@ -1,7 +1,6 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import liveCustomEdits from '../data/live_custom_edits.json';
-import { getLiveSyncState } from '../services/liveSyncService';
 
 const BundlesSettingsContext = createContext();
 
@@ -48,30 +47,7 @@ export const DEFAULT_BUNDLES_SETTINGS = {
 };
 
 export const BundlesSettingsProvider = ({ children }) => {
-  const getCombinedSettings = () => {
-    const syncState = getLiveSyncState();
-    const source = syncState?.bundlesSettings || liveCustomEdits?.bundlesSettings || {};
-    try {
-      const saved = localStorage.getItem('duat_bundles_settings_v1');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...source.hero, ...parsed.hero },
-          cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...source.cta, ...parsed.cta },
-          grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...source.grid, ...parsed.grid }
-        };
-      }
-    } catch (e) {
-      console.warn('Error reading duat_bundles_settings from localStorage:', e);
-    }
-    return {
-      hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...source.hero },
-      cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...source.cta },
-      grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...source.grid }
-    };
-  };
-
-  const [bundlesSettings, setBundlesSettings] = useState(() => getCombinedSettings());
+  const [bundlesSettings, setBundlesSettings] = useState(DEFAULT_BUNDLES_SETTINGS);
   const [loading, setLoading] = useState(false);
 
   // Fetch latest from Supabase (called on mount and on remote update)
@@ -82,11 +58,11 @@ export const BundlesSettingsProvider = ({ children }) => {
         .select('value')
         .eq('key', 'bundles_page_settings')
         .maybeSingle();
-      if (!error && data?.value && typeof data.value === 'object') {
-        setBundlesSettings({
-          hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...(data.value.hero || {}) },
-          cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...(data.value.cta || {}) },
-          grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...(data.value.grid || {}) }
+      if (!error) {
+        setCloudValue(setBundlesSettings, {
+          hero: { ...DEFAULT_BUNDLES_SETTINGS.hero, ...(data?.value?.hero || {}) },
+          cta: { ...DEFAULT_BUNDLES_SETTINGS.cta, ...(data?.value?.cta || {}) },
+          grid: { ...DEFAULT_BUNDLES_SETTINGS.grid, ...(data?.value?.grid || {}) }
         });
       }
     } catch (err) {
@@ -97,6 +73,7 @@ export const BundlesSettingsProvider = ({ children }) => {
   useEffect(() => {
     // Initial load from Supabase
     loadFromSupabase();
+    const stopRefresh = subscribeCloudRefresh(loadFromSupabase);
 
     const channel = supabase
       .channel('duat-bundles-settings')
@@ -113,6 +90,7 @@ export const BundlesSettingsProvider = ({ children }) => {
       .subscribe();
 
     return () => {
+      stopRefresh();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -139,27 +117,27 @@ export const BundlesSettingsProvider = ({ children }) => {
   const updateBundlesHero = async (heroFields) => {
     const updated = { ...bundlesSettings, hero: { ...bundlesSettings.hero, ...heroFields } };
     await saveSettingsToSupabase(updated);
-    setBundlesSettings(updated);
+    setCloudValue(setBundlesSettings, updated);
     return updated;
   };
 
   const updateBundlesCta = async (ctaFields) => {
     const updated = { ...bundlesSettings, cta: { ...bundlesSettings.cta, ...ctaFields } };
     await saveSettingsToSupabase(updated);
-    setBundlesSettings(updated);
+    setCloudValue(setBundlesSettings, updated);
     return updated;
   };
 
   const updateBundlesGridSettings = async (gridFields) => {
     const updated = { ...bundlesSettings, grid: { ...bundlesSettings.grid, ...gridFields } };
     await saveSettingsToSupabase(updated);
-    setBundlesSettings(updated);
+    setCloudValue(setBundlesSettings, updated);
     return updated;
   };
 
   const resetBundlesSettings = async () => {
     await saveSettingsToSupabase(DEFAULT_BUNDLES_SETTINGS);
-    setBundlesSettings(DEFAULT_BUNDLES_SETTINGS);
+    setCloudValue(setBundlesSettings, DEFAULT_BUNDLES_SETTINGS);
   };
 
   return (

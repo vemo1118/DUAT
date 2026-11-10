@@ -13,7 +13,7 @@ function safeNum(val, fallback) {
 
 export const HeroSlider = () => {
   const { lang } = useLanguage();
-  const { slides } = useHeroBanners();
+  const { slides, loading } = useHeroBanners();
   const navigate = useNavigate();
   
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -47,7 +47,7 @@ export const HeroSlider = () => {
     setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
 
-  if (activeSlides.length === 0) return null;
+  if (activeSlides.length === 0) return loading ? <div className="h-[460px] md:h-[720px] bg-stone animate-pulse" aria-label="Loading banners" /> : null;
 
   const current = (activeSlides[currentSlide] && typeof activeSlides[currentSlide] === 'object')
     ? activeSlides[currentSlide]

@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { storefrontProduct } from '../domain/commerce';
 import {
@@ -320,15 +321,14 @@ async function saveProductToSupabase(product) {
 }
 
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useState(() => loadLocalProducts());
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncError, setSyncError] = useState(false);
 
   // Fetch products safely with Supabase as primary source of truth
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const isCustomOrder = localStorage.getItem('duat_custom_product_order') === 'true';
-
       // 1. Primary: Attempt to load from Supabase
       const { data, error } = await supabase
         .from('products')
@@ -339,28 +339,17 @@ export function ProductsProvider({ children }) {
 
         // Cloud rows are authoritative. Device-only overrides must not mask edits from another device.
         const finalProducts = sortProductsByDefaultOrder(fetchedProds);
-        setProducts(finalProducts);
+        setSyncError(false);
+        setCloudValue(setProducts, finalProducts);
         saveLocalProducts(finalProducts);
         setLoading(false);
         return;
       }
 
-      // 2. Fallback to localStorage if Supabase call returned empty or error
-      const local = loadLocalProducts();
-      if (local && local.length > 0) {
-        setProducts(isCustomOrder ? local : sortProductsByDefaultOrder(local));
-        setLoading(false);
-        return;
-      }
-
-      // 3. Fallback to INITIAL_PRODUCTS
-      const initialSorted = sortProductsByDefaultOrder(applyOverridesAndMergedProducts(INITIAL_PRODUCTS));
-      setProducts(initialSorted);
-      saveLocalProducts(initialSorted);
+      throw error || new Error('Product cloud read failed');
     } catch (err) {
-      console.warn('Products fetch fallback to local/initial:', err);
-      const local = loadLocalProducts();
-      setProducts(local && local.length > 0 ? local : sortProductsByDefaultOrder(applyOverridesAndMergedProducts(INITIAL_PRODUCTS)));
+      setSyncError(true);
+      console.warn('Could not refresh cloud products:', err);
     } finally {
       setLoading(false);
     }
@@ -378,10 +367,10 @@ export function ProductsProvider({ children }) {
         fetchProducts
       )
       .subscribe();
-    window.addEventListener('focus', fetchProducts);
+    const stopRefresh = subscribeCloudRefresh(fetchProducts);
 
     return () => {
-      window.removeEventListener('focus', fetchProducts);
+      stopRefresh();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -390,7 +379,7 @@ export function ProductsProvider({ children }) {
     const ordered = list.map((item, index) => ({ ...item, sortOrder: index }));
     const { data, error } = await supabase.from('products').upsert(ordered.map(mapToDb), { onConflict: 'id' }).select('id');
     if (error || data?.length !== ordered.length) throw error || new Error('Order save was not confirmed');
-    setProducts(ordered);
+    setCloudValue(setProducts, ordered);
     saveLocalProducts(ordered);
   };
   const moveProduct = async (id, step) => {
@@ -413,7 +402,7 @@ export function ProductsProvider({ children }) {
       images: normalizeProductImages(img, Array.isArray(prodData.images) ? prodData.images : [])
     };
     const saved = await saveProductToSupabase(newProduct);
-    setProducts(prev => { const next = [saved, ...prev]; saveLocalProducts(next); return next; });
+    setCloudValue(setProducts, prev => { const next = [saved, ...prev]; saveLocalProducts(next); return next; });
     return saved;
   };
 
@@ -424,7 +413,7 @@ export function ProductsProvider({ children }) {
     const updated = { ...product, ...fields, imageUrl: img, image: img,
       images: normalizeProductImages(img, fields.images || [], product.images || []) };
     const saved = await saveProductToSupabase(updated);
-    setProducts(prev => { const next = prev.map(item => item.id === id ? saved : item); saveLocalProducts(next); return next; });
+    setCloudValue(setProducts, prev => { const next = prev.map(item => item.id === id ? saved : item); saveLocalProducts(next); return next; });
     return saved;
   };
 
@@ -444,7 +433,7 @@ export function ProductsProvider({ children }) {
   const deleteProduct = async (id) => {
     const { data, error } = await supabase.from('products').delete().eq('id', id).select('id');
     if (error || !data?.length) throw error || new Error('Delete was not confirmed');
-    setProducts(prev => { const next = prev.filter(item => item.id !== id); saveLocalProducts(next); return next; });
+    setCloudValue(setProducts, prev => { const next = prev.filter(item => item.id !== id); saveLocalProducts(next); return next; });
   };
 
   // Get single product by ID
@@ -463,7 +452,7 @@ export function ProductsProvider({ children }) {
     } catch (e) {
       // ignore
     }
-    setProducts(INITIAL_PRODUCTS);
+    setCloudValue(setProducts, INITIAL_PRODUCTS);
     saveLocalProducts(INITIAL_PRODUCTS);
   };
 
@@ -473,6 +462,8 @@ export function ProductsProvider({ children }) {
         products: products.map(storefrontProduct),
         catalogProducts: products,
         loading,
+        syncError,
+        reload: fetchProducts,
         addProduct,
         updateProduct,
         adjustPrice,

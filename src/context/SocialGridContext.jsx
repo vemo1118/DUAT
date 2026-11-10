@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
@@ -61,28 +62,8 @@ const SETTINGS_KEY = 'duat_social_settings_v1';
 const TILES_KEY = 'duat_social_tiles_v1';
 
 export const SocialGridProvider = ({ children }) => {
-  const [settings, setSettings] = useState(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn('Error reading social grid settings:', e);
-    }
-    return INITIAL_SOCIAL_GRID_SETTINGS;
-  });
-
-  const [tiles, setTiles] = useState(() => {
-    try {
-      const saved = localStorage.getItem(TILES_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.warn('Error reading social tiles:', e);
-    }
-    return INITIAL_SOCIAL_TILES;
-  });
+  const [settings, setSettings] = useState(INITIAL_SOCIAL_GRID_SETTINGS);
+  const [tiles, setTiles] = useState(INITIAL_SOCIAL_TILES);
 
   // Fetch from Supabase on mount — also used by Realtime broadcast subscription
   useEffect(() => {
@@ -90,24 +71,24 @@ export const SocialGridProvider = ({ children }) => {
 
     async function loadSocialFromSupabase() {
       try {
-        const { data: setRes } = await supabase
+        const { data: setRes, error: settingsError } = await supabase
           .from('store_settings')
           .select('value')
           .eq('key', 'social_grid_settings')
           .maybeSingle();
 
-        if (isMounted && setRes?.value && typeof setRes.value === 'object') {
-          setSettings({ ...INITIAL_SOCIAL_GRID_SETTINGS, ...setRes.value });
+        if (isMounted && !settingsError) {
+          setCloudValue(setSettings, { ...INITIAL_SOCIAL_GRID_SETTINGS, ...(setRes?.value || {}) });
         }
 
-        const { data: tileRes } = await supabase
+        const { data: tileRes, error: tilesError } = await supabase
           .from('store_settings')
           .select('value')
           .eq('key', 'social_grid_tiles')
           .maybeSingle();
 
-        if (isMounted && Array.isArray(tileRes?.value)) {
-          setTiles(tileRes.value);
+        if (isMounted && !tilesError) {
+          setCloudValue(setTiles, Array.isArray(tileRes?.value) ? tileRes.value : INITIAL_SOCIAL_TILES);
         }
       } catch (err) {
         console.warn('Error loading social grid from Supabase:', err);
@@ -143,11 +124,11 @@ export const SocialGridProvider = ({ children }) => {
         reloadSocial
       )
       .subscribe();
-    window.addEventListener('focus', reloadSocial);
+    const stopRefresh = subscribeCloudRefresh(reloadSocial);
 
     return () => {
       isMounted = false;
-      window.removeEventListener('focus', reloadSocial);
+      stopRefresh();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -176,7 +157,7 @@ export const SocialGridProvider = ({ children }) => {
         updated_at: new Date().toISOString()
       }).select('key').single();
     if (error || !data) throw error || new Error('SOCIAL_SETTINGS_SAVE_FAILED');
-    setSettings(updated);
+    setCloudValue(setSettings, updated);
     return updated;
   };
 
@@ -208,14 +189,14 @@ export const SocialGridProvider = ({ children }) => {
     };
     const updated = [...tiles, newTile];
     const saved = await saveTilesToSupabase(updated);
-    setTiles(saved);
+    setCloudValue(setTiles, saved);
     return saved.find((tile) => tile.id === newTile.id);
   };
 
   const updateTile = async (id, updatedFields) => {
     const updated = tiles.map((t) => (t.id === id ? { ...t, ...updatedFields } : t));
     const saved = await saveTilesToSupabase(updated);
-    setTiles(saved);
+    setCloudValue(setTiles, saved);
   };
 
   const toggleTileVisibility = async (id) => {
@@ -227,20 +208,20 @@ export const SocialGridProvider = ({ children }) => {
       return t;
     });
     await saveTilesToSupabase(updated);
-    setTiles(updated);
+    setCloudValue(setTiles, updated);
   };
 
   const deleteTile = async (id) => {
     const updated = tiles.filter((t) => t.id !== id);
     await saveTilesToSupabase(updated);
-    setTiles(updated);
+    setCloudValue(setTiles, updated);
   };
 
   const resetSocialGrid = async () => {
     await updateSettings(INITIAL_SOCIAL_GRID_SETTINGS);
     await saveTilesToSupabase(INITIAL_SOCIAL_TILES);
-    setSettings(INITIAL_SOCIAL_GRID_SETTINGS);
-    setTiles(INITIAL_SOCIAL_TILES);
+    setCloudValue(setSettings, INITIAL_SOCIAL_GRID_SETTINGS);
+    setCloudValue(setTiles, INITIAL_SOCIAL_TILES);
   };
 
   return (

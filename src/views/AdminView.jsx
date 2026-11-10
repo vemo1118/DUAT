@@ -1,3 +1,5 @@
+import { subscribeCloudRefresh } from '../services/cloudRefresh';
+import { useNotificationSettings } from '../context/NotificationSettingsContext';
 import { AdminCheckoutEditor } from '../components/AdminCheckoutEditor';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useProducts } from '../context/ProductsContext';
@@ -60,14 +62,13 @@ import {
 } from 'lucide-react';
 import {
   exportOrdersToCSV,
-  saveNotificationSettingsToSupabase,
-  ADMIN_WHATSAPP_NUMBER_KEY
 } from '../utils/orderNotifier';
 
 export function AdminView() {
   const { formatPrice } = useLanguage();
   const {
     catalogProducts: products,
+    loading: productsLoading,
     addProduct,
     updateProduct,
     adjustPrice,
@@ -160,12 +161,18 @@ export function AdminView() {
 
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders' | 'hero' | 'notifications'
 
-  const [adminWhatsApp, setAdminWhatsApp] = useState(() => localStorage.getItem(ADMIN_WHATSAPP_NUMBER_KEY) || '201000000000');
+  const { settings: notificationSettings, loading: notificationLoading, error: notificationError, reload: reloadNotifications, saveSettings: saveNotifications } = useNotificationSettings();
+  const [adminWhatsApp, setAdminWhatsApp] = useState('');
+  const [notificationDirty, setNotificationDirty] = useState(false);
+  const [notificationSaving, setNotificationSaving] = useState(false);
+  useEffect(() => { if (!notificationDirty) setAdminWhatsApp(notificationSettings.whatsapp); }, [notificationSettings.whatsapp, notificationDirty]);
 
   const handleSaveNotificationSettings = async (e) => {
     e.preventDefault();
-    await saveNotificationSettingsToSupabase(null, null, adminWhatsApp);
-    showToast('تم حفظ رقم واتساب بنجاح.', 'success');
+    setNotificationSaving(true);
+    try { const saved = await saveNotifications(adminWhatsApp); setAdminWhatsApp(saved.whatsapp); setNotificationDirty(false); showToast('اتحفظ رقم الواتساب على السيرفر لكل الأجهزة.', 'success'); }
+    catch (error) { showToast(error.message, 'error'); }
+    finally { setNotificationSaving(false); }
   };
 
   const handleTestNotification = async () => {
@@ -203,18 +210,6 @@ export function AdminView() {
         setTimeout(() => { if (active) checkSession(currentSession); }, 0);
       }
     });
-
-    const syncNotifSettingsFromDb = async () => {
-      try {
-        const { data } = await supabase.from('builder_settings').select('admin_whatsapp').eq('id', 'global-builder-config').maybeSingle();
-        if (data) {
-          if (data.admin_whatsapp) setAdminWhatsApp(data.admin_whatsapp);
-        }
-      } catch (e) {
-        console.warn('Error loading notification settings in AdminView:', e);
-      }
-    };
-    syncNotifSettingsFromDb();
 
     return () => { active = false; authVersion++; subscription.unsubscribe(); };
   }, []);
@@ -288,7 +283,7 @@ export function AdminView() {
 
   useEffect(() => {
     if (!session) return;
-    supabase
+    const loadCoupons = () => supabase
       .from('coupons')
       .select('code, type, value, is_active, expires_at')
       .order('code')
@@ -302,6 +297,9 @@ export function AdminView() {
           isActive: coupon.is_active !== false
         })));
       });
+    loadCoupons();
+    const stopRefresh = subscribeCloudRefresh(loadCoupons, 15_000);
+    return stopRefresh;
   }, [session]);
 
   const handleAddCoupon = async (e) => {
@@ -719,7 +717,7 @@ export function AdminView() {
                     <span>المنتجات والكاتالوج</span>
                   </div>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-void/40 border border-current">
-                    {products.length}
+                    {productsLoading ? '…' : products.length}
                   </span>
                 </button>
 
@@ -2192,15 +2190,19 @@ export function AdminView() {
             </div>
           </div>
 
+          {notificationLoading && <p>جاري تحميل الرقم المحفوظ على السيرفر…</p>}
+          {notificationError && <button type="button" onClick={reloadNotifications} className="text-gold">تعذر تحميل إعدادات السيرفر — إعادة المحاولة</button>}
+          {notificationDirty && <p className="text-gold text-sm">فيه تعديلات لسه ما اتحفظتش.</p>}
           <form onSubmit={handleSaveNotificationSettings} className="space-y-5 font-mono text-xs">
             <div>
-              <label className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
+              <label htmlFor="admin-notification-whatsapp" className="block text-gold font-bold mb-1.5 uppercase tracking-wider">
                 رقم الواتساب لاستلام طلبات الشات المباشرة
               </label>
               <input
-                type="text"
+                type="tel"
+                id="admin-notification-whatsapp"
                 value={adminWhatsApp}
-                onChange={(e) => setAdminWhatsApp(e.target.value)}
+                onChange={(e) => { setAdminWhatsApp(e.target.value); setNotificationDirty(true); }}
                 placeholder="مثال: 201012345678"
                 className="w-full bg-coal border border-grave px-4 py-3 text-bone font-mono focus:border-gold outline-none"
                 dir="ltr"
@@ -2217,10 +2219,11 @@ export function AdminView() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <button
                 type="submit"
+                disabled={notificationLoading || notificationSaving || notificationError}
                 className="btn-primary w-full py-4 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
               >
                 <Save size={16} />
-                <span>حفظ الإعدادات</span>
+                <span>{notificationSaving ? 'جاري الحفظ…' : 'حفظ الإعدادات'}</span>
               </button>
               <button
                 type="button"

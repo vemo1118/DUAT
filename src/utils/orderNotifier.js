@@ -1,28 +1,19 @@
 import { supabase } from '../lib/supabase';
 
-export const ADMIN_WHATSAPP_NUMBER_KEY = 'duat_admin_whatsapp_number';
-export const DEFAULT_ADMIN_WHATSAPP = '201000000000';
+import { NOTIFICATION_SETTINGS_KEY, normalizeWhatsApp } from '../domain/notificationSettings';
 
 export async function saveNotificationSettingsToSupabase(_token, _chatId, whatsapp) {
-  const cleanWa = (whatsapp || '').trim();
-  if (cleanWa) localStorage.setItem(ADMIN_WHATSAPP_NUMBER_KEY, cleanWa);
-  try {
-    await supabase.from('builder_settings').upsert({
-      id: 'global-builder-config',
-      admin_whatsapp: cleanWa,
-      updated_at: new Date().toISOString()
-    });
-  } catch (err) {
-    console.warn('Failed saving whatsapp setting to Supabase:', err.message);
-  }
+  const value = { whatsapp: normalizeWhatsApp(whatsapp) };
+  const { data, error } = await supabase.from('store_settings').upsert({ key: NOTIFICATION_SETTINGS_KEY, value, updated_at: new Date().toISOString() }, { onConflict: 'key' }).select('value').single();
+  if (error || !data?.value) throw new Error('تعذر حفظ رقم الواتساب على السيرفر. حاول مرة أخرى.');
+  return data.value;
 }
 
 /**
  * Generates a pre-filled WhatsApp click-to-chat URL with full order breakdown.
  */
 export function generateWhatsAppOrderLink(order, phone = null) {
-  const targetPhone = phone || localStorage.getItem(ADMIN_WHATSAPP_NUMBER_KEY) || DEFAULT_ADMIN_WHATSAPP;
-  const cleanPhone = targetPhone.replace(/[^0-9]/g, '');
+  const cleanPhone = normalizeWhatsApp(phone);
 
   const itemsText = Array.isArray(order.items)
     ? order.items

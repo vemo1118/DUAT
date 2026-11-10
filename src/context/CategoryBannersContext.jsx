@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import {
@@ -151,13 +152,12 @@ async function migrateLegacyCategoriesIfAdmin(banners) {
 }
 
 export const CategoryBannersProvider = ({ children }) => {
-  const [categoryBanners, setCategoryBanners] = useState(readLocalCategories);
+  const [categoryBanners, setCategoryBanners] = useState([]);
   const [forgeBanner, setForgeBanner] = useState(DEFAULT_FORGE_BANNER);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    const legacyBanners = categoryBanners;
 
     async function loadFromSupabase() {
       setLoading(true);
@@ -170,17 +170,10 @@ export const CategoryBannersProvider = ({ children }) => {
         if (!isMounted) return;
 
         const nextForge = normalizeForgeBanner(forgeResult.data?.value);
-        setForgeBanner(current => JSON.stringify(current) === JSON.stringify(nextForge) ? current : nextForge);
+        setCloudValue(setForgeBanner, current => JSON.stringify(current) === JSON.stringify(nextForge) ? current : nextForge);
         if (categoryResult.error) throw categoryResult.error;
 
-        if (Array.isArray(categoryResult.data) && categoryResult.data.length > 0) {
-          setCategoryBanners(categoryResult.data.map(mapCategoryRow));
-        } else {
-          const migrated = await migrateLegacyCategoriesIfAdmin(legacyBanners);
-          if (isMounted && Array.isArray(migrated) && migrated.length > 0) {
-            setCategoryBanners(migrated);
-          }
-        }
+        if (Array.isArray(categoryResult.data)) setCloudValue(setCategoryBanners, categoryResult.data.map(mapCategoryRow));
       } catch (error) {
         console.warn('Error loading category banners from Supabase:', error?.message || error);
       } finally {
@@ -205,9 +198,9 @@ export const CategoryBannersProvider = ({ children }) => {
       )
       .subscribe();
 
-    window.addEventListener('focus', loadFromSupabase);
+    const stopRefresh = subscribeCloudRefresh(loadFromSupabase);
     return () => {
-      window.removeEventListener('focus', loadFromSupabase);
+      stopRefresh();
       isMounted = false;
       supabase.removeChannel(channel);
     };
@@ -229,7 +222,7 @@ export const CategoryBannersProvider = ({ children }) => {
       badge: newBanner.badge || `0${categoryBanners.length + 1}`
     };
     const saved = await saveCategoryBannerRecord(banner);
-    setCategoryBanners((current) => [...current.filter((item) => item.id !== saved.id), saved]);
+    setCloudValue(setCategoryBanners, (current) => [...current.filter((item) => item.id !== saved.id), saved]);
     return saved;
   };
 
@@ -237,7 +230,7 @@ export const CategoryBannersProvider = ({ children }) => {
     const current = categoryBanners.find((banner) => banner.id === bannerId);
     if (!current) throw new Error('CATEGORY_NOT_FOUND');
     const saved = await saveCategoryBannerRecord({ ...current, ...updatedFields, id: bannerId });
-    setCategoryBanners((banners) => banners.map((banner) => (banner.id === bannerId ? saved : banner)));
+    setCloudValue(setCategoryBanners, (banners) => banners.map((banner) => (banner.id === bannerId ? saved : banner)));
     return saved;
   };
 
@@ -257,7 +250,7 @@ export const CategoryBannersProvider = ({ children }) => {
       .select('id');
     if (error) throw error;
     if (!Array.isArray(data) || data.length !== 1) throw new Error('CATEGORY_DELETE_NOT_CONFIRMED');
-    setCategoryBanners((banners) => banners.filter((banner) => banner.id !== bannerId));
+    setCloudValue(setCategoryBanners, (banners) => banners.filter((banner) => banner.id !== bannerId));
   };
 
   const updateForgeBanner = async (updatedFields) => {
@@ -273,7 +266,7 @@ export const CategoryBannersProvider = ({ children }) => {
       .single();
     if (error || !data?.value) throw error || new Error('FORGE_SAVE_NOT_CONFIRMED');
     const saved = normalizeForgeBanner(data.value);
-    setForgeBanner(saved);
+    setCloudValue(setForgeBanner, saved);
     return saved;
   };
 
@@ -291,8 +284,8 @@ export const CategoryBannersProvider = ({ children }) => {
     });
     if (forgeError) throw forgeError;
 
-    setCategoryBanners(data.map(mapCategoryRow));
-    setForgeBanner(DEFAULT_FORGE_BANNER);
+    setCloudValue(setCategoryBanners, data.map(mapCategoryRow));
+    setCloudValue(setForgeBanner, DEFAULT_FORGE_BANNER);
     localStorage.removeItem(CATEGORY_STORAGE_KEY);
   };
 

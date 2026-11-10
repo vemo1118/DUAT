@@ -1,3 +1,4 @@
+import { useNotificationSettings } from '../context/NotificationSettingsContext';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SunDisc } from './SunDisc';
@@ -5,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const Footer = () => {
   const { lang, t } = useLanguage();
+  const { settings: contactSettings } = useNotificationSettings();
 
   return (
     <footer className="bg-stone border-t border-grave pt-24 pb-16 transition-colors">
@@ -76,7 +78,7 @@ export const Footer = () => {
               CONNECT
             </h4>
             <p className="text-ash">{t('footerSocial')}</p>
-            <p className="text-ash">Support: {lang === 'ar' ? 'واتساب الدعم المباشر' : 'WhatsApp Direct Support'}</p>
+            {contactSettings.whatsapp && <a href={`https://wa.me/${contactSettings.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-ash block py-2">{lang === 'ar' ? 'واتساب الدعم المباشر' : 'WhatsApp Direct Support'}</a>}
           </div>
 
         </div>

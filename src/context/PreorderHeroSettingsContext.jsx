@@ -1,3 +1,4 @@
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
@@ -52,7 +53,7 @@ export function PreorderHeroSettingsProvider({ children }) {
     const { data, error } = await supabase.from('store_settings').select('value').eq('key', SETTINGS_KEY).maybeSingle();
     if (!error) {
       const next = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...data?.value };
-      setSettings(current => JSON.stringify(current) === JSON.stringify(next) ? current : next);
+      setCloudValue(setSettings, current => JSON.stringify(current) === JSON.stringify(next) ? current : next);
     }
     setLoading(false);
   }, []);
@@ -62,9 +63,8 @@ export function PreorderHeroSettingsProvider({ children }) {
     const channel = supabase.channel('duat-preorder-hero-settings').on('postgres_changes', {
       event: '*', schema: 'public', table: 'store_settings', filter: `key=eq.${SETTINGS_KEY}`
     }, load).subscribe();
-    const onFocus = () => load();
-    window.addEventListener('focus', onFocus);
-    return () => { supabase.removeChannel(channel); window.removeEventListener('focus', onFocus); };
+    const stopRefresh = subscribeCloudRefresh(load);
+    return () => { supabase.removeChannel(channel); stopRefresh(); };
   }, [load]);
 
   const saveSettings = useCallback(async (next) => {
@@ -81,7 +81,7 @@ export function PreorderHeroSettingsProvider({ children }) {
     const { data, error } = await supabase.from('store_settings').upsert({ key: SETTINGS_KEY, value: payload }, { onConflict: 'key' }).select('value').single();
     if (error) throw error;
     const saved = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...(data?.value || payload) };
-    setSettings(saved);
+    setCloudValue(setSettings, saved);
     return saved;
   }, []);
 
