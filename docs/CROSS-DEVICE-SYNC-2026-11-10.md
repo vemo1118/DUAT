@@ -19,3 +19,6 @@ Notification settings wrote WhatsApp to localStorage first, then attempted to up
 - Production build, ESLint error check and whitespace check pass. No customer order, payment, campaign price or Telegram message was changed or sent.
 
 Theme/language choices, cart and wishlist remain personal browser state; they are not shared merchant configuration. Offline or suspended devices catch up when connectivity/visibility returns. These are browser sessions with mobile viewport emulation, not a physical two-phone test.
+
+## Open order detail follow-up
+An open order detail now tracks the current cloud-backed order list, including a status changed in another admin session. Identical order refreshes retain object references. A failed order read preserves the last known list and displays a stale-data/retry warning. Isolated browser fixtures verified one session saving a shipped status and the other session's already-open detail updating on resume; no real order was edited.

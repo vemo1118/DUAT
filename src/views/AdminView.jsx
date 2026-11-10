@@ -82,7 +82,7 @@ export function AdminView() {
     () => new Map(products.map((product) => [String(product.id), product])),
     [products]
   );
-  const { orders, fetchOrders, updateOrderStatus, deleteOrder } = useOrders();
+  const { orders, fetchOrders, updateOrderStatus, deleteOrder, syncError: ordersSyncError } = useOrders();
   const { slides, addSlide, updateSlide, toggleSlideVisibility, deleteSlide, resetSlides } = useHeroBanners();
   const {
     categoryBanners,
@@ -271,6 +271,9 @@ export function AdminView() {
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  useEffect(() => {
+    setSelectedOrderDetails(current => current ? (orders.find(order => order.id === current.id) || null) : null);
+  }, [orders]);
   const [signedProofUrl, setSignedProofUrl] = useState(null);
   const [signedDesignUrls, setSignedDesignUrls] = useState({});
 
@@ -863,6 +866,7 @@ export function AdminView() {
         {/* MAIN CONTENT AREA (Left column in RTL: 9 cols out of 12) */}
         <div className="lg:col-span-9 space-y-8">
 
+      {ordersSyncError && <p role="status" className="text-gold border border-gold p-3 text-sm">تعذر تحديث الطلبات. المعروض آخر بيانات متاحة، وهنحاول التحديث تلقائيًا عند رجوع الاتصال.</p>}
       {/* EXECUTIVE ANALYTICS STATS OVERVIEW WIDGET */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Revenue Card */}

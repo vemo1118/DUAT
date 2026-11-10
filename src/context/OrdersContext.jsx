@@ -1,4 +1,4 @@
-import { subscribeCloudRefresh } from '../services/cloudRefresh';
+import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -62,6 +62,7 @@ function mapFromDb(ord) {
 export function OrdersProvider({ children }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [syncError, setSyncError] = useState(false);
 
   const fetchOrders = async () => {
     // Admin Session Check: Ensure user is authenticated admin before querying orders
@@ -88,14 +89,16 @@ export function OrdersProvider({ children }) {
 
       if (error) {
         console.error('Failed to fetch orders from Supabase:', error.message);
-        setOrders([]);
+        setSyncError(true);
         return [];
       } else if (Array.isArray(data)) {
         const mapped = data.map(mapFromDb);
-        setOrders(mapped);
+        setSyncError(false);
+        setCloudValue(setOrders, mapped);
         return mapped;
       }
     } catch (err) {
+      setSyncError(true);
       console.error('Unexpected error loading orders:', err);
     } finally {
       setLoading(false);
@@ -164,6 +167,7 @@ export function OrdersProvider({ children }) {
       value={{
         orders,
         loading,
+        syncError,
         fetchOrders,
         updateOrderStatus,
         deleteOrder,
