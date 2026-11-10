@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { PreorderHeroGallery } from './PreorderHeroGallery';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, ArrowRight, Check, Layers3, Palette, Sparkles } from 'lucide-react';
@@ -11,11 +12,9 @@ export function PreorderHero({ fallbackImage }) {
   const isAr = lang === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
   const campaignState = preorderState();
-  const { settings: s } = usePreorderHeroSettings();
-  const [selectedPiece, setSelectedPiece] = useState(0);
+  const { settings: s, loading } = usePreorderHeroSettings();
   const defaultImage = 'https://res.cloudinary.com/ikim5u08/image/upload/v1786192179/iPhone_1_1_cdhx8b.jpg';
-  const images = [s.imageUrl || fallbackImage || defaultImage, ...s.galleryImages].map((image, index) => ({ src: image?.trim(), index })).filter(image => image.src);
-  const activePiece = images.find(image => image.index === selectedPiece) || images[0];
+  const images = [s.imageUrl?.trim() || fallbackImage?.trim() || defaultImage, ...s.galleryImages].map((image, index) => ({ src: image?.trim(), index })).filter(image => image.src);
   const isOpen = campaignState === 'open';
   const isClosed = campaignState === 'closed';
 
@@ -121,24 +120,9 @@ export function PreorderHero({ fallbackImage }) {
               <span className="text-gold">{s.cardEyebrow}</span>
               <span className="text-ash">{s.rangeStart} — {s.rangeEnd}</span>
             </div>
-            <img
-              src={activePiece.src}
-              alt={isAr ? s.imageAltAr : s.imageAltEn}
-              className="mx-auto aspect-square w-full max-w-sm object-contain drop-shadow-2xl"
-            />
-            <div className="mt-5 grid grid-cols-4 gap-2" aria-label={isAr ? 'معاينات الاستيكرات' : 'Sticker previews'}>
-              {images.map(({ index }) => (
-                <button
-                  type="button"
-                  key={index}
-                  aria-pressed={activePiece.index === index}
-                  onClick={() => setSelectedPiece(index)}
-                  className={`border py-3 text-center font-mono text-xs ${activePiece.index === index ? 'border-gold bg-gold text-ink' : 'border-grave bg-coal text-gold hover:border-gold'}`}
-                >
-                  {s.pieceLabels?.[index] || String(index + 1).padStart(2, '0')}
-                </button>
-              ))}
-            </div>
+            {loading ? <div className="mx-auto aspect-square w-full max-w-sm animate-pulse bg-coal" aria-label={isAr ? 'جاري تحميل الصور' : 'Loading images'} /> :
+              <PreorderHeroGallery key={JSON.stringify(images)} images={images} labels={s.pieceLabels}
+                alt={isAr ? s.imageAltAr : s.imageAltEn} isAr={isAr} />}
             <p className="mt-4 text-center font-space text-xs text-bone/70">
               {isAr ? s.cardCaptionAr : s.cardCaptionEn}
             </p>

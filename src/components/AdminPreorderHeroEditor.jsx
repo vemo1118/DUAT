@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Eye, EyeOff, Image as ImageIcon, RotateCcw, Save } from 'lucide-react';
 import { usePreorderHeroSettings } from '../context/PreorderHeroSettingsContext';
 
@@ -13,22 +13,23 @@ const bilingual = [
 ];
 
 export function AdminPreorderHeroEditor({ showToast }) {
-  const { settings, saveSettings, resetSettings } = usePreorderHeroSettings();
+  const { settings, loading, saveSettings, resetSettings } = usePreorderHeroSettings();
   const [form, setForm] = useState(settings);
   const [saving, setSaving] = useState(false);
-  useEffect(() => setForm(settings), [settings]);
+  const dirty = useRef(false);
+  useEffect(() => { if (!dirty.current) setForm(settings); }, [settings]);
 
-  const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const set = (key, value) => { dirty.current = true; setForm((current) => ({ ...current, [key]: value })); };
   const save = async (event) => {
     event.preventDefault(); setSaving(true);
-    try { const saved = await saveSettings(form); setForm(saved); showToast('تم حفظ سيكشن الحجز على الموقع ✨', 'success'); }
+    try { const saved = await saveSettings(form); dirty.current = false; setForm(saved); showToast('تم حفظ سيكشن الحجز على الموقع ✨', 'success'); }
     catch (error) { console.error(error); showToast('تعذر حفظ السيكشن. حاول مرة أخرى.', 'error'); }
     finally { setSaving(false); }
   };
-  const setGalleryImage = (index, value) => setForm(current => ({
+  const setGalleryImage = (index, value) => { dirty.current = true; setForm(current => ({
     ...current,
     galleryImages: current.galleryImages.map((image, i) => i === index ? value : image)
-  }));
+  })); };
   const uploadPreview = (file, onLoad = value => set('imageUrl', value)) => {
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
@@ -37,14 +38,16 @@ export function AdminPreorderHeroEditor({ showToast }) {
     const reader = new FileReader(); reader.onload = () => onLoad(reader.result); reader.readAsDataURL(file);
   };
 
+  if (loading) return <p role="status" className="p-6 text-ash">جاري تحميل إعدادات السيكشن من السيرفر…</p>;
+
   return <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
     <div className="bg-stone border border-gold/40 p-6 sm:p-8 rounded-lg shadow-2xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-grave pb-4">
         <div><h2 className="font-clash text-xl font-bold text-bone">سيكشن الحجز والكستمايز في الرئيسية</h2><p className="font-mono text-xs text-ash">تحكم كامل في النصوص، السعر، الأزرار، الصورة والمميزات بالعربي والإنجليزي.</p></div>
-        <button type="button" onClick={async()=>{if(window.confirm('استعادة الإعدادات الافتراضية؟')){const saved=await resetSettings();setForm(saved);showToast('تمت استعادة الإعدادات الافتراضية','success')}}} className="flex items-center gap-2 border border-grave px-3 py-2 text-xs text-ash hover:text-gold"><RotateCcw size={14}/>استعادة الافتراضي</button>
+        <button type="button" onClick={async()=>{if(window.confirm('استعادة الإعدادات الافتراضية؟')){const saved=await resetSettings();dirty.current=false;setForm(saved);showToast('تمت استعادة الإعدادات الافتراضية','success')}}} className="flex items-center gap-2 border border-grave px-3 py-2 text-xs text-ash hover:text-gold"><RotateCcw size={14}/>استعادة الافتراضي</button>
       </div>
 
-      <form onSubmit={save} className="space-y-7 font-mono text-xs">
+      <form onSubmit={save} onChange={() => { dirty.current = true; }} className="space-y-7 font-mono text-xs">
         <button type="button" onClick={()=>set('isActive',form.isActive===false)} className={`flex items-center gap-2 px-4 py-3 border font-bold ${form.isActive!==false?'border-emerald-500/50 text-emerald-400':'border-red-500/50 text-red-400'}`}>
           {form.isActive!==false?<Eye size={16}/>:<EyeOff size={16}/>} {form.isActive!==false?'السيكشن ظاهر على الموقع':'السيكشن مخفي'}
         </button>

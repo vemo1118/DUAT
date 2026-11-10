@@ -1,5 +1,5 @@
 import { subscribeCloudRefresh, setCloudValue } from '../services/cloudRefresh';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { isInlineStoreImage, uploadStoreImageDataUrl } from '../services/storeAssetService';
 
@@ -48,9 +48,12 @@ const SETTINGS_KEY = 'preorder_hero_settings';
 export function PreorderHeroSettingsProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_PREORDER_HERO_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const revision = useRef(0);
 
   const load = useCallback(async () => {
+    const startedAt = revision.current;
     const { data, error } = await supabase.from('store_settings').select('value').eq('key', SETTINGS_KEY).maybeSingle();
+    if (startedAt !== revision.current) return;
     if (!error) {
       const next = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...data?.value };
       setCloudValue(setSettings, current => JSON.stringify(current) === JSON.stringify(next) ? current : next);
@@ -68,6 +71,7 @@ export function PreorderHeroSettingsProvider({ children }) {
   }, [load]);
 
   const saveSettings = useCallback(async (next) => {
+    revision.current += 1;
     const payload = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...next };
     if (isInlineStoreImage(payload.imageUrl)) {
       const uploaded = await uploadStoreImageDataUrl(payload.imageUrl, { folder: 'preorder-hero', assetId: 'main' });
@@ -79,7 +83,9 @@ export function PreorderHeroSettingsProvider({ children }) {
       return uploaded.publicUrl;
     }));
     const { data, error } = await supabase.from('store_settings').upsert({ key: SETTINGS_KEY, value: payload }, { onConflict: 'key' }).select('value').single();
+    revision.current += 1;
     if (error) throw error;
+    if (!data?.value) throw new Error('تعذر تأكيد حفظ الصور على السيرفر');
     const saved = { ...DEFAULT_PREORDER_HERO_SETTINGS, ...(data?.value || payload) };
     setCloudValue(setSettings, saved);
     return saved;
